@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{11E362E4-B8FB-4BD4-B0D3-BA078D5FB002}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WzComparerR2.MapRender</RootNamespace>
+    <AssemblyName>WzComparerR2.MapRender</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Bass.Net">
+      <HintPath>..\..\..\..\..\程序源码\BASS.NET\v2.0\Bass.Net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevComponents.DotNetBar2, Version=12.1.0.0, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL" />
+    <Reference Include="IMEHelper">
+      <HintPath>..\..\..\..\..\程序源码\IMEHelper-1.3\IMEHelper-1.3\IMEHelper_Xna31\bin\Release\IMEHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework">
+      <HintPath>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v3.1\Reference\Windows\x86\Microsoft.Xna.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Game">
+      <HintPath>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v3.1\Reference\Windows\x86\Microsoft.Xna.Framework.Game.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\..\..\程序源码\SignalR.Client.20-master\source\SignalR.Client.20\bin\Release\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="SignalR.Client.20">
+      <HintPath>..\..\..\..\..\程序源码\SignalR.Client.20-master\source\SignalR.Client.20\bin\Release\SignalR.Client.20.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="TSF">
+      <HintPath>..\..\..\..\..\程序源码\IMEHelper-1.3\IMEHelper-1.3\IMEHelper_Xna31\bin\Debug\TSF.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MapScene.cs" />
+    <Compile Include="Net\ChatClient.cs" />
+    <Compile Include="Patches\BackPatch.cs" />
+    <Compile Include="Camera.cs" />
+    <Compile Include="Chat.cs" />
+    <Compile Include="Entry.cs" />
+    <Compile Include="Patches\FootholdPatch.cs" />
+    <Compile Include="FpsCounter.cs" />
+    <Compile Include="Frm1.cs" />
+    <Compile Include="FrmMapRender.cs" />
+    <Compile Include="InputState.cs" />
+    <Compile Include="ITooltip.cs" />
+    <Compile Include="Patches\LadderRopePatch.cs" />
+    <Compile Include="LifeInfo.cs" />
+    <Compile Include="Patches\LifePatch.cs" />
+    <Compile Include="MapRenderFonts.cs" />
+    <Compile Include="MathHelper2.cs" />
+    <Compile Include="Methods.cs" />
+    <Compile Include="MiniMap.cs" />
+    <Compile Include="MouseButton.cs" />
+    <Compile Include="Patches\ObjTilePatch.cs" />
+    <Compile Include="PatchVisibility.cs" />
+    <Compile Include="Patches\PortalPatch.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Patches\ReactorPatch.cs" />
+    <Compile Include="RenderAnimate.cs" />
+    <Compile Include="RenderArgs.cs" />
+    <Compile Include="RenderEnv.cs" />
+    <Compile Include="RenderFrame.cs" />
+    <Compile Include="Patches\RenderObjectType.cs" />
+    <Compile Include="Patches\RenderPatch.cs" />
+    <Compile Include="SpriteBatchEx.cs" />
+    <Compile Include="TextureLoader.cs" />
+    <Compile Include="TileMode.cs" />
+    <Compile Include="UI\Tooltip.cs" />
+    <Compile Include="Patches\TooltipPatch.cs" />
+    <Compile Include="UI\NineFormResource.cs" />
+    <Compile Include="UI\UIGraphics.cs" />
+    <Compile Include="UI\UIMiniMap.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="XnaFont.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\CharaSimResource\CharaSimResource.csproj">
+      <Project>{54797f38-a12c-4202-92a4-1a3ddce914b7}</Project>
+      <Name>CharaSimResource</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj">
+      <Project>{818060bc-404c-470a-94b3-5160716c5247}</Project>
+      <Name>WzComparerR2.Common</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj">
+      <Project>{fa74a2fd-0250-4182-845d-dd98d829b525}</Project>
+      <Name>WzComparerR2.PluginBase</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj">
+      <Project>{0e9801fd-44a2-4af8-ae91-d6e74bad56b2}</Project>
+      <Name>WzComparerR2.WzLib</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2\WzComparerR2.csproj">
+      <Project>{5e883be2-2009-4517-8026-4b90deb83884}</Project>
+      <Name>WzComparerR2</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="d3dx9_31.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="X3DAudio1_6.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(TargetDir)*.dll" "$(SolutionDir)WzComparerR2\bin\$(ConfigurationName)\Plugin\$(ProjectName)" /I /Y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

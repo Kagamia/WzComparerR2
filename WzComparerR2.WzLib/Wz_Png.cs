@@ -1,0 +1,408 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Drawing;
+using System.IO;
+using System.IO.Compression;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+
+namespace WzComparerR2.WzLib
+{
+    public class Wz_Png
+    {
+        public Wz_Png(int w, int h, int data_length, int form, int offs, Wz_File wz_f)
+        {
+            this.w = w;
+            this.h = h;
+            this.data_length = data_length;
+            this.form = form;
+            this.offs = offs;
+            this.wz_f = wz_f;
+        }
+
+        private int w;
+        private int h;
+        private int data_length;
+        private int form;
+        private int offs;
+        private Wz_File wz_f;
+
+        /// <summary>
+        /// 获取或设置图片的宽度。
+        /// </summary>
+        public int Width
+        {
+            get { return w; }
+            set { w = value; }
+        }
+
+        /// <summary>
+        /// 获取或设置图片的高度。
+        /// </summary>
+        public int Height
+        {
+            get { return h; }
+            set { h = value; }
+        }
+
+        /// <summary>
+        /// 获取或设置数据块的长度。
+        /// </summary>
+        public int DataLength
+        {
+            get { return data_length; }
+            set { data_length = value; }
+        }
+
+        /// <summary>
+        /// 获取或设置数据块对于文件的偏移。
+        /// </summary>
+        public int Offset
+        {
+            get { return offs; }
+            set { offs = value; }
+        }
+
+        /// <summary>
+        /// 获取或设置图片的数据压缩方式。
+        /// </summary>
+        public int Form
+        {
+            get { return form; }
+            set { form = value; }
+        }
+
+        /// <summary>
+        /// 获取或设置图片所属的WzFile
+        /// </summary>
+        public Wz_File WzFile
+        {
+            get { return wz_f; }
+            set { wz_f = value; }
+        }
+
+        public byte[] GetRawData()
+        {
+            lock (this.WzFile.ReadLock)
+            {
+                DeflateStream zlib;
+                byte[] plainData = null;
+
+                this.WzFile.FileStream.Position = this.Offset;
+
+                if (this.WzFile.BReader.ReadUInt16() == 0x9C78)
+                {
+                    byte[] buffer = this.WzFile.BReader.ReadBytes(this.data_length - 2);
+                    MemoryStream dataStream = new MemoryStream(buffer);
+
+                    zlib = new DeflateStream(dataStream, CompressionMode.Decompress);
+                }
+                else
+                {
+                    this.WzFile.FileStream.Position -= 2;
+                    MemoryStream dataStream = new MemoryStream(this.DataLength);
+                    int blocksize = 0;
+                    int endPosition = (int)(this.DataLength + this.WzFile.FileStream.Position);
+
+                    byte[] encKeys = this.WzFile.WzStructure.encryption.keys;
+
+                    while (this.WzFile.FileStream.Position < endPosition)
+                    {
+                        blocksize = this.WzFile.BReader.ReadInt32();
+                        byte[] dataBlock = this.WzFile.BReader.ReadBytes(blocksize);
+                        for (int i = 0; i < dataBlock.Length; i++)
+                        {
+                            dataBlock[i] ^= encKeys[i];
+                        }
+                        dataStream.Write(dataBlock, 0, dataBlock.Length);
+                    }
+                    dataStream.Position = 2;
+                    zlib = new DeflateStream(dataStream, CompressionMode.Decompress);
+                }
+
+                switch (this.Form)
+                {
+                    case 1:
+                        plainData = new byte[this.w * this.h * 2];
+                        zlib.Read(plainData, 0, plainData.Length);
+                        break;
+
+                    case 2:
+                        plainData = new byte[this.w * this.h * 4];
+                        zlib.Read(plainData, 0, plainData.Length);
+                        break;
+
+                    case 3:
+                        plainData = new byte[((int)Math.Ceiling(this.w / 4.0)) * 4 * ((int)Math.Ceiling(this.h / 4.0)) * 4 / 8];
+                        zlib.Read(plainData, 0, plainData.Length);
+                        break;
+
+                    case 513:
+                        plainData = new byte[this.w * this.h * 2];
+                        zlib.Read(plainData, 0, plainData.Length);
+                        break;
+
+                    case 517:
+                        plainData = new byte[this.w * this.h / 128];
+                        zlib.Read(plainData, 0, plainData.Length);
+                        break;
+
+                    case 1026:
+                        plainData = new byte[this.w * this.h];
+                        zlib.Read(plainData, 0, plainData.Length);
+                        break;
+
+                    default:
+                        break;
+                }
+                if (zlib != null)
+                {
+                    zlib.Close();
+                }
+                return plainData;
+            }
+        }
+
+        public Bitmap ExtractPng()
+        {
+            byte[] pixel = this.GetRawData();
+            if (pixel == null)
+            {
+                return null;
+            }
+            Bitmap pngDecoded = null;
+            BitmapData bmpdata;
+
+            switch (this.form)
+            {
+                case 1: //16位argba4444
+                    byte[] argb = new Byte[pixel.Length * 2];
+                    {
+                        int p;
+                        for (int i = 0; i < pixel.Length; i++)
+                        {
+                            p = pixel[i] & 0x0F; p |= (p << 4); argb[i * 2] = (byte)p;
+                            p = pixel[i] & 0xF0; p |= (p >> 4); argb[i * 2 + 1] = (byte)p;
+                        }
+                    }
+
+                    pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format32bppArgb);
+                    bmpdata = pngDecoded.LockBits(new Rectangle(Point.Empty, pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    Marshal.Copy(argb, 0, bmpdata.Scan0, argb.Length);
+                    pngDecoded.UnlockBits(bmpdata);
+                    break;
+
+                case 2: //32位argb8888
+                    pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format32bppArgb);
+                    bmpdata = pngDecoded.LockBits(new Rectangle(Point.Empty, pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    Marshal.Copy(pixel, 0, bmpdata.Scan0, pixel.Length);
+                    pngDecoded.UnlockBits(bmpdata);
+                    break;
+
+                case 3: //黑白缩略图
+                    pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format32bppArgb);
+                    int[] argb2 = new int[this.w * this.h];
+                    {
+                        int index;
+                        int index2;
+                        int p;
+                        int w = ((int)Math.Ceiling(this.w / 4.0));
+                        int h = ((int)Math.Ceiling(this.h / 4.0));
+                        for (int y = 0; y < h; y++)
+                        {
+                            for (int x = 0; x < w; x++)
+                            {
+                                index = (x + y * w) * 2; //原像素索引
+                                index2 = x * 4 + y * this.w * 4; //目标像素索引
+                                p = (pixel[index] & 0x0F) | ((pixel[index] & 0x0F) << 4);
+                                p |= ((pixel[index] & 0xF0) | ((pixel[index] & 0xF0) >> 4)) << 8;
+                                p |= ((pixel[index + 1] & 0x0F) | ((pixel[index + 1] & 0x0F) << 4)) << 16;
+                                p |= ((pixel[index + 1] & 0xF0) | ((pixel[index] & 0xF0) >> 4)) << 24;
+
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    if (x * 4 + i < this.w)
+                                    {
+                                        argb2[index2 + i] = p;
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                            //复制行
+                            index2 = y * this.w * 4;
+                            for (int j = 1; j < 4; j++)
+                            {
+                                if (y *4 + j < this.h)
+                                {
+                                    Array.Copy(argb2, index2, argb2, index2 + j * this.w, this.w);
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    bmpdata = pngDecoded.LockBits(new Rectangle(Point.Empty, pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    Marshal.Copy(argb2, 0, bmpdata.Scan0, argb2.Length);
+                    pngDecoded.UnlockBits(bmpdata);
+                    break;
+
+                case 513: //16位rgb565
+                    pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format16bppRgb565);
+                    bmpdata = pngDecoded.LockBits(new Rectangle(new Point(), pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    Marshal.Copy(pixel, 0, bmpdata.Scan0, pixel.Length);
+                    pngDecoded.UnlockBits(bmpdata);
+                    break;
+
+                case 517: //16位rgb565缩略图
+                    pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format16bppRgb565);
+                    bmpdata = pngDecoded.LockBits(new Rectangle(0, 0, this.w, this.h), ImageLockMode.WriteOnly, PixelFormat.Format16bppRgb565);
+                    byte[] lineData = new byte[this.w * 2];
+                    for (int j0 = 0, j1 = this.h / 16; j0 < j1; j0++)
+                    {
+                        for (int i0 = 0, i1 = this.w / 16; i0 < i1; i0++)
+                        {
+                            int idx = (i0 + j0 * i1) * 2;
+                            for (int k = 0; k < 16; k++)
+                            {
+                                lineData[i0 * 32 + k * 2] = pixel[idx];
+                                lineData[i0 * 32 + k * 2 + 1] = pixel[idx + 1];
+                            }
+                        }
+                        for (int k = 0; k < 16; k++)
+                        {
+                            Marshal.Copy(lineData, 0, new IntPtr(bmpdata.Scan0.ToInt32() + lineData.Length * (j0 * 16 + k)), lineData.Length);
+                        }
+                    }
+                    pngDecoded.UnlockBits(bmpdata);
+                    break;
+                   /* pngDecoded = new Bitmap(this.w, this.h);
+                    pngSize = this.w * this.h / 128;
+                    plainData = new byte[pngSize];
+                    zlib.Read(plainData, 0, pngSize);
+                    byte iB = 0;
+                    for (int i = 0; i < pngSize; i++)
+                    {
+                        for (byte j = 0; j < 8; j++)
+                        {
+                            iB = Convert.ToByte(((plainData[i] & (0x01 << (7 - j))) >> (7 - j)) * 0xFF);
+                            for (int k = 0; k < 16; k++)
+                            {
+                                if (x == this.w) { x = 0; y++; }
+                                pngDecoded.SetPixel(x, y, Color.FromArgb(0xFF, iB, iB, iB));
+                                x++;
+                            }
+                        }
+                    }
+                    break;*/
+
+                case 1026: //dxt3
+                    argb = GetPixelDataDXT3(pixel, this.w, this.h);
+                    pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format32bppArgb);
+                    bmpdata = pngDecoded.LockBits(new Rectangle(new Point(), pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    Marshal.Copy(argb, 0, bmpdata.Scan0, argb.Length);
+                    pngDecoded.UnlockBits(bmpdata);
+                    break;
+            }
+
+            return pngDecoded;
+        }
+
+        private byte[] GetPixelDataDXT3(byte[] rawData, int width, int height)
+        {
+            byte[] pixel = new byte[width * height * 4];
+
+            Color[] colorTable = new Color[4];
+            int[] colorIdxTable = new int[16];
+            byte[] alphaTable = new byte[16];
+            for (int y = 0; y < height; y += 4)
+            {
+                for (int x = 0; x < width; x += 4)
+                {
+                    int off = x * 4 + y * width;
+                    ExpandAlphaTable(alphaTable, rawData, off);
+                    ushort u0 = BitConverter.ToUInt16(rawData, off + 8);
+                    ushort u1 = BitConverter.ToUInt16(rawData, off + 10);
+                    ExpandColorTable(colorTable, u0, u1);
+                    ExpandColorIndexTable(colorIdxTable, rawData, off + 12);
+
+                    for (int j = 0; j < 4; j++)
+                    {
+                        for (int i = 0; i < 4; i++)
+                        {
+                            SetPixel(pixel,
+                                x + i,
+                                y + j,
+                                width, 
+                                colorTable[colorIdxTable[j * 4 + i]],
+                                alphaTable[j * 4 + i]);
+                        }
+                    }
+                }
+            }
+
+            return pixel;
+        }
+
+        private void SetPixel(byte[] pixelData, int x, int y, int width, Color color, byte alpha)
+        {
+            int offset = (y * width + x) * 4;
+            pixelData[offset + 0] = color.B;
+            pixelData[offset + 1] = color.G;
+            pixelData[offset + 2] = color.R;
+            pixelData[offset + 3] = alpha;
+        }
+
+        private void ExpandColorTable(Color[] color, ushort u0, ushort u1)
+        {
+            color[0] = RGB565ToColor(u0);
+            color[1] = RGB565ToColor(u1);
+            color[2] = System.Drawing.Color.FromArgb(0xff, (color[0].R * 2 + color[1].R + 1) / 3, (color[0].G * 2 + color[1].G + 1) / 3, (color[0].B * 2 + color[1].B + 1) / 3);
+            color[3] = System.Drawing.Color.FromArgb(0xff, (color[0].R + color[1].R * 2 + 1) / 3, (color[0].G + color[1].G * 2 + 1) / 3, (color[0].B + color[1].B * 2 + 1) / 3);
+        }
+
+        private void ExpandColorIndexTable(int[] colorIndex, byte[] rawData, int offset)
+        {
+            for (int i = 0; i < 16; i += 4, offset++)
+            {
+                colorIndex[i + 0] = (rawData[offset] & 0x03);
+                colorIndex[i + 1] = (rawData[offset] & 0x0c) >> 2;
+                colorIndex[i + 2] = (rawData[offset] & 0x30) >> 4;
+                colorIndex[i + 3] = (rawData[offset] & 0xc0) >> 6;
+            }
+        }
+
+        private void ExpandAlphaTable(byte[] alpha, byte[] rawData, int offset)
+        {
+            for (int i = 0; i < 16; i += 2, offset++)
+            {
+                alpha[i + 0] = (byte)(rawData[offset] & 0x0f);
+                alpha[i + 1] = (byte)((rawData[offset] & 0xf0) >> 4);
+            }
+            for (int i = 0; i < 16; i++)
+            {
+                alpha[i] = (byte)(alpha[i] | (alpha[i] << 4));
+            }
+        }
+
+        public static Color RGB565ToColor(ushort val)
+        {
+            const int rgb565_mask_r = 0xf800;
+            const int rgb565_mask_g = 0x07e0;
+            const int rgb565_mask_b = 0x001f;
+            int r = (val & rgb565_mask_r) >> 11;
+            int g = (val & rgb565_mask_g) >> 5;
+            int b = (val & rgb565_mask_b);
+            var c = Color.FromArgb(
+                (r << 3) | (r >> 2),
+                (g << 2) | (g >> 4),
+                (b << 3) | (b >> 2));
+            return c;
+        }
+    }
+}

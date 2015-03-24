@@ -1,0 +1,341 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5E883BE2-2009-4517-8026-4B90DEB83884}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WzComparerR2</RootNamespace>
+    <AssemblyName>WzComparerR2</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <PublishUrl>发布\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>0</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>wcr2_256.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Bass.Net, Version=2.4.8.5, Culture=neutral, PublicKeyToken=b7566c273e6ef480, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\程序源码\BASS.NET\v2.0\Bass.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="DevComponents.DotNetBar2, Version=12.1.0.0, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL" />
+    <Reference Include="ImageManipulation">
+      <HintPath>..\..\WzCompare\WzCompare\bin\Debug\ImageManipulation.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Calculator.cs" />
+    <Compile Include="CharaSimControl\AControl.cs" />
+    <Compile Include="CharaSimControl\ACtrlButton.cs" />
+    <Compile Include="CharaSimControl\ACtrlVScroll.cs" />
+    <Compile Include="CharaSimControl\AfrmEquip.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CharaSimControl\AfrmTooltip.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CharaSimControl\GearTooltipRender2.cs" />
+    <Compile Include="CharaSimControl\ItemTooltipRender.cs" />
+    <Compile Include="CharaSimControl\AfrmStat.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CharaSimControl\BitmapOrigin.cs" />
+    <Compile Include="CharaSimControl\ButtonState.cs" />
+    <Compile Include="CharaSimControl\CharaSimControlGroup.cs" />
+    <Compile Include="CharaSimControl\ItemMouseEventArgs.cs" />
+    <Compile Include="CharaSimControl\ItemMouseEventHandler.cs" />
+    <Compile Include="CharaSimControl\ItemTooltipRender2.cs" />
+    <Compile Include="CharaSimControl\RecipeTooltipRender.cs" />
+    <Compile Include="CharaSimControl\SkillTooltipRender.cs" />
+    <Compile Include="CharaSimControl\SkillTooltipRender2.cs" />
+    <Compile Include="CharaSim\Addition.cs" />
+    <Compile Include="CharaSim\AdditionType.cs" />
+    <Compile Include="CharaSimControl\GearTooltipRender.cs" />
+    <Compile Include="CharaSimControl\AlphaForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CharaSimControl\AfrmItem.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CharaSim\AlienStoneGrade.cs" />
+    <Compile Include="CharaSim\AlienStone.cs" />
+    <Compile Include="CharaSim\Character.cs" />
+    <Compile Include="CharaSim\CharacterStatus.cs" />
+    <Compile Include="CharaSim\CharaEquip.cs" />
+    <Compile Include="CharaSim\CharaSimLoader.cs" />
+    <Compile Include="CharaSim\CharaProp.cs" />
+    <Compile Include="CharaSim\FormulaVersion.cs" />
+    <Compile Include="CharaSim\Gear.cs" />
+    <Compile Include="CharaSimControl\GearGraphics.cs" />
+    <Compile Include="CharaSim\GearLevelInfo.cs" />
+    <Compile Include="CharaSim\GearPropType.cs" />
+    <Compile Include="CharaSim\GearGrade.cs" />
+    <Compile Include="CharaSim\GearSealedInfo.cs" />
+    <Compile Include="CharaSim\GearState.cs" />
+    <Compile Include="CharaSim\ItemSpecType.cs" />
+    <Compile Include="CharaSim\ItemStringHelper.cs" />
+    <Compile Include="CharaSim\GearType.cs" />
+    <Compile Include="CharaSim\Item.cs" />
+    <Compile Include="CharaSim\ItemBase.cs" />
+    <Compile Include="CharaSim\ItemPropType.cs" />
+    <Compile Include="CharaSim\ItemBaseType.cs" />
+    <Compile Include="CharaSim\Recipe.cs" />
+    <Compile Include="CharaSim\RecipePropType.cs" />
+    <Compile Include="CharaSim\SetItemOptionToMob.cs" />
+    <Compile Include="CharaSim\Skill.cs" />
+    <Compile Include="CharaSim\SummaryParams.cs" />
+    <Compile Include="CharaSim\SummaryParser.cs" />
+    <Compile Include="Comparer\WzPngComparison.cs" />
+    <Compile Include="DBConnection.cs" />
+    <Compile Include="Drawer.cs" />
+    <Compile Include="FrmAbout.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmAbout.Designer.cs">
+      <DependentUpon>FrmAbout.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmGifMaker.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmGifMaker.Designer.cs">
+      <DependentUpon>FrmGifMaker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmQuickViewSetting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmQuickViewSetting.Designer.cs">
+      <DependentUpon>FrmQuickViewSetting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GifEncoder.cs" />
+    <Compile Include="MemoryTributary.cs" />
+    <Compile Include="Comparer\CompareDifference.cs" />
+    <Compile Include="Comparer\DifferenceType.cs" />
+    <Compile Include="Comparer\EasyComparer.cs" />
+    <Compile Include="Patcher\Builder\InflateStream.cs" />
+    <Compile Include="Patcher\Builder\PatchType.cs" />
+    <Compile Include="Patcher\Builder\StreamUtils.cs" />
+    <Compile Include="Patcher\Builder\CheckSum.cs" />
+    <Compile Include="DownloadingItem.cs" />
+    <Compile Include="FrmPatcher.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmPatcher.Designer.cs">
+      <DependentUpon>FrmPatcher.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmGifSetting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmGifSetting.Designer.cs">
+      <DependentUpon>FrmGifSetting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Gif.cs" />
+    <Compile Include="GifFrame.cs" />
+    <Compile Include="Patcher\Builder\PartialStream.cs" />
+    <Compile Include="Patcher\Builder\BuildInstruction.cs" />
+    <Compile Include="Patcher\Builder\BuildType.cs" />
+    <Compile Include="Patcher\Builder\PatchPart.cs" />
+    <Compile Include="Patcher\ReversePatcherBuilder.cs" />
+    <Compile Include="Patcher\PatcherSetting.cs" />
+    <Compile Include="Patcher\PatchingEventArgs.cs" />
+    <Compile Include="Patcher\PatchingState.cs" />
+    <Compile Include="Patcher\PatchPartContext.cs" />
+    <Compile Include="Patcher\Builder\WzPatcherReader.cs" />
+    <Compile Include="Patcher\Builder\WzPatcherWriter.cs" />
+    <Compile Include="CharaSim\RecipeItemInfo.cs" />
+    <Compile Include="SettingItem.cs" />
+    <Compile Include="SettingItemCollection.cs" />
+    <Compile Include="SoundPlayer\CustomSoundFile.cs" />
+    <Compile Include="SoundPlayer\ISoundFile.cs" />
+    <Compile Include="SoundPlayer\ISoundPlayer.cs" />
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CharaSim\Potential.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="QueryPerformance.cs" />
+    <Compile Include="CharaSim\SetItem.cs" />
+    <Compile Include="CharaSim\SetItemEffect.cs" />
+    <Compile Include="CharaSim\SetItemIDList.cs" />
+    <Compile Include="CharaSim\SetItemIDPart.cs" />
+    <Compile Include="Setting.cs" />
+    <Compile Include="SoundPlayer\BassSoundPlayer.cs" />
+    <Compile Include="SoundPlayer\PlayState.cs" />
+    <Compile Include="HistoryList.cs" />
+    <Compile Include="CharaSimControl\TooltipRender.cs" />
+    <Compile Include="Updater.cs" />
+    <Compile Include="Comparer\WzFileComparer.cs" />
+    <Compile Include="Patcher\WzPatcher.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="FrmAbout.resx">
+      <DependentUpon>FrmAbout.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmGifMaker.resx">
+      <DependentUpon>FrmGifMaker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmPatcher.resx">
+      <DependentUpon>FrmPatcher.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmGifSetting.resx">
+      <DependentUpon>FrmGifSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmQuickViewSetting.resx">
+      <DependentUpon>FrmQuickViewSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Resources\dir.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mp3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\num.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\png.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\string.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\uol.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\vector.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\num2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\dir2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\dir3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\dir4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pause.png" />
+    <None Include="Resources\Play.png" />
+    <None Include="Resources\Stop.png" />
+    <None Include="Resources\Save.png" />
+    <None Include="Resources\Open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\CharaSimResource\CharaSimResource.csproj">
+      <Project>{54797f38-a12c-4202-92a4-1a3ddce914b7}</Project>
+      <Name>CharaSimResource</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj">
+      <Project>{818060bc-404c-470a-94b3-5160716c5247}</Project>
+      <Name>WzComparerR2.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj">
+      <Project>{FA74A2FD-0250-4182-845D-DD98D829B525}</Project>
+      <Name>WzComparerR2.PluginBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj">
+      <Project>{0e9801fd-44a2-4af8-ae91-d6e74bad56b2}</Project>
+      <Name>WzComparerR2.WzLib</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="wcr2_256.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

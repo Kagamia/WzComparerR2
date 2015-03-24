@@ -1,0 +1,320 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Reflection;
+using System.Text.RegularExpressions;
+
+namespace WzComparerR2.WzLib
+{
+    public class Wz_Node : ICloneable, IComparable, IComparable<Wz_Node>
+    {
+        public Wz_Node()
+        {
+            this.nodes = new WzNodeCollection(this);
+        }
+
+        public Wz_Node(string nodeText)
+            : this()
+        {
+            this.text = nodeText;
+        }
+
+        //fields
+        private object value;
+        private string text;
+        private WzNodeCollection nodes;
+        private Wz_Node parentNode;
+
+        //properties
+        public object Value
+        {
+            get { return value; }
+            set { this.value = value; }
+        }
+
+        public string Text
+        {
+            get { return this.text; }
+            set { this.text = value; }
+        }
+
+        public string FullPath
+        {
+            get
+            {
+                Stack<string> path = new Stack<string>();
+                Wz_Node node = this;
+                do
+                {
+                    path.Push(node.text);
+                    node = node.parentNode;
+                } while (node != null);
+                return string.Join("\\", path.ToArray());
+            }
+        }
+
+        public string FullPathToFile
+        {
+            get
+            {
+                Stack<string> path = new Stack<string>();
+                Wz_Node node = this;
+                do
+                {
+                    if (node.value is Wz_File)
+                    {
+                        if (node.text.EndsWith(".wz", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            path.Push(node.text.Substring(0, node.text.Length - 3));
+                        }
+                        else
+                        {
+                            path.Push(node.text);
+                        }
+                        break;
+                    }
+
+                    path.Push(node.text);
+
+                    if (node.value is Wz_Image)
+                    {
+                        Wz_Image img = (Wz_Image)node.value;
+                        node = img.OwnerNode;
+                    }
+
+                    if (node != null)
+                    {
+                        node = node.parentNode;
+                    }
+                } while (node != null);
+                return string.Join("\\", path.ToArray());
+            }
+        }
+
+        public WzNodeCollection Nodes
+        {
+            get { return this.nodes; }
+        }
+
+        public Wz_Node ParentNode
+        {
+            get { return parentNode; }
+            private set { parentNode = value; }
+        }
+
+        //methods
+        public override string ToString()
+        {
+            return this.Text + " " + (this.value != null ? this.value.ToString() : "-") + " " + this.nodes.Count;
+        }
+
+        public Wz_Node FindNodeByPath(string fullPath)
+        {
+            return FindNodeByPath(fullPath, false);
+        }
+
+        public Wz_Node FindNodeByPath(string fullPath, bool extractImage)
+        {
+            string[] patten = fullPath.Split('\\');
+            return FindNodeByPath(extractImage, patten);
+        }
+
+        public Wz_Node FindNodeByPath(bool extractImage, params string[] fullPath)
+        {
+            return FindNodeByPath(extractImage, false, fullPath);
+        }
+
+        public Wz_Node FindNodeByPath(bool extractImage, bool ignoreCase, params string[] fullPath)
+        {
+            Wz_Node node = this;
+
+            //首次解压
+            if (extractImage && this.value is Wz_Image)
+            {
+                Wz_Image img = (Wz_Image)node.value;
+                if (img.TryExtract())
+                {
+                    node = img.Node;
+                }
+            }
+
+            foreach (string txt in fullPath)
+            {
+                if (ignoreCase)
+                {
+                    bool find = false;
+
+                    foreach (Wz_Node subNode in node.nodes)
+                    {
+                        if (string.Equals(subNode.text, txt, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            find = true;
+                            node = subNode;
+                        }
+                    }
+                    if (!find)
+                        node = null;
+                }
+                else
+                {
+                    node = node.nodes[txt];
+                }
+
+                if (node == null)
+                    return null;
+
+                if (extractImage)
+                {
+                    Wz_Image img = node.value as Wz_Image;
+                    if (img != null && img.TryExtract()) //判断是否是img
+                    {
+                        node = img.Node;
+                    }
+                }
+            }
+            return node;
+        }
+
+        public T GetValue<T>(T defaultValue)
+        {
+            if (this.value == null)
+                return defaultValue;
+            if (this.value.GetType() == typeof(T))
+                return (T)this.value;
+
+            IConvertible iconvertible = this.value as IConvertible;
+            if (iconvertible != null)
+            {
+                try
+                {
+                    T result = (T)iconvertible.ToType(typeof(T), null);
+                    return result;
+                }
+                catch
+                {
+                }
+            }
+            return defaultValue;
+        }
+
+        public T GetValue<T>()
+        {
+            return GetValue<T>(default(T));
+        }
+
+        //innerClass
+        public class WzNodeCollection : System.Collections.ObjectModel.KeyedCollection<string, Wz_Node>
+        {
+            public WzNodeCollection(Wz_Node baseNode)
+                : base()
+            {
+                this.parentNode = baseNode;
+            }
+
+            public Wz_Node Add(string nodeText)
+            {
+                Wz_Node newNode = new Wz_Node(nodeText);
+                this.Add(newNode);
+                return newNode;
+            }
+
+            public new void Add(Wz_Node item)
+            {
+                base.Add(item);
+                item.parentNode = this.parentNode;
+            }
+
+            private Wz_Node parentNode;
+
+            public void Sort()
+            {
+                List<Wz_Node> lst = base.Items as List<Wz_Node>;
+                if (lst != null)
+                    lst.Sort();
+            }
+
+            public new Wz_Node this[string key]
+            {
+                get
+                {
+                    Wz_Node node;
+                    if (key != null && this.Dictionary != null && this.Dictionary.TryGetValue(key, out node))
+                        return node;
+                    return null;
+                }
+            }
+
+            protected override string GetKeyForItem(Wz_Node item)
+            {
+                if (item != null)
+                    return item.text;
+                return null;
+            }
+        }
+
+        public object Clone()
+        {
+            Wz_Node newNode = new Wz_Node(this.text);
+            newNode.value = this.value;
+            foreach (Wz_Node node in this.nodes)
+            {
+                Wz_Node newChild = node.Clone() as Wz_Node;
+                newChild.parentNode = newNode;
+                newNode.nodes.Add(newChild);
+            }
+            return newNode;
+        }
+
+        int IComparable.CompareTo(object obj)
+        {
+            return ((IComparable<Wz_Node>)this).CompareTo(obj as Wz_Node);
+        }
+
+        int IComparable<Wz_Node>.CompareTo(Wz_Node other)
+        {
+            if (other != null)
+            {
+                return string.Compare(this.Text, other.Text);
+            }
+            else
+            {
+                return 1;
+            }
+        }
+    }
+
+    public static class Wz_NodeExtension
+    {
+        public static T GetValueEx<T>(this Wz_Node node, T defaultValue)
+        {
+            if (node == null)
+                return defaultValue;
+            return node.GetValue<T>(defaultValue);
+        }
+
+        /// <summary>
+        /// 搜索node所属的wz_file，若搜索不到则返回null。
+        /// </summary>
+        /// <param Name="node">要搜索的wznode。</param>
+        /// <returns></returns>
+        public static Wz_File GetNodeWzFile(this Wz_Node node)
+        {
+            Wz_File wzfile = null;
+            Wz_Image wzImg = null;
+            while (node != null)
+            {
+                if ((wzfile = node.Value as Wz_File) != null)
+                {
+                    break;
+                }
+                if ((wzImg = node.Value as Wz_Image) != null)
+                {
+                    wzfile = wzImg.WzFile;
+                    break;
+                }
+                node = node.ParentNode;
+            }
+            return wzfile;
+        }
+    }
+}
