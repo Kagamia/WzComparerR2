@@ -312,7 +312,7 @@
     <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj">
       <Project>{0e9801fd-44a2-4af8-ae91-d6e74bad56b2}</Project>
       <Name>WzComparerR2.WzLib</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -328,6 +328,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="libgif.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="wcr2_256.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
