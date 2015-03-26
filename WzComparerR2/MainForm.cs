@@ -27,6 +27,7 @@ namespace WzComparerR2
             InitializeComponent();
             advTree1.AfterNodeSelect += new AdvTreeNodeEventHandler(advTree1_AfterNodeSelect_2);
             advTree2.AfterNodeSelect += new AdvTreeNodeEventHandler(advTree2_AfterNodeSelect_2);
+            new ImageDragHandler(this.pictureBox1).AttachEvents();
 
             Setting.Load();
             refreshRecentDocItems();
@@ -2430,5 +2431,10 @@ namespace WzComparerR2
         }
 
         Form imgF;
+
+        private void labelItemStatus_TextChanged(object sender, EventArgs e)
+        {
+            ribbonBar2.RecalcLayout();
+        }
     }
 }

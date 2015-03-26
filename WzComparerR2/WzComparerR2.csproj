@@ -162,6 +162,7 @@
       <DependentUpon>FrmQuickViewSetting.cs</DependentUpon>
     </Compile>
     <Compile Include="GifEncoder.cs" />
+    <Compile Include="ImageDragHandler.cs" />
     <Compile Include="MemoryTributary.cs" />
     <Compile Include="Comparer\CompareDifference.cs" />
     <Compile Include="Comparer\DifferenceType.cs" />

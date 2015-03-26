@@ -1754,7 +1754,6 @@
             // ribbonBar2
             // 
             this.ribbonBar2.AutoOverflowEnabled = false;
-            this.ribbonBar2.AutoSizeItems = false;
             // 
             // 
             // 
@@ -1790,6 +1789,7 @@
             // 
             this.labelItemStatus.Name = "labelItemStatus";
             this.labelItemStatus.Text = "kira~";
+            this.labelItemStatus.TextChanged += new System.EventHandler(this.labelItemStatus_TextChanged);
             // 
             // progressBarItem1
             // 
