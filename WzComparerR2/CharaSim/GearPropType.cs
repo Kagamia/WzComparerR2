@@ -71,6 +71,10 @@ namespace WzComparerR2
         incCriticaldamageMax,
         incCriticaldamageMin,
         @sealed,
+        incSTRlv,
+        incDEXlv,
+        incINTlv,
+        incLUKlv,
 
         Option,
         OptionToMob,
