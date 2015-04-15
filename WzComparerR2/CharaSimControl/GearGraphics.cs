@@ -223,16 +223,23 @@ namespace WzComparerR2.CharaSimControl
                 curChar = s[strPos++];
                 if (curChar == '\\')
                 {
-                    curChar = s[strPos++];
-                    switch (curChar)
+                    if (strPos < s.Length)
                     {
-                        case 'r': curChar = '\r'; break;
-                        case 'n':
-                            if (strPos <= 2)
-                                curChar = ' ';//替换文本第一个\n
-                            else
-                                curChar = '\n';
-                            break;
+                        curChar = s[strPos++];
+                        switch (curChar)
+                        {
+                            case 'r': curChar = '\r'; break;
+                            case 'n':
+                                if (strPos <= 2)
+                                    curChar = ' ';//替换文本第一个\n
+                                else
+                                    curChar = '\n';
+                                break;
+                        }
+                    }
+                    else //结束符处理
+                    {
+                        curChar = '#';
                     }
                 }
                 if (curChar == '#')

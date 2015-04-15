@@ -50,6 +50,7 @@ namespace WzComparerR2.Patcher
                                 else
                                 {
                                     reversePart = new PatchPart() { Type = PatchType.Delete };
+                                    reversePart.FileName = filePart.FileName;
                                     preReverse.Add(new FileReversePart(reversePart));
                                 }
                             }
