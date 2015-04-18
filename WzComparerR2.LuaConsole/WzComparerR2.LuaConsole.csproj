@@ -34,15 +34,21 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DevComponents.DotNetBar2, Version=12.1.0.0, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL" />
-    <Reference Include="ICSharpCode.TextEditor">
-      <HintPath>..\..\..\..\..\程序源码\ICSharpCode.TextEditor.3.2\ICSharpCode.TextEditor.dll</HintPath>
+    <Reference Include="DevComponents.DotNetBar2, Version=12.1.0.0, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
     </Reference>
-    <Reference Include="KopiLua">
-      <HintPath>..\..\..\..\..\程序源码\NLua-master\NLua-master\Core\NLua\bin\ReleaseKopiLua\KopiLua.dll</HintPath>
+    <Reference Include="ICSharpCode.TextEditor, Version=3.2.1.6466, Culture=neutral, PublicKeyToken=4d61825e8dd49f1a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\ICSharpCode.TextEditor.dll</HintPath>
     </Reference>
-    <Reference Include="NLua">
-      <HintPath>..\..\..\..\..\程序源码\NLua-master\NLua-master\Core\NLua\bin\ReleaseKopiLua\NLua.dll</HintPath>
+    <Reference Include="KopiLua, Version=1.3.5433.22627, Culture=neutral, PublicKeyToken=e25f4af1e4f7b31c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\KopiLua.dll</HintPath>
+    </Reference>
+    <Reference Include="NLua, Version=1.3.1.0, Culture=neutral, PublicKeyToken=8df2ab518030ea95, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\NLua.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
