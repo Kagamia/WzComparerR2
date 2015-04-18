@@ -68,6 +68,8 @@ namespace WzComparerR2.CharaSimControl
             set { showLevelOrSealed = value; }
         }
 
+        public TooltipRender SetItemRender { get; set; }
+
         public override Bitmap Render()
         {
             if (this.gear == null)
@@ -135,9 +137,9 @@ namespace WzComparerR2.CharaSimControl
             if (set != null)
             {
                 //绘制背景
-                g.DrawImage(res["t"].Image, width, 0);
-                FillRect(g, res["line"], width, 13, picH[2] - 13);
-                g.DrawImage(res["b"].Image, width, picH[2] - 13);
+                //g.DrawImage(res["t"].Image, width, 0);
+                //FillRect(g, res["line"], width, 13, picH[2] - 13);
+                //g.DrawImage(res["b"].Image, width, picH[2] - 13);
 
                 //复制原图
                 g.DrawImage(set, width, 0, new Rectangle(0, 0, set.Width, picH[2]), GraphicsUnit.Pixel);
@@ -697,91 +699,20 @@ namespace WzComparerR2.CharaSimControl
                 SetItem setItem;
                 if (!CharaSimLoader.LoadedSetItems.TryGetValue(setID, out setItem))
                     return null;
-                setBitmap = new Bitmap(261, DefaultPicHeight);
-                Graphics g = Graphics.FromImage(setBitmap);
-                StringFormat format = new StringFormat();
-                format.Alignment = StringAlignment.Center;
 
-                picHeight = 10;
-                g.DrawString(setItem.setItemName, GearGraphics.ItemDetailFont2, GearGraphics.GreenBrush2, 130, 10, format);
-                picHeight += 25;
-
-                format.Alignment = StringAlignment.Far;
-
-                foreach (var setItemPart in setItem.itemIDs.Parts)
+                TooltipRender renderer = this.SetItemRender;
+                if (renderer == null)
                 {
-                    string itemName = setItemPart.Value.RepresentName;
-                    string typeName = setItemPart.Value.TypeName;
-
-                    if (string.IsNullOrEmpty(itemName) || string.IsNullOrEmpty(typeName))
-                    {
-                        foreach (var itemID in setItemPart.Value.ItemIDs)
-                        {
-                            StringResult sr;
-                            if (StringLinker == null || !StringLinker.StringEqp.TryGetValue(itemID.Key, out sr))
-                            {
-                                sr = new StringResult();
-                                sr.Name = "(null)";
-                            }
-                            itemName = sr.Name;
-                            typeName = ItemStringHelper.GetSetItemGearTypeString(Gear.GetGearType(itemID.Key));
-                            break;
-                        }
-                    }
-
-                    itemName = itemName ?? string.Empty;
-                    typeName = typeName ?? "装备";
-
-                    if (!Regex.IsMatch(typeName, @"^(\(.*\)|（.*）)$"))
-                    {
-                        typeName = "(" + typeName + ")";
-                    }
-
-                    Brush brush = setItemPart.Value.Enabled ? Brushes.White : GearGraphics.GrayBrush2;
-                    g.DrawString(itemName, GearGraphics.ItemDetailFont2, brush, 10, picHeight);
-                    g.DrawString(typeName, GearGraphics.ItemDetailFont2, brush, 250, picHeight, format);
-                    picHeight += 18;
+                    var defaultRenderer = new SetItemTooltipRender();
+                    defaultRenderer.StringLinker = this.StringLinker;
+                    defaultRenderer.ShowObjectID = false;
+                    renderer = defaultRenderer;
                 }
 
-                picHeight += 5;
-                g.DrawLine(Pens.White, 6, picHeight, 254, picHeight);//分割线
-                picHeight += 9;
-                foreach (KeyValuePair<int, SetItemEffect> effect in setItem.effects)
-                {
-                    g.DrawString(effect.Key + "套装效果", GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 10, picHeight);
-                    picHeight += 16;
-                    Brush brush = effect.Value.Enabled ? Brushes.White : GearGraphics.GrayBrush2;
-                    foreach (KeyValuePair<GearPropType, object> prop in effect.Value.Props)
-                    {
-                        if (prop.Key == GearPropType.Option)
-                        {
-                            List<Potential> ops = (List<Potential>)prop.Value;
-                            foreach (Potential p in ops)
-                            {
-                                g.DrawString(p.ConvertSummary(), GearGraphics.ItemDetailFont2, brush, 10, picHeight);
-                                picHeight += 16;
-                            }
-                        }
-                        else if (prop.Key == GearPropType.OptionToMob)
-                        {
-                            List<SetItemOptionToMob> ops = (List<SetItemOptionToMob>)prop.Value;
-                            foreach (SetItemOptionToMob p in ops)
-                            {
-                                g.DrawString(p.ConvertSummary(), GearGraphics.ItemDetailFont2, brush, 10, picHeight);
-                                picHeight += 16;
-                            }
-                        }
-                        else
-                        {
-                            g.DrawString(ItemStringHelper.GetGearPropString(prop.Key, Convert.ToInt32(prop.Value)),
-                                GearGraphics.SetItemPropFont, brush, 10, picHeight);
-                            picHeight += 16;
-                        }
-                    }
-                }
-                picHeight += 11;
-                format.Dispose();
-                g.Dispose();
+                renderer.TargetItem = setItem;
+                setBitmap = renderer.Render();
+                if (setBitmap != null)
+                    picHeight = setBitmap.Height;
             }
             return setBitmap;
         }

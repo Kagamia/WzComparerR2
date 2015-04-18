@@ -37,7 +37,9 @@ namespace WzComparerR2
         {
             Item item = new Item();
             int value;
-            if (node == null || !Int32.TryParse(node.Text, out value))
+            if (node == null
+                || !Int32.TryParse(node.Text, out value)
+                && !((value = node.Text.IndexOf(".img")) > -1 && Int32.TryParse(node.Text.Substring(0, value), out value)))
             {
                 return null;
             }

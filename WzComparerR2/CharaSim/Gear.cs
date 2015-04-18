@@ -241,7 +241,14 @@ namespace WzComparerR2
             }
             if (code / 10000 == 135)
             {
-                return (GearType)(code / 10);
+                if (code / 100 == 13522 || code / 100 == 13529)
+                {
+                    return (GearType)(code / 10);
+                }
+                else
+                {
+                    return (GearType)(code / 100 * 10);
+                }
             }
             return (GearType)(code / 10000);
         }
@@ -270,7 +277,7 @@ namespace WzComparerR2
                 case GearType.magicArrow:
                 case GearType.card:
                 case GearType.box:
-                case GearType.pearl:
+                case GearType.orb:
                 case GearType.novaMarrow:
                 case GearType.soulBangle:
                 case GearType.mailin:
@@ -500,7 +507,7 @@ namespace WzComparerR2
             //读取默认gearGrade
             if (gear.Props.TryGetValue(GearPropType.fixedGrade, out value))
             {
-                gear.Grade = (GearGrade)value;
+                gear.Grade = (GearGrade)(value - 1);
             }
 
             //添加默认装备要求

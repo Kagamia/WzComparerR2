@@ -49,12 +49,12 @@ namespace WzComparerR2
                         default: return -1;
                     }
                 case GearType.android: return 3;
-                case GearType.heart: return 4;
+                case GearType.machineHeart: return 4;
                 //line 1
                 case GearType.medal: return 5;
                 case GearType.faceAccessory: return 6;
                 //line 2
-                case GearType.pouch: return 10;
+                case GearType.pocket: return 10;
                 case GearType.eyeAccessory: return 11;
                 case GearType.pendant:
                     switch (index)

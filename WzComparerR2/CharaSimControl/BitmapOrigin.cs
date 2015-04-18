@@ -26,6 +26,12 @@ namespace WzComparerR2
 
         public BitmapOrigin(Wz_Node node)
         {
+            Wz_Uol uol = node.GetValue<Wz_Uol>(null);
+            if (uol != null)
+            {
+                node = uol.HandleUol(node);
+            }
+
             Wz_Png png = node.GetValue<Wz_Png>(null);
             //---2013-12-04 by kagamia---
             Wz_Node sourceNode = node.Nodes["source"];

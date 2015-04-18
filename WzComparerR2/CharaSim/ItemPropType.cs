@@ -17,6 +17,7 @@ namespace WzComparerR2
         only,
         tradeAvailable,
         accountSharable,
-        timeLimited
+        timeLimited,
+        setItemID,
     }
 }

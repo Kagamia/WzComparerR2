@@ -151,6 +151,35 @@ namespace WzComparerR2
                                         effect.Props.Add(GearPropType.OptionToMob, opToMobList);
                                         break;
 
+                                    case "activeSkill":
+                                        List<SetItemActiveSkill> activeSkillList = new List<SetItemActiveSkill>();
+                                        for (int i = 0; ; i++)
+                                        {
+                                            Wz_Node optNode = propNode.FindNodeByPath(i.ToString());
+                                            if (optNode == null)
+                                            {
+                                                break;
+                                            }
+
+                                            SetItemActiveSkill activeSkill = new SetItemActiveSkill();
+                                            foreach (Wz_Node pNode in optNode.Nodes)
+                                            {
+                                                switch (pNode.Text)
+                                                {
+                                                    case "id":
+                                                        activeSkill.SkillID = pNode.GetValue<int>();
+                                                        break;
+
+                                                    case "level":
+                                                        activeSkill.Level= pNode.GetValue<int>();
+                                                        break;
+                                                }
+                                            }
+                                            activeSkillList.Add(activeSkill);
+                                        }
+                                        effect.Props.Add(GearPropType.activeSkill, activeSkillList);
+                                        break;
+
                                     default:
                                         {
                                             GearPropType type;

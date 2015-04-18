@@ -43,6 +43,7 @@ namespace WzComparerR2.CharaSimControl
         public TooltipRender LinkRecipeInfoRender { get; set; }
         public TooltipRender LinkRecipeGearRender { get; set; }
         public TooltipRender LinkRecipeItemRender { get; set; }
+        public TooltipRender SetItemRender { get; set; }
 
         public override Bitmap Render()
         {
@@ -55,6 +56,7 @@ namespace WzComparerR2.CharaSimControl
             Bitmap itemBmp = RenderItem(out picHeight);
             Bitmap recipeInfoBmp = null;
             Bitmap recipeItemBmp = null;
+            Bitmap setItemBmp = null;
 
             //图纸相关
             int recipeID;
@@ -128,10 +130,22 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
 
+            int setID;
+            if (this.item.Props.TryGetValue(ItemPropType.setItemID, out setID))
+            {
+                SetItem setItem;
+                if (CharaSimLoader.LoadedSetItems.TryGetValue(setID, out setItem))
+                {
+                    setItemBmp = RenderSetItem(setItem);
+                }
+            }
+
             //计算布局
             Size totalSize = new Size(itemBmp.Width, picHeight);
             Point recipeInfoOrigin = Point.Empty;
             Point recipeItemOrigin = Point.Empty;
+            Point setItemOrigin = Point.Empty;
+
             if (recipeItemBmp != null)
             {
                 recipeItemOrigin.X = totalSize.Width;
@@ -153,6 +167,12 @@ namespace WzComparerR2.CharaSimControl
                 totalSize.Width += recipeInfoBmp.Width;
                 totalSize.Height = Math.Max(picHeight, recipeInfoBmp.Height);
                 recipeInfoOrigin.X = itemBmp.Width;
+            }
+            if (setItemBmp != null)
+            {
+                setItemOrigin = new Point(totalSize.Width, 0);
+                totalSize.Width += setItemBmp.Width;
+                totalSize.Height = Math.Max(totalSize.Height, setItemBmp.Height);
             }
 
             //开始绘制
@@ -188,12 +208,21 @@ namespace WzComparerR2.CharaSimControl
                     new Rectangle(Point.Empty, recipeItemBmp.Size), GraphicsUnit.Pixel);
             }
 
+            //绘制套装
+            if (setItemBmp != null)
+            {
+                g.DrawImage(setItemBmp, setItemOrigin.X, setItemOrigin.Y,
+                    new Rectangle(Point.Empty, setItemBmp.Size), GraphicsUnit.Pixel);
+            }
+
             if (itemBmp != null)
                 itemBmp.Dispose();
             if (recipeInfoBmp != null)
                 recipeInfoBmp.Dispose();
             if (recipeItemBmp != null)
                 recipeItemBmp.Dispose();
+            if (setItemBmp != null)
+                setItemBmp.Dispose();
 
             g.Dispose();
             return tooltip;
@@ -399,6 +428,21 @@ namespace WzComparerR2.CharaSimControl
             }
 
             renderer.TargetItem = item;
+            return renderer.Render();
+        }
+
+        private Bitmap RenderSetItem(SetItem setItem)
+        {
+            TooltipRender renderer = this.SetItemRender;
+            if (renderer == null)
+            {
+                var defaultRenderer = new SetItemTooltipRender();
+                defaultRenderer.StringLinker = this.StringLinker;
+                defaultRenderer.ShowObjectID = false;
+                renderer = defaultRenderer;
+            }
+
+            renderer.TargetItem = setItem;
             return renderer.Render();
         }
     }

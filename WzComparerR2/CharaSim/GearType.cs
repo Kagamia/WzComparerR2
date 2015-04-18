@@ -97,11 +97,11 @@ namespace WzComparerR2
         /// <summary>
         /// 心脏 167
         /// </summary>
-        heart = 167,
+        machineHeart = 167,
         /// <summary>
         /// 口袋物品 116
         /// </summary>
-        pouch = 116,
+        pocket = 116,
         /// <summary>
         /// 徽章 118
         /// </summary>
@@ -145,7 +145,7 @@ namespace WzComparerR2
         /// <summary>
         /// 亡命剑 123
         /// </summary>
-        avengeSword = 123,
+        desperado = 123,
         /// <summary>
         /// 能量剑 124
         /// </summary>
@@ -185,43 +185,43 @@ namespace WzComparerR2
         /// <summary>
         /// 吊坠 135_20
         /// </summary>
-        locket = 135220,
+        heroMedal = 135220,
         /// <summary>
         /// 念珠 135_21
         /// </summary>
-        beads = 135221,
+        rosario = 135221,
         /// <summary>
         /// 铁链 135_22
         /// </summary>
-        chains = 135222,
+        chain = 135222,
         /// <summary>
         /// 魔导书(火毒) 135_23
         /// </summary>
-        magicBook1 = 135223,
+        book1 = 135223,
         /// <summary>
         /// 魔导书(冰雷) 135_24
         /// </summary>
-        magicBook2 = 135224,
+        book2 = 135224,
         /// <summary>
         /// 魔导书(牧师) 135_25
         /// </summary>
-        magicBook3 = 135225,
+        book3 = 135225,
         /// <summary>
         /// 箭羽 135_26
         /// </summary>
-        feather = 135226,
+        bowMasterFeather = 135226,
         /// <summary>
         /// 扳指 135_27
         /// </summary>
-        fingerstall =135227,
+        crossBowThimble =135227,
         /// <summary>
         /// 短剑剑鞘 135_28
         /// </summary>
-        scabbard =135228,
+        shadowerSheath =135228,
         /// <summary>
         /// 护身符 135_29
         /// </summary>
-        amulet =135229,
+        nightLordPoutch =135229,
         /// <summary>
         /// 宝盒 135_30
         /// </summary>
@@ -229,7 +229,7 @@ namespace WzComparerR2
         /// <summary>
         /// 宝珠 135_40
         /// </summary>
-        pearl = 135240,
+        orb = 135240,
         /// <summary>
         /// 龙之精髓 135_50
         /// </summary>
@@ -253,39 +253,43 @@ namespace WzComparerR2
         /// <summary>
         /// 手腕护带 135_90
         /// </summary>
-        wristBand = 135290,
+        viperWristband = 135290,
         /// <summary>
         /// 望远镜 135_91
         /// </summary>
-        foresight = 135291,
+        captainSight = 135291,
         /// <summary>
         /// 火药桶 135_92
         /// </summary>
-        powderCask = 135292,
+        connonGunPowder = 135292,
         /// <summary>
         /// 砝码 135_93
         /// </summary>
-        counterweight =135293,
+        aranPendulum =135293,
         /// <summary>
         /// 文件 135_94
         /// </summary>
-        file = 135294,
+        evanPaper = 135294,
         /// <summary>
         /// 魔法球 135_95
         /// </summary>
-        magicBall =135295,
+        battlemageBall =135295,
         /// <summary>
         /// 箭轴 135_96
         /// </summary>
-        arrowShaft = 135296,
+        wildHunterArrowHead = 135296,
         /// <summary>
         /// 珠宝 135_97
         /// </summary>
-        jewel = 135297,
+        cygnusGem = 135297,
+        /// <summary>
+        /// 火药桶 135_98
+        /// </summary>
+        connonGunPowder2 = 135298,
         /// <summary>
         /// 能量源 135300
         /// </summary>
-        energySource = 135300,
+        powerSource = 135300,
         /// <summary>
         /// 狐狸珠 135310
         /// </summary>
@@ -337,7 +341,7 @@ namespace WzComparerR2
         /// <summary>
         /// 拳套 147
         /// </summary>
-        claw = 147,
+        throwingGlove = 147,
         /// <summary>
         /// 指节 148
         /// </summary>
@@ -361,7 +365,7 @@ namespace WzComparerR2
         /// <summary>
         /// 手持火炮 153
         /// </summary>
-        cannon = 153,
+        handCannon = 153,
         /// <summary>
         /// 太刀 154
         /// </summary>

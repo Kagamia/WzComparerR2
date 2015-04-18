@@ -78,6 +78,7 @@ namespace WzComparerR2
 
         Option,
         OptionToMob,
+        activeSkill,
         //特殊装备属性
         attackSpeed = 200,
         tuc,

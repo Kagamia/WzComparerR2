@@ -608,7 +608,7 @@ namespace WzComparerR2
 
                 case GearType.crossbow:
                     return (dex * 4 + str) * 1.35 * pad * 0.01;
-                case GearType.claw:
+                case GearType.throwingGlove:
                     return (dex + luk * 4) * 1.75 * pad * 0.01;
                 case GearType.knuckle:
                     return (str * 4 + dex) * 1.7 * pad * 0.01;
@@ -616,7 +616,7 @@ namespace WzComparerR2
                     return (dex * 4 + str) * 1.5 * pad * 0.01;
                 case GearType.dualBow:
                     return (dex * 4 + str) * 1.3 * pad * 0.01;
-                case GearType.cannon:
+                case GearType.handCannon:
                     return (str * 4 + dex) * 1.5 * pad * 0.01;
             }
             return 0;

@@ -192,7 +192,7 @@ namespace WzComparerR2
                 case GearType.magicArrow: return "魔法箭矢";
                 case GearType.card: return "卡片";
                 case GearType.box: return "宝盒";
-                case GearType.pearl: return "宝珠";
+                case GearType.orb: return "宝珠";
                 case GearType.novaMarrow: return "龙之精髓";
                 case GearType.soulBangle: return "灵魂戒指";
                 case GearType.mailin: return "麦林";
@@ -206,16 +206,16 @@ namespace WzComparerR2
                 case GearType.polearm: return "矛";
                 case GearType.bow: return "弓";
                 case GearType.crossbow: return "弩";
-                case GearType.claw: return "拳套";
+                case GearType.throwingGlove: return "拳套";
                 case GearType.knuckle: return "指节";
                 case GearType.gun: return "短枪";
                 case GearType.android: return "智能机器人";
-                case GearType.heart: return "机械心脏";
+                case GearType.machineHeart: return "机械心脏";
                 case GearType.pickaxe: return "采矿工具";
                 case GearType.shovel: return "采药工具";
-                case GearType.pouch: return "口袋物品";
+                case GearType.pocket: return "口袋物品";
                 case GearType.dualBow: return "双弩枪";
-                case GearType.cannon: return "手持火炮";
+                case GearType.handCannon: return "手持火炮";
                 case GearType.badge: return "徽章";
                 case GearType.emblem: return "纹章";
                 case GearType.soulShield: return "灵魂盾";
@@ -232,29 +232,30 @@ namespace WzComparerR2
                 case GearType.swordZL: return "太刀";
                 case GearType.weapon: return "武器";
                 case GearType.subWeapon: return "辅助武器";
-                case GearType.locket: return "吊坠";
-                case GearType.beads: return "念珠";
-                case GearType.chains: return "铁链";
-                case GearType.magicBook1:
-                case GearType.magicBook2:
-                case GearType.magicBook3: return "魔导书";
-                case GearType.feather: return "箭羽";
-                case GearType.fingerstall: return "扳指";
-                case GearType.scabbard: return "短剑剑鞘";
-                case GearType.amulet: return "护身符";
-                case GearType.wristBand: return "手腕护带";
-                case GearType.foresight: return "瞄准镜";
-                case GearType.powderCask: return "火药桶";
-                case GearType.counterweight: return "砝码";
-                case GearType.file: return "文件";
-                case GearType.magicBall: return "魔法球";
-                case GearType.arrowShaft: return "箭轴";
-                case GearType.jewel: return "珠宝";
-                case GearType.energySource: return "能量源";
+                case GearType.heroMedal: return "吊坠";
+                case GearType.rosario: return "念珠";
+                case GearType.chain: return "铁链";
+                case GearType.book1:
+                case GearType.book2:
+                case GearType.book3: return "魔导书";
+                case GearType.bowMasterFeather: return "箭羽";
+                case GearType.crossBowThimble: return "扳指";
+                case GearType.shadowerSheath: return "短剑剑鞘";
+                case GearType.nightLordPoutch: return "护身符";
+                case GearType.viperWristband: return "手腕护带";
+                case GearType.captainSight: return "瞄准镜";
+                case GearType.connonGunPowder: 
+                case GearType.connonGunPowder2: return "火药桶";
+                case GearType.aranPendulum: return "砝码";
+                case GearType.evanPaper: return "文件";
+                case GearType.battlemageBall: return "魔法球";
+                case GearType.wildHunterArrowHead: return "箭轴";
+                case GearType.cygnusGem: return "珠宝";
+                case GearType.powerSource: return "能量源";
                 case GearType.foxPearl: return "狐狸珠";
 
                 case GearType.energySword: return "能量剑";
-                case GearType.avengeSword: return "亡命剑";
+                case GearType.desperado: return "亡命剑";
                 case GearType.magicStick: return "驯兽魔法棒";
                 case GearType.whistle: return "哨子";
                 case GearType.boxingClaw: return "拳爪";
@@ -310,7 +311,7 @@ namespace WzComparerR2
                 case GearType.magicArrow: return "双弩精灵可以装备";
                 case GearType.card: return "幻影可以装备";
                 case GearType.box: return "龙的传人可以装备";
-                case GearType.pearl:
+                case GearType.orb:
                 case GearType.shiningRod: return "夜光法师可以装备";
                 case GearType.novaMarrow: return "狂龙战士可以装备";
                 case GearType.soulBangle:
@@ -318,28 +319,29 @@ namespace WzComparerR2
                 case GearType.soulShield: return "米哈尔可以装备";
                 case GearType.mailin: return "机械师可以装备";
 
-                case GearType.locket: return "英雄职业群可以装备";
-                case GearType.beads: return "圣骑士职业群可以装备";
-                case GearType.chains: return "黑骑士职业群可以装备";
-                case GearType.magicBook1: return "火毒系列魔法师可以装备";
-                case GearType.magicBook2: return "冰雷系列魔法师可以装备";
-                case GearType.magicBook3: return "主教系列魔法师可以装备";
-                case GearType.feather: return "神射手职业群可以装备";
-                case GearType.fingerstall: return "箭神职业群可以装备";
-                case GearType.scabbard: return "侠盗职业群可以装备";
-                case GearType.amulet: return "隐士职业群可以装备";
+                case GearType.heroMedal: return "英雄职业群可以装备";
+                case GearType.rosario: return "圣骑士职业群可以装备";
+                case GearType.chain: return "黑骑士职业群可以装备";
+                case GearType.book1: return "火毒系列魔法师可以装备";
+                case GearType.book2: return "冰雷系列魔法师可以装备";
+                case GearType.book3: return "主教系列魔法师可以装备";
+                case GearType.bowMasterFeather: return "神射手职业群可以装备";
+                case GearType.crossBowThimble: return "箭神职业群可以装备";
+                case GearType.shadowerSheath: return "侠盗职业群可以装备";
+                case GearType.nightLordPoutch: return "隐士职业群可以装备";
 
-                case GearType.wristBand: return "冲锋队长职业群可以装备";
-                case GearType.foresight: return "船长职业群可以装备";
-                case GearType.powderCask: return "火炮手职业群可以装备";
-                case GearType.counterweight: return "战神职业群可以装备";
-                case GearType.file: return "龙神职业群可以装备";
-                case GearType.magicBall: return "唤灵斗师职业群可以装备";
-                case GearType.arrowShaft: return "豹弩游侠职业群可以装备";
-                case GearType.jewel: return "冒险骑士团可以装备";
-                case GearType.energySource:
+                case GearType.viperWristband: return "冲锋队长职业群可以装备";
+                case GearType.captainSight: return "船长职业群可以装备";
+                case GearType.connonGunPowder: 
+                case GearType.connonGunPowder2: return "火炮手职业群可以装备";
+                case GearType.aranPendulum: return "战神职业群可以装备";
+                case GearType.evanPaper: return "龙神职业群可以装备";
+                case GearType.battlemageBall: return "唤灵斗师职业群可以装备";
+                case GearType.wildHunterArrowHead: return "豹弩游侠职业群可以装备";
+                case GearType.cygnusGem: return "冒险骑士团可以装备";
+                case GearType.powerSource:
                 case GearType.energySword: return "尖兵可以装备";
-                case GearType.avengeSword: return "恶魔复仇者可以装备";
+                case GearType.desperado: return "恶魔复仇者可以装备";
                 case GearType.swordZB:
                 case GearType.swordZL: return "神之子可以装备";
                 case GearType.magicStick: return "林之灵可以装备";

@@ -101,6 +101,7 @@
     <Compile Include="CharaSimControl\ItemMouseEventHandler.cs" />
     <Compile Include="CharaSimControl\ItemTooltipRender2.cs" />
     <Compile Include="CharaSimControl\RecipeTooltipRender.cs" />
+    <Compile Include="CharaSimControl\SetItemTooltipRender.cs" />
     <Compile Include="CharaSimControl\SkillTooltipRender.cs" />
     <Compile Include="CharaSimControl\SkillTooltipRender2.cs" />
     <Compile Include="CharaSim\Addition.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="CharaSim\ItemBaseType.cs" />
     <Compile Include="CharaSim\Recipe.cs" />
     <Compile Include="CharaSim\RecipePropType.cs" />
+    <Compile Include="CharaSim\SetItemActiveSkill.cs" />
     <Compile Include="CharaSim\SetItemOptionToMob.cs" />
     <Compile Include="CharaSim\Skill.cs" />
     <Compile Include="CharaSim\SummaryParams.cs" />
