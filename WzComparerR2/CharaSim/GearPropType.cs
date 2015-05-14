@@ -67,6 +67,8 @@ namespace WzComparerR2
         boss,
         level,
         incTerR,
+        incAsrR,
+        incEXPr,
         reduceCooltime,
         incCriticaldamageMax,
         incCriticaldamageMin,
@@ -75,6 +77,10 @@ namespace WzComparerR2
         incDEXlv,
         incINTlv,
         incLUKlv,
+        incMaxDamage,
+        incPADlv,
+        incMADlv,
+        
 
         Option,
         OptionToMob,

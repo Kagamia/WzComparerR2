@@ -1926,7 +1926,19 @@ namespace WzComparerR2
                     break;
                 case Wz_Type.Item:
                     Wz_Node itemNode = getWzNodeByNode(node);
-                    obj = Item.CreateFromNode(itemNode);
+                    if (Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\(Cash|Consume|Etc|Install|Cash)\\\d{4}.img\\\d+$"))
+                    {
+                        obj = Item.CreateFromNode(itemNode);
+                    }
+                    else if( Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\Pet\\\d{7}.img"))
+                    {
+                        if (CharaSimLoader.LoadedSetItems.Count == 0) //宠物 预读套装
+                        {
+                            CharaSimLoader.LoadSetItems();
+                        }
+                        obj = Item.CreateFromNode(itemNode);
+                    }
+                    
                     break;
                 case Wz_Type.Skill:
                     Wz_Node skillNode = getWzNodeByNode(node);
@@ -2383,21 +2395,6 @@ namespace WzComparerR2
 
         private void buttonItem1_Click(object sender, EventArgs e)
         {
-            PictureBox pb;
-            if (imgF == null || imgF.IsDisposed)
-            {
-                imgF = new Form();
-                
-                imgF.BackColor = Color.White;
-                pb = new PictureBox();
-                pb.Parent = imgF;
-                pb.Dock = DockStyle.Fill;
-                imgF.Show();
-            }
-            else
-            {
-                pb = imgF.Controls[0] as PictureBox;
-            }
 
 
             Drawer dr = new Drawer();
@@ -2413,19 +2410,50 @@ namespace WzComparerR2
 
             dr.Init(charac);
 
-            Wz_Image cap = charac.Node.FindNodeByPath("Cap\\01002777.img").GetValueEx<Wz_Image>(null);
-            dr.AddEquip(cap, "stand1");
-            Wz_Image shoe = charac.Node.FindNodeByPath("Shoes\\01072356.img").GetValueEx<Wz_Image>(null);
-            dr.AddEquip(shoe, "stand1");
-            Wz_Image coat = charac.Node.FindNodeByPath("Longcoat\\01052156.img").GetValueEx<Wz_Image>(null);
-            dr.AddEquip(coat, "stand1");
-            Wz_Image wp = charac.Node.FindNodeByPath("Weapon\\01382057.img").GetValueEx<Wz_Image>(null);
-            dr.AddEquip(wp, "stand1");
-            Wz_Image sh = charac.Node.FindNodeByPath("Shield\\01092029.img").GetValueEx<Wz_Image>(null);
-            dr.AddEquip(sh, "stand1");
+            string action = "sit";
 
-            pb.Image = dr.Draw();
-            imgF.ClientSize = pb.Image.Size;
+            Wz_Image cap = charac.Node.FindNodeByPath("Cap\\01002777.img").GetValueEx<Wz_Image>(null);
+            dr.AddEquip(cap, action);
+            Wz_Image shoe = charac.Node.FindNodeByPath("Shoes\\01072356.img").GetValueEx<Wz_Image>(null);
+            dr.AddEquip(shoe, action);
+            Wz_Image coat = charac.Node.FindNodeByPath("Longcoat\\01052156.img").GetValueEx<Wz_Image>(null);
+            dr.AddEquip(coat, action);
+            Wz_Image wp = charac.Node.FindNodeByPath("Weapon\\01382057.img").GetValueEx<Wz_Image>(null);
+            dr.AddEquip(wp, action);
+            Wz_Image sh = charac.Node.FindNodeByPath("Shield\\01092029.img").GetValueEx<Wz_Image>(null);
+            dr.AddEquip(sh, action);
+
+            PictureBox pb;
+            if (imgF == null || imgF.IsDisposed)
+            {
+                imgF = new Form();
+
+                imgF.BackColor = Color.White;
+                pb = new PictureBox();
+                pb.Parent = imgF;
+                pb.Dock = DockStyle.Fill;
+                imgF.ClientSizeChanged += (o, args) =>
+                {
+                    if (imgF.ClientSize.Width > 0 && imgF.ClientSize.Height > 0)
+                    {
+                        pb.Image = dr.Draw(imgF.ClientSize);
+                        pb.Size = imgF.ClientSize;
+                    }
+                };
+
+                imgF.Show();
+            }
+            else
+            {
+                pb = imgF.Controls[0] as PictureBox;
+            }
+
+            if (imgF.ClientSize.Width > 0 && imgF.ClientSize.Height > 0)
+            {
+                pb.Image = dr.Draw(imgF.ClientSize);
+                pb.Size = imgF.ClientSize;
+            }
+
             imgF.BringToFront();
             imgF.Focus();
         }
@@ -2436,5 +2464,16 @@ namespace WzComparerR2
         {
             ribbonBar2.RecalcLayout();
         }
+
+        private void btnNodeBack_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnNodeForward_Click(object sender, EventArgs e)
+        {
+
+        }
+
     }
 }

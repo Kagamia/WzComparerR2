@@ -154,13 +154,6 @@ env:Write(string format, object[] args)
 env:WriteLine(object)
 env:WriteLine(string format, object[] args)");
             }
-
-            public IEnumerable<int> GetValue()
-            {
-                yield return 1;
-                yield return 2;
-                yield return 3;
-            }
         }
 
         private void buttonItem2_Click(object sender, EventArgs e)

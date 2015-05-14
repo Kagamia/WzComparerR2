@@ -71,9 +71,6 @@
     <Compile Include="FrmLuaEditor.Designer.cs">
       <DependentUpon>FrmLuaEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="LuaDocContainerItem.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

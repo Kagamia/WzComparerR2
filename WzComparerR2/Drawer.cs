@@ -30,36 +30,57 @@ namespace WzComparerR2
         public void Init(Wz_File charact)
         {
             Wz_Image img;
+            
+            if ((img = charact.Node.FindNodeByPath("TamingMob\\01983055.img").GetValueEx<Wz_Image>(null)) != null
+                && img.TryExtract())
+            {
+                AddPart(img.Node, "sit");
+            }
+
+            if ((img = charact.Node.FindNodeByPath("TamingMob\\01912000.img").GetValueEx<Wz_Image>(null)) != null
+                && img.TryExtract())
+            {
+                //AddPart(img.Node.FindNodeByPath("1902000"), "stand1");
+            }
+            
+
             if ((img = charact.Node.FindNodeByPath("00002000.img").GetValueEx<Wz_Image>(null)) != null
                 && img.TryExtract())
             {
-                AddPart(img, "stand1");
+                AddPart(img.Node, "sit");
             }
-
+            
             if ((img = charact.Node.FindNodeByPath("00012000.img").GetValueEx<Wz_Image>(null)) != null
                 && img.TryExtract())
             {
-                AddPart(img, "stand1");
+                AddPart(img.Node, "sit");
             }
 
             if ((img = charact.Node.FindNodeByPath("Face\\00020000.img").GetValueEx<Wz_Image>(null)) != null
                 && img.TryExtract())
             {
-                AddPart(img, "troubled");
+                AddPart(img.Node, "dam");
             }
+            
         }
 
         public void AddEquip(Wz_Image img, string action)
         {
             if (img != null && img.TryExtract())
             {
-                AddPart(img, action);
+                AddPart(img.Node, action);
             }
         }
 
-        private void AddPart(Wz_Image img, string action)
+        public void AddEquip(Wz_Node imgNode, string action)
         {
-            Wz_Node frameNode = img.Node.FindNodeByPath(false, action);
+            AddPart(imgNode, action);
+        }
+
+        private void AddPart(Wz_Node imgNode, string action)
+        {
+            Wz_Node frameNode = imgNode.FindNodeByPath(false, action);
+            if (frameNode == null) return;
             if (frameNode.Nodes.Contains("0"))
             {
                 frameNode = frameNode.Nodes["0"];
@@ -110,7 +131,7 @@ namespace WzComparerR2
             return part;
         }
 
-        public Bitmap Draw()
+        public Bitmap Draw(Size bmpSize)
         {
             Bitmap backTexture = new Bitmap(16, 16, PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(backTexture);
@@ -120,7 +141,7 @@ namespace WzComparerR2
             g.FillRectangle(Brushes.White, new Rectangle(8, 8, 8, 8));
             g.Dispose();
 
-            Bitmap bmp = new Bitmap(300, 300, PixelFormat.Format32bppArgb);
+            Bitmap bmp = new Bitmap(bmpSize.Width, bmpSize.Height, PixelFormat.Format32bppArgb);
             g = Graphics.FromImage(bmp);
 
             TextureBrush backBrush = new TextureBrush(backTexture);
@@ -129,42 +150,108 @@ namespace WzComparerR2
             backTexture.Dispose();
 
             //正式绘制
-            g.TranslateTransform(bmp.Width / 2, bmp.Height / 2);
-            g.DrawLine(Pens.Black, -50, 0, 50, 0);
+            g.TranslateTransform(bmp.Width / 2, (int)(bmp.Height * 0.8));
+            g.DrawLine(Pens.Indigo, -100, 0, 100, 0);
 
-            Dictionary<string, Point> mapOffset = new Dictionary<string, Point>();
+            Bone root = new Bone("root");
+            root.Position = Point.Empty;
+
             List<PreDrawPart> preDrawParts = new List<PreDrawPart>();
             foreach (FramePart part in this.Parts)
             {
-                Point origin = new Point();
-                int tryCount = 0;
+                Point offset = new Point();
+                Bone parentBone = null;
+                int i = 0;
+                
+                //计算骨骼
                 foreach (var kv in part.Map)
                 {
-                    Point offs;
-                    if (tryCount == 0 && mapOffset.TryGetValue(kv.Key, out offs))
+                    Bone bone = root.FindChild(kv.Key);
+                    bool exists;
+                    if (bone == null) //创建骨骼
                     {
-                        origin.X -= offs.X - kv.Value.X;
-                        origin.Y -= offs.Y - kv.Value.Y;
-                        tryCount++;
+                        exists = false;
+                        bone = new Bone(kv.Key);
+                        bone.Position = kv.Value;
                     }
                     else
                     {
-                        mapOffset[kv.Key] = new Point(-origin.X + kv.Value.X, -origin.Y + kv.Value.Y);
+                        exists = true;
                     }
+
+                    if (i == 0) //主骨骼
+                    {
+                        PreDrawPart drawItem = new PreDrawPart();
+                        drawItem.Image = new BitmapOrigin((Bitmap)part.Image, part.Origin);
+                        drawItem.Z = part.Z;
+                        preDrawParts.Add(drawItem);
+
+                        if (!exists) //基准骨骼不存在 加到root
+                        {
+                            parentBone = root;
+                            bone.Parent = parentBone;
+                            drawItem.Bone = bone;
+                            drawItem.Offset = new Point(-kv.Value.X, -kv.Value.Y);
+                        }
+                        else //如果已存在 创建一个关节
+                        {
+                            Bone bone0 = new Bone("@" + bone.Name + "_" + part.Name);
+                            bone0.Position = new Point(-kv.Value.X, -kv.Value.Y);
+                            bone0.Parent = bone;
+                            parentBone = bone0;
+                            drawItem.Bone = bone0;
+                            drawItem.Offset = Point.Empty;
+                        }
+                    }
+                    else //级联骨骼
+                    {
+                        if (!exists)
+                        {
+                            bone.Parent = parentBone;
+                            bone.Position = kv.Value;
+                        }
+                        else //如果已存在
+                        {
+                            if (parentBone == root) //翻转
+                            {
+                                Bone bone0 = new Bone("@" + bone.Name + "_" + part.Name); //创建虚关节
+                                bone0.Position = new Point(- kv.Value.X, - kv.Value.Y); //偏移差值
+                                for (int j = root.Children.Count - 1; j >= 0; j--) //对root所有子骨骼进行重定位
+                                {
+                                    Bone child = root.Children[j];
+                                    if (child != bone)
+                                    {
+                                        child.Parent = bone0;
+                                    }
+                                }
+                                bone0.Parent = bone;
+                            }
+                            else //替换
+                            {
+                                bone.Parent = parentBone;
+                                bone.Position = kv.Value;
+                            }
+                        }
+                    }
+
+                    i++;
                 }
-
-                origin.X += part.Origin.X;
-                origin.Y += part.Origin.Y;
-
-                preDrawParts.Add(new PreDrawPart() { Image = part.Image, Origin = origin, Z = part.Z });
             }
 
             var sorter = new PreDrawPartComprer(this.Zmap);
 
             preDrawParts.Sort(sorter);
+
+            //绘制
+            root.DrawOffset = Point.Empty;
+            root.UpdateDrawOffset();
+
             foreach (var part in preDrawParts)
             {
-                g.DrawImage(part.Image, -part.Origin.X, -part.Origin.Y);
+                Point offset = part.Bone.DrawOffset;
+                offset.X += part.Offset.X - part.Image.Origin.X;
+                offset.Y += part.Offset.Y - part.Image.Origin.Y;
+                g.DrawImage(part.Image.Bitmap, offset);
             }
 
             g.ResetTransform();
@@ -188,9 +275,73 @@ namespace WzComparerR2
 
         private class PreDrawPart
         {
-            public Image Image;
-            public Point Origin;
+            public BitmapOrigin Image;
+            public Point Offset;
             public string Z;
+
+            public Bone Bone;
+        }
+
+        private class Bone
+        {
+            public Bone(string name)
+            {
+                this.Name = name;
+            }
+
+            public string Name { get; set; }
+            public Point Position { get; set; }
+            private Bone parent;
+            public Bone Parent
+            {
+                get { return this.parent; }
+                set
+                {
+                    Bone oldParent = this.parent;
+                    if (oldParent != value)
+                    {
+                        if (oldParent != null)
+                        {
+                            oldParent.Children.Remove(this);
+                        }
+                        if (value != null)
+                        {
+                            value.Children.Add(this);
+                        }
+
+                        this.parent = value;
+                    }
+                }
+            }
+
+            public List<Bone> Children = new List<Bone>();
+
+            public Point DrawOffset;
+
+            public Bone FindChild(string name)
+            {
+                foreach (Bone bone in Children)
+                {
+                    if (bone.Name == name) return bone;
+                    if (bone.Children.Count > 0)
+                    {
+                        Bone c = bone.FindChild(name);
+                        if (c != null) return c;
+                    }
+                }
+                return null;
+            }
+
+            public void UpdateDrawOffset()
+            {
+                foreach (Bone bone in Children)
+                {
+                    Point offset = this.DrawOffset;
+                    offset.Offset(bone.Position);
+                    bone.DrawOffset = offset;
+                    bone.UpdateDrawOffset();
+                }
+            }
         }
 
         private class PreDrawPartComprer : Comparer<PreDrawPart>

@@ -353,7 +353,7 @@ namespace WzComparerR2.CharaSimControl
                 picH += 6;
             }
 
-            picH = Math.Max(iconY + 94, picH);
+            picH = Math.Max(iconY + 94, picH + 6);
             return tooltip;
         }
 
