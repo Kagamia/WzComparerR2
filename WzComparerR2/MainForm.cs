@@ -1030,71 +1030,131 @@ namespace WzComparerR2
             }
             string id = listViewExString.SelectedItems[0].Text;
             string nodePath = listViewExString.SelectedItems[0].SubItems[3].Text;
-            string[] wzFullPath = detectObjPathByStringPath(id, nodePath);
+            List<string[]> objPathList = detectObjPathByStringPath(id, nodePath);
 
             //分离wz路径和img路径
-            int i;
-            for (i = 0; i < wzFullPath.Length; i++)
+            foreach (string[] fullPath in objPathList)
             {
-                if (wzFullPath[i].IndexOf(".img") >= 0 || i == wzFullPath.Length - 1)
+                //寻找所有可能的wzfile
+                List<Wz_Node> allWzFile = new List<Wz_Node>();
+                Wz_Type wzType = ParseType(fullPath[0]);
+                foreach (var wzs in this.openedWz)
                 {
-                    break;
-                }
-            }
-            string[] wzPath = new string[i + 1];
-            Array.Copy(wzFullPath, 0, wzPath, 0, wzPath.Length);
-            string[] imagePath = new string[wzFullPath.Length - i - 1];
-            Array.Copy(wzFullPath, i + 1, imagePath, 0, imagePath.Length);
-
-            //搜索wz节点
-            Node wzNode = findImageNode(wzPath);
-            if (wzNode == null)
-            {
-                //按照id搜索节点
-                bool find = false;
-                wzNode = findWzParentNode(wzPath[0]);
-                if (wzNode != null)
-                {
-                    switch ((wzNode.Tag as Wz_File).Type)
+                    foreach (var wzf in wzs.wz_files)
                     {
-                        case Wz_Type.Character:
-                            id = id.PadLeft(8, '0') + ".img";
-                            foreach (Node dirNode in wzNode.Nodes)
-                            {
-                                foreach (Node imgNode in dirNode.Nodes)
-                                {
-                                    if (string.Compare(id, imgNode.Text, true) == 0)
-                                    {
-                                        wzNode = imgNode;
-                                        find = true;
-                                        goto _find;
-                                    }
-                                }
-                            }
-                            break;
+                        if (wzf.Type == wzf.Type)
+                        {
+                            allWzFile.Add(wzf.Node);
+                        }
                     }
                 }
-            _find:
-                if (!find)
-                {
-                    labelItemStatus.Text = "无法找到wzNode: " + string.Join("\\", wzPath);
-                    return;
-                }
-            }
-            advTree1.SelectedNode = wzNode;
 
-            //搜索img节点
-            advTree2.SelectedNode = null;
-            if (advTree2.Nodes.Count > 0)
-            {
-                Node imageNode = findNode(advTree2.Nodes[0], imagePath);
-                if (imageNode == null)
+                //开始搜索
+                foreach (var wzFileNode in allWzFile)
                 {
-                    labelItemStatus.Text = "无法找到imageNode: " + string.Join("\\", imagePath);
-                    return;
+                    Wz_Node node = SearchNode(wzFileNode, fullPath, 1);
+                    if (node != null)
+                    {
+                        OnSelectedWzNode(node); //遇到第一个 选中 返回
+                        return;
+                    }
                 }
-                advTree2.SelectedNode = imageNode;
             }
+            
+            //失败
+            string path;
+            if (objPathList.Count == 1)
+            {
+                path = string.Join("\\", objPathList[0]);
+            }
+            else
+            {
+                path = "(" + objPathList.Count + ")个节点";
+            }
+            labelItemStatus.Text = "无法找到imageNode: " + path;
+        }
+
+        private Wz_Node SearchNode(Wz_Node parent, string[] path, int startIndex)
+        {
+            if (startIndex >= path.Length)
+            {
+                return null;
+            }
+            string nodeName = path[startIndex];
+            if (!string.IsNullOrEmpty(nodeName))
+            {
+                Wz_Node child = parent.FindNodeByPath(true, true, nodeName);
+                if (child != null)
+                {
+                    return (startIndex == path.Length - 1) ? child : SearchNode(child, path, startIndex + 1);
+                }
+            }
+            else //遍历全部
+            {
+                foreach (Wz_Node child in parent.Nodes)
+                {
+                    Wz_Node find = SearchNode(child, path, startIndex + 1);
+                    if (find != null)
+                    {
+                        return (startIndex == path.Length - 1) ? null : find;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private bool OnSelectedWzNode(Wz_Node wzNode)
+        {
+            Wz_File wzFile = wzNode.GetNodeWzFile();
+            string[] path = wzNode.FullPathToFile.Split('\\');
+            if (wzFile == null)
+            {
+                return false;
+            }
+
+            Node treeNode = findWzFileTreeNode(wzFile);
+            if (treeNode == null)
+            {
+                return false;
+            }
+
+            for (int i = 1; i < path.Length; i++)
+            {
+                Node find = null;
+                foreach (Node child in treeNode.Nodes)
+                {
+                    if (child.Text == path[i])
+                    {
+                        find = child;
+                        break;
+                    }
+                }
+                if (find == null)
+                {
+                    return false;
+                }
+
+                if (find.Tag is Wz_Image)
+                {
+                    advTree1.SelectedNode = find;
+                    if (advTree2.Nodes.Count > 0)
+                    {
+                        treeNode = advTree2.Nodes[0];
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    treeNode = find;
+                }
+            }
+
+            advTree2.SelectedNode = treeNode;
+            return true;
         }
 
         private void listViewExStringCopy()
@@ -1114,10 +1174,19 @@ namespace WzComparerR2
             labelItemStatus.Text = "已复制string条目到剪切板。";
         }
 
-        private string[] detectObjPathByStringPath(string id, string stringNodePath)
+        private List<string[]> detectObjPathByStringPath(string id, string stringNodePath)
         {
+            List<string[]> pathList = new List<string[]>();
+
             List<string> wzPath = new List<string>();
             List<string> imagePath = new List<string>();
+
+            Action<int> addPath = i => {
+                List<string> fullPath = new List<string>(wzPath.Count + imagePath.Count);
+                fullPath.AddRange(wzPath);
+                fullPath.AddRange(imagePath);
+                pathList.Add(fullPath.ToArray());
+            };
 
             string[] pathArray = stringNodePath.Split('\\');
             switch (pathArray[0])
@@ -1146,7 +1215,9 @@ namespace WzComparerR2
                         wzPath.Add(id.Substring(0, 4) + ".img");
                         imagePath.Add(id);
                     }
+                    addPath(0);
                     break;
+
                 case "Eqp.img":
                     wzPath.Add("Character");
                     if (pathArray[2] == "Taming")
@@ -1158,46 +1229,49 @@ namespace WzComparerR2
                         wzPath.Add(pathArray[2]);
                     }
                     wzPath.Add(id.PadLeft(8, '0') + ".img");
+                    addPath(0);
+                    //往往这个不靠谱。。 加一个任意门备用
+                    wzPath[1] = "";
+                    addPath(1);
                     break;
+
                 case "Map.img":
                     id = id.PadLeft(9, '0');
                     wzPath.AddRange(new string[] { "Map", "Map", "Map" + id[0], id + ".img" });
+                    addPath(0);
                     break;
+
                 case "Mob.img":
                     wzPath.Add("Mob");
                     wzPath.Add(id.PadLeft(7, '0') + ".img");
+                    addPath(0);
                     break;
+
                 case "Npc.img":
                     wzPath.Add("Npc");
                     wzPath.Add(id.PadLeft(7, '0') + ".img");
+                    addPath(0);
                     break;
+
                 case "Skill.img":
                     id = id.PadLeft(7, '0');
                     wzPath.Add("Skill");
+                    //old skill
                     wzPath.Add(id.Substring(0, id.Length - 4) + ".img");
                     imagePath.Add("skill");
                     imagePath.Add(id);
+                    addPath(0);
+                    if (Regex.IsMatch(id, @"8000\d{4}")) //kmst new skill
+                    {
+                        wzPath[1] = id.Substring(0, 6) + ".img";
+                        addPath(1);
+                    }
                     break;
                 default:
-                    return null;
+                    break;
             }
-            wzPath.AddRange(imagePath);
-            return wzPath.ToArray();
-        }
 
-        private Node findImageNode(string[] pathArray)
-        {
-            if (pathArray == null || pathArray.Length == 0)
-                return null;
-
-            Node wzNode = findWzParentNode(pathArray[0]);
-            if (wzNode != null)
-            {
-                string[] path2 = new string[pathArray.Length - 1];
-                Array.Copy(pathArray, 1, path2, 0, path2.Length);
-                return findNode(wzNode, path2);
-            }
-            return null;
+            return pathList;
         }
 
         /// <summary>
@@ -1205,7 +1279,33 @@ namespace WzComparerR2
         /// </summary>
         /// <param Name="wzName">要寻找的wz名称，不包含".wz"后缀。</param>
         /// <returns></returns>
-        private Node findWzParentNode(string wzName)
+        private Node findWzFileTreeNode(string wzName)
+        {
+            Wz_Type type = ParseType(wzName);
+            if (type == Wz_Type.Unknown)
+            {
+                return null;
+            }
+
+            foreach (var wzs in this.openedWz)
+            {
+                foreach (var wzf in wzs.wz_files)
+                {
+                    if (wzf.Type == type)
+                    {
+                        Node node = findWzFileTreeNode(wzf);
+                        if (node != null)
+                        {
+                            return node;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private Wz_Type ParseType(string wzName)
         {
             Wz_Type type;
             try
@@ -1214,14 +1314,20 @@ namespace WzComparerR2
             }
             catch
             {
-                return null;
+                type = Wz_Type.Unknown;
             }
+
+            return type;
+        }
+
+        private Node findWzFileTreeNode(Wz_File wzFile)
+        {
             foreach (Node baseNode in advTree1.Nodes)
             {
                 Wz_File wz_f = baseNode.Tag as Wz_File;
                 if (wz_f != null)
                 {
-                    if (wz_f.Type == type)
+                    if (wz_f == wzFile)
                     {
                         return baseNode;
                     }
@@ -1229,7 +1335,7 @@ namespace WzComparerR2
                     {
                         foreach (Node wzNode in baseNode.Nodes)
                         {
-                            if ((wz_f = wzNode.Tag as Wz_File) != null && wz_f.Type == type)
+                            if ((wz_f = wzNode.Tag as Wz_File) != null && wz_f == wzFile)
                             {
                                 return wzNode;
                             }
@@ -1240,18 +1346,18 @@ namespace WzComparerR2
             return null;
         }
 
-        private Node findNode(Node parentNode, string[] pathArray)
+        private Node findChildTreeNode(Node parent, string[] path)
         {
-            if (parentNode == null || pathArray == null)
+            if (parent == null || path == null)
                 return null;
-            for (int i = 0; i < pathArray.Length; i++)
+            for (int i = 0; i < path.Length; i++)
             {
                 bool find = false;
-                foreach (Node subNode in parentNode.Nodes)
+                foreach (Node subNode in parent.Nodes)
                 {
-                    if (subNode.Text == pathArray[i])
+                    if (subNode.Text == path[i])
                     {
-                        parentNode = subNode;
+                        parent = subNode;
                         find = true;
                         break;
                     }
@@ -1261,7 +1367,7 @@ namespace WzComparerR2
                     return null;
                 }
             }
-            return parentNode;
+            return parent;
         }
         #endregion
 
