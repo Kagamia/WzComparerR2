@@ -1042,7 +1042,7 @@ namespace WzComparerR2
                 {
                     foreach (var wzf in wzs.wz_files)
                     {
-                        if (wzf.Type == wzf.Type)
+                        if (wzf.Type == wzType)
                         {
                             allWzFile.Add(wzf.Node);
                         }
@@ -1080,10 +1080,19 @@ namespace WzComparerR2
             {
                 return null;
             }
+            if (parent.Value is Wz_Image)
+            {
+                Wz_Image img = parent.GetValue<Wz_Image>();
+                if (!img.TryExtract())
+                {
+                    return null;
+                }
+                parent = img.Node;
+            }
             string nodeName = path[startIndex];
             if (!string.IsNullOrEmpty(nodeName))
             {
-                Wz_Node child = parent.FindNodeByPath(true, true, nodeName);
+                Wz_Node child = parent.FindNodeByPath(false, true, nodeName);
                 if (child != null)
                 {
                     return (startIndex == path.Length - 1) ? child : SearchNode(child, path, startIndex + 1);
@@ -1093,11 +1102,16 @@ namespace WzComparerR2
             {
                 foreach (Wz_Node child in parent.Nodes)
                 {
+                    if (child.Value != null) //只过滤文件夹 未来有需求再改
+                    {
+                        continue;
+                    }
                     Wz_Node find = SearchNode(child, path, startIndex + 1);
                     if (find != null)
                     {
                         return (startIndex == path.Length - 1) ? null : find;
                     }
+
                 }
             }
 

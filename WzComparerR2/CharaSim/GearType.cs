@@ -243,6 +243,10 @@ namespace WzComparerR2
         /// </summary>
         mailin = 135270,
         /// <summary>
+        /// 小太刀 135_80
+        /// </summary>
+        katana2 = 135280,
+        /// <summary>
         /// 哨子 135_81
         /// </summary>
         whistle = 135281,

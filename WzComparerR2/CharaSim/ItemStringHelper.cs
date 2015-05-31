@@ -226,8 +226,8 @@ namespace WzComparerR2
                 case GearType.taming2:
                 case GearType.taming3: return "骑兽";
                 case GearType.saddle: return "鞍子";
-                case GearType.katana: return "太刀";
-                case GearType.fan: return "扇";
+                case GearType.katana: return "武士刀";
+                case GearType.fan: return "折扇";
                 case GearType.swordZB: return "大剑";
                 case GearType.swordZL: return "太刀";
                 case GearType.weapon: return "武器";
@@ -259,6 +259,7 @@ namespace WzComparerR2
                 case GearType.magicStick: return "驯兽魔法棒";
                 case GearType.whistle: return "哨子";
                 case GearType.boxingClaw: return "拳爪";
+                case GearType.katana2: return "小太刀";
                 default: return null;
             }
         }
@@ -344,10 +345,15 @@ namespace WzComparerR2
                 case GearType.desperado: return "恶魔复仇者可以装备";
                 case GearType.swordZB:
                 case GearType.swordZL: return "神之子可以装备";
+                case GearType.whistle:
                 case GearType.magicStick: return "林之灵可以装备";
 
                 case GearType.foxPearl: return "隐月可以装备";
                 case GearType.boxingClaw: return "龙的传人可以装备";
+
+                case GearType.katana:
+                case GearType.katana2: return "剑豪可以装备";
+                case GearType.fan: return "阴阳师可以装备";
                 default: return null;
             }
         }

@@ -241,13 +241,15 @@ namespace WzComparerR2
             }
             if (code / 10000 == 135)
             {
-                if (code / 100 == 13522 || code / 100 == 13529)
+                switch (code / 100)
                 {
-                    return (GearType)(code / 10);
-                }
-                else
-                {
-                    return (GearType)(code / 100 * 10);
+                    case 13522:
+                    case 13528:
+                    case 13529:
+                        return (GearType)(code / 10);
+
+                    default:
+                        return (GearType)(code / 100 * 10);
                 }
             }
             return (GearType)(code / 10000);

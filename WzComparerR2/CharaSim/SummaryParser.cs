@@ -136,6 +136,10 @@ namespace WzComparerR2
                         }
                         idx += 2;
                     }
+                    else //转义失败
+                    {
+                        idx++;
+                    }
                 }
                 else
                 {
