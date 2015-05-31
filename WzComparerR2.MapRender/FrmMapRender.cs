@@ -1765,11 +1765,7 @@ namespace WzComparerR2.MapRender
             if (editorNode == null)
                 return;
 
-            string[] ptList = new string[editorNode.Nodes.Count];
-            for (int i = 0; i < ptList.Length; i++)
-            {
-                ptList[i] = editorNode.Nodes[i].Text;
-            }
+            string[] ptList = new [] { "sp", "pi", "pv", "pc", "pg", "tp", "ps", "pgi", "psi", "pcs", "ph", "psh", "pcj", "pci", "pcig", "pshg" };
 
             Wz_Node portalNode = mapImg.Node.FindNodeByPath("portal");
             if (portalNode != null)
@@ -1984,7 +1980,7 @@ namespace WzComparerR2.MapRender
 
         private void LoadTooltip()
         {
-
+            Wz_Node tooltipNode = mapImg.Node.FindNodeByPath("ToolTip");
         }
 
         private void CalcMapSize()

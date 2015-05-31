@@ -101,7 +101,8 @@ namespace WzComparerR2.MapRender.UI
                         PortalPatch p = tooltipTarget as PortalPatch;
                         Vector2 current = Vector2.Zero;
                         PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "pName: " + p.PortalName, ref current, Color.White, ref size.X);
-                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "pType: " + p.PortalType, ref current, Color.White, ref size.X);
+                        string pTypeName = GetPortalTypeString(p.PortalType);
+                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "pType: " + p.PortalType + (pTypeName == null ? null : (" (" + pTypeName + ")")), ref current, Color.White, ref size.X);
                         stringLinker.StringMap.TryGetValue(p.ToMap, out sr);
                         PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "toMap: " + (sr == null ? "(null)" : sr.Name) + "(" + p.ToMap + ")", ref current, Color.White, ref size.X);
                         PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "toName: " + p.ToName, ref current, Color.White, ref size.X);
@@ -139,6 +140,24 @@ namespace WzComparerR2.MapRender.UI
             sb.Append(GetElemResistanceString("暗", elemAttr.D));
             sb.Append(GetElemResistanceString("物", elemAttr.P));
             return sb;
+        }
+
+        private string GetPortalTypeString(int pType)
+        {
+            switch (pType)
+            {
+                case 0: return "地图出生点";
+                case 1: return "一般传送门(隐藏)";
+                case 2: return "一般传送门";
+                case 3: return "一般传送门(接触)";
+                case 6: return "时空门入口点";
+                case 7: return "脚本传送门";
+                case 8: return "脚本传送门(隐藏)";
+                case 9: return "脚本传送门(接触)";
+                case 10: return "地图内传送门";
+                case 12: return "弹力装置";
+                default: return null;
+            }
         }
 
         private string GetElemResistanceString(string elemName, LifeInfo.ElemResistance resist)
