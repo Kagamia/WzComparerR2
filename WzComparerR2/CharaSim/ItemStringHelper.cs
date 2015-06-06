@@ -544,6 +544,17 @@ namespace WzComparerR2
                 case 3611: return "尖兵(3次)";
                 case 3612: return "尖兵(4次)";
 
+                case 4001: return "剑豪";
+                case 4002: return "阴阳师";
+                case 4100: return "剑豪(1次)";
+                case 4110: return "剑豪(2次)";
+                case 4111: return "剑豪(3次)";
+                case 4112: return "剑豪(4次)";
+                case 4200: return "阴阳师(1次)";
+                case 4210: return "阴阳师(2次)";
+                case 4211: return "阴阳师(3次)";
+                case 4212: return "阴阳师(4次)";
+
 
                 case 5000: return "无名少年";
                 case 5100: return "米哈尔(1次)";
