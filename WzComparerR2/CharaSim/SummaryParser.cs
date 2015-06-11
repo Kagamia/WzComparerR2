@@ -10,9 +10,8 @@ namespace WzComparerR2
     {
         static SummaryParser()
         {
-            List<string> lst = new List<string>() { "comboConAran" };
-            lst.Sort((a, b) => a.Length.CompareTo(b.Length));
-            GlobalVariables = new System.Collections.ObjectModel.ReadOnlyCollection<string>(lst);
+            GlobalVariableMapping = new Dictionary<string, string>();
+            GlobalVariableMapping["comboConAran"] = "aranComboCon";
         }
 
         public static string GetSkillSummary(string H, int Level, Dictionary<string, string> CommonProps, SummaryParams param)
@@ -47,18 +46,8 @@ namespace WzComparerR2
                     {
                         for (int i = len; i > 0; i--)
                         {
-                            bool find = false;
                             string key = H.Substring(idx + 1, i);
-                            foreach (var kv in CommonProps)
-                            {
-                                if (kv.Key.Equals(key, StringComparison.CurrentCultureIgnoreCase))
-                                {
-                                    find = true;
-                                    prop = kv.Value;
-                                    break;
-                                }
-                            }
-                            if (find)
+                            if (GetValueIgnoreCase(CommonProps, key, out prop))
                             {
                                 len = i;
                                 break;
@@ -74,18 +63,26 @@ namespace WzComparerR2
                     }
                     else //试图匹配全局变量
                     {
+                        string key = null;
                         for (int i = len; i > 0; i--)
                         {
-                            string key = H.Substring(idx + 1, i);
-                            if (GlobalVariables.Contains(key))
+                            key = H.Substring(idx + 1, i);
+                            if (GlobalVariableMapping.TryGetValue(key, out prop))
                             {
-                                prop = "[" + key + "]";
                                 break;
                             }
                         }
                         if (prop != null)
                         {
-                            sb.Append(param.GStart).Append(prop).Append(param.GEnd);
+                            if (prop != "" && GetValueIgnoreCase(CommonProps, prop, out prop))
+                            {
+                                double val = Calculator.Parse(prop, Level);
+                                sb.Append(val);
+                            }
+                            else
+                            {
+                                sb.Append(param.GStart).Append("[").Append(key).Append("]").Append(param.GEnd);
+                            }
                             idx += len + 1;
                             continue;
                         }
@@ -149,6 +146,21 @@ namespace WzComparerR2
             return sb.ToString();
         }
 
+        private static bool GetValueIgnoreCase(Dictionary<string,string> dict, string key, out string value)
+        {
+            bool find = false;
+            foreach (var kv in dict)
+            {
+                if (kv.Key.Equals(key, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    value = kv.Value;
+                    return true;
+                }
+            }
+            value = null;
+            return false;
+        }
+
         public static string GetSkillSummary(Skill skill, StringResult sr, SummaryParams param)
         {
             if (skill == null)
@@ -185,6 +197,6 @@ namespace WzComparerR2
             return GetSkillSummary(h, level, skill.Common, param);
         }
 
-        public static System.Collections.ObjectModel.ReadOnlyCollection<string> GlobalVariables { get; private set; }
+        public static Dictionary<string,string> GlobalVariableMapping { get; private set; }
     }
 }

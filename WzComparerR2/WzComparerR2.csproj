@@ -130,6 +130,7 @@
     <Compile Include="CharaSim\GearGrade.cs" />
     <Compile Include="CharaSim\GearSealedInfo.cs" />
     <Compile Include="CharaSim\GearState.cs" />
+    <Compile Include="CharaSim\HyperSkillType.cs" />
     <Compile Include="CharaSim\ItemSpecType.cs" />
     <Compile Include="CharaSim\ItemStringHelper.cs" />
     <Compile Include="CharaSim\GearType.cs" />

@@ -39,7 +39,7 @@ namespace WzComparerR2
         public BitmapOrigin IconMouseOver { get; set; }
         public BitmapOrigin IconDisabled { get; set; }
 
-        public int Hyper { get; set; }
+        public HyperSkillType Hyper { get; set; }
 
         public int Level
         {
@@ -55,6 +55,8 @@ namespace WzComparerR2
         public bool PreBBSkill { get; set; }
         public bool Invisible { get; set; }
         public bool CombatOrders { get; set; }
+        public bool NotRemoved { get; set; }
+        public int MasterLevel { get; set; }
         public Dictionary<int, int> ReqSkill { get; private set; }
         public List<string> Action { get; private set; }
 
@@ -135,13 +137,19 @@ namespace WzComparerR2
                         }
                         break;
                     case "hyper":
-                        skill.Hyper = childNode.GetValue<int>();
+                        skill.Hyper = (HyperSkillType)childNode.GetValue<int>();
                         break;
                     case "invisible":
                         skill.Invisible = childNode.GetValue<int>() != 0;
                         break;
                     case "combatOrders":
                         skill.CombatOrders = childNode.GetValue<int>() != 0;
+                        break;
+                    case "notRemoved":
+                        skill.NotRemoved = childNode.GetValue<int>() != 0;
+                        break;
+                    case "masterLevel":
+                        skill.MasterLevel = childNode.GetValue<int>();
                         break;
                     case "reqLev":
                         skill.ReqLevel = childNode.GetValue<int>();

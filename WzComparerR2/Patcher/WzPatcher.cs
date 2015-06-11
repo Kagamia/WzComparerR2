@@ -286,13 +286,13 @@ namespace WzComparerR2.Patcher
                 else if (part.Type == 2)
                 {
                     if (part.FileName.EndsWith("\\"))
-                        Directory.Delete(Path.Combine(mapleStoryFolder, part.FileName), true);
+                        SafeDeleteDirectory(Path.Combine(mapleStoryFolder, part.FileName));
                     else
-                        File.Delete(Path.Combine(mapleStoryFolder, part.FileName));
+                        SafeDeleteFile(Path.Combine(mapleStoryFolder, part.FileName));
                 }
             }
 
-            Directory.Delete(tempDir, true);
+            SafeDeleteDirectory(tempDir);
         }
 
         private string CreateRandomDir(string folder)
@@ -317,10 +317,46 @@ namespace WzComparerR2.Patcher
             if (!dir.Exists)
                 dir.Create();
 
-            if (File.Exists(dstFile))
-                File.Delete(dstFile);
+            SafeDeleteFile(dstFile);
+
             File.Move(srcFile, dstFile);
         }
+
+        private static void SafeDeleteFile(string fileName)
+        {
+            FileInfo fi = new FileInfo(fileName);
+            if (fi.Exists)
+            {
+                if ((fi.Attributes & FileAttributes.ReadOnly) != 0)
+                {
+                    fi.Attributes = fi.Attributes & (~FileAttributes.ReadOnly);
+                }
+                fi.Delete();
+            }
+        }
+
+        private static void SafeDeleteDirectory(string dirName)
+        {
+            DirectoryInfo di = new DirectoryInfo(dirName);
+            if (di.Exists)
+            {
+                if ((di.Attributes & FileAttributes.ReadOnly) != 0)
+                {
+                    di.Attributes = di.Attributes & (~FileAttributes.ReadOnly);
+                }
+
+                foreach (var f in di.GetFileSystemInfos())
+                {
+                    if ((f.Attributes & FileAttributes.ReadOnly) != 0)
+                    {
+                        f.Attributes = f.Attributes & (~FileAttributes.ReadOnly);
+                    }
+                }
+
+                di.Delete(true);
+            }
+        }
+
 
         private int GetFileName(BinaryReader reader, out string fileName)
         {

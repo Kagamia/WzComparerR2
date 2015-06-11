@@ -147,29 +147,47 @@ namespace WzComparerR2.CharaSimControl
             }
             picH += 9;
 
-            bool splitEx = false;
+            List<string> skillDescEx = new List<string>();
+
+            {
+                List<string> attr = new List<string>();
+                if (skill.Invisible)
+                {
+                    attr.Add("隐藏技能");
+                }
+                if (skill.Hyper != HyperSkillType.None)
+                {
+                    attr.Add("超级技能:" + skill.Hyper);
+                }
+                if (skill.CombatOrders)
+                {
+                    attr.Add("战斗命令加成");
+                } 
+                if (skill.NotRemoved)
+                {
+                    attr.Add("无法被移除");
+                }
+                if (skill.MasterLevel > 0 && skill.MasterLevel < skill.MaxLevel)
+                {
+                    attr.Add("初始掌握:Lv." + skill.MasterLevel);
+                }
+
+                if (attr.Count > 0)
+                {
+                    skillDescEx.Add("#c" + string.Join(", ", attr.ToArray()) + "#");
+                }
+            }
+
             if (showDelay && skill.Action.Count > 0)
             {
-                if (!splitEx)
-                {
-                    g.DrawLine(Pens.White, 6, picH, 283, picH);
-                    picH += 9;
-                    splitEx = true;
-                }
                 foreach (string action in skill.Action)
                 {
-                    GearGraphics.DrawString(g, "#c[技能延时] " + action + ": " + Skill.GetActionDelay(action) + " ms#", GearGraphics.ItemDetailFont, 8,266, ref picH, 16);
+                    skillDescEx.Add("#c[技能延时] " + action + ": " + Skill.GetActionDelay(action) + " ms#");
                 }
             }
 
             if (showReqSkill && skill.ReqSkill.Count > 0)
             {
-                if (!splitEx)
-                {
-                    g.DrawLine(Pens.White, 6, picH, 283, picH);
-                    picH += 9;
-                    splitEx = true;
-                }
                 foreach (var kv in skill.ReqSkill)
                 {
                     string skillName;
@@ -181,12 +199,18 @@ namespace WzComparerR2.CharaSimControl
                     {
                         skillName = kv.Key.ToString();
                     }
-                    GearGraphics.DrawString(g, "#c[前置技能] " + skillName + ": " + kv.Value + " 级#", GearGraphics.ItemDetailFont, 8, 266, ref picH, 16);
+                    skillDescEx.Add("#c[前置技能] " + skillName + ": " + kv.Value + " 级#");
                 }
             }
 
-            if (splitEx)
+            if (skillDescEx.Count > 0)
             {
+                g.DrawLine(Pens.White, 6, picH, 283, picH);
+                picH += 9;
+                foreach (var descEx in skillDescEx)
+                {
+                    GearGraphics.DrawString(g, descEx, GearGraphics.ItemDetailFont, 8, 266, ref picH, 16);
+                }
                 picH += 9;
             }
 
