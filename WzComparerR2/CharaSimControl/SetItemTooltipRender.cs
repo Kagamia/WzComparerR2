@@ -8,6 +8,7 @@ using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
 using WzComparerR2.Common;
 using System.Text.RegularExpressions;
+using WzComparerR2.CharaSim;
 
 namespace WzComparerR2.CharaSimControl
 {

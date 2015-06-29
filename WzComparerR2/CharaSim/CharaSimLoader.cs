@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
+using System.Drawing;
 using WzComparerR2.WzLib;
 using WzComparerR2.PluginBase;
 
-namespace WzComparerR2
+namespace WzComparerR2.CharaSim
 {
     public static class CharaSimLoader
     {
@@ -50,6 +50,31 @@ namespace WzComparerR2
                         loadedSetItems[setItemIndex] = setItem;
                 }
             }
+        }
+
+        public static int GetActionDelay(string actionName)
+        {
+            if (string.IsNullOrEmpty(actionName))
+            {
+                return 0;
+            }
+            Wz_Node actionNode = PluginManager.FindWz("Character/00002000.img/" + actionName);
+            if (actionNode == null)
+            {
+                return 0;
+            }
+
+            int delay = 0;
+            foreach (Wz_Node frameNode in actionNode.Nodes)
+            {
+                Wz_Node delayNode = frameNode.Nodes["delay"];
+                if (delayNode != null)
+                {
+                    delay += Math.Abs(delayNode.GetValue<int>());
+                }
+            }
+
+            return delay;
         }
     }
 }

@@ -7,6 +7,7 @@ using Resource = CharaSimResource.Resource;
 using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
 using WzComparerR2.Common;
+using WzComparerR2.CharaSim;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -93,7 +94,7 @@ namespace WzComparerR2.CharaSimControl
                                     Wz_Node imgNode = node0.FindNodeByPath(imgName, true);
                                     if (imgNode != null)
                                     {
-                                        Gear gear = Gear.CreateFromNode(imgNode);
+                                        Gear gear = Gear.CreateFromNode(imgNode, path=>PluginManager.FindWz(path));
                                         if (gear != null)
                                         {
                                             recipeItemBmp = RenderLinkRecipeGear(gear);

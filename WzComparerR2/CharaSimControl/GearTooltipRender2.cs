@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Resource = CharaSimResource.Resource;
 using WzComparerR2.Common;
+using WzComparerR2.CharaSim;
 
 namespace WzComparerR2.CharaSimControl
 {

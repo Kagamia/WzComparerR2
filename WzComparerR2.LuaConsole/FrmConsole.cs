@@ -33,6 +33,7 @@ namespace WzComparerR2.LuaConsole
         private void InitLuaEnv()
         {
             lua = new Lua();
+            lua.LoadCLRPackage();
             lua["env"] = env;
 
             lua.DoString(@"

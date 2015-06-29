@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 
-namespace WzComparerR2
+namespace WzComparerR2.CharaSim
 {
     public class CharacterStatus
     {

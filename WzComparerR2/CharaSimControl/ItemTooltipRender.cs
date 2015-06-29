@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using CharaSimResource;
 using WzComparerR2.Common;
+using WzComparerR2.CharaSim;
 
 namespace WzComparerR2.CharaSimControl
 {

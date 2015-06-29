@@ -4,6 +4,7 @@ using System.Text;
 using System.Drawing;
 using Resource = CharaSimResource.Resource;
 using WzComparerR2.Common;
+using WzComparerR2.CharaSim;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -182,7 +183,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 foreach (string action in skill.Action)
                 {
-                    skillDescEx.Add("#c[技能延时] " + action + ": " + Skill.GetActionDelay(action) + " ms#");
+                    skillDescEx.Add("#c[技能延时] " + action + ": " + CharaSimLoader.GetActionDelay(action) + " ms#");
                 }
             }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
+using WzComparerR2.CharaSim;
 
 namespace WzComparerR2.CharaSimControl
 {

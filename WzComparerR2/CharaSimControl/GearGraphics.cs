@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using CharaSimResource;
+using WzComparerR2.CharaSim;
 
 namespace WzComparerR2.CharaSimControl
 {

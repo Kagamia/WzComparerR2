@@ -30,9 +30,51 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ImageManipulation">
+      <HintPath>..\References\ImageManipulation.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BitmapOrigin.cs" />
+    <Compile Include="Calculator.cs" />
+    <Compile Include="CharaSim\Addition.cs" />
+    <Compile Include="CharaSim\AdditionType.cs" />
+    <Compile Include="CharaSim\AlienStone.cs" />
+    <Compile Include="CharaSim\AlienStoneGrade.cs" />
+    <Compile Include="CharaSim\FormulaVersion.cs" />
+    <Compile Include="CharaSim\Gear.cs" />
+    <Compile Include="CharaSim\GearGrade.cs" />
+    <Compile Include="CharaSim\GearLevelInfo.cs" />
+    <Compile Include="CharaSim\GearPropType.cs" />
+    <Compile Include="CharaSim\GearSealedInfo.cs" />
+    <Compile Include="CharaSim\GearState.cs" />
+    <Compile Include="CharaSim\GearType.cs" />
+    <Compile Include="GlobalFindNodeFunction.cs" />
+    <Compile Include="CharaSim\HyperSkillType.cs" />
+    <Compile Include="CharaSim\Item.cs" />
+    <Compile Include="CharaSim\ItemBase.cs" />
+    <Compile Include="CharaSim\ItemBaseType.cs" />
+    <Compile Include="CharaSim\ItemPropType.cs" />
+    <Compile Include="CharaSim\ItemSpecType.cs" />
+    <Compile Include="CharaSim\ItemStringHelper.cs" />
+    <Compile Include="CharaSim\Potential.cs" />
+    <Compile Include="CharaSim\Recipe.cs" />
+    <Compile Include="CharaSim\RecipeItemInfo.cs" />
+    <Compile Include="CharaSim\RecipePropType.cs" />
+    <Compile Include="CharaSim\SetItem.cs" />
+    <Compile Include="CharaSim\SetItemActiveSkill.cs" />
+    <Compile Include="CharaSim\SetItemEffect.cs" />
+    <Compile Include="CharaSim\SetItemIDList.cs" />
+    <Compile Include="CharaSim\SetItemIDPart.cs" />
+    <Compile Include="CharaSim\SetItemOptionToMob.cs" />
+    <Compile Include="CharaSim\Skill.cs" />
+    <Compile Include="CharaSim\SummaryParams.cs" />
+    <Compile Include="CharaSim\SummaryParser.cs" />
+    <Compile Include="Gif.cs" />
+    <Compile Include="GifEncoder.cs" />
+    <Compile Include="GifFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringLinker.cs" />
     <Compile Include="StringResult.cs" />

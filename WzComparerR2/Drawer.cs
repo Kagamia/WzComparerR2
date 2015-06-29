@@ -31,7 +31,7 @@ namespace WzComparerR2
         {
             Wz_Image img;
             
-            if ((img = charact.Node.FindNodeByPath("TamingMob\\01983055.img").GetValueEx<Wz_Image>(null)) != null
+            if ((img = charact.Node.FindNodeByPath("TamingMob\\01983000.img").GetValueEx<Wz_Image>(null)) != null
                 && img.TryExtract())
             {
                 AddPart(img.Node, "sit");

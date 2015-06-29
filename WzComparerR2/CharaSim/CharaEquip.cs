@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace WzComparerR2
+namespace WzComparerR2.CharaSim
 {
     public class CharaEquip
     {

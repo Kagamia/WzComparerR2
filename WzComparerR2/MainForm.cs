@@ -16,6 +16,7 @@ using WzComparerR2.WzLib;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSimControl;
 using WzComparerR2.PluginBase;
+using WzComparerR2.CharaSim;
 
 namespace WzComparerR2
 {
@@ -454,7 +455,7 @@ namespace WzComparerR2
             if (advTree3.SelectedNode == null)
                 return;
             Wz_Node node = getWzNodeByNode(advTree3.SelectedNode, advTree3.Tag as Wz_Node);
-            Gif gif = Gif.CreateFromNode(node);
+            Gif gif = CreateGifFromNode(node);
             if (gif == null || gif.Frames.Count == 0)
             {
                 labelItemStatus.Text = "gif提取失败...";
@@ -529,6 +530,65 @@ namespace WzComparerR2
                     labelItemAutoSaveFolder.Text = Setting.AutoSavePictureFolder;
                 }
             }
+        }
+
+        public static Gif CreateGifFromNode(Wz_Node node)
+        {
+            if (node == null)
+                return null;
+            Gif gif = new Gif();
+            for (int i = 0; ; i++)
+            {
+                GifFrame gifFrame = null;
+                Wz_Node frameNode = node.FindNodeByPath(i.ToString());
+
+                if (frameNode == null || frameNode.Value == null)
+                    break;
+
+                if (frameNode.Value is Wz_Uol)
+                {
+                    Wz_Uol uol = frameNode.Value as Wz_Uol;
+                    Wz_Node uolNode = uol.HandleUol(frameNode);
+                    if (uolNode != null)
+                        frameNode = uolNode;
+                }
+                if (frameNode.Value is Wz_Png)
+                {
+                    string source = frameNode.Nodes["source"].GetValueEx<string>(null);
+                    Wz_Png png = null;
+                    if (!string.IsNullOrEmpty(source))
+                    {
+                        png = PluginBase.PluginManager.FindWz(source).GetValueEx<Wz_Png>(null);
+                    }
+                    if (png == null)
+                    {
+                        png = frameNode.Value as Wz_Png;
+                    }
+
+                    gifFrame = new GifFrame(png.ExtractPng());
+                    foreach (Wz_Node propNode in frameNode.Nodes)
+                    {
+                        switch (propNode.Text)
+                        {
+                            case "origin":
+                                gifFrame.Origin = (propNode.Value as Wz_Vector);
+                                break;
+                            case "delay":
+                                gifFrame.Delay = Convert.ToInt32(propNode.Value);
+                                break;
+                        }
+                    }
+                    if (gifFrame.Delay == 0)
+                        gifFrame.Delay = 100;//给予默认delay
+                }
+                if (gifFrame == null)
+                    break;
+                gif.Frames.Add(gifFrame);
+            }
+            if (gif.Frames.Count > 0)
+                return gif;
+            else
+                return null;
         }
         #endregion
 
@@ -2042,7 +2102,7 @@ namespace WzComparerR2
                     {
                         CharaSimLoader.LoadSetItems();
                     }
-                    obj = Gear.CreateFromNode(image.Node);
+                    obj = Gear.CreateFromNode(image.Node, PluginManager.FindWz);
                     break;
                 case Wz_Type.Item:
                     Wz_Node itemNode = getWzNodeByNode(node);
@@ -2070,7 +2130,7 @@ namespace WzComparerR2
                     }
                     else if (Regex.IsMatch(skillNode.FullPathToFile, @"^Skill\\\d+.img"))
                     {
-                        Skill skill = Skill.CreateFromNode(skillNode);
+                        Skill skill = Skill.CreateFromNode(skillNode, PluginManager.FindWz);
                         if (skill != null)
                         {
                             switch (this.skillDefaultLevel)

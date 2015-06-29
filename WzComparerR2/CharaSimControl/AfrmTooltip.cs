@@ -4,6 +4,7 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 using WzComparerR2.Common;
+using WzComparerR2.CharaSim;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -98,35 +99,38 @@ namespace WzComparerR2.CharaSimControl
                     Gear g = GearRender.Gear;
                     if (this.StringLinker.StringEqp.ContainsKey(g.ItemID))
                     {
-                        this.StringLinker.StringEqp[g.ItemID].Name = "米猪猪的胖次";
-                        this.StringLinker.StringEqp[g.ItemID].Desc = @"传说中米猪猪穿过的胖次。\n\n#c“来♂一♂发”#——颠倒";
+                        this.StringLinker.StringEqp[g.ItemID].Name = "暴君之高卡文黑锅";
+                        this.StringLinker.StringEqp[g.ItemID].Desc = @"""#c这个锅 我背了！#"" ————gaokawen";
                     }
                     g.Star = 25;
                     g.Grade = GearGrade.SS;
                     g.AdditionGrade = GearGrade.B;
-                    g.Props[GearPropType.reqLevel] = 180;
-                    g.Props[GearPropType.reqSTR] = 0;
-                    g.Props[GearPropType.reqDEX] = 0;
-                    g.Props[GearPropType.reqINT] = 0;
-                    g.Props[GearPropType.reqLUK] = 0;
-                    g.Props[GearPropType.reqPOP] = 880;
+                    g.Props[GearPropType.reqLevel] = 250;
+                    g.Props[GearPropType.reqSTR] = 6;
+                    g.Props[GearPropType.reqDEX] = 6;
+                    g.Props[GearPropType.reqINT] = 6;
+                    g.Props[GearPropType.reqLUK] = 6;
+                    g.Props[GearPropType.reqPOP] = 666;
                     g.Props[GearPropType.level] = 1;
                     g.Props[GearPropType.reqJob] = 0;
-                    g.Props[GearPropType.incPAD] = 880;
-                    g.Props[GearPropType.incMAD] = 880;
-                    g.Props[GearPropType.tuc] = 8;
+                    g.Props[GearPropType.incPAD] = 6;
+                    g.Props[GearPropType.incMAD] = 6;
+                    g.Props[GearPropType.incPDD] = 666;
+                    g.Props[GearPropType.incMDD] = 666;
+                    g.Props[GearPropType.tuc] = 66;
                     g.Props[GearPropType.superiorEqp] = 1;
                     g.Props[GearPropType.tradeAvailable] = 2;
-                    g.Props[GearPropType.charismaEXP] = 88;
-                    g.Props[GearPropType.willEXP] = 88;
-                    g.Props[GearPropType.charmEXP] = 88;
+                    //g.Props[GearPropType.charismaEXP] = 88;
+                    //g.Props[GearPropType.willEXP] = 88;
+                    //g.Props[GearPropType.charmEXP] = 88;
                     g.Props[GearPropType.nActivatedSocket] = 1;
-                    g.Options[0] = Potential.LoadFromWz(60001, 3);
-                    g.Options[1] = Potential.LoadFromWz(60001, 3);
-                    g.Options[2] = Potential.LoadFromWz(60001, 3);
-                    g.AdditionalOptions[0] = Potential.LoadFromWz(32086, 10);
-                    g.AdditionalOptions[1] = Potential.LoadFromWz(32086, 10);
-                    g.AdditionalOptions[2] = Potential.LoadFromWz(32086, 10);
+                    //g.Props[GearPropType.setItemID] = 135;
+                    //g.Options[0] = Potential.LoadFromWz(60001, 3);
+                    //g.Options[1] = Potential.LoadFromWz(60001, 3);
+                    //g.Options[2] = Potential.LoadFromWz(60001, 3);
+                    //g.AdditionalOptions[0] = Potential.LoadFromWz(32086, 10);
+                    //g.AdditionalOptions[1] = Potential.LoadFromWz(32086, 10);
+                    //g.AdditionalOptions[2] = Potential.LoadFromWz(32086, 10);
                 }
             }
             else if (item is Skill)

@@ -9,6 +9,7 @@ using WzComparerR2.WzLib;
 using WzComparerR2.Common;
 using WzComparerR2.PluginBase;
 using WzComparerR2.CharaSimControl;
+using WzComparerR2.CharaSim;
 
 namespace WzComparerR2
 {
@@ -98,7 +99,7 @@ namespace WzComparerR2
 
                 foreach (Wz_Node skillNode in skillListNode.Nodes)
                 {
-                    Skill skill = Skill.CreateFromNode(skillNode);
+                    Skill skill = Skill.CreateFromNode(skillNode,  PluginManager.FindWz);
                     if (skill == null)
                         continue;
 
@@ -342,7 +343,7 @@ namespace WzComparerR2
                                 sw.WriteLine("<tr><td>技能名称</td><td>{0} (id:{1})</td></tr>", sr == null ? "null" : sr.Name, skillId);
                             }
 
-                            Skill skill = Skill.CreateFromNode(skill8000.Nodes[skillId.ToString("D7")]);
+                            Skill skill = Skill.CreateFromNode(skill8000.Nodes[skillId.ToString("D7")], PluginManager.FindWz);
                             if (skill != null)
                             {
                                 skill.Level = skill.MaxLevel;

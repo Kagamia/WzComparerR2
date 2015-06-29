@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Text;
 using WzComparerR2.Common;
+using WzComparerR2.CharaSim;
 
 namespace WzComparerR2.CharaSimControl
 {
