@@ -455,7 +455,7 @@ namespace WzComparerR2
             if (advTree3.SelectedNode == null)
                 return;
             Wz_Node node = getWzNodeByNode(advTree3.SelectedNode, advTree3.Tag as Wz_Node);
-            Gif gif = CreateGifFromNode(node);
+            Gif gif = Gif.CreateFromNode(node, PluginManager.FindWz);
             if (gif == null || gif.Frames.Count == 0)
             {
                 labelItemStatus.Text = "gif提取失败...";
@@ -474,7 +474,7 @@ namespace WzComparerR2
             {
                 if (pictureBox1.Image != null)
                     pictureBox1.Image.Dispose();
-                pictureBox1.Image = gif.Frames[0].Bitmap;
+                pictureBox1.Image = ((GifFrame)gif.Frames[0]).Bitmap;
                 pictureBox1.Size = pictureBox1.Image.Size;
                 pictureBox1.Tag = gifName + ".png";
             }
@@ -532,64 +532,6 @@ namespace WzComparerR2
             }
         }
 
-        public static Gif CreateGifFromNode(Wz_Node node)
-        {
-            if (node == null)
-                return null;
-            Gif gif = new Gif();
-            for (int i = 0; ; i++)
-            {
-                GifFrame gifFrame = null;
-                Wz_Node frameNode = node.FindNodeByPath(i.ToString());
-
-                if (frameNode == null || frameNode.Value == null)
-                    break;
-
-                if (frameNode.Value is Wz_Uol)
-                {
-                    Wz_Uol uol = frameNode.Value as Wz_Uol;
-                    Wz_Node uolNode = uol.HandleUol(frameNode);
-                    if (uolNode != null)
-                        frameNode = uolNode;
-                }
-                if (frameNode.Value is Wz_Png)
-                {
-                    string source = frameNode.Nodes["source"].GetValueEx<string>(null);
-                    Wz_Png png = null;
-                    if (!string.IsNullOrEmpty(source))
-                    {
-                        png = PluginBase.PluginManager.FindWz(source).GetValueEx<Wz_Png>(null);
-                    }
-                    if (png == null)
-                    {
-                        png = frameNode.Value as Wz_Png;
-                    }
-
-                    gifFrame = new GifFrame(png.ExtractPng());
-                    foreach (Wz_Node propNode in frameNode.Nodes)
-                    {
-                        switch (propNode.Text)
-                        {
-                            case "origin":
-                                gifFrame.Origin = (propNode.Value as Wz_Vector);
-                                break;
-                            case "delay":
-                                gifFrame.Delay = Convert.ToInt32(propNode.Value);
-                                break;
-                        }
-                    }
-                    if (gifFrame.Delay == 0)
-                        gifFrame.Delay = 100;//给予默认delay
-                }
-                if (gifFrame == null)
-                    break;
-                gif.Frames.Add(gifFrame);
-            }
-            if (gif.Frames.Count > 0)
-                return gif;
-            else
-                return null;
-        }
         #endregion
 
         #region File菜单的事件

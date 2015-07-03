@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Drawing;
 
 namespace WzComparerR2.Avatar
 {
@@ -17,7 +18,13 @@ namespace WzComparerR2.Avatar
         }
 
         public string Action { get; set; }
-        public int Frame { get; set; }
+        public int? Frame { get; set; }
         public int Delay { get; set; }
+
+        public bool? Face { get; set; }
+        public bool Flip { get; set; }
+        public Point Move { get; set; }
+        public int Rotate { get; set; }
+        public int RotateProp { get; set; }
     }
 }

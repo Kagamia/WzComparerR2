@@ -94,7 +94,6 @@ namespace WzComparerR2.CharaSim
                         skill.IconDisabled = BitmapOrigin.CreateFromNode(childNode, findNode);
                         break;
                     case "common":
-                        skill.PreBBSkill = false;
                         foreach (Wz_Node commonNode in childNode.Nodes)
                         {
                             if (commonNode.Value != null && !(commonNode.Value is Wz_Vector))
@@ -113,26 +112,22 @@ namespace WzComparerR2.CharaSim
                         }
                         break;
                     case "level":
-                        if (skill.common.Count == 0)
+                        for (int i = 1; ; i++)
                         {
-                            skill.PreBBSkill = true;
-                            for (int i = 1; ; i++)
+                            Wz_Node levelNode = childNode.FindNodeByPath(i.ToString());
+                            if (levelNode == null)
+                                break;
+                            Dictionary<string, string> levelInfo = new Dictionary<string, string>();
+
+                            foreach (Wz_Node commonNode in levelNode.Nodes)
                             {
-                                Wz_Node levelNode = childNode.FindNodeByPath(i.ToString());
-                                if (levelNode == null)
-                                    break;
-                                Dictionary<string, string> levelInfo = new Dictionary<string, string>();
-
-                                foreach (Wz_Node commonNode in levelNode.Nodes)
+                                if (commonNode.Value != null && !(commonNode.Value is Wz_Vector))
                                 {
-                                    if (commonNode.Value != null && !(commonNode.Value is Wz_Vector))
-                                    {
-                                        levelInfo[commonNode.Text] = commonNode.Value.ToString();
-                                    }
+                                    levelInfo[commonNode.Text] = commonNode.Value.ToString();
                                 }
-
-                                skill.levelCommon.Add(levelInfo);
                             }
+
+                            skill.levelCommon.Add(levelInfo);
                         }
                         break;
                     case "hyper":
@@ -183,6 +178,17 @@ namespace WzComparerR2.CharaSim
                             skill.Action.Add(idxNode.GetValue<string>());
                         }
                         break;
+                }
+            }
+
+            //判定技能声明版本
+            skill.PreBBSkill = false;
+            if (skill.levelCommon.Count > 0)
+            {
+                if (skill.common.Count <= 0
+                    || (skill.common.Count == 1 && skill.common.ContainsKey("maxLevel")))
+                {
+                    skill.PreBBSkill = true;
                 }
             }
 

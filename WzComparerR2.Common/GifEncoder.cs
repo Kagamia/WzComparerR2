@@ -39,12 +39,11 @@ namespace WzComparerR2.Common
         [DllImport("libgif.dll", EntryPoint = "#1", CharSet = CharSet.Unicode)]
         private extern static IntPtr construct(string location, int width, int height, int maxColor, int backColor);
 
-        public delegate void gif_encoder_destruct(IntPtr encoder_pointer);
-        public delegate void gif_encoder_append_frame(IntPtr pixels, int delay, IntPtr encoder_pointer);
-
+        private delegate void gif_encoder_destruct(IntPtr encoder_pointer);
+        private delegate void gif_encoder_append_frame(IntPtr pixels, int delay, IntPtr encoder_pointer);
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct gif_encoder_structure
+        private struct gif_encoder_structure
         {
             public gif_encoder_destruct destruct;
             public gif_encoder_append_frame append_frame;

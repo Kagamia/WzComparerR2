@@ -6,6 +6,7 @@ using DevComponents.DotNetBar;
 using DevComponents.Editors;
 using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
+using WzComparerR2.Common;
 
 namespace WzComparerR2.Avatar
 {
@@ -55,7 +56,7 @@ namespace WzComparerR2.Avatar
             canvas.LoadZ();
             canvas.LoadActions();
             canvas.LoadEmotions();
-            
+
             cmbAction.Items.Clear();
             foreach (var action in canvas.Actions)
             {
@@ -81,9 +82,186 @@ namespace WzComparerR2.Avatar
             AddPart(canvas, "Character\\00012000.img");
             AddPart(canvas, "Character\\Face\\00020000.img");
             AddPart(canvas, "Character\\Hair\\00030000.img");
-            var bone = canvas.CreateFrame(0, 0, 0);
-            var bo = canvas.Render(bone);
-            bo.Bitmap.Save("D:\\b.png");
+            AddPart(canvas, "Character\\Coat\\01040036.img");
+            AddPart(canvas, "Character\\Pants\\01060026.img");
+            //AddPart(canvas, "Character\\Weapon\\01442000.img");
+            //AddPart(canvas, "Character\\Weapon\\01382007.img");
+            AddPart(canvas, "Character\\Weapon\\01332000.img");
+            AddPart(canvas, "Character\\Weapon\\01342000.img");
+
+            var faceFrames = canvas.GetFaceFrames(canvas.EmotionName);
+
+            foreach (var action in canvas.Actions)
+            {
+                break;
+                Gif gif = new Gif();
+                var actionFrames = canvas.GetActionFrames(action.Name);
+                foreach (var frame in actionFrames)
+                {
+                    if (frame.Delay != 0)
+                    {
+                        var bone = canvas.CreateFrame(frame, faceFrames[0], null);
+                        var bmp = canvas.DrawFrame(bone, frame);
+
+                        Point pos = bmp.OpOrigin;
+                        pos.Offset(frame.Flip ? new Point(-frame.Move.X, frame.Move.Y) : frame.Move);
+                        GifFrame f = new GifFrame(bmp.Bitmap, new Point(-pos.X, -pos.Y), Math.Abs(frame.Delay));
+                        gif.Frames.Add(f);
+                    }
+                }
+
+                var gifFile = gif.EncodeGif(Color.Black);
+                string fileName = "D:\\ms\\" + action.Name.Replace('\\', '.');
+                gifFile.Save(fileName + (gif.Frames.Count == 1 ? ".png" : ".gif"));
+                gifFile.Dispose();
+            }
+
+            {
+
+                Gif gif = CreateContinueAction(canvas);
+                var gifFile = gif.EncodeGif(Color.Gray);
+                string fileName = "D:\\d4";
+
+                var fd = new System.Drawing.Imaging.FrameDimension(gifFile.FrameDimensionsList[0]);
+                //获取帧数(gif图片可能包含多帧，其它格式图片一般仅一帧)
+                int count = gifFile.GetFrameCount(fd);
+                for (int i = 0; i < count; i++)
+                {
+                    gifFile.SelectActiveFrame(fd, i);
+                    gifFile.Save(fileName + "_" + i + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                }
+
+                gifFile.Save(fileName + (gif.Frames.Count == 1 ? ".png" : ".gif"));
+                gifFile.Dispose();
+            }
+        }
+
+        private Gif CreateContinueAction(AvatarCanvas canvas)
+        {
+            string afterImage = null;
+            Wz_Node defaultAfterImageNode = null;
+            if (canvas.Weapon != null)
+            {
+                afterImage = canvas.Weapon.Node.FindNodeByPath(false, "info", "afterImage").GetValueEx<string>(null);
+                if (!string.IsNullOrEmpty(afterImage))
+                {
+                    defaultAfterImageNode = PluginManager.FindWz("Character\\Afterimage\\" + afterImage + ".img\\10");
+                }
+            }
+
+            GifCanvas gifCanvas = new GifCanvas();
+            gifCanvas.Layers.Add(new GifLayer());
+            int delay = 0;
+            //foreach (string act in new[] { "alert", "swingP1PoleArm", "doubleSwing", "tripleSwing" })
+            //foreach (var act in new object[] { "alert", "swingP1PoleArm", "overSwingDouble", "overSwingTriple" })
+            var faceFrames = canvas.GetFaceFrames(canvas.EmotionName);
+           
+
+
+
+            foreach (var act in new object[] {
+                //PluginManager.FindWz("Skill\\2112.img\\skill\\21120015"),
+                //PluginManager.FindWz("Skill\\2112.img\\skill\\21120009"),
+                //PluginManager.FindWz("Skill\\2112.img\\skill\\21120010"),
+
+                //PluginManager.FindWz("Skill\\200.img\\skill\\2001002"),
+                //PluginManager.FindWz("Skill\\230.img\\skill\\2301003"),
+                //PluginManager.FindWz("Skill\\230.img\\skill\\2301004"),
+                //PluginManager.FindWz("Skill\\231.img\\skill\\2311003"),
+
+                PluginManager.FindWz("Skill\\433.img\\skill\\4331006"),
+                "alert"
+            })
+            {
+                string actionName = null;
+                Wz_Node afterImageNode = null;
+                List<Gif> effects = new List<Gif>();
+
+                if (act is string)
+                {
+                    actionName = (string)act;
+                }
+                else if (act is Wz_Node)
+                {
+                    Wz_Node skillNode = (Wz_Node)act;
+                    actionName = skillNode.FindNodeByPath("action\\0").GetValueEx<string>(null);
+                    if (!string.IsNullOrEmpty("afterImage"))
+                    {
+                        afterImageNode = skillNode.FindNodeByPath("afterimage\\" + afterImage);
+                    }
+                    for (int i = -1; ; i++)
+                    {
+                        Wz_Node effNode = skillNode.FindNodeByPath("effect" + (i > -1 ? i.ToString() : ""));
+                        if (effNode == null)
+                            break;
+                        effects.Add(Gif.CreateFromNode(effNode, PluginManager.FindWz));
+                    }
+                }
+
+                if (string.IsNullOrEmpty(actionName))
+                {
+                    continue;
+                }
+                afterImageNode = afterImageNode ?? defaultAfterImageNode;
+
+
+                //添加特效帧
+                foreach (var effGif in effects)
+                {
+                    if (effGif != null && effGif.Frames.Count > 0)
+                    {
+                        var layer = new GifLayer();
+                        if (delay > 0)
+                        {
+                            layer.AddBlank(delay);
+                        }
+                        effGif.Frames.ForEach(af => layer.AddFrame((GifFrame)af));
+                        gifCanvas.Layers.Add(layer);
+                    }
+                }
+
+                //添加角色帧
+                ActionFrame[] actionFrames = canvas.GetActionFrames(actionName);
+                for (int i = 0; i < actionFrames.Length; i++)
+                {
+                    var frame = actionFrames[i];
+
+                    if (frame.Delay != 0)
+                    {
+                        //绘制角色主动作
+                        var bone = canvas.CreateFrame(frame, faceFrames[0], null);
+                        var bmp = canvas.DrawFrame(bone, frame);
+                        GifFrame f = new GifFrame(bmp.Bitmap, bmp.Origin, Math.Abs(frame.Delay));
+                        gifCanvas.Layers[0].Frames.Add(f);
+
+                        //寻找刀光帧
+                        if (afterImageNode != null)
+                        {
+                            var afterImageAction = afterImageNode.FindNodeByPath(false, actionName, i.ToString());
+                            if (afterImageAction != null)
+                            {
+                                Gif aGif = Gif.CreateFromNode(afterImageAction, PluginManager.FindWz);
+                                if (aGif != null && aGif.Frames.Count > 0) //添加新图层
+                                {
+                                    var layer = new GifLayer();
+                                    if (delay > 0)
+                                    {
+                                        layer.AddBlank(delay);
+                                    }
+                                    aGif.Frames.ForEach(af => layer.AddFrame((GifFrame)af));
+                                    gifCanvas.Layers.Add(layer);
+                                }
+                            }
+                        }
+
+                        delay += f.Delay;
+                    }
+
+                }
+
+            }
+
+            return gifCanvas.Combine();
         }
 
         void AddPart(AvatarCanvas canvas, string imgPath)
