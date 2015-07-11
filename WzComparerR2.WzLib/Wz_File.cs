@@ -187,6 +187,7 @@ namespace WzComparerR2.WzLib
 
                 byte[] data = this.BReader.ReadBytes(size);
                 retStr = new char[size];
+                
                 for (int i = 0; i < size; i++)
                 {
                     retStr[i] = (char)(data[i] ^ (use_enc ? mask ^ this.WzStructure.encryption.keys[i] : mask));

@@ -31,7 +31,7 @@ namespace WzComparerR2.WzLib
 
         private byte[] getKeys(byte[] iv)
         {
-            byte[] retKey = new byte[ushort.MaxValue];
+            byte[] retKey = new byte[1024*1024];
             byte[] input = multiplyBytes(iv, 4, 4);
             int retlen = retKey.Length;
 
