@@ -56,7 +56,7 @@ namespace WzComparerR2.WzLib
             if (Path.GetFileName(fileName).ToLower() == "list.wz")
             {
                 this.encryption.LoadListWz(Path.GetDirectoryName(fileName));
-                foreach (string list in this.encryption.list.Keys)
+                foreach (string list in this.encryption.List)
                 {
                     WzNode.Nodes.Add(list);
                 }

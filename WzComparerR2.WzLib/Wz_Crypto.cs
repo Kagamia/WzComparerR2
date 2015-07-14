@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
+using System.Collections.Specialized;
 
 namespace WzComparerR2.WzLib
 {
@@ -10,52 +11,11 @@ namespace WzComparerR2.WzLib
     {
         public Wz_Crypto()
         {
-            this.crypto = Rijndael.Create();
-            this.crypto.KeySize = 256;
-            this.crypto.Key = this.key;
-            this.crypto.Mode = CipherMode.ECB;
-            this.memStream = new MemoryStream();
-            this.cryptoStream = new CryptoStream(memStream, this.crypto.CreateEncryptor(), CryptoStreamMode.Write);
-            this.keys_kms = this.getKeys(this.iv_kms);
-            this.cryptoStream.Dispose();
-            this.memStream.Dispose();
-            this.memStream = new MemoryStream();
-            this.cryptoStream = new CryptoStream(memStream, this.crypto.CreateEncryptor(), CryptoStreamMode.Write);
-            this.keys_gms = this.getKeys(this.iv_gms);
-            this.cryptoStream.Dispose();
-            this.memStream.Dispose();
+            this.keys_kms = new Wz_CryptoKey(iv_kms);
+            this.keys_gms = new Wz_CryptoKey(iv_gms);
             this.listwz = false;
-            this.enc_type = enc_unknown;
-            this.list = new Dictionary<string, bool>();
-        }
-
-        private byte[] getKeys(byte[] iv)
-        {
-            byte[] retKey = new byte[1024*1024];
-            byte[] input = multiplyBytes(iv, 4, 4);
-            int retlen = retKey.Length;
-
-            for (int i = 0; i < (retlen / 16); i++)
-            {
-                cryptoStream.Write(input, 0, 16);
-                input = memStream.ToArray();
-                Array.Copy(memStream.ToArray(), 0, retKey, (i * 16), 16);
-                memStream.Position = 0;
-            }
-            cryptoStream.Write(input, 0, 16);
-            Array.Copy(memStream.ToArray(), 0, retKey, (retlen - 15), 15);
-            return retKey;
-        }
-
-        private byte[] multiplyBytes(byte[] iv, int count, int mul)
-        {
-            int count_mul = count * mul;
-            byte[] ret = new byte[count_mul];
-            for (int i = 0; i < count_mul; i++)
-            {
-                ret[i] = iv[i % count];
-            }
-            return ret;
+            this.EncType = Wz_CryptoKeyType.Unknown;
+            this.List = new StringCollection();
         }
 
         public void Reset()
@@ -63,16 +23,15 @@ namespace WzComparerR2.WzLib
             this.encryption_detected = false;
             this.all_strings_encrypted = false;
             this.listwz = false;
-            this.enc_type = Wz_Crypto.enc_unknown;
-            this.keys = null;
-            this.list.Clear();
+            this.EncType = Wz_Crypto.Wz_CryptoKeyType.Unknown;
+            this.List.Clear();
         }
 
         public bool list_contains(string name)
         {
-            bool contains = this.list.ContainsKey(name);
+            bool contains = this.List.Contains(name);
             if (contains)
-                this.list.Remove(name);
+                this.List.Remove(name);
             return contains;
             //    foreach (string list_entry in this.list)
             //    {
@@ -103,13 +62,11 @@ namespace WzComparerR2.WzLib
 
                 if ((char)(check_for_d ^ this.keys_gms[0]) == 'd')
                 {
-                    this.enc_type = Wz_Crypto.enc_GMS;
-                    this.keys = this.keys_gms;
+                    this.EncType = Wz_CryptoKeyType.GMS;
                 }
                 else if ((char)(check_for_d ^ this.keys_kms[0]) == 'd')
                 {
-                    this.enc_type = Wz_Crypto.enc_KMS;
-                    this.keys = this.keys_kms;
+                    this.EncType = Wz_CryptoKeyType.KMS;
                 }
 
                 list_file.Position = 0;
@@ -124,10 +81,10 @@ namespace WzComparerR2.WzLib
                     }
                     list_file.Position += 2;
                     folder.Replace(".im/", ".img");
-                    this.list.Add(folder, true);
+                    this.List.Add(folder);
                     folder = "";
                 }
-                this.list.Remove("dummy");
+                this.List.Remove("dummy");
             }
         }
 
@@ -157,7 +114,7 @@ namespace WzComparerR2.WzLib
             else
             {
                 sb.Remove(0, sb.Length);
-                if (this.enc_type != Wz_Crypto.enc_unknown)
+                if (this.EncType != Wz_CryptoKeyType.Unknown)
                 {
                     for (int i = 0; i < len; i++)
                     {
@@ -175,8 +132,7 @@ namespace WzComparerR2.WzLib
                     for (int i = 0; i < len; i++) { sb.Append((char)(bytes[i] ^ keys_kms[i])); }
                     if (sb.ToString().Contains(".img") || sb.ToString().Contains("Cash"))
                     {
-                        this.enc_type = Wz_Crypto.enc_KMS;
-                        this.keys = this.keys_kms;
+                        this.EncType = Wz_CryptoKeyType.KMS;
                         this.all_strings_encrypted = true;
                         this.encryption_detected = true;
                     }
@@ -186,8 +142,7 @@ namespace WzComparerR2.WzLib
                         for (int i = 0; i < len; i++) { sb.Append((char)(bytes[i] ^ keys_gms[i])); }
                         if (sb.ToString().Contains(".img") || sb.ToString().Contains("Cash"))
                         {
-                            this.enc_type = Wz_Crypto.enc_GMS;
-                            this.keys = this.keys_gms;
+                            this.EncType = Wz_CryptoKeyType.GMS;
                             this.all_strings_encrypted = true;
                             this.encryption_detected = true;
                         }
@@ -198,13 +153,119 @@ namespace WzComparerR2.WzLib
             f.FileStream.Position = old_off;
         }
 
-        public const byte enc_unknown = 0;
-        public const byte enc_KMS = 2;
-        public const byte enc_GMS = 3;
+        static readonly byte[] iv_gms = { 0x4d, 0x23, 0xc7, 0x2b };
+        static readonly byte[] iv_kms = { 0xb9, 0x7d, 0x63, 0xe9 };
 
-        readonly byte[] iv_gms = { 0x4d, 0x23, 0xc7, 0x2b };
-        readonly byte[] iv_kms = { 0xb9, 0x7d, 0x63, 0xe9 };
-        readonly byte[] key = {	0x13, 0x00, 0x00, 0x00,
+        private Wz_CryptoKey keys_gms, keys_kms;
+        private Wz_CryptoKeyType enc_type;
+
+        public bool encryption_detected = false;
+        public bool all_strings_encrypted = false;
+        public bool listwz = false;
+
+        public Wz_CryptoKey keys { get; private set; }
+        public StringCollection List { get; private set; }
+
+        public Wz_CryptoKeyType EncType
+        {
+            get { return enc_type; }
+            set
+            {
+                enc_type = value;
+                switch (enc_type)
+                {
+                    case Wz_CryptoKeyType.Unknown:
+                        this.keys = null;
+                        break;
+
+                    case Wz_CryptoKeyType.KMS:
+                        this.keys = keys_kms;
+                        break;
+
+                    case Wz_CryptoKeyType.GMS:
+                        this.keys = keys_gms;
+                        break;
+                }
+            }
+        }
+
+        public enum Wz_CryptoKeyType
+        {
+            Unknown = 0,
+            KMS = 2,
+            GMS = 3
+        }
+
+        public class Wz_CryptoKey
+        {
+            public Wz_CryptoKey(byte[] iv)
+            {
+                this.iv = iv;
+            }
+
+            private byte[] keys;
+            private byte[] iv;
+
+            public byte this[int index]
+            {
+                get
+                {
+                    if (keys == null || keys.Length <= index)
+                    {
+                        EnsureKeySize(index + 1);
+                    }
+                    return this.keys[index];
+                }
+            }
+
+            public void EnsureKeySize(int size)
+            {
+                if (keys != null && keys.Length >= size)
+                {
+                    return;
+                }
+
+                size = (int)Math.Ceiling(1.0 * size / 4096) * 4096;
+                byte[] newKeys = new byte[size];
+                int startIndex = 0;
+
+                if (keys != null)
+                {
+                    Buffer.BlockCopy(keys, 0, newKeys, 0, keys.Length);
+                    startIndex = keys.Length;
+                }
+
+                Rijndael aes = Rijndael.Create();
+                aes.KeySize = 256;
+                aes.BlockSize = 128;
+                aes.Key = aesKey;
+                aes.Mode = CipherMode.ECB;
+                MemoryStream ms = new MemoryStream(newKeys, startIndex, newKeys.Length - startIndex, true);
+                CryptoStream s = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write);
+
+                for (int i = startIndex; i < size; i += 16)
+                {
+                    if (i == 0)
+                    {
+                        byte[] block = new byte[16];
+                        for (int j = 0; j < block.Length; j++)
+                        {
+                            block[j] = iv[j % 4];
+                        }
+                        s.Write(block, 0, block.Length);
+                    }
+                    else
+                    {
+                        s.Write(newKeys, i - 16, 16);
+                    }
+                }
+
+                s.Flush();
+                ms.Close();
+                this.keys = newKeys;
+            }
+
+            static readonly byte[] aesKey = {0x13, 0x00, 0x00, 0x00,
 										0x08, 0x00, 0x00, 0x00,
 										0x06, 0x00, 0x00, 0x00,
 										0xB4, 0x00, 0x00, 0x00,
@@ -212,17 +273,6 @@ namespace WzComparerR2.WzLib
 										0x0F, 0x00, 0x00, 0x00,
 										0x33, 0x00, 0x00, 0x00,
 										0x52, 0x00, 0x00, 0x00 };
-
-        internal byte[] keys_gms, keys_kms;
-        Rijndael crypto;
-        MemoryStream memStream;
-        CryptoStream cryptoStream;
-
-        public bool encryption_detected = false;
-        public bool all_strings_encrypted = false;
-        public bool listwz = false;
-        public byte enc_type = Wz_Crypto.enc_unknown;
-        public byte[] keys;
-        public Dictionary<string, bool> list;
+        }
     }
 }

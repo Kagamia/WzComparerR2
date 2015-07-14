@@ -227,7 +227,7 @@ namespace WzComparerR2.WzLib
             {
                 this.checEnc = true;
             }
-            else if (crypto.enc_type != Wz_Crypto.enc_unknown)
+            else if (crypto.EncType != Wz_Crypto.Wz_CryptoKeyType.Unknown)
             {
                 if (IsIllegalTag(false))
                 {
@@ -242,9 +242,7 @@ namespace WzComparerR2.WzLib
             }
             else
             {
-                byte[] keys = crypto.keys;
-                crypto.enc_type = Wz_Crypto.enc_KMS;
-                crypto.keys = crypto.keys_kms;
+                crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.KMS;
                 if (IsIllegalTag(false))
                 {
                     this.isOnList = false;
@@ -258,8 +256,7 @@ namespace WzComparerR2.WzLib
                     return;
                 }
 
-                crypto.enc_type = Wz_Crypto.enc_GMS;
-                crypto.keys = crypto.keys_gms;
+                crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.GMS;
                 if (IsIllegalTag(false))
                 {
                     this.isOnList = false;
@@ -273,8 +270,7 @@ namespace WzComparerR2.WzLib
                     return;
                 }
 
-                crypto.enc_type = Wz_Crypto.enc_unknown;
-                crypto.keys = keys;
+                crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.Unknown;
             }
         }
 
