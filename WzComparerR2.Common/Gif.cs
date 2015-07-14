@@ -114,7 +114,7 @@ namespace WzComparerR2.Common
 
             GifEncoder enc;
             byte a = backgrnd.A;
-            backgrnd = Color.FromArgb(255, backgrnd);
+            Color backgrndColor = Color.FromArgb(255, backgrnd);
             if (a == 0xff) //纯色
             {
                 enc = new GifEncoder(tempFileName, rect.Width, rect.Height, 256, backgrnd);
@@ -198,7 +198,7 @@ namespace WzComparerR2.Common
                 frameRect.Offset(-canvasRect.X, -canvasRect.Y);
                 frame.Draw(g, canvasRect);
 
-                BitmapData data = gifFrame.LockBits(canvasRect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                BitmapData data = gifFrame.LockBits(new Rectangle(Point.Empty, gifFrame.Size), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
                 byte[] buffer = new byte[data.Stride * data.Height];
                 Marshal.Copy(data.Scan0, buffer, 0, buffer.Length);
 
