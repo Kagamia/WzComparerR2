@@ -86,6 +86,7 @@
     <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj">
       <Project>{0e9801fd-44a2-4af8-ae91-d6e74bad56b2}</Project>
       <Name>WzComparerR2.WzLib</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
