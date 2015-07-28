@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -45,7 +45,7 @@ namespace WzComparerR2.Avatar.UI
         bool suspendUpdate;
 
         /// <summary>
-        /// wz1½ÚµãÑ¡ÖĞÊÂ¼ş¡£
+        /// wz1èŠ‚ç‚¹é€‰ä¸­äº‹ä»¶ã€‚
         /// </summary>
         public void OnSelectedNode1Changed(object sender, WzNodeEventArgs e)
         {
@@ -62,7 +62,7 @@ namespace WzComparerR2.Avatar.UI
 
             switch (file.Type)
             {
-                case Wz_Type.Character: //¶ÁÈ¡×°±¸
+                case Wz_Type.Character: //è¯»å–è£…å¤‡
                     Wz_Image wzImg = e.Node.GetValue<Wz_Image>();
                     if (wzImg != null && wzImg.TryExtract())
                     {
@@ -81,7 +81,7 @@ namespace WzComparerR2.Avatar.UI
                 if (part != null)
                 {
                     var wzFile = part.Node.GetNodeWzFile();
-                    if (wzFile != null && e.WzStructure.wz_files.Contains(wzFile))//½«Òª¹Ø±ÕÎÄ¼ş ÒÆ³ı
+                    if (wzFile != null && e.WzStructure.wz_files.Contains(wzFile))//å°†è¦å…³é—­æ–‡ä»¶ ç§»é™¤
                     {
                         avatar.Parts[i] = null;
                         hasChanged = true;
@@ -97,7 +97,7 @@ namespace WzComparerR2.Avatar.UI
         }
 
         /// <summary>
-        /// ³õÊ¼»¯Ö½ÍŞÍŞ×ÊÔ´¡£
+        /// åˆå§‹åŒ–çº¸å¨ƒå¨ƒèµ„æºã€‚
         /// </summary>
         private bool AvatarInit()
         {
@@ -114,7 +114,7 @@ namespace WzComparerR2.Avatar.UI
         }
 
         /// <summary>
-        /// ¼ÓÔØ×°±¸²¿¼ş¡£
+        /// åŠ è½½è£…å¤‡éƒ¨ä»¶ã€‚
         /// </summary>
         /// <param name="imgNode"></param>
         private void LoadPart(Wz_Node imgNode)
@@ -127,7 +127,7 @@ namespace WzComparerR2.Avatar.UI
             AvatarPart part = this.avatar.AddPart(imgNode);
             if (part != null)
             {
-                if (part == avatar.Body) //Í¬²½head
+                if (part == avatar.Body) //åŒæ­¥head
                 {
                     int headID = 10000 + part.ID.Value % 10000;
                     if (avatar.Head == null || avatar.Head.ID != headID)
@@ -139,7 +139,7 @@ namespace WzComparerR2.Avatar.UI
                         }
                     }
                 }
-                else if (part == avatar.Head) //Í¬²½body
+                else if (part == avatar.Head) //åŒæ­¥body
                 {
                     int bodyID = part.ID.Value % 10000;
                     if (avatar.Body == null || avatar.Body.ID != bodyID)
@@ -151,12 +151,12 @@ namespace WzComparerR2.Avatar.UI
                         }
                     }
                 }
-                else if (part == avatar.Face) //Í¬²½±íÇé
+                else if (part == avatar.Face) //åŒæ­¥è¡¨æƒ…
                 {
                     this.avatar.LoadEmotions();
                     FillEmotion();
                 }
-                else if (part == avatar.Taming) //Í¬²½×ù¼İ¶¯×÷
+                else if (part == avatar.Taming) //åŒæ­¥åº§é©¾åŠ¨ä½œ
                 {
                     this.avatar.LoadTamingActions();
                     FillTamingAction();
@@ -181,7 +181,7 @@ namespace WzComparerR2.Avatar.UI
         }
 
         /// <summary>
-        /// ¸üĞÂ»­²¼¡£
+        /// æ›´æ–°ç”»å¸ƒã€‚
         /// </summary>
         private void UpdateDisplay()
         {
@@ -198,17 +198,17 @@ namespace WzComparerR2.Avatar.UI
             }
 
             ComboItem selectedItem;
-            //Í¬²½½ÇÉ«¶¯×÷
+            //åŒæ­¥è§’è‰²åŠ¨ä½œ
             selectedItem = this.cmbActionBody.SelectedItem as ComboItem;
             this.avatar.ActionName = selectedItem != null ? selectedItem.Text : null;
-            //Í¬²½±íÇé
+            //åŒæ­¥è¡¨æƒ…
             selectedItem = this.cmbEmotion.SelectedItem as ComboItem;
             this.avatar.EmotionName = selectedItem != null ? selectedItem.Text : null;
-            //Í¬²½Æï³è¶¯×÷
+            //åŒæ­¥éª‘å® åŠ¨ä½œ
             selectedItem = this.cmbActionTaming.SelectedItem as ComboItem;
             this.avatar.TamingActionName = selectedItem != null ? selectedItem.Text : null;
 
-            //»ñÈ¡¶¯×÷Ö¡
+            //è·å–åŠ¨ä½œå¸§
             selectedItem = this.cmbBodyFrame.SelectedItem as ComboItem;
             int bodyFrame = selectedItem != null ? Convert.ToInt32(selectedItem.Text) : -1;
             selectedItem = this.cmbEmotionFrame.SelectedItem as ComboItem;
@@ -291,7 +291,7 @@ namespace WzComparerR2.Avatar.UI
             }
         }
 
-        #region Í¬²½½çÃæ
+        #region åŒæ­¥ç•Œé¢
         private void FillBodyAction()
         {
             var oldSelection = cmbActionBody.SelectedItem as ComboItem;
@@ -343,7 +343,7 @@ namespace WzComparerR2.Avatar.UI
         }
 
         /// <summary>
-        /// ¸üĞÂµ±Ç°ÏÔÊ¾²¿¼şÁĞ±í¡£
+        /// æ›´æ–°å½“å‰æ˜¾ç¤ºéƒ¨ä»¶åˆ—è¡¨ã€‚
         /// </summary>
         private void FillAvatarParts()
         {

@@ -1,4 +1,4 @@
-namespace WzComparerR2.Avatar.UI
+锘縩amespace WzComparerR2.Avatar.UI
 {
     partial class AvatarForm
     {
@@ -138,7 +138,7 @@ namespace WzComparerR2.Avatar.UI
             this.bar3.AutoSyncBarCaption = true;
             this.bar3.CloseSingleTab = true;
             this.bar3.Controls.Add(this.panelDockContainer3);
-            this.bar3.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.bar3.Font = new System.Drawing.Font("瀹嬩綋", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.bar3.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Caption;
             this.bar3.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.dockContainerItem3});
@@ -150,7 +150,7 @@ namespace WzComparerR2.Avatar.UI
             this.bar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar3.TabIndex = 0;
             this.bar3.TabStop = false;
-            this.bar3.Text = "菜单";
+            this.bar3.Text = "鑿滃崟";
             // 
             // panelDockContainer3
             // 
@@ -205,7 +205,7 @@ namespace WzComparerR2.Avatar.UI
             // 
             this.dockContainerItem3.Control = this.panelDockContainer3;
             this.dockContainerItem3.Name = "dockContainerItem3";
-            this.dockContainerItem3.Text = "菜单";
+            this.dockContainerItem3.Text = "鑿滃崟";
             // 
             // dockSite2
             // 
@@ -230,7 +230,7 @@ namespace WzComparerR2.Avatar.UI
             this.bar1.AutoSyncBarCaption = true;
             this.bar1.CloseSingleTab = true;
             this.bar1.Controls.Add(this.panelDockContainer1);
-            this.bar1.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.bar1.Font = new System.Drawing.Font("瀹嬩綋", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.bar1.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Caption;
             this.bar1.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.dockContainerItem1});
@@ -242,7 +242,7 @@ namespace WzComparerR2.Avatar.UI
             this.bar1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar1.TabIndex = 0;
             this.bar1.TabStop = false;
-            this.bar1.Text = "零件";
+            this.bar1.Text = "闆朵欢";
             // 
             // panelDockContainer1
             // 
@@ -282,7 +282,7 @@ namespace WzComparerR2.Avatar.UI
             // 
             this.dockContainerItem1.Control = this.panelDockContainer1;
             this.dockContainerItem1.Name = "dockContainerItem1";
-            this.dockContainerItem1.Text = "零件";
+            this.dockContainerItem1.Text = "闆朵欢";
             // 
             // bar2
             // 
@@ -292,7 +292,7 @@ namespace WzComparerR2.Avatar.UI
             this.bar2.AutoSyncBarCaption = true;
             this.bar2.CloseSingleTab = true;
             this.bar2.Controls.Add(this.panelDockContainer2);
-            this.bar2.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.bar2.Font = new System.Drawing.Font("瀹嬩綋", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.bar2.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Caption;
             this.bar2.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.dockContainerItem2});
@@ -304,7 +304,7 @@ namespace WzComparerR2.Avatar.UI
             this.bar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar2.TabIndex = 1;
             this.bar2.TabStop = false;
-            this.bar2.Text = "动作";
+            this.bar2.Text = "鍔ㄤ綔";
             // 
             // panelDockContainer2
             // 
@@ -476,7 +476,7 @@ namespace WzComparerR2.Avatar.UI
             this.labelX3.Size = new System.Drawing.Size(31, 18);
             this.labelX3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.labelX3.TabIndex = 3;
-            this.labelX3.Text = "骑兽";
+            this.labelX3.Text = "楠戝吔";
             // 
             // labelX2
             // 
@@ -491,7 +491,7 @@ namespace WzComparerR2.Avatar.UI
             this.labelX2.Size = new System.Drawing.Size(31, 18);
             this.labelX2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.labelX2.TabIndex = 2;
-            this.labelX2.Text = "表情";
+            this.labelX2.Text = "琛ㄦ儏";
             // 
             // labelX1
             // 
@@ -506,7 +506,7 @@ namespace WzComparerR2.Avatar.UI
             this.labelX1.Size = new System.Drawing.Size(31, 18);
             this.labelX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.labelX1.TabIndex = 1;
-            this.labelX1.Text = "身体";
+            this.labelX1.Text = "韬綋";
             // 
             // cmbActionBody
             // 
@@ -528,7 +528,7 @@ namespace WzComparerR2.Avatar.UI
             // 
             this.dockContainerItem2.Control = this.panelDockContainer2;
             this.dockContainerItem2.Name = "dockContainerItem2";
-            this.dockContainerItem2.Text = "动作";
+            this.dockContainerItem2.Text = "鍔ㄤ綔";
             // 
             // dockSite8
             // 
@@ -635,7 +635,7 @@ namespace WzComparerR2.Avatar.UI
             this.labelX4.Size = new System.Drawing.Size(31, 18);
             this.labelX4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.labelX4.TabIndex = 13;
-            this.labelX4.Text = "武器";
+            this.labelX4.Text = "姝﹀櫒";
             // 
             // comboBoxEx1
             // 
