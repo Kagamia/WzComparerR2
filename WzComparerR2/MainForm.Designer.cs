@@ -196,6 +196,10 @@
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.superTabItem1 = new DevComponents.DotNetBar.SuperTabItem();
+            this.superTabControlPanel3 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.btnExportSkillOption = new DevComponents.DotNetBar.ButtonX();
+            this.btnExportSkill = new DevComponents.DotNetBar.ButtonX();
+            this.superTabItem3 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -206,10 +210,6 @@
             this.labelXComp1 = new DevComponents.DotNetBar.LabelX();
             this.btnEasyCompare = new DevComponents.DotNetBar.ButtonX();
             this.superTabItem2 = new DevComponents.DotNetBar.SuperTabItem();
-            this.superTabControlPanel3 = new DevComponents.DotNetBar.SuperTabControlPanel();
-            this.btnExportSkillOption = new DevComponents.DotNetBar.ButtonX();
-            this.btnExportSkill = new DevComponents.DotNetBar.ButtonX();
-            this.superTabItem3 = new DevComponents.DotNetBar.SuperTabItem();
             this.btnNodeBack = new DevComponents.DotNetBar.ButtonItem();
             this.btnNodeForward = new DevComponents.DotNetBar.ButtonItem();
             this.panelExLeft = new DevComponents.DotNetBar.PanelEx();
@@ -260,8 +260,8 @@
             this.panelEx1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.advTree3)).BeginInit();
             this.contextMenuStrip2.SuspendLayout();
-            this.superTabControlPanel2.SuspendLayout();
             this.superTabControlPanel3.SuspendLayout();
+            this.superTabControlPanel2.SuspendLayout();
             this.panelExLeft.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.advTree2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.advTree1)).BeginInit();
@@ -280,9 +280,9 @@
             this.ribbonControl1.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.ribbonControl1.CanCustomize = false;
             this.ribbonControl1.CaptionVisible = true;
-            this.ribbonControl1.Controls.Add(this.ribbonPanel2);
-            this.ribbonControl1.Controls.Add(this.ribbonPanel3);
             this.ribbonControl1.Controls.Add(this.ribbonPanel1);
+            this.ribbonControl1.Controls.Add(this.ribbonPanel3);
+            this.ribbonControl1.Controls.Add(this.ribbonPanel2);
             this.ribbonControl1.Dock = System.Windows.Forms.DockStyle.Top;
             this.ribbonControl1.EnableQatPlacement = false;
             this.ribbonControl1.Expanded = false;
@@ -557,6 +557,7 @@
             // 
             this.ribbonPanel2.StyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.ribbonPanel2.TabIndex = 2;
+            this.ribbonPanel2.Visible = false;
             // 
             // ribbonBar8
             // 
@@ -1202,7 +1203,6 @@
             // 
             this.ribbonPanel1.StyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.ribbonPanel1.TabIndex = 1;
-            this.ribbonPanel1.Visible = false;
             // 
             // ribbonBar9
             // 
@@ -1560,6 +1560,7 @@
             // 
             // ribbonTabItem1
             // 
+            this.ribbonTabItem1.Checked = true;
             this.ribbonTabItem1.Name = "ribbonTabItem1";
             this.ribbonTabItem1.Panel = this.ribbonPanel1;
             this.ribbonTabItem1.Tag = "Tools";
@@ -1567,7 +1568,6 @@
             // 
             // ribbonTabItem2
             // 
-            this.ribbonTabItem2.Checked = true;
             this.ribbonTabItem2.Name = "ribbonTabItem2";
             this.ribbonTabItem2.Panel = this.ribbonPanel2;
             this.ribbonTabItem2.Tag = "Modules";
@@ -1868,8 +1868,8 @@
             this.superTabControl1.ControlBox.MenuBox,
             this.superTabControl1.ControlBox.CloseBox});
             this.superTabControl1.Controls.Add(this.superTabControlPanel1);
-            this.superTabControl1.Controls.Add(this.superTabControlPanel2);
             this.superTabControl1.Controls.Add(this.superTabControlPanel3);
+            this.superTabControl1.Controls.Add(this.superTabControlPanel2);
             this.superTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControl1.Location = new System.Drawing.Point(0, 0);
             this.superTabControl1.Name = "superTabControl1";
@@ -1894,9 +1894,9 @@
             this.superTabControlPanel1.Controls.Add(this.expandableSplitter1);
             this.superTabControlPanel1.Controls.Add(this.panelEx1);
             this.superTabControlPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.superTabControlPanel1.Location = new System.Drawing.Point(0, 0);
+            this.superTabControlPanel1.Location = new System.Drawing.Point(0, 26);
             this.superTabControlPanel1.Name = "superTabControlPanel1";
-            this.superTabControlPanel1.Size = new System.Drawing.Size(530, 266);
+            this.superTabControlPanel1.Size = new System.Drawing.Size(530, 240);
             this.superTabControlPanel1.TabIndex = 1;
             this.superTabControlPanel1.TabItem = this.superTabItem1;
             // 
@@ -1911,7 +1911,7 @@
             this.panelEx2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelEx2.Location = new System.Drawing.Point(238, 0);
             this.panelEx2.Name = "panelEx2";
-            this.panelEx2.Size = new System.Drawing.Size(292, 266);
+            this.panelEx2.Size = new System.Drawing.Size(292, 240);
             this.panelEx2.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelEx2.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground;
             this.panelEx2.Style.BackColor2.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground2;
@@ -1931,7 +1931,7 @@
             this.panelEx3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelEx3.Location = new System.Drawing.Point(0, 79);
             this.panelEx3.Name = "panelEx3";
-            this.panelEx3.Size = new System.Drawing.Size(292, 164);
+            this.panelEx3.Size = new System.Drawing.Size(292, 138);
             this.panelEx3.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelEx3.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground;
             this.panelEx3.Style.BackColor2.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground2;
@@ -1969,7 +1969,7 @@
             this.buttonItemSaveImage,
             this.buttonItemHandleUol,
             this.buttonItemGif});
-            this.ribbonBar5.Location = new System.Drawing.Point(0, 243);
+            this.ribbonBar5.Location = new System.Drawing.Point(0, 217);
             this.ribbonBar5.Name = "ribbonBar5";
             this.ribbonBar5.Size = new System.Drawing.Size(292, 23);
             this.ribbonBar5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -2121,7 +2121,7 @@
             this.expandableSplitter1.HotGripLightColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarBackground;
             this.expandableSplitter1.Location = new System.Drawing.Point(233, 0);
             this.expandableSplitter1.Name = "expandableSplitter1";
-            this.expandableSplitter1.Size = new System.Drawing.Size(5, 266);
+            this.expandableSplitter1.Size = new System.Drawing.Size(5, 240);
             this.expandableSplitter1.Style = DevComponents.DotNetBar.eSplitterStyle.Office2007;
             this.expandableSplitter1.TabIndex = 1;
             this.expandableSplitter1.TabStop = false;
@@ -2136,7 +2136,7 @@
             this.panelEx1.Dock = System.Windows.Forms.DockStyle.Left;
             this.panelEx1.Location = new System.Drawing.Point(0, 0);
             this.panelEx1.Name = "panelEx1";
-            this.panelEx1.Size = new System.Drawing.Size(233, 266);
+            this.panelEx1.Size = new System.Drawing.Size(233, 240);
             this.panelEx1.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelEx1.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground;
             this.panelEx1.Style.BackColor2.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground2;
@@ -2170,7 +2170,7 @@
             this.advTree3.NodesConnector = this.nodeConnector3;
             this.advTree3.NodeStyle = this.elementStyle3;
             this.advTree3.PathSeparator = ";";
-            this.advTree3.Size = new System.Drawing.Size(227, 180);
+            this.advTree3.Size = new System.Drawing.Size(227, 154);
             this.advTree3.Styles.Add(this.elementStyle3);
             this.advTree3.TabIndex = 1;
             this.advTree3.Text = "advTree3";
@@ -2320,6 +2320,48 @@
             this.superTabItem1.Name = "superTabItem1";
             this.superTabItem1.Text = "WzView";
             // 
+            // superTabControlPanel3
+            // 
+            this.superTabControlPanel3.Controls.Add(this.btnExportSkillOption);
+            this.superTabControlPanel3.Controls.Add(this.btnExportSkill);
+            this.superTabControlPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.superTabControlPanel3.Location = new System.Drawing.Point(0, 26);
+            this.superTabControlPanel3.Name = "superTabControlPanel3";
+            this.superTabControlPanel3.Size = new System.Drawing.Size(530, 240);
+            this.superTabControlPanel3.TabIndex = 0;
+            this.superTabControlPanel3.TabItem = this.superTabItem3;
+            // 
+            // btnExportSkillOption
+            // 
+            this.btnExportSkillOption.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.btnExportSkillOption.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnExportSkillOption.Location = new System.Drawing.Point(99, 6);
+            this.btnExportSkillOption.Name = "btnExportSkillOption";
+            this.btnExportSkillOption.Size = new System.Drawing.Size(111, 23);
+            this.btnExportSkillOption.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.btnExportSkillOption.TabIndex = 1;
+            this.btnExportSkillOption.Text = "ExportSkillOption";
+            this.btnExportSkillOption.Click += new System.EventHandler(this.btnExportSkillOption_Click);
+            // 
+            // btnExportSkill
+            // 
+            this.btnExportSkill.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.btnExportSkill.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnExportSkill.Location = new System.Drawing.Point(6, 6);
+            this.btnExportSkill.Name = "btnExportSkill";
+            this.btnExportSkill.Size = new System.Drawing.Size(75, 23);
+            this.btnExportSkill.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.btnExportSkill.TabIndex = 0;
+            this.btnExportSkill.Text = "ExportSkill";
+            this.btnExportSkill.Click += new System.EventHandler(this.btnExportSkill_Click);
+            // 
+            // superTabItem3
+            // 
+            this.superTabItem3.AttachedControl = this.superTabControlPanel3;
+            this.superTabItem3.GlobalItem = false;
+            this.superTabItem3.Name = "superTabItem3";
+            this.superTabItem3.Text = "DataBase";
+            // 
             // superTabControlPanel2
             // 
             this.superTabControlPanel2.Controls.Add(this.chkOutputRemovedImg);
@@ -2451,48 +2493,6 @@
             this.superTabItem2.GlobalItem = false;
             this.superTabItem2.Name = "superTabItem2";
             this.superTabItem2.Text = "WzCompare";
-            // 
-            // superTabControlPanel3
-            // 
-            this.superTabControlPanel3.Controls.Add(this.btnExportSkillOption);
-            this.superTabControlPanel3.Controls.Add(this.btnExportSkill);
-            this.superTabControlPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.superTabControlPanel3.Location = new System.Drawing.Point(0, 0);
-            this.superTabControlPanel3.Name = "superTabControlPanel3";
-            this.superTabControlPanel3.Size = new System.Drawing.Size(530, 266);
-            this.superTabControlPanel3.TabIndex = 0;
-            this.superTabControlPanel3.TabItem = this.superTabItem3;
-            // 
-            // btnExportSkillOption
-            // 
-            this.btnExportSkillOption.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
-            this.btnExportSkillOption.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.btnExportSkillOption.Location = new System.Drawing.Point(99, 6);
-            this.btnExportSkillOption.Name = "btnExportSkillOption";
-            this.btnExportSkillOption.Size = new System.Drawing.Size(111, 23);
-            this.btnExportSkillOption.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.btnExportSkillOption.TabIndex = 1;
-            this.btnExportSkillOption.Text = "ExportSkillOption";
-            this.btnExportSkillOption.Click += new System.EventHandler(this.btnExportSkillOption_Click);
-            // 
-            // btnExportSkill
-            // 
-            this.btnExportSkill.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
-            this.btnExportSkill.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.btnExportSkill.Location = new System.Drawing.Point(6, 6);
-            this.btnExportSkill.Name = "btnExportSkill";
-            this.btnExportSkill.Size = new System.Drawing.Size(75, 23);
-            this.btnExportSkill.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.btnExportSkill.TabIndex = 0;
-            this.btnExportSkill.Text = "ExportSkill";
-            this.btnExportSkill.Click += new System.EventHandler(this.btnExportSkill_Click);
-            // 
-            // superTabItem3
-            // 
-            this.superTabItem3.AttachedControl = this.superTabControlPanel3;
-            this.superTabItem3.GlobalItem = false;
-            this.superTabItem3.Name = "superTabItem3";
-            this.superTabItem3.Text = "DataBase";
             // 
             // btnNodeBack
             // 
@@ -2936,9 +2936,9 @@
             this.panelEx1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.advTree3)).EndInit();
             this.contextMenuStrip2.ResumeLayout(false);
+            this.superTabControlPanel3.ResumeLayout(false);
             this.superTabControlPanel2.ResumeLayout(false);
             this.superTabControlPanel2.PerformLayout();
-            this.superTabControlPanel3.ResumeLayout(false);
             this.panelExLeft.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.advTree2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.advTree1)).EndInit();

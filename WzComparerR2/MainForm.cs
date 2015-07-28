@@ -36,9 +36,12 @@ namespace WzComparerR2
             initFields();
 
             //开始读取插件
+            RegisterPluginEvents();
             PluginBase.PluginContext context = new PluginBase.PluginContext(this);
             PluginBase.PluginManager.LoadPlugin(context);
             PluginBase.PluginManager.PluginOnLoad();
+
+            this.styleManager1.ManagerStyle = this.styleManager1.ManagerStyle;
         }
 
         List<Wz_Structure> openedWz;
@@ -571,6 +574,7 @@ namespace WzComparerR2
                 node.Expand();
                 advTree1.Nodes.Add(node);
                 this.openedWz.Add(wz);
+                OnWzOpened(new WzStructureEventArgs(wz)); //触发事件
                 QueryPerformance.End();
                 labelItemStatus.Text = "读取成功,用时" + (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000) + "ms,共读取" + wz.img_number + "img.";
                 Setting.AddRecentDocument(wzFilePath);
@@ -638,6 +642,7 @@ namespace WzComparerR2
                 }
             }
 
+            OnWzClosing(new WzStructureEventArgs(wz));
             wz.Clear();
             if (this.openedWz.Remove(wz))
                 labelItemStatus.Text = "已经关闭所选wz...";
@@ -652,6 +657,7 @@ namespace WzComparerR2
             advTree3.Nodes.Clear();
             foreach (Wz_Structure wz in openedWz)
             {
+                OnWzClosing(new WzStructureEventArgs(wz));
                 wz.Clear();
             }
             openedWz.Clear();
@@ -955,7 +961,12 @@ namespace WzComparerR2
             }
             else
             {
-                textBoxX1.Text = Convert.ToString(e.Node.Tag);
+                string valueStr = Convert.ToString(e.Node.Tag);
+                if (valueStr != null && valueStr.Contains("\n") && !valueStr.Contains("\r\n"))
+                {
+                    valueStr = valueStr.Replace("\n", "\r\n");
+                }
+                textBoxX1.Text = Convert.ToString(valueStr);
 
                 if (e.Node.Text == "source")
                 {
@@ -2265,9 +2276,98 @@ namespace WzComparerR2
             get { return getWzNodeByNode(advTree3.SelectedNode, advTree3.Tag as Wz_Node); }
         }
 
+        private EventHandler<WzNodeEventArgs> selectedNode1Changed;
+        private EventHandler<WzNodeEventArgs> selectedNode2Changed;
+        private EventHandler<WzNodeEventArgs> selectedNode3Changed;
+        private EventHandler<WzStructureEventArgs> wzOpened;
+        private EventHandler<WzStructureEventArgs> wzClosing;
+
+        event EventHandler<WzNodeEventArgs> PluginContextProvider.SelectedNode1Changed
+        {
+            add { selectedNode1Changed += value; }
+            remove { selectedNode1Changed -= value; }
+        }
+
+        event EventHandler<WzNodeEventArgs> PluginContextProvider.SelectedNode2Changed
+        {
+            add { selectedNode2Changed += value; }
+            remove { selectedNode2Changed -= value; }
+        }
+
+        event EventHandler<WzNodeEventArgs> PluginContextProvider.SelectedNode3Changed
+        {
+            add { selectedNode3Changed += value; }
+            remove { selectedNode3Changed -= value; }
+        }
+
+        event EventHandler<WzStructureEventArgs> PluginContextProvider.WzOpened
+        {
+            add { wzOpened += value; }
+            remove { wzOpened -= value; }
+        }
+
+        event EventHandler<WzStructureEventArgs> PluginContextProvider.WzClosing
+        {
+            add { wzClosing += value; }
+            remove { wzClosing -= value; }
+        }
+
         StringLinker PluginContextProvider.DefaultStringLinker
         {
             get { return this.stringLinker; }
+        }
+
+        private void RegisterPluginEvents()
+        {
+            advTree1.AfterNodeSelect += advTree1_AfterNodeSelect_Plugin;
+            advTree2.AfterNodeSelect += advTree2_AfterNodeSelect_Plugin;
+            advTree3.AfterNodeSelect += advTree3_AfterNodeSelect_Plugin;
+        }
+
+        private void advTree1_AfterNodeSelect_Plugin(object sender, AdvTreeNodeEventArgs e)
+        {
+            if (selectedNode1Changed != null)
+            {
+                var wzNode = ((PluginContextProvider)(this)).SelectedNode1;
+                var args = new WzNodeEventArgs(wzNode);
+                selectedNode1Changed(this, args);
+            }
+        }
+
+        private void advTree2_AfterNodeSelect_Plugin(object sender, AdvTreeNodeEventArgs e)
+        {
+            if (selectedNode2Changed != null)
+            {
+                var wzNode = ((PluginContextProvider)(this)).SelectedNode2;
+                var args = new WzNodeEventArgs(wzNode);
+                selectedNode2Changed(this, args);
+            }
+        }
+
+        private void advTree3_AfterNodeSelect_Plugin(object sender, AdvTreeNodeEventArgs e)
+        {
+            if (selectedNode3Changed != null)
+            {
+                var wzNode = ((PluginContextProvider)(this)).SelectedNode3;
+                var args = new WzNodeEventArgs(wzNode);
+                selectedNode3Changed(this, args);
+            }
+        }
+
+        protected virtual void OnWzOpened(WzStructureEventArgs e)
+        {
+            if (wzOpened != null)
+            {
+                wzOpened(this, e);
+            }
+        }
+
+        protected virtual void OnWzClosing(WzStructureEventArgs e)
+        {
+            if (wzClosing != null)
+            {
+                wzClosing(this, e);
+            }
         }
         #endregion
 

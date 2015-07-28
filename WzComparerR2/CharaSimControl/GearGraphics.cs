@@ -210,6 +210,7 @@ namespace WzComparerR2.CharaSimControl
         {
             if (s == null)
                 return;
+            StringFormat fmt = StringFormat.GenericTypographic;
             Stack<Brush> brushStack = new Stack<Brush>();
             brushStack.Push(Brushes.White);
             Brush brush = brushStack.Peek();
@@ -247,27 +248,27 @@ namespace WzComparerR2.CharaSimControl
                 {
                     if (strPos < s.Length && s[strPos] == 'c')//遇到#c 换橙刷子并flush
                     {
-                        g.DrawString(sb.ToString(), font, brush, curX, y);
+                        g.DrawString(sb.ToString(), font, brush, curX, y, fmt);
                         brushStack.Push(GearGraphics.OrangeBrush);
                         brush = brushStack.Peek();
                         strPos++;
                     }
                     else if (strPos < s.Length && s[strPos] == 'g')//遇到#c 换绿刷子并flush
                     {
-                        g.DrawString(sb.ToString(), font, brush, curX, y);
+                        g.DrawString(sb.ToString(), font, brush, curX, y, fmt);
                         brushStack.Push(GearGraphics.GearNameBrushG);
                         brush = brushStack.Peek();
                         strPos++;
                     }
                     else if (brushStack.Count == 1) //同#c
                     {
-                        g.DrawString(sb.ToString(), font, brush, curX, y);
+                        g.DrawString(sb.ToString(), font, brush, curX, y, fmt);
                         brushStack.Push(GearGraphics.OrangeBrush);
                         brush = brushStack.Peek();
                     }
                     else//遇到# 换白刷子并flush
                     {
-                        g.DrawString(sb.ToString(), font, brush, curX, y);
+                        g.DrawString(sb.ToString(), font, brush, curX, y, fmt);
                         brushStack.Pop();
                         brush = brushStack.Peek();
                     }
@@ -287,13 +288,15 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (curX + tempX >= x1 || curChar == '\n' || strPos == s.Length)
                 {
-                    g.DrawString(sb.ToString(), font, brush, curX, y);
+                    g.DrawString(sb.ToString(), font, brush, curX, y, fmt);
                     sb.Remove(0, sb.Length);
                     curX = x;
                     tempX = 0;
                     y += height;
                 }
             }
+
+            fmt.Dispose();
         }
 
         public static Bitmap EnlargeBitmap(Bitmap bitmap)

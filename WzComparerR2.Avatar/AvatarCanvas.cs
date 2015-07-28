@@ -15,6 +15,7 @@ namespace WzComparerR2.Avatar
             this.ZMap = new List<string>();
             this.Actions = new List<Action>();
             this.Emotions = new List<string>();
+            this.TamingActions = new List<string>();
             this.Parts = new AvatarPart[18];
             this.ShowEar = false;
             this.WeaponIndex = 0;
@@ -23,6 +24,7 @@ namespace WzComparerR2.Avatar
         public List<string> ZMap { get; private set; }
         public List<Action> Actions { get; private set; }
         public List<string> Emotions { get; private set; }
+        public List<string> TamingActions { get; private set; }
 
         public AvatarPart[] Parts { get; private set; }
         public string ActionName { get; set; }
@@ -114,7 +116,7 @@ namespace WzComparerR2.Avatar
         /// <returns></returns>
         public bool LoadEmotions()
         {
-            Wz_Node faceNode = PluginBase.PluginManager.FindWz("Character\\Face\\00020000.img");
+            Wz_Node faceNode = this.Face != null? this.Face.Node : PluginBase.PluginManager.FindWz("Character\\Face\\00020000.img");
             if (faceNode == null)
             {
                 return false;
@@ -127,6 +129,28 @@ namespace WzComparerR2.Avatar
                 if (emotionNode.Text != "info")
                 {
                     this.Emotions.Add(emotionNode.Text);
+                }
+            }
+
+            return true;
+        }
+
+        public bool LoadTamingActions()
+        {
+            this.TamingActions.Clear();
+
+            Wz_Node tamingNode = this.Taming == null ? null : this.Taming.Node;
+
+            if (tamingNode == null)
+            {
+                return false;
+            }
+
+            foreach (Wz_Node actionNode in tamingNode.Nodes)
+            {
+                if (actionNode.Text != "info")
+                {
+                    this.TamingActions.Add(actionNode.Text);
                 }
             }
 
@@ -280,9 +304,18 @@ namespace WzComparerR2.Avatar
         {
             Action action = this.Actions.Find(act => act.Name == actionName);
             Wz_Node bodyNode = PluginBase.PluginManager.FindWz("Character\\00002000.img");
-            if (action.Level == 2)
+            if (action == null)
+            {
+                return new ActionFrame[0];
+            }
+            else if (action.Level == 2)
             {
                 var actionNode = bodyNode.FindNodeByPath(action.Name);
+                if (actionNode == null)
+                {
+                    return new ActionFrame[0];
+                }
+
                 List<ActionFrame> frames = new List<ActionFrame>();
                 for (int i = 0; ; i++)
                 {
@@ -418,6 +451,7 @@ namespace WzComparerR2.Avatar
             //根骨骼 作为角色原点
             Bone root = new Bone("@root");
             root.Position = Point.Empty;
+            Bone bodyRoot = root;
 
             //获取所有部件
             Wz_Node[] nodes = LinkAllParts(bodyAction, faceAction, tamingAction);
@@ -437,6 +471,10 @@ namespace WzComparerR2.Avatar
                     if (childNode.Value is Wz_Uol)
                     {
                         linkNode = ((Wz_Uol)childNode.Value).HandleUol(linkNode);
+                        if (linkNode == null)
+                        {
+                            continue;
+                        }
                     }
                     if (linkNode.Value is Wz_Png)
                     {
@@ -480,15 +518,20 @@ namespace WzComparerR2.Avatar
                                 Point mapOrigin = mapNode.Nodes[i].GetValue<Wz_Vector>();
                                 if (i == 0) //主骨骼
                                 {
-                                    parentBone = AppendBone(root, null, skin, mapName, mapOrigin);
+                                    parentBone = AppendBone(bodyRoot, null, skin, mapName, mapOrigin);
                                 }
                                 else //级联骨骼
                                 {
-                                    AppendBone(root, parentBone, skin, mapName, mapOrigin);
+                                    var newRoot = AppendBone(bodyRoot, parentBone, skin, mapName, mapOrigin);
+                                    if (newRoot != null)
+                                    {
+                                        bodyRoot = newRoot;
+                                    }
+
                                 }
                             }
                         }
-                    }
+                    } 
                     else
                     {
                         switch (childNode.Text)
@@ -505,7 +548,12 @@ namespace WzComparerR2.Avatar
 
         private Bone AppendBone(Bone root, Bone parentBone, Skin skin, string mapName, Point mapOrigin)
         {
-            Bone bone = root.FindChild(mapName);
+            Bone topNode = root;
+            while (topNode.Parent != null)
+            {
+                topNode = topNode.Parent;
+            }
+            Bone bone = topNode.FindChild(mapName);
             bool exists;
             if (bone == null) //创建骨骼
             {
@@ -560,6 +608,7 @@ namespace WzComparerR2.Avatar
                             }
                         }
                         bone0.Parent = bone;
+                        return bone0; //翻转后返回映射的骨骼
                     }
                     else //替换
                     {
@@ -579,6 +628,10 @@ namespace WzComparerR2.Avatar
 
         public BitmapOrigin DrawFrame(Bone bone, ActionFrame frame)
         {
+            if (frame == null)
+            {
+                return DrawFrame(bone);
+            }
             return DrawFrame(bone, frame.RotateProp == 0 ? frame.Rotate : 0, frame.Move, frame.Flip);
         }
 
@@ -595,6 +648,11 @@ namespace WzComparerR2.Avatar
             }
             rect = rect.Size.IsEmpty ? Rectangle.Empty : rect;
 
+            if (rect.IsEmpty)
+            {
+                return new BitmapOrigin();
+            }
+
             //绘制图像
             Bitmap bmp = new Bitmap(rect.Width, rect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(bmp);
@@ -607,22 +665,22 @@ namespace WzComparerR2.Avatar
 
             if (flip || rotate != 0) //重新绘制 旋转和镜像
             {
-                Point[] destPoints;
+                Matrix mt;
                 switch (rotate)
                 {
                     case 0:
-                        destPoints = new[] { new Point(0, 0), new Point(bmp.Width, 0), new Point(0, bmp.Height) };
+                        mt = Matrix.Identity;
                         break;
                     case 90:
-                        destPoints = new[] { new Point(bmp.Height, 0), new Point(bmp.Height, bmp.Width), new Point(0, 0) };
+                        mt = new Matrix(0, 1, -1, 0, bmp.Height - 1, 0);
                         rect = new Rectangle(-rect.Bottom, rect.X, bmp.Height, bmp.Width);
                         break;
                     case 180:
-                        destPoints = new[] { new Point(bmp.Width, bmp.Height), new Point(0, bmp.Height), new Point(bmp.Width, 0) };
+                        mt = new Matrix(-1, 0, 0, -1, bmp.Width - 1, bmp.Height - 1);
                         rect = new Rectangle(-rect.Right, -rect.Bottom, bmp.Width, bmp.Height);
                         break;
                     case 270:
-                        destPoints = new[] { new Point(0, bmp.Width), new Point(0, 0), new Point(bmp.Height, bmp.Width) };
+                        mt = new Matrix(0, -1, 1, 0, 0, bmp.Width - 1);
                         rect = new Rectangle(rect.Y, -rect.Right, bmp.Height, bmp.Width);
                         break;
                     default:
@@ -631,33 +689,12 @@ namespace WzComparerR2.Avatar
 
                 if (flip)
                 {
-                    Point temp;
-                    switch (rotate)
-                    {
-                        case 0:
-                        case 180:
-                            temp = destPoints[0];
-                            destPoints[0] = destPoints[1];
-                            destPoints[1] = temp;
-                            destPoints[2].X = destPoints[0].X;
-                            break;
-                        case 90:
-                        case 270:
-                            temp = destPoints[0];
-                            destPoints[0] = destPoints[2];
-                            destPoints[2] = temp;
-                            destPoints[1].X = destPoints[0].X;
-                            break;
-                        default:
-                            goto case 0;
-                    }
+                    mt *= new Matrix(-1, 0, 0, 1, rect.Width - 1, 0);
                     rect.X = -rect.Right;
                 }
 
                 Bitmap bmpFlip = new Bitmap(rect.Width, rect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                g = Graphics.FromImage(bmpFlip);
-                g.DrawImage(bmp, destPoints);
-                g.Dispose();
+                TransformPixel(bmp, bmpFlip, mt);
                 bmp.Dispose();
                 bmp = bmpFlip;
             }
@@ -668,6 +705,33 @@ namespace WzComparerR2.Avatar
             }
 
             return new BitmapOrigin(bmp, -rect.X, -rect.Y);
+        }
+
+        private unsafe void TransformPixel(Bitmap src, Bitmap dst, Matrix mt)
+        {
+            var pxData1 = src.LockBits(new Rectangle(0, 0, src.Width, src.Height),
+                System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var pxData2 = dst.LockBits(new Rectangle(0, 0, dst.Width, dst.Height),
+                System.Drawing.Imaging.ImageLockMode.WriteOnly,
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            for (int y = 0; y < pxData1.Height; y++)
+            {
+                int* pSrc = (int*)((byte*)pxData1.Scan0 + y * pxData1.Stride);
+                for (int x = 0; x < pxData1.Width; x++, pSrc++)
+                {
+                    Point newPoint = new Point(
+                        x * mt.m11 + y * mt.m21 + mt.m31,
+                        x * mt.m12 + y * mt.m22 + mt.m32
+                    );
+                    int* pDst = (int*)((byte*)pxData2.Scan0 + newPoint.Y * pxData2.Stride + newPoint.X * 4);
+                    *pDst = *pSrc;
+                }
+            }
+
+            dst.UnlockBits(pxData2);
+            src.UnlockBits(pxData1);
         }
 
         private IEnumerable<AvatarLayer> GenerateLayer(Bone bone, Point position)
@@ -700,10 +764,11 @@ namespace WzComparerR2.Avatar
             //如果有马 马先来
             if (this.Taming != null && tamingAction != null)
             {
-                partNode.Add(this.Taming.Node.FindNodeByPath(tamingAction.Action));
+                partNode.Add(FindActionFrameNode(this.Taming.Node, tamingAction));
                 if (this.Saddle != null)
                 {
-                    partNode.Add(this.Saddle.Node.FindNodeByPath(false, this.Taming.ID.ToString(), tamingAction.Action, tamingAction.Frame.ToString()));
+                    var saddleNode = this.Saddle.Node.FindNodeByPath(false, this.Taming.ID.ToString());
+                    partNode.Add(FindActionFrameNode(saddleNode, tamingAction));
                 }
             }
 
@@ -726,9 +791,9 @@ namespace WzComparerR2.Avatar
                     }
                 }
 
-                if (face != null)
+                if (face ?? false)
                 {
-                    ActionFrame headAction = new ActionFrame() { Action = face.Value ? "front" : "back" };
+                    ActionFrame headAction = new ActionFrame() { Action = "front" };
                     partNode.Add(FindActionFrameNode(this.Head.Node, headAction));
                 }
                 else
@@ -744,9 +809,9 @@ namespace WzComparerR2.Avatar
                 //毛
                 if (this.Hair != null && this.Hair.Visible)
                 {
-                    if (face != null)
+                    if (face ?? false)
                     {
-                        ActionFrame headAction = new ActionFrame() { Action = face.Value ? "default" : "backDefault" };
+                        ActionFrame headAction = new ActionFrame() { Action = "default" };
                         partNode.Add(FindActionFrameNode(this.Hair.Node, headAction));
                     }
                     else
@@ -760,7 +825,7 @@ namespace WzComparerR2.Avatar
                     var part = this.Parts[i];
                     if (part != null && part.Visible)
                     {
-                        if (i != 12 && Gear.GetGearType(part.ID.Value) == GearType.cashWeapon) //点装武器
+                        if (i == 12 && Gear.GetGearType(part.ID.Value) == GearType.cashWeapon) //点装武器
                         {
                             var wpNode = part.Node.FindNodeByPath(this.WeaponType.ToString());
                             partNode.Add(FindActionFrameNode(wpNode, bodyAction));
@@ -1015,5 +1080,34 @@ namespace WzComparerR2.Avatar
             public int ZIndex { get; set; }
         }
 
+        private struct Matrix
+        {
+            public Matrix(int m11, int m12, int m21, int m22, int m31, int m32)
+            {
+                this.m11 = m11;
+                this.m12 = m12;
+                this.m21 = m21;
+                this.m22 = m22;
+                this.m31 = m31;
+                this.m32 = m32;
+            }
+            public int m11, m12, m21, m22, m31, m32;
+
+            public static Matrix Identity
+            {
+                get { return new Matrix(1, 0, 0, 1, 0, 0); }
+            }
+
+            public static Matrix operator *(Matrix mt1, Matrix mt2)
+            {
+                return new Matrix(
+                    mt1.m11 * mt2.m11 + mt1.m12 * mt2.m21,
+                    mt1.m11 * mt2.m12 + mt1.m12 * mt2.m22,
+                    mt1.m21 * mt2.m11 + mt1.m22 * mt2.m21,
+                    mt1.m21 * mt2.m12 + mt1.m22 * mt2.m22,
+                    mt1.m31 * mt2.m11 + mt1.m32 * mt2.m21 + mt2.m31,
+                    mt1.m31 * mt2.m12 + mt1.m32 * mt2.m22 + mt2.m32);
+            }
+        }
     }
 }

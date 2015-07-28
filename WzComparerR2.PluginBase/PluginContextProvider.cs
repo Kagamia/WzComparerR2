@@ -16,5 +16,10 @@ namespace WzComparerR2.PluginBase
         Wz_Node SelectedNode2 { get; }
         Wz_Node SelectedNode3 { get; }
         StringLinker DefaultStringLinker { get; }
+        event EventHandler<WzNodeEventArgs> SelectedNode1Changed;
+        event EventHandler<WzNodeEventArgs> SelectedNode2Changed;
+        event EventHandler<WzNodeEventArgs> SelectedNode3Changed;
+        event EventHandler<WzStructureEventArgs> WzOpened;
+        event EventHandler<WzStructureEventArgs> WzClosing;
     }
 }
