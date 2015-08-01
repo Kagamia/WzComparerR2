@@ -92,7 +92,7 @@ namespace WzComparerR2.CharaSimControl
 
             //绘制技能名称
             format.Alignment = StringAlignment.Center;
-            g.DrawString(sr.Name, GearGraphics.ItemNameFont2, Brushes.White, 145, 10, format);
+            g.DrawString(sr.Name, GearGraphics.ItemNameFont2, Brushes.White, 144, 10, format);
 
             //绘制图标
             picH = 33;
@@ -107,19 +107,19 @@ namespace WzComparerR2.CharaSimControl
             //绘制desc
             picH = 35;
             if (!skill.PreBBSkill)
-                GearGraphics.DrawString(g, "[最高等级：" + skill.MaxLevel + "]", GearGraphics.ItemDetailFont2, 90, 270, ref picH, 16);
+                GearGraphics.DrawString(g, "[最高等级：" + skill.MaxLevel + "]", GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
 
             if (sr.Desc != null)
             {
-                GearGraphics.DrawString(g, sr.Desc, GearGraphics.ItemDetailFont2, 90, 270, ref picH, 16);
+                GearGraphics.DrawString(g, sr.Desc, GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
             }
             if (skill.ReqLevel > 0)
             {
-                GearGraphics.DrawString(g, "#c[要求等级：" + skill.ReqLevel.ToString() + "]#", GearGraphics.ItemDetailFont2, 90, 270, ref picH, 16);
+                GearGraphics.DrawString(g, "#c[要求等级：" + skill.ReqLevel.ToString() + "]#", GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
             }
             if (skill.ReqAmount > 0)
             {
-                GearGraphics.DrawString(g, "#c" + ItemStringHelper.GetSkillReqAmount(skill.SkillID, skill.ReqAmount) + "#", GearGraphics.ItemDetailFont2, 90, 270, ref picH, 16);
+                GearGraphics.DrawString(g, "#c" + ItemStringHelper.GetSkillReqAmount(skill.SkillID, skill.ReqAmount) + "#", GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
             }
 
             //分割线
@@ -130,20 +130,20 @@ namespace WzComparerR2.CharaSimControl
             if (skill.Level > 0)
             {
                 string hStr = SummaryParser.GetSkillSummary(skill, skill.Level, sr, SummaryParams.Default);
-                GearGraphics.DrawString(g, "[现在等级 " + skill.Level + "]", GearGraphics.ItemDetailFont, 8, 266, ref picH, 16);
+                GearGraphics.DrawString(g, "[现在等级 " + skill.Level + "]", GearGraphics.ItemDetailFont, 10, 274, ref picH, 16);
                 if (hStr != null)
                 {
-                    GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, 8, 266, ref picH, 16);
+                    GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, 10, 274, ref picH, 16);
                 }
             }
 
             if (skill.Level < skill.MaxLevel)
             {
                 string hStr = SummaryParser.GetSkillSummary(skill, skill.Level + 1, sr, SummaryParams.Default);
-                GearGraphics.DrawString(g, "[下次等级 " + (skill.Level + 1) + "]", GearGraphics.ItemDetailFont, 8, 266, ref picH, 16);
+                GearGraphics.DrawString(g, "[下次等级 " + (skill.Level + 1) + "]", GearGraphics.ItemDetailFont, 10, 274, ref picH, 16);
                 if (hStr != null)
                 {
-                    GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, 8, 266, ref picH, 16);
+                    GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, 10, 274, ref picH, 16);
                 }
             }
             picH += 9;

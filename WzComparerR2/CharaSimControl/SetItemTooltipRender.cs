@@ -104,8 +104,8 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 Brush brush = setItemPart.Value.Enabled ? Brushes.White : GearGraphics.GrayBrush2;
-                g.DrawString(itemName, GearGraphics.ItemDetailFont2, brush, 10, picHeight);
-                g.DrawString(typeName, GearGraphics.ItemDetailFont2, brush, 250, picHeight, format);
+                g.DrawString(itemName, GearGraphics.ItemDetailFont2, brush, 8, picHeight);
+                g.DrawString(typeName, GearGraphics.ItemDetailFont2, brush, 254, picHeight, format);
                 picHeight += 18;
             }
 
@@ -114,7 +114,7 @@ namespace WzComparerR2.CharaSimControl
             picHeight += 9;
             foreach (KeyValuePair<int, SetItemEffect> effect in this.SetItem.effects)
             {
-                g.DrawString(effect.Key + "套装效果", GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 10, picHeight);
+                g.DrawString(effect.Key + "套装效果", GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 8, picHeight);
                 picHeight += 16;
                 Brush brush = effect.Value.Enabled ? Brushes.White : GearGraphics.GrayBrush2;
                 foreach (KeyValuePair<GearPropType, object> prop in effect.Value.Props)
@@ -124,7 +124,7 @@ namespace WzComparerR2.CharaSimControl
                         List<Potential> ops = (List<Potential>)prop.Value;
                         foreach (Potential p in ops)
                         {
-                            g.DrawString(p.ConvertSummary(), GearGraphics.ItemDetailFont2, brush, 10, picHeight);
+                            g.DrawString(p.ConvertSummary(), GearGraphics.ItemDetailFont2, brush, 8, picHeight);
                             picHeight += 16;
                         }
                     }
@@ -133,7 +133,7 @@ namespace WzComparerR2.CharaSimControl
                         List<SetItemOptionToMob> ops = (List<SetItemOptionToMob>)prop.Value;
                         foreach (SetItemOptionToMob p in ops)
                         {
-                            g.DrawString(p.ConvertSummary(), GearGraphics.ItemDetailFont2, brush, 10, picHeight);
+                            g.DrawString(p.ConvertSummary(), GearGraphics.ItemDetailFont2, brush, 8, picHeight);
                             picHeight += 16;
                         }
                     }
@@ -149,14 +149,14 @@ namespace WzComparerR2.CharaSimControl
                                 sr.Name = p.SkillID.ToString();
                             }
                             string summary = "激活技能<" + sr.Name + "> Lv." + p.Level;
-                            g.DrawString(summary, GearGraphics.ItemDetailFont2, brush, 10, picHeight);
+                            g.DrawString(summary, GearGraphics.ItemDetailFont2, brush, 8, picHeight);
                             picHeight += 16;
                         }
                     }
                     else
                     {
                         g.DrawString(ItemStringHelper.GetGearPropString(prop.Key, Convert.ToInt32(prop.Value)),
-                            GearGraphics.SetItemPropFont, brush, 10, picHeight);
+                            GearGraphics.SetItemPropFont, brush, 8, picHeight);
                         picHeight += 16;
                     }
                 }

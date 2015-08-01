@@ -249,7 +249,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             //分割线1号
-            picH += 8;
+            picH += 7;
             g.DrawImage(res["dotline"].Image, 0, picH);
 
             //绘制装备图标
@@ -262,11 +262,32 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
             g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_base, 12, picH + 10); //绘制背景
-            if (gear.Icon.Bitmap != null) //绘制icon
+            if (gear.IconRaw.Bitmap != null) //绘制icon
             {
-                g.DrawImage(GearGraphics.EnlargeBitmap(gear.Icon.Bitmap),
-                    18 + (1 - gear.Icon.Origin.X) * 2,
-                    picH + 15 + (33 - gear.Icon.Origin.Y) * 2);
+                var attr = new System.Drawing.Imaging.ImageAttributes();
+                var matrix = new System.Drawing.Imaging.ColorMatrix(
+                    new[] {
+                        new float[] { 1, 0, 0, 0, 0 },
+                        new float[] { 0, 1, 0, 0, 0 },
+                        new float[] { 0, 0, 1, 0, 0 },
+                        new float[] { 0, 0, 0, 0.5f, 0 },
+                        new float[] { 0, 0, 0, 0, 1 },
+                        });
+                attr.SetColorMatrix(matrix);
+
+                //绘制阴影
+                var shade = Resource.UIToolTip_img_Item_ItemIcon_shade;
+                g.DrawImage(shade,
+                    new Rectangle(18 + 9, picH + 15 + 54, shade.Width, shade.Height),
+                    0, 0, shade.Width, shade.Height,
+                    GraphicsUnit.Pixel,
+                    attr);
+                //绘制图标
+                g.DrawImage(GearGraphics.EnlargeBitmap(gear.IconRaw.Bitmap),
+                    18 + (1 - gear.IconRaw.Origin.X) * 2,
+                    picH + 15 + (33 - gear.IconRaw.Origin.Y) * 2);
+
+                attr.Dispose();
             }
             if (gear.Cash) //绘制cash标识
             {
@@ -1124,7 +1145,7 @@ namespace WzComparerR2.CharaSimControl
                 {
                     int starLine = Math.Min(maxStar - i, 15);
                     int totalWidth = starLine * 10 + (starLine / 5 - 1) * 6;
-                    int dx = 131 - totalWidth / 2;
+                    int dx = 130 - totalWidth / 2;
                     for (int j = 0; j < starLine; j++)
                     {
                         g.DrawImage((i + j < gear.Star) ?
@@ -1138,6 +1159,7 @@ namespace WzComparerR2.CharaSimControl
                     }
                     picH += 18;
                 }
+                picH -= 1;
             }
         }
 
