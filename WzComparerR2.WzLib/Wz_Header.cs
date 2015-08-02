@@ -41,7 +41,7 @@ namespace WzComparerR2.WzLib
         {
             get
             {
-                int idx = this.c_version_test.Count-1;
+                int idx = this.c_version_test.Count - 1;
                 return idx > -1 ? this.c_version_test[idx] : 0;
             }
         }
@@ -57,7 +57,7 @@ namespace WzComparerR2.WzLib
 
         public bool TryGetNextVersion()
         {
-            for (int i = startVersion+1; i < Int16.MaxValue; i++)
+            for (int i = startVersion + 1; i < Int16.MaxValue; i++)
             {
                 int sum = 0;
                 string versionStr = i.ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -67,9 +67,9 @@ namespace WzComparerR2.WzLib
                     sum += (int)versionStr[j] + 1;
                 }
                 int enc = 0xff
-                    ^ ((sum >> 24) & 0xFF) 
-                    ^ ((sum >> 16) & 0xFF) 
-                    ^ ((sum >> 8) & 0xFF) 
+                    ^ ((sum >> 24) & 0xFF)
+                    ^ ((sum >> 16) & 0xFF)
+                    ^ ((sum >> 8) & 0xFF)
                     ^ ((sum) & 0xFF);
 
                 if (enc == EncryptedVersion)

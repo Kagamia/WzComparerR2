@@ -275,11 +275,10 @@ namespace WzComparerR2
             {
                 try
                 {
-                    if (htmlFile != null)
+                    if (sw != null)
                     {
                         sw.Flush();
                         sw.Close();
-                        htmlFile.Dispose();
                     }
                 }
                 catch
@@ -463,7 +462,6 @@ namespace WzComparerR2
             sw.WriteLine("table.img tr.r2 { background-color:#ffffff; }");
             sw.Flush();
             sw.Close();
-            fs.Dispose();
         }
     }
 }

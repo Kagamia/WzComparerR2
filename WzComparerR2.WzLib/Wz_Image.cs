@@ -6,67 +6,41 @@ namespace WzComparerR2.WzLib
 {
     public class Wz_Image
     {
-        public Wz_Image(string name, int size, int cs32, int offs, bool on_list, Wz_File wz_f)
+        public Wz_Image(string name, int size, int cs32, uint hashOff, uint hashPos, bool on_list, Wz_File wz_f)
         {
-            this.name = name;
-            this.wzFile = wz_f;
-            this.size = size;
-            this.checksum = cs32;
-            this.offset = offs;
-            this.isOnList = on_list;
-            this.node = new Wz_Node(name);
-            this.node.Value = this;
+            this.Name = name;
+            this.WzFile = wz_f;
+            this.Size = size;
+            this.Checksum = cs32;
+            this.HashedOffset = hashOff;
+            this.HashedOffsetPosition = hashPos;
+            this.IsOnList = on_list;
+            this.Node = new Wz_Node(name) { Value = this };
+
             this.extr = false;
             this.chec = false;
             this.checEnc = false;
         }
 
-        private string name;
-        private Wz_File wzFile;
-        private int size;
-        private int checksum;
         private int offset;
-        private bool isOnList;
-        private Wz_Node node;
 
         private bool extr;
         private bool chec;
         private bool checEnc;
 
-        public string Name
-        {
-            get { return this.name; }
-            set { this.name = value; }
-        }
-        public Wz_File WzFile
-        {
-            get { return this.wzFile; }
-            set { this.wzFile = value; }
-        }
-        public int Size
-        {
-            get { return this.size; }
-            set { this.size = value; }
-        }
-        public int Checksum
-        {
-            get { return this.checksum; }
-            set { this.checksum = value; }
-        }
+        public string Name { get; set; }
+        public Wz_File WzFile { get; set; }
+        public int Size { get; set; }
+        public int Checksum { get; set; }
+        public uint HashedOffset { get; set; }
+        public uint HashedOffsetPosition { get; set; }
         public int Offset
         {
             get { return this.offset; }
             set { this.offset = value; }
         }
-        public bool IsOnList
-        {
-            get { return this.isOnList; }
-            set { this.isOnList = value; }
-        }
-        public Wz_Node Node
-        {
-            get { return this.node; }
-        }
+        public bool IsOnList { get; set; }
+        public Wz_Node Node { get; private set; }
 
         public Wz_Node OwnerNode { get; set; }
 
@@ -203,8 +177,8 @@ namespace WzComparerR2.WzLib
                     this.WzFile.FileStream.Position++;
                     int len = this.WzFile.ReadInt32();
                     int ms = this.WzFile.ReadInt32();
-                    int headerLen = eob - len - (int)wzFile.FileStream.Position;
-                    byte[] header = wzFile.BReader.ReadBytes(headerLen);
+                    int headerLen = eob - len - (int)this.WzFile.FileStream.Position;
+                    byte[] header = this.WzFile.BReader.ReadBytes(headerLen);
                     parent.Value = new Wz_Sound(eob - len, len, header, ms, this.WzFile);
                     this.WzFile.FileStream.Position = eob;
                     break;
@@ -221,9 +195,9 @@ namespace WzComparerR2.WzLib
 
         private void TryDetectEnc()
         {
-            Wz_Crypto crypto = this.wzFile.WzStructure.encryption;
+            Wz_Crypto crypto = this.WzFile.WzStructure.encryption;
 
-            if (IsIllegalTag(this.isOnList))
+            if (IsIllegalTag(this.IsOnList))
             {
                 this.checEnc = true;
             }
@@ -231,12 +205,12 @@ namespace WzComparerR2.WzLib
             {
                 if (IsIllegalTag(false))
                 {
-                    this.isOnList = false;
+                    this.IsOnList = false;
                     this.checEnc = true;
                 }
                 else if (IsIllegalTag(true))
                 {
-                    this.isOnList = true;
+                    this.IsOnList = true;
                     this.checEnc = true;
                 }
             }
@@ -245,13 +219,13 @@ namespace WzComparerR2.WzLib
                 crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.KMS;
                 if (IsIllegalTag(false))
                 {
-                    this.isOnList = false;
+                    this.IsOnList = false;
                     this.checEnc = true;
                     return;
                 }
                 else if (IsIllegalTag(true))
                 {
-                    this.isOnList = true;
+                    this.IsOnList = true;
                     this.checEnc = true;
                     return;
                 }
@@ -259,13 +233,13 @@ namespace WzComparerR2.WzLib
                 crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.GMS;
                 if (IsIllegalTag(false))
                 {
-                    this.isOnList = false;
+                    this.IsOnList = false;
                     this.checEnc = true;
                     return;
                 }
                 else if (IsIllegalTag(true))
                 {
-                    this.isOnList = true;
+                    this.IsOnList = true;
                     this.checEnc = true;
                     return;
                 }

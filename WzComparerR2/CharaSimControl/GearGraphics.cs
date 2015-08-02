@@ -477,14 +477,14 @@ namespace WzComparerR2.CharaSimControl
         }
 
         [DllImport("user32.dll")]
-        private static extern int SendMessage(IntPtr hwnd, int wMsg, int wParam, IntPtr lParam);
+        private static extern IntPtr SendMessage(IntPtr hwnd, UInt32 wMsg, IntPtr wParam, IntPtr lParam);
         private const int WM_SETREDRAW = 0xB;
 
         public static void SetRedraw(System.Windows.Forms.Control control, bool enable)
         {
             if (control != null)
             {
-                SendMessage(control.Handle, WM_SETREDRAW, enable ? 1 : 0, IntPtr.Zero);
+                SendMessage(control.Handle, WM_SETREDRAW, new IntPtr(enable ? 1 : 0), IntPtr.Zero);
             }
         }
     }

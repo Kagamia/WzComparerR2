@@ -408,7 +408,6 @@ namespace WzComparerR2
             finally
             {
                 sw.Close();
-                fs.Dispose();
             }
         }
     }

@@ -111,10 +111,8 @@ namespace WzComparerR2.WzLib
                     {
                         blocksize = this.WzFile.BReader.ReadInt32();
                         byte[] dataBlock = this.WzFile.BReader.ReadBytes(blocksize);
-                        for (int i = 0; i < dataBlock.Length; i++)
-                        {
-                            dataBlock[i] ^= encKeys[i];
-                        }
+                        encKeys.Decrypt(dataBlock, 0, dataBlock.Length);
+
                         dataStream.Write(dataBlock, 0, dataBlock.Length);
                     }
                     dataStream.Position = 2;

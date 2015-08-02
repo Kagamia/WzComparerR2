@@ -218,11 +218,11 @@ namespace WzComparerR2.MapRender
 
         public void Dispose()
         {
-            GC.SuppressFinalize(this);
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {

@@ -90,6 +90,7 @@ namespace WzComparerR2.WzLib
                 file.FileStream.Position = 62;
                 file.GetDirTree(node, false, useBaseWz);
                 file.DetectWzType();
+                file.DetectWzVersion();
             }
             catch
             {

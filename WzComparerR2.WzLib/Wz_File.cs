@@ -48,7 +48,7 @@ namespace WzComparerR2.WzLib
         public Wz_Header Header
         {
             get { return header; }
-            set { header = value; }
+            private set { header = value; }
         }
 
         public Wz_Node Node
@@ -174,7 +174,7 @@ namespace WzComparerR2.WzLib
             return ReadString(false);
         }
 
-        public string ReadString(bool use_enc)
+        public unsafe string ReadString(bool use_enc)
         {
             use_enc |= this.WzStructure.encryption.all_strings_encrypted;
             char[] retStr;
@@ -186,32 +186,48 @@ namespace WzComparerR2.WzLib
                 size = (size == -128) ? this.BReader.ReadInt32() : -size;
 
                 byte[] data = this.BReader.ReadBytes(size);
-                retStr = new char[size];
-                
-                for (int i = 0; i < size; i++)
+
+                if (use_enc)
                 {
-                    retStr[i] = (char)(data[i] ^ (use_enc ? mask ^ this.WzStructure.encryption.keys[i] : mask));
-                    unchecked { mask++; }
+                    this.WzStructure.encryption.keys.Decrypt(data, 0, data.Length);
                 }
-                return new string(retStr); 
+                fixed (byte* pData = data)
+                {
+                    for (int i = 0; i < size; i++)
+                    {
+                        pData[i] ^= mask;
+                        unchecked { mask++; }
+                    }
+
+                    return new string((sbyte*)pData, 0, size);
+                }
             }
             else if (size > 0)
             {
-                int mask = 0xAAAA;
+                ushort mask = 0xAAAA;
                 if (size == 127)
                 {
                     size = this.BReader.ReadInt32();
                 }
 
                 byte[] data = this.BReader.ReadBytes(size * 2);
-                retStr = new char[size];
-                for (int i = 0; i < size; i++)
+
+                if (use_enc)
                 {
-                    retStr[i] = ((char)(data[2 * i] + data[2 * i + 1] * 0x100 ^
-                        (use_enc ? mask ^ this.WzStructure.encryption.keys[2 * i] ^ (this.WzStructure.encryption.keys[2 * i + 1] * 0x100) : mask)));
-                    unchecked { mask++; }
+                    this.WzStructure.encryption.keys.Decrypt(data, 0, data.Length);
                 }
-                return new string(retStr); 
+
+                fixed (byte* pData = data)
+                {
+                    ushort* pChar = (ushort*)pData;
+                    for (int i = 0; i < size; i++)
+                    {
+                        pChar[i] ^= mask;
+                        unchecked { mask++; }
+                    }
+
+                    return new string((char*)pChar, 0, size);
+                }
             }
             else
             {
@@ -219,10 +235,9 @@ namespace WzComparerR2.WzLib
             }
         }
 
-        public int CalcOffset()
+        public int CalcOffset(uint filePos, uint hashedOffset)
         {
-            uint offset = (uint)(this.FileStream.Position - 0x3C) ^ 0xFFFFFFFF;
-            uint bytes = this.BReader.ReadUInt32();
+            uint offset = (uint)(filePos - 0x3C) ^ 0xFFFFFFFF;
             int distance = 0;
             long pos = this.FileStream.Position;
 
@@ -230,7 +245,7 @@ namespace WzComparerR2.WzLib
             offset -= 0x581C3F6D;
             distance = (int)offset & 0x1F;
             offset = (offset << distance) | (offset >> (32 - distance));
-            offset ^= bytes;
+            offset ^= hashedOffset;
             offset += 0x78;
 
             return (int)offset;
@@ -268,54 +283,14 @@ namespace WzComparerR2.WzLib
                     case 0xffff:
                         size = this.ReadInt32();
                         cs32 = this.ReadInt32();
+                        uint pos = (uint)this.bReader.BaseStream.Position;
+                        uint hashOffset = this.bReader.ReadUInt32();
+                       
                         on_list = all_lst
                              || (parentBase ? this.WzStructure.encryption.list_contains(name.ToLower()) :
                             this.WzStructure.encryption.list_contains(getFullPath(parent, name)));
 
-                        Wz_Image img = null;
-                        if (!this.header.VersionChecked) //用第一个img测试版本
-                        {
-                            long pos = this.fileStream.Position;
-                            while (this.header.TryGetNextVersion())
-                            {
-                                this.fileStream.Position = pos;
-                                offs = CalcOffset();
-                                if (offs < this.header.HeaderSize || offs + size > this.fileStream.Length)  //img块越界
-                                {
-                                    continue;
-                                }
-                                this.fileStream.Position = offs;
-                                switch (this.fileStream.ReadByte())
-                                {
-                                    case 0x73:
-                                    case 0x1b:
-                                        //试读img第一个string
-                                        break;
-                                    default:
-                                        continue;
-                                }
-
-                                img = new Wz_Image(name, size, cs32, offs, on_list, this);
-
-                                if (img.TryExtract()) //试读成功
-                                {
-                                    img.Unextract();
-                                    this.header.VersionChecked = true;
-                                    break;
-                                }
-                            }
-                            this.fileStream.Position = pos + 4;
-
-                            if (!this.header.VersionChecked) //最终测试失败 那就失败吧..
-                            {
-                                this.header.VersionChecked = true;
-                            }
-                        }
-                        else
-                        {
-                            offs = CalcOffset();
-                            img = new Wz_Image(name, size, cs32, offs, on_list, this);
-                        }
+                        Wz_Image img = new Wz_Image(name, size, cs32, hashOffset, pos, on_list, this);
                         Wz_Node childNode = parent.Nodes.Add(name);
                         childNode.Value = img;
                         img.OwnerNode = childNode;
@@ -346,7 +321,7 @@ namespace WzComparerR2.WzLib
                         if (File.Exists(filePath))
                             this.WzStructure.LoadFile(filePath, t);
                     }
-                    catch
+                    catch(Exception ex)
                     {
                     }
                 }
@@ -465,5 +440,95 @@ namespace WzComparerR2.WzLib
                }
            }
        }
+
+        public void DetectWzVersion()
+        {
+            if (!this.header.VersionChecked) 
+            {
+                //选择最小的img作为实验品
+                Wz_Image minSizeImg = null;
+                List<Wz_Image> imgList = new List<Wz_Image>(this.imageCount);
+                foreach (var img in (EnumerableAllWzImage(this.node)))
+                {
+                    if (img.Size >= 20
+                        && (minSizeImg == null || img.Size < minSizeImg.Size))
+                    {
+                        minSizeImg = img;
+                    }
+
+                    imgList.Add(img);
+                }
+
+                if (minSizeImg == null)
+                {
+                    if (imgList.Count <= 0)
+                    {
+                        return;
+                    }
+                    minSizeImg = imgList[0];
+                }
+
+                while (this.header.TryGetNextVersion())
+                {
+                    int offs = CalcOffset(minSizeImg.HashedOffsetPosition, minSizeImg.HashedOffset);
+
+                    if (offs < this.header.HeaderSize || offs + minSizeImg.Size > this.fileStream.Length)  //img块越界
+                    {
+                        continue;
+                    }
+
+                    this.fileStream.Position = offs;
+                    switch (this.fileStream.ReadByte())
+                    {
+                        case 0x73:
+                        case 0x1b:
+                            //试读img第一个string
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    minSizeImg.Offset = offs;
+                    if (minSizeImg.TryExtract()) //试读成功
+                    {
+                        minSizeImg.Unextract();
+                        this.header.VersionChecked = true;
+                        break;
+                    }
+                }
+
+                if (this.header.VersionChecked) //重新计算全部img
+                {
+                    foreach (var img in imgList)
+                    {
+                        img.Offset = CalcOffset(img.HashedOffsetPosition, img.HashedOffset);
+                    }
+                }
+                else //最终测试失败 那就失败吧..
+                {
+                    this.header.VersionChecked = true;
+                }
+            }
+        }
+
+        private IEnumerable<Wz_Image> EnumerableAllWzImage(Wz_Node parentNode)
+        {
+            foreach (var node in parentNode.Nodes)
+            {
+                Wz_Image img = node.Value as Wz_Image;
+                if (img != null)
+                {
+                    yield return img;
+                }
+
+                if (!(node.Value is Wz_File) && node.Nodes.Count > 0)
+                {
+                    foreach (var imgChild in EnumerableAllWzImage(node))
+                    {
+                        yield return imgChild;
+                    }
+                }
+            }
+        }
     }
 }

@@ -167,13 +167,6 @@ namespace WzComparerR2.CharaSimControl
                 GearGraphics.DrawGearDetailNumber(g, 3, 3, gear.ItemID.ToString("d8"), true);
             }
 
-            if (left != null)
-                left.Dispose();
-            if (add != null)
-                add.Dispose();
-            if (set != null)
-                set.Dispose();
-
             g.Dispose();
             return tooltip;
         }

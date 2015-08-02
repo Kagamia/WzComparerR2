@@ -265,6 +265,27 @@ namespace WzComparerR2.WzLib
                 this.keys = newKeys;
             }
 
+            public unsafe void Decrypt(byte[] buffer, int startIndex, int length)
+            {
+                this.EnsureKeySize(length);
+
+                fixed (byte* pBuffer = buffer, pKeys = this.keys)
+                {
+                    int i = 0;
+                    byte* pData = pBuffer + startIndex;
+
+                    for (int i1 = length / 4 * 4; i < i1; i+=4, pData += 4)
+                    {
+                        *((int*)pData) ^= *(int*)(pKeys + i);
+                    }
+
+                    for (; i < length; i++, pData++)
+                    {
+                        *pData ^= *(pKeys + i);
+                    }
+                }
+            }
+
             static readonly byte[] aesKey = {0x13, 0x00, 0x00, 0x00,
 										0x08, 0x00, 0x00, 0x00,
 										0x06, 0x00, 0x00, 0x00,
