@@ -259,54 +259,12 @@ namespace WzComparerR2.Common
             Gif gif = new Gif();
             for (int i = 0; ; i++)
             {
-                GifFrame gifFrame = null;
                 Wz_Node frameNode = node.FindNodeByPath(i.ToString());
 
                 if (frameNode == null || frameNode.Value == null)
                     break;
+                GifFrame gifFrame = CreateFrameFromNode(frameNode, findNode);
 
-                if (frameNode.Value is Wz_Uol)
-                {
-                    Wz_Uol uol = frameNode.Value as Wz_Uol;
-                    Wz_Node uolNode = uol.HandleUol(frameNode);
-                    if (uolNode != null)
-                        frameNode = uolNode;
-                }
-                if (frameNode.Value is Wz_Png)
-                {
-                    string source = frameNode.Nodes["source"].GetValueEx<string>(null);
-                    Wz_Png png = null;
-                    if (!string.IsNullOrEmpty(source) && findNode != null)
-                    {
-                        png = findNode(source).GetValueEx<Wz_Png>(null);
-                    }
-                    if (png == null)
-                    {
-                        png = (Wz_Png)frameNode.Value;
-                    }
-
-                    gifFrame = new GifFrame(png.ExtractPng());
-                    foreach (Wz_Node propNode in frameNode.Nodes)
-                    {
-                        switch (propNode.Text)
-                        {
-                            case "origin":
-                                gifFrame.Origin = (propNode.Value as Wz_Vector);
-                                break;
-                            case "delay":
-                                gifFrame.Delay = propNode.GetValue<int>();
-                                break;
-                            case "a0":
-                                gifFrame.A0 = propNode.GetValue<int>();
-                                break;
-                            case "a1":
-                                gifFrame.A1 = propNode.GetValue<int>();
-                                break;
-                        }
-                    }
-                    if (gifFrame.Delay == 0)
-                        gifFrame.Delay = 100;//给予默认delay
-                }
                 if (gifFrame == null)
                     break;
                 gif.Frames.Add(gifFrame);
@@ -315,6 +273,63 @@ namespace WzComparerR2.Common
                 return gif;
             else
                 return null;
+        }
+
+        public static GifFrame CreateFrameFromNode(Wz_Node frameNode, GlobalFindNodeFunction findNode)
+        {
+            if (frameNode == null || frameNode.Value == null)
+            {
+                return null;
+            }
+
+            if (frameNode.Value is Wz_Uol)
+            {
+                Wz_Uol uol = frameNode.Value as Wz_Uol;
+                Wz_Node uolNode = uol.HandleUol(frameNode);
+                if (uolNode != null)
+                {
+                    frameNode = uolNode;
+                }
+            }
+            if (frameNode.Value is Wz_Png)
+            {
+                string source = frameNode.Nodes["source"].GetValueEx<string>(null);
+                Wz_Png png = null;
+                if (!string.IsNullOrEmpty(source) && findNode != null)
+                {
+                    png = findNode(source).GetValueEx<Wz_Png>(null);
+                }
+                if (png == null)
+                {
+                    png = (Wz_Png)frameNode.Value;
+                }
+
+                var gifFrame = new GifFrame(png.ExtractPng());
+                foreach (Wz_Node propNode in frameNode.Nodes)
+                {
+                    switch (propNode.Text)
+                    {
+                        case "origin":
+                            gifFrame.Origin = (propNode.Value as Wz_Vector);
+                            break;
+                        case "delay":
+                            gifFrame.Delay = propNode.GetValue<int>();
+                            break;
+                        case "a0":
+                            gifFrame.A0 = propNode.GetValue<int>();
+                            break;
+                        case "a1":
+                            gifFrame.A1 = propNode.GetValue<int>();
+                            break;
+                    }
+                }
+                if (gifFrame.Delay == 0)
+                {
+                    gifFrame.Delay = 100;//给予默认delay
+                }
+                return gifFrame;
+            }
+            return null;
         }
     }
 }

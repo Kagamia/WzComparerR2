@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace WzComparerR2.CharaSimControl
+namespace WzComparerR2.Common
 {
     public class AlphaForm : PerPixelAlphaForm
     {

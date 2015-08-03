@@ -77,6 +77,11 @@ namespace WzComparerR2.PluginBase
             get { return this.contextProvider.DefaultStringLinker; }
         }
 
+        public AlphaForm DefaultTooltipWindow
+        {
+            get { return this.contextProvider.DefaultTooltipWindow; }
+        }
+
         private SuperTabControl SuperTabControl1
         {
             get

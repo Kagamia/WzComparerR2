@@ -567,6 +567,7 @@ namespace WzComparerR2
 
             Wz_Structure wz = new Wz_Structure();
             QueryPerformance.Start();
+            advTree1.BeginUpdate();
             try
             {
                 wz.Load(wzFilePath);
@@ -588,6 +589,10 @@ namespace WzComparerR2
             {
                 MessageBoxEx.Show(ex.ToString(), "嗯?");
                 wz.Clear();
+            }
+            finally
+            {
+                advTree1.EndUpdate();
             }
         }
 
@@ -1404,6 +1409,7 @@ namespace WzComparerR2
             if (openedWz.Count > 0)
             {
                 QueryPerformance.Start();
+                advTree1.BeginUpdate();
                 advTree1.Nodes.Clear();
                 foreach (Wz_Structure wz in openedWz)
                 {
@@ -1416,6 +1422,7 @@ namespace WzComparerR2
                     node.Expand();
                     advTree1.Nodes.Add(node);
                 }
+                advTree1.EndUpdate();
                 GC.Collect();
                 QueryPerformance.End();
                 labelItemStatus.Text = "排序成功,用时" + (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000) + "ms.";
@@ -2317,6 +2324,11 @@ namespace WzComparerR2
             get { return this.stringLinker; }
         }
 
+        AlphaForm PluginContextProvider.DefaultTooltipWindow
+        {
+            get { return this.tooltipQuickView; }
+        }
+
         private void RegisterPluginEvents()
         {
             advTree1.AfterNodeSelect += advTree1_AfterNodeSelect_Plugin;
@@ -2617,70 +2629,7 @@ namespace WzComparerR2
 
         private void buttonItem1_Click(object sender, EventArgs e)
         {
-
-
-            Drawer dr = new Drawer();
-            Wz_File basewz = WzComparerR2.PluginBase.PluginManager.FindWz(Wz_Type.Base).GetValueEx<Wz_File>(null);
-            dr.LoadZ(basewz);
-
-            Wz_File charac = WzComparerR2.PluginBase.PluginManager.FindWz(Wz_Type.Character).GetValueEx<Wz_File>(null);
-            if (charac == null)
-            {
-                MessageBoxEx.Show("木有character.wz");
-                return;
-            }
-
-            dr.Init(charac);
-
-            string action = "sit";
-
-            Wz_Image cap = charac.Node.FindNodeByPath("Cap\\01002777.img").GetValueEx<Wz_Image>(null);
-            dr.AddEquip(cap, action);
-            Wz_Image shoe = charac.Node.FindNodeByPath("Shoes\\01072356.img").GetValueEx<Wz_Image>(null);
-            dr.AddEquip(shoe, action);
-            Wz_Image coat = charac.Node.FindNodeByPath("Longcoat\\01052156.img").GetValueEx<Wz_Image>(null);
-            dr.AddEquip(coat, action);
-            Wz_Image wp = charac.Node.FindNodeByPath("Weapon\\01382057.img").GetValueEx<Wz_Image>(null);
-            dr.AddEquip(wp, action);
-            Wz_Image sh = charac.Node.FindNodeByPath("Shield\\01092029.img").GetValueEx<Wz_Image>(null);
-            dr.AddEquip(sh, action);
-
-            PictureBox pb;
-            if (imgF == null || imgF.IsDisposed)
-            {
-                imgF = new Form();
-
-                imgF.BackColor = Color.White;
-                pb = new PictureBox();
-                pb.Parent = imgF;
-                pb.Dock = DockStyle.Fill;
-                imgF.ClientSizeChanged += (o, args) =>
-                {
-                    if (imgF.ClientSize.Width > 0 && imgF.ClientSize.Height > 0)
-                    {
-                        pb.Image = dr.Draw(imgF.ClientSize);
-                        pb.Size = imgF.ClientSize;
-                    }
-                };
-
-                imgF.Show();
-            }
-            else
-            {
-                pb = imgF.Controls[0] as PictureBox;
-            }
-
-            if (imgF.ClientSize.Width > 0 && imgF.ClientSize.Height > 0)
-            {
-                pb.Image = dr.Draw(imgF.ClientSize);
-                pb.Size = imgF.ClientSize;
-            }
-
-            imgF.BringToFront();
-            imgF.Focus();
         }
-
-        Form imgF;
 
         private void labelItemStatus_TextChanged(object sender, EventArgs e)
         {

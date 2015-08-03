@@ -35,8 +35,12 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlphaForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="BitmapOrigin.cs" />
     <Compile Include="Calculator.cs" />
     <Compile Include="CharaSim\Addition.cs" />
