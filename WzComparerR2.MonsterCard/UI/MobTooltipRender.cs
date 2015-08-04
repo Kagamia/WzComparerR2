@@ -69,6 +69,10 @@ namespace WzComparerR2.MonsterCard.UI
             {
                 sbExt.Append("无法攻击 ");
             }
+            if (mobInfo.FixedDamage > 0)
+            {
+                sbExt.Append("固定伤害" + mobInfo.FixedDamage + " ");
+            }
 
             if (sbExt.Length > 1)
             {
@@ -267,7 +271,7 @@ namespace WzComparerR2.MonsterCard.UI
             {
                 case ElemResistance.Immune: e = "×"; break;
                 case ElemResistance.Resist: e = "△"; break;
-                case ElemResistance.Normal: e = "〇"; break;
+                case ElemResistance.Normal: e = "○"; break;
                 case ElemResistance.Weak: e = "◎"; break;
             }
             return e ?? "  ";

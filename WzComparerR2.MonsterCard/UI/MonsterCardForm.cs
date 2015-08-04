@@ -146,6 +146,7 @@ namespace WzComparerR2.MonsterCard.UI
                         case "damagedByMob": mobInfo.DamagedByMob = node.GetValueEx<int>(0) != 0; break;
                         case "invincible": mobInfo.Invincible = node.GetValueEx<int>(0) != 0; break;
                         case "notAttack": mobInfo.NotAttack = node.GetValueEx<int>(0) != 0; break;
+                        case "fixedDamage": mobInfo.FixedDamage = node.GetValueEx<int>(0); break;
                         case "elemAttr": mobInfo.ElemAttr = new MobElemAttr(node.GetValueEx<string>(null)); break;
 
                         case "link": mobInfo.Link = node.GetValueEx<int>(0); break;
@@ -330,7 +331,7 @@ namespace WzComparerR2.MonsterCard.UI
                     return;
                 }
                 //基本信息
-                advTreeMobInfo.Nodes.Add(CreateNode("level", this.mobInfo.Level.ToString()));
+                advTreeMobInfo.Nodes.Add(CreateNodeWithValue("level", this.mobInfo.Level));
                 if (!string.IsNullOrEmpty(this.mobInfo.DefaultHP))
                 {
                     advTreeMobInfo.Nodes.Add(CreateNode("defaultHP", this.mobInfo.DefaultHP));
@@ -347,10 +348,10 @@ namespace WzComparerR2.MonsterCard.UI
                 {
                     advTreeMobInfo.Nodes.Add(CreateNode("finalMaxMP", this.mobInfo.FinalMaxMP));
                 }
-                advTreeMobInfo.Nodes.Add(CreateNode("maxHP", this.mobInfo.MaxHP.ToString()));
-                advTreeMobInfo.Nodes.Add(CreateNode("maxMP", this.mobInfo.MaxMP.ToString()));
-                advTreeMobInfo.Nodes.Add(CreateNode("HPRecovery", this.mobInfo.HPRecovery.ToString()));
-                advTreeMobInfo.Nodes.Add(CreateNode("MPRecovery", this.mobInfo.MPRecovery.ToString()));
+                advTreeMobInfo.Nodes.Add(CreateNodeWithValue("maxHP", this.mobInfo.MaxHP));
+                advTreeMobInfo.Nodes.Add(CreateNodeWithValue("maxMP", this.mobInfo.MaxMP));
+                advTreeMobInfo.Nodes.Add(CreateNodeWithValue("HPRecovery", this.mobInfo.HPRecovery));
+                advTreeMobInfo.Nodes.Add(CreateNodeWithValue("MPRecovery", this.mobInfo.MPRecovery));
                 if (this.mobInfo.Speed == null && this.mobInfo.FlySpeed == null
                     && !this.mobInfo.Animates.Contains("move") && !this.mobInfo.Animates.Contains("fly"))
                 {
@@ -360,22 +361,22 @@ namespace WzComparerR2.MonsterCard.UI
                 {
                     if (this.mobInfo.Speed != null || this.mobInfo.Animates.Contains("move"))
                     {
-                        advTreeMobInfo.Nodes.Add(CreateNode("speed", (this.mobInfo.Speed ?? 0).ToString()));
+                        advTreeMobInfo.Nodes.Add(CreateNodeWithValue("speed", this.mobInfo.Speed ?? 0));
                     }
                     if (this.mobInfo.FlySpeed != null || this.mobInfo.Animates.Contains("fly"))
                     {
-                        advTreeMobInfo.Nodes.Add(CreateNode("flySpeed", (this.mobInfo.FlySpeed ?? 0).ToString()));
+                        advTreeMobInfo.Nodes.Add(CreateNodeWithValue("flySpeed", this.mobInfo.FlySpeed ?? 0));
                     }
                 }
 
-                advTreeMobInfo.Nodes.Add(CreateNode("PADamage", this.mobInfo.PADamage.ToString()));
-                advTreeMobInfo.Nodes.Add(CreateNode("MADamage", this.mobInfo.MADamage.ToString()));
+                advTreeMobInfo.Nodes.Add(CreateNodeWithValue("PADamage", this.mobInfo.PADamage));
+                advTreeMobInfo.Nodes.Add(CreateNodeWithValue("MADamage", this.mobInfo.MADamage));
                 advTreeMobInfo.Nodes.Add(CreateNode("PDRate", this.mobInfo.PDRate + "%"));
                 advTreeMobInfo.Nodes.Add(CreateNode("MDRate", this.mobInfo.MDRate + "%"));
-                advTreeMobInfo.Nodes.Add(CreateNode("Acc", this.mobInfo.Acc.ToString()));
-                advTreeMobInfo.Nodes.Add(CreateNode("Eva", this.mobInfo.Eva.ToString()));
-                advTreeMobInfo.Nodes.Add(CreateNode("KnockBack", this.mobInfo.Pushed.ToString()));
-                advTreeMobInfo.Nodes.Add(CreateNode("Exp", this.mobInfo.Exp.ToString()));
+                advTreeMobInfo.Nodes.Add(CreateNodeWithValue("Acc", this.mobInfo.Acc));
+                advTreeMobInfo.Nodes.Add(CreateNodeWithValue("Eva", this.mobInfo.Eva));
+                advTreeMobInfo.Nodes.Add(CreateNodeWithValue("KnockBack", this.mobInfo.Pushed));
+                advTreeMobInfo.Nodes.Add(CreateNodeWithValue("Exp", this.mobInfo.Exp));
 
                 Node treeNode;
 
@@ -389,7 +390,10 @@ namespace WzComparerR2.MonsterCard.UI
                 treeNode.Nodes.Add(CreateNodeWithValue("只受怪物伤害(damagedByMob)", this.mobInfo.DamagedByMob));
                 treeNode.Nodes.Add(CreateNodeWithValue("无敌(Invincible)", this.mobInfo.Invincible));
                 treeNode.Nodes.Add(CreateNodeWithValue("无法攻击(NotAttack)", this.mobInfo.NotAttack));
-                treeNode.Expand();
+                if (this.mobInfo.FixedDamage > 0)
+                {
+                    treeNode.Nodes.Add(CreateNodeWithValue("只受固定伤害(FixedDamage)", this.mobInfo.FixedDamage));
+                }
                 advTreeMobInfo.Nodes.Add(treeNode);
 
 
@@ -472,6 +476,11 @@ namespace WzComparerR2.MonsterCard.UI
                 node.Style = new ElementStyle(Color.Gray);
             }
             return node;
+        }
+
+        private Node CreateNodeWithValue(string propName, int value)
+        {
+            return CreateNode(propName, value.ToString());
         }
 
         private void ShowAnimes()

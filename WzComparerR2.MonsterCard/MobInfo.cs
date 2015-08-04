@@ -46,6 +46,7 @@ namespace WzComparerR2.MonsterCard
         public bool DamagedByMob { get; set; }
         public bool Invincible { get; set; }
         public bool NotAttack { get; set; }
+        public int FixedDamage { get; set; }
         public MobElemAttr ElemAttr { get; set; }
 
         public int? Link { get; set; }
