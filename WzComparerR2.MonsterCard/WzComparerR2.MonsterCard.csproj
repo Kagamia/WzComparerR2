@@ -33,8 +33,8 @@
     <Reference Include="DevComponents.DotNetBar2, Version=12.1.0.0, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="DevComponents.Instrumentation, Version=12.1.0.0, Culture=neutral, PublicKeyToken=bc4a9d761ea44ef0" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -84,6 +84,7 @@
     <ProjectReference Include="..\WzComparerR2\WzComparerR2.csproj">
       <Project>{5e883be2-2009-4517-8026-4b90deb83884}</Project>
       <Name>WzComparerR2</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
