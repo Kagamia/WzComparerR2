@@ -10,6 +10,7 @@ namespace WzComparerR2.CharaSim
         head = 1,
         face = 2,
         hair = 3,
+        hair2 = 4,
 
         /// <summary>
         /// 脸饰 101

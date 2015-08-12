@@ -157,6 +157,24 @@ namespace WzComparerR2.Avatar
             return true;
         }
 
+        public List<int> GetCashWeaponTypes()
+        {
+            List<int> types = new List<int>();
+            if (this.Weapon != null && this.Weapon.ID != null && Gear.GetGearType(this.Weapon.ID.Value) == GearType.cashWeapon)
+            {
+                foreach (var node in this.Weapon.Node.Nodes)
+                {
+                    int typeID;
+                    if (Int32.TryParse(node.Text, out typeID))
+                    {
+                        types.Add(typeID);
+                    }
+                }
+            }
+            types.Sort();
+            return types;
+        }
+
         private IEnumerable<Action> LoadAction(Wz_Node actionNode)
         {
             if (actionNode.FindNodeByPath("0") != null)
@@ -229,7 +247,8 @@ namespace WzComparerR2.Avatar
                 case GearType.body: this.Body = part; break;
                 case GearType.head: this.Head = part; break;
                 case GearType.face: this.Face = part; break;
-                case GearType.hair: this.Hair = part; break;
+                case GearType.hair:
+                case GearType.hair2: this.Hair = part; break;
                 case GearType.cap: this.Cap = part; break;
                 case GearType.coat: this.Coat = part; break;
                 case GearType.longcoat: this.Longcoat = part; break;
@@ -258,43 +277,9 @@ namespace WzComparerR2.Avatar
                         this.Weapon = part;
                     }
                     break;
-                /*
-            case "Bd": this.Body = part; break;
-            case "Hd": this.Head = part; break;
-            case "Fc": this.Face = part; break;
-            case "Hr": this.Hair = part; break;
-            case "Cp": 
-            case "HrCp": this.Cap = part; break;
-            case "Ma": this.Coat = part; break;
-            case "MaPn": this.Longcoat = part; break;
-            case "Pn": this.Pants = part; break;
-            case "So": this.Shoes = part; break;
-            case "Gv": this.Glove = part; break;
-            case "Si": this.Shield = part; break;
-            case "Sr": this.Cape = part; break;
-            case "Wp": this.Weapon = part; break;
-            case "Ae": this.Earrings = part; break;
-            case "Af": this.FaceAccessory = part; break;
-            case "Ay": this.EyeAccessory = part; break;
-            case "Tm": this.Taming = part; break;
-            case "Sd": this.Saddle = part; break;
-                 */
             }
-
-            UpdateVisibility();
 
             return part;
-        }
-
-        public void UpdateVisibility()
-        {
-            if (this.Cap != null && this.Cap.ISlot == "HrCp" && this.Cap.Visible)
-            {
-                if (this.Hair != null)
-                {
-                    this.Hair.Visible = false;
-                }
-            }
         }
 
         /// <summary>
@@ -448,16 +433,95 @@ namespace WzComparerR2.Avatar
 
         public Bone CreateFrame(ActionFrame bodyAction, ActionFrame faceAction, ActionFrame tamingAction)
         {
-            //根骨骼 作为角色原点
-            Bone root = new Bone("@root");
-            root.Position = Point.Empty;
-            Bone bodyRoot = root;
-
             //获取所有部件
-            Wz_Node[] nodes = LinkAllParts(bodyAction, faceAction, tamingAction);
+            Wz_Node[] playerNodes = LinkPlayerParts(bodyAction, faceAction);
+            Wz_Node[] tamingNodes = LinkTamingParts(tamingAction);
+
+            //根骨骼 作为角色原点
+            Bone bodyRoot = new Bone("@root");
+            bodyRoot.Position = Point.Empty;
+            CreateBone(bodyRoot, playerNodes, bodyAction.Face);
+
+            
+            if (tamingNodes != null && tamingNodes.Length > 0)
+            {
+                //骑宠骨骼
+                Bone tamingRoot = new Bone("@root2");
+                tamingRoot.Position = Point.Empty;
+                CreateBone(tamingRoot, tamingNodes);
+
+                //合并骨骼
+                foreach (var childBone in tamingRoot.Children)
+                {
+                    Bone bone = bodyRoot.FindChild(childBone.Name);
+                    if (bone != null) //翻转骨骼
+                    {
+                        RotateBone(bodyRoot, bone);
+                        bone.Position = childBone.Position;
+                        bone.Skins.AddRange(childBone.Skins);
+                        for (int i = childBone.Children.Count - 1; i >= 0; i--)
+                        {
+                            childBone.Children[i].Parent = bone;
+                        }
+                    }
+                    else //直接添加
+                    {
+                        bodyRoot.Children.Add(childBone);
+                    }
+                }
+            }
+
+            return bodyRoot;
+        }
+
+        private void RotateBone(Bone root, Bone childBone)
+        {
+            List<Bone> parents = new List<Bone>();
+            Bone bone = childBone;
+            while (bone != null)
+            {
+                parents.Add(bone);
+                if (bone == root) break;
+                bone = bone.Parent;
+            }
+
+            for (int i = parents.Count - 1; i > 0; i--)
+            {
+                var b0 = parents[i];
+                var b1 = parents[i - 1];
+
+                if (b0 == root)
+                { //转接到新root里
+
+                    Bone vRoot = new Bone("@" + root.Name);
+                    vRoot.Position = new Point(-b1.Position.X, -b1.Position.Y);
+                    for (int j = b0.Children.Count - 1; j >= 0; j--)
+                    {
+                        if (b0.Children[j] != b1)
+                        {
+                            b0.Children[j].Parent = vRoot;
+                        }
+                    }
+                    if (vRoot.Children.Count > 0)
+                    {
+                        vRoot.Parent = b1;
+                    }
+                }
+                else
+                {
+                    b0.Position = new Point(-b1.Position.X, -b1.Position.Y);
+                    b1.Parent = null;
+                    b0.Parent = b1;
+                }
+            }
+            childBone.Parent = root;
+        }
+
+        private void CreateBone(Bone root, Wz_Node[] frameNodes, bool? bodyFace = null)
+        {
             bool face = true;
 
-            foreach (Wz_Node partNode in nodes)
+            foreach (Wz_Node partNode in frameNodes)
             {
                 Wz_Node linkPartNode = partNode;
                 if (linkPartNode.Value is Wz_Uol)
@@ -481,7 +545,7 @@ namespace WzComparerR2.Avatar
                         //过滤纹理
                         switch (childNode.Text)
                         {
-                            case "face": if (!(bodyAction.Face ?? face)) continue; break;
+                            case "face": if (!(bodyFace ?? face)) continue; break;
                             case "ear": if (!ShowEar) continue; break;
                             case "hairOverHead": if (!ShowhairOverHead) continue; break;
                             default:
@@ -512,26 +576,31 @@ namespace WzComparerR2.Avatar
                         if (mapNode != null)
                         {
                             Bone parentBone = null;
-                            for (int i = 0; i < mapNode.Nodes.Count; i++)
+                            foreach (var map in mapNode.Nodes)
                             {
-                                string mapName = mapNode.Nodes[i].Text;
-                                Point mapOrigin = mapNode.Nodes[i].GetValue<Wz_Vector>();
-                                if (i == 0) //主骨骼
+                                string mapName = map.Text;
+                                Point mapOrigin = map.GetValue<Wz_Vector>();
+
+                                if (mapName == "muzzle") //特殊处理 忽略
                                 {
-                                    parentBone = AppendBone(bodyRoot, null, skin, mapName, mapOrigin);
+                                    continue;
+                                }
+
+                                if (parentBone == null) //主骨骼
+                                {
+                                    parentBone = AppendBone(root, null, skin, mapName, mapOrigin);
                                 }
                                 else //级联骨骼
                                 {
-                                    var newRoot = AppendBone(bodyRoot, parentBone, skin, mapName, mapOrigin);
-                                    if (newRoot != null)
-                                    {
-                                        bodyRoot = newRoot;
-                                    }
-
+                                    AppendBone(root, parentBone, skin, mapName, mapOrigin);
                                 }
                             }
                         }
-                    } 
+                        else
+                        {
+                            root.Skins.Add(skin);
+                        }
+                    }
                     else
                     {
                         switch (childNode.Text)
@@ -543,17 +612,22 @@ namespace WzComparerR2.Avatar
                     }
                 }
             }
-            return root;
         }
 
         private Bone AppendBone(Bone root, Bone parentBone, Skin skin, string mapName, Point mapOrigin)
         {
-            Bone topNode = root;
-            while (topNode.Parent != null)
+            Bone bone;
+            switch (mapName)
             {
-                topNode = topNode.Parent;
+                case "muzzle":
+                    bone = root.FindChild("navel");
+                    break;
+                default:
+                    bone = root.FindChild(mapName);
+                    break;
             }
-            Bone bone = topNode.FindChild(mapName);
+
+            
             bool exists;
             if (bone == null) //创建骨骼
             {
@@ -593,8 +667,11 @@ namespace WzComparerR2.Avatar
                     bone.Parent = parentBone;
                     bone.Position = mapOrigin;
                 }
-                else //如果已存在
+                else //如果已存在 替换
                 {
+                    bone.Parent = parentBone;
+                    bone.Position = mapOrigin;
+                    /*
                     if (parentBone == root) //翻转
                     {
                         Bone bone0 = new Bone("@" + bone.Name + "_" + skin.Name); //创建虚关节
@@ -612,9 +689,8 @@ namespace WzComparerR2.Avatar
                     }
                     else //替换
                     {
-                        bone.Parent = parentBone;
-                        bone.Position = mapOrigin;
-                    }
+                       
+                    }*/
                 }
 
                 return null;
@@ -744,6 +820,10 @@ namespace WzComparerR2.Avatar
                 layer.Position = new Point(position.X + skin.Offset.X - skin.Image.Origin.X,
                     position.Y + skin.Offset.Y - skin.Image.Origin.Y);
                 layer.ZIndex = this.ZMap.IndexOf(skin.Z);
+                if (layer.ZIndex < 0)
+                {
+                    layer.ZIndex = this.ZMap.Count;
+                }
                 yield return layer;
             }
 
@@ -756,23 +836,12 @@ namespace WzComparerR2.Avatar
             }
         }
 
-        private Wz_Node[] LinkAllParts(ActionFrame bodyAction, ActionFrame faceAction, ActionFrame tamingAction)
+        private Wz_Node[] LinkPlayerParts(ActionFrame bodyAction, ActionFrame faceAction)
         {
             //寻找所有部件
             List<Wz_Node> partNode = new List<Wz_Node>();
 
-            //如果有马 马先来
-            if (this.Taming != null && tamingAction != null)
-            {
-                partNode.Add(FindActionFrameNode(this.Taming.Node, tamingAction));
-                if (this.Saddle != null)
-                {
-                    var saddleNode = this.Saddle.Node.FindNodeByPath(false, this.Taming.ID.ToString());
-                    partNode.Add(FindActionFrameNode(saddleNode, tamingAction));
-                }
-            }
-
-            //如果有人...什么鬼
+            //链接人
             if (this.Body != null && this.Head != null && bodyAction != null
                 && this.Body.Visible && this.Head.Visible)
             {
@@ -839,6 +908,26 @@ namespace WzComparerR2.Avatar
                             partNode.Add(FindActionFrameNode(part.Node, bodyAction));
                         }
                     }
+                }
+            }
+
+            partNode.RemoveAll(node => node == null);
+
+            return partNode.ToArray();
+        }
+
+        private Wz_Node[] LinkTamingParts(ActionFrame tamingAction)
+        {
+            List<Wz_Node> partNode = new List<Wz_Node>();
+
+            //链接马
+            if (this.Taming != null && tamingAction != null)
+            {
+                partNode.Add(FindActionFrameNode(this.Taming.Node, tamingAction));
+                if (this.Saddle != null)
+                {
+                    var saddleNode = this.Saddle.Node.FindNodeByPath(false, this.Taming.ID.ToString());
+                    partNode.Add(FindActionFrameNode(saddleNode, tamingAction));
                 }
             }
 

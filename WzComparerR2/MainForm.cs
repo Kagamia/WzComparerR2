@@ -2053,6 +2053,7 @@ namespace WzComparerR2
             }
             
             object obj = null;
+            string fileName = null;
             switch (wzf.Type)
             {
                 case Wz_Type.Character:
@@ -2062,13 +2063,17 @@ namespace WzComparerR2
                     {
                         CharaSimLoader.LoadSetItems();
                     }
-                    obj = Gear.CreateFromNode(image.Node, PluginManager.FindWz);
+                    var gear = Gear.CreateFromNode(image.Node, PluginManager.FindWz);
+                    obj = gear;
+                    fileName = gear.ItemID + ".png";
                     break;
                 case Wz_Type.Item:
                     Wz_Node itemNode = getWzNodeByNode(node);
                     if (Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\(Cash|Consume|Etc|Install|Cash)\\\d{4}.img\\\d+$"))
                     {
-                        obj = Item.CreateFromNode(itemNode);
+                        var item = Item.CreateFromNode(itemNode);
+                        obj = item;
+                        fileName = item.ItemID + ".png";
                     }
                     else if( Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\Pet\\\d{7}.img"))
                     {
@@ -2076,7 +2081,9 @@ namespace WzComparerR2
                         {
                             CharaSimLoader.LoadSetItems();
                         }
-                        obj = Item.CreateFromNode(itemNode);
+                        var item = Item.CreateFromNode(itemNode);
+                        obj = item;
+                        fileName = item.ItemID + ".png";
                     }
                     
                     break;
@@ -2087,8 +2094,9 @@ namespace WzComparerR2
                     {
                         Recipe recipe = Recipe.CreateFromNode(skillNode);
                         obj = recipe;
+                        fileName = "recipe_" + recipe.RecipeID + ".png";
                     }
-                    else if (Regex.IsMatch(skillNode.FullPathToFile, @"^Skill\\\d+.img"))
+                    else if (Regex.IsMatch(skillNode.FullPathToFile, @"^Skill\\\d+.img\\skill\\\d+$"))
                     {
                         Skill skill = Skill.CreateFromNode(skillNode, PluginManager.FindWz);
                         if (skill != null)
@@ -2100,14 +2108,16 @@ namespace WzComparerR2
                                 case DefaultLevel.LevelMax: skill.Level = skill.MaxLevel; break;
                                 case DefaultLevel.LevelMaxWithCO: skill.Level = skill.MaxLevel + 2; break;
                             }
+                            obj = skill;
+                            fileName = "skill_" + skill.SkillID + ".png";
                         }
-                        obj = skill;
                     }
                     break;
             }
             if (obj != null)
             {
                 tooltipQuickView.TargetItem = obj;
+                tooltipQuickView.ImageFileName = fileName;
                 tooltipQuickView.Refresh();
                 tooltipQuickView.HideOnHover = false;
                 tooltipQuickView.Show();

@@ -28,8 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.dotNetBarManager1 = new DevComponents.DotNetBar.DotNetBarManager(this.components);
+            this.dotNetBarManager1 = new DevComponents.DotNetBar.DotNetBarManager();
             this.dockSite4 = new DevComponents.DotNetBar.DockSite();
             this.dockSite1 = new DevComponents.DotNetBar.DockSite();
             this.bar3 = new DevComponents.DotNetBar.Bar();
@@ -45,6 +44,11 @@
             this.dockContainerItem1 = new DevComponents.DotNetBar.DockContainerItem();
             this.bar2 = new DevComponents.DotNetBar.Bar();
             this.panelDockContainer2 = new DevComponents.DotNetBar.PanelDockContainer();
+            this.cmbWeaponIdx = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+            this.cmbWeaponType = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+            this.labelX4 = new DevComponents.DotNetBar.LabelX();
+            this.chkEar = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkHairOverHead = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkTamingPlay = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkEmotionPlay = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkBodyPlay = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -63,13 +67,8 @@
             this.dockSite6 = new DevComponents.DotNetBar.DockSite();
             this.dockSite7 = new DevComponents.DotNetBar.DockSite();
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.timer1 = new System.Windows.Forms.Timer();
             this.avatarContainer1 = new WzComparerR2.Avatar.UI.AvatarContainer();
-            this.checkBoxX1 = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.checkBoxX2 = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.labelX4 = new DevComponents.DotNetBar.LabelX();
-            this.comboBoxEx1 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
-            this.comboBoxEx2 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.dockSite1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bar3)).BeginInit();
             this.bar3.SuspendLayout();
@@ -310,11 +309,11 @@
             // 
             this.panelDockContainer2.AutoScroll = true;
             this.panelDockContainer2.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.panelDockContainer2.Controls.Add(this.comboBoxEx2);
-            this.panelDockContainer2.Controls.Add(this.comboBoxEx1);
+            this.panelDockContainer2.Controls.Add(this.cmbWeaponIdx);
+            this.panelDockContainer2.Controls.Add(this.cmbWeaponType);
             this.panelDockContainer2.Controls.Add(this.labelX4);
-            this.panelDockContainer2.Controls.Add(this.checkBoxX2);
-            this.panelDockContainer2.Controls.Add(this.checkBoxX1);
+            this.panelDockContainer2.Controls.Add(this.chkEar);
+            this.panelDockContainer2.Controls.Add(this.chkHairOverHead);
             this.panelDockContainer2.Controls.Add(this.chkTamingPlay);
             this.panelDockContainer2.Controls.Add(this.chkEmotionPlay);
             this.panelDockContainer2.Controls.Add(this.chkBodyPlay);
@@ -337,6 +336,81 @@
             this.panelDockContainer2.Style.ForeColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.ItemText;
             this.panelDockContainer2.Style.GradientAngle = 90;
             this.panelDockContainer2.TabIndex = 0;
+            // 
+            // cmbWeaponIdx
+            // 
+            this.cmbWeaponIdx.DisplayMember = "Text";
+            this.cmbWeaponIdx.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cmbWeaponIdx.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbWeaponIdx.FormattingEnabled = true;
+            this.cmbWeaponIdx.ItemHeight = 15;
+            this.cmbWeaponIdx.Location = new System.Drawing.Point(91, 103);
+            this.cmbWeaponIdx.Name = "cmbWeaponIdx";
+            this.cmbWeaponIdx.Size = new System.Drawing.Size(50, 21);
+            this.cmbWeaponIdx.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.cmbWeaponIdx.TabIndex = 15;
+            this.cmbWeaponIdx.SelectedIndexChanged += new System.EventHandler(this.cmbWeaponIdx_SelectedIndexChanged);
+            // 
+            // cmbWeaponType
+            // 
+            this.cmbWeaponType.DisplayMember = "Text";
+            this.cmbWeaponType.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cmbWeaponType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbWeaponType.FormattingEnabled = true;
+            this.cmbWeaponType.ItemHeight = 15;
+            this.cmbWeaponType.Location = new System.Drawing.Point(35, 103);
+            this.cmbWeaponType.Name = "cmbWeaponType";
+            this.cmbWeaponType.Size = new System.Drawing.Size(50, 21);
+            this.cmbWeaponType.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.cmbWeaponType.TabIndex = 14;
+            this.cmbWeaponType.SelectedIndexChanged += new System.EventHandler(this.cmbWeaponType_SelectedIndexChanged);
+            // 
+            // labelX4
+            // 
+            this.labelX4.AutoSize = true;
+            this.labelX4.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX4.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX4.Location = new System.Drawing.Point(3, 106);
+            this.labelX4.Name = "labelX4";
+            this.labelX4.Size = new System.Drawing.Size(31, 18);
+            this.labelX4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.labelX4.TabIndex = 13;
+            this.labelX4.Text = "武器";
+            // 
+            // chkEar
+            // 
+            this.chkEar.AutoSize = true;
+            this.chkEar.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkEar.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkEar.Location = new System.Drawing.Point(106, 84);
+            this.chkEar.Name = "chkEar";
+            this.chkEar.Size = new System.Drawing.Size(45, 19);
+            this.chkEar.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkEar.TabIndex = 12;
+            this.chkEar.Text = "ear";
+            this.chkEar.CheckedChanged += new System.EventHandler(this.chkEar_CheckedChanged);
+            // 
+            // chkHairOverHead
+            // 
+            this.chkHairOverHead.AutoSize = true;
+            this.chkHairOverHead.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkHairOverHead.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkHairOverHead.Location = new System.Drawing.Point(5, 84);
+            this.chkHairOverHead.Name = "chkHairOverHead";
+            this.chkHairOverHead.Size = new System.Drawing.Size(109, 19);
+            this.chkHairOverHead.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkHairOverHead.TabIndex = 9;
+            this.chkHairOverHead.Text = "hairOverHead";
+            this.chkHairOverHead.CheckedChanged += new System.EventHandler(this.chkHairOverHead_CheckedChanged);
             // 
             // chkTamingPlay
             // 
@@ -581,6 +655,10 @@
             this.dockSite3.TabIndex = 2;
             this.dockSite3.TabStop = false;
             // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // avatarContainer1
             // 
             this.avatarContainer1.BackColor = System.Drawing.Color.White;
@@ -591,79 +669,6 @@
             this.avatarContainer1.Size = new System.Drawing.Size(277, 411);
             this.avatarContainer1.TabIndex = 8;
             this.avatarContainer1.Text = "avatarContainer1";
-            // 
-            // checkBoxX1
-            // 
-            this.checkBoxX1.AutoSize = true;
-            this.checkBoxX1.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX1.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX1.Location = new System.Drawing.Point(5, 84);
-            this.checkBoxX1.Name = "checkBoxX1";
-            this.checkBoxX1.Size = new System.Drawing.Size(101, 16);
-            this.checkBoxX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX1.TabIndex = 9;
-            this.checkBoxX1.Text = "hairOverHead";
-            // 
-            // checkBoxX2
-            // 
-            this.checkBoxX2.AutoSize = true;
-            this.checkBoxX2.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.checkBoxX2.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.checkBoxX2.Location = new System.Drawing.Point(106, 84);
-            this.checkBoxX2.Name = "checkBoxX2";
-            this.checkBoxX2.Size = new System.Drawing.Size(45, 16);
-            this.checkBoxX2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.checkBoxX2.TabIndex = 12;
-            this.checkBoxX2.Text = "ear";
-            // 
-            // labelX4
-            // 
-            this.labelX4.AutoSize = true;
-            this.labelX4.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.labelX4.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX4.Location = new System.Drawing.Point(3, 106);
-            this.labelX4.Name = "labelX4";
-            this.labelX4.Size = new System.Drawing.Size(31, 18);
-            this.labelX4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.labelX4.TabIndex = 13;
-            this.labelX4.Text = "武器";
-            // 
-            // comboBoxEx1
-            // 
-            this.comboBoxEx1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBoxEx1.DisplayMember = "Text";
-            this.comboBoxEx1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.comboBoxEx1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxEx1.FormattingEnabled = true;
-            this.comboBoxEx1.ItemHeight = 15;
-            this.comboBoxEx1.Location = new System.Drawing.Point(35, 103);
-            this.comboBoxEx1.Name = "comboBoxEx1";
-            this.comboBoxEx1.Size = new System.Drawing.Size(50, 21);
-            this.comboBoxEx1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.comboBoxEx1.TabIndex = 14;
-            // 
-            // comboBoxEx2
-            // 
-            this.comboBoxEx2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBoxEx2.DisplayMember = "Text";
-            this.comboBoxEx2.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.comboBoxEx2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxEx2.FormattingEnabled = true;
-            this.comboBoxEx2.ItemHeight = 15;
-            this.comboBoxEx2.Location = new System.Drawing.Point(91, 103);
-            this.comboBoxEx2.Name = "comboBoxEx2";
-            this.comboBoxEx2.Size = new System.Drawing.Size(50, 21);
-            this.comboBoxEx2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.comboBoxEx2.TabIndex = 15;
             // 
             // AvatarForm
             // 
@@ -734,10 +739,10 @@
         private DevComponents.DotNetBar.ButtonItem buttonItem1;
         private System.Windows.Forms.Timer timer1;
         private AvatarContainer avatarContainer1;
-        private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX1;
-        private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX2;
-        private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx2;
-        private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx1;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkHairOverHead;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkEar;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWeaponIdx;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWeaponType;
         private DevComponents.DotNetBar.LabelX labelX4;
     }
 }

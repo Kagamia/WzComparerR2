@@ -48,6 +48,8 @@ namespace WzComparerR2.CharaSimControl
         public SkillTooltipRender2 SkillRender { get; private set; }
         public RecipeTooltipRender RecipeRender { get; private set; }
 
+        public string ImageFileName { get; set; }
+
         public bool ShowID
         {
             get { return this.showID; }
@@ -165,7 +167,8 @@ namespace WzComparerR2.CharaSimControl
         {
             if (this.Bitmap != null)
             {
-                Clipboard.SetImage(this.Bitmap);
+                var dataObj = new ImageDataObject(this.Bitmap, this.ImageFileName);
+                Clipboard.SetDataObject(dataObj, false);
             }
         }
 
@@ -176,14 +179,7 @@ namespace WzComparerR2.CharaSimControl
                 using (SaveFileDialog dlg = new SaveFileDialog())
                 {
                     dlg.Filter = "*.png|*.png|*.*|*.*";
-                    if (this.item is ItemBase)
-                    {
-                        dlg.FileName = ((ItemBase)this.item).ItemID.ToString("D7") + ".png";
-                    }
-                    else if (this.item is Skill)
-                    {
-                        dlg.FileName = ((Skill)this.item).SkillID.ToString("D7") + ".png";
-                    }
+                    dlg.FileName = this.ImageFileName;
 
                     if (dlg.ShowDialog() == DialogResult.OK)
                     {

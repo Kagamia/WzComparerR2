@@ -83,7 +83,14 @@ namespace WzComparerR2.CharaSimControl
                             else if (StringLinker.StringItem.TryGetValue(itemID.Key, out sr)) //兼容宠物
                             {
                                 itemName = sr.Name;
-                                typeName = "";
+                                if (itemID.Key / 10000 == 500)
+                                {
+                                    typeName = "宠物";
+                                }
+                                else
+                                {
+                                    typeName = "";
+                                }
                             }
                         }
                         if (sr == null)

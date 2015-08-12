@@ -12,6 +12,7 @@ using WzComparerR2.Common;
 using WzComparerR2.WzLib;
 using WzComparerR2.CharaSimControl;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace WzComparerR2.MonsterCard.UI
 {
@@ -313,6 +314,7 @@ namespace WzComparerR2.MonsterCard.UI
 
                     tooltipWnd.TargetItem = this.mobInfo;
                     tooltipWnd.HideOnHover = false;
+                    tooltipWnd.ImageFileName = "mob_" + this.mobInfo.ID.ToString() + ".png";
                     tooltipWnd.Show();
                 }
             }
@@ -322,8 +324,14 @@ namespace WzComparerR2.MonsterCard.UI
         {
             try
             {
+                int scrolling = 0;
+                if (advTreeMobInfo.VScrollBarVisible && advTreeMobInfo.VScrollBar != null)
+                {
+                    scrolling = advTreeMobInfo.VScrollBar.Value;
+                }
+
                 advTreeMobInfo.BeginUpdate();
-               
+                
                 advTreeMobInfo.Nodes.Clear();
                 
                 if (this.mobInfo == null)
@@ -394,6 +402,7 @@ namespace WzComparerR2.MonsterCard.UI
                 {
                     treeNode.Nodes.Add(CreateNodeWithValue("只受固定伤害(FixedDamage)", this.mobInfo.FixedDamage));
                 }
+                treeNode.Expand();
                 advTreeMobInfo.Nodes.Add(treeNode);
 
 
@@ -426,10 +435,36 @@ namespace WzComparerR2.MonsterCard.UI
                     treeNode.Expand();
                     advTreeMobInfo.Nodes.Add(treeNode);
                 }
+
+                if (scrolling > 0)
+                {
+                    InvokeScroll(scrolling);
+                }
             }
             finally
             {
                 advTreeMobInfo.EndUpdate();
+            }
+        }
+
+        private void InvokeScroll(int value)
+        {
+            if (advTreeMobInfo.VScrollBarVisible && advTreeMobInfo.VScrollBar != null)
+            {
+                var bar = advTreeMobInfo.VScrollBar;
+                value = Math.Max(Math.Min(bar.Maximum, value), bar.Minimum);
+                var methods = typeof(ScrollBarAdv).GetMethods(BindingFlags.NonPublic | BindingFlags.Instance);
+                foreach (var mInfo in methods)
+                {
+                    var pList = mInfo.GetParameters();
+                    if (pList.Length == 2
+                        && pList[0].ParameterType == typeof(int)
+                        && pList[1].ParameterType == typeof(ScrollEventType))
+                    {
+                        mInfo.Invoke(bar, new object[] { value, ScrollEventType.ThumbPosition });
+                        break;
+                    }
+                }
             }
         }
 

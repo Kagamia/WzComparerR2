@@ -24,7 +24,7 @@ namespace WzComparerR2
                 string logFile = Path.Combine(Application.StartupPath, "error.log");
                 try
                 {
-                    string content = DateTime.UtcNow.ToString() + "\r\n" + ex.ToString() + "\r\n";
+                    string content = DateTime.Now.ToString() + "\r\n" + ex.ToString() + "\r\n";
                     File.AppendAllText(logFile, content);
                 }
                 catch

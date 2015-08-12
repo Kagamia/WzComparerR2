@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows.Forms;
 using DevComponents.DotNetBar;
@@ -21,14 +19,18 @@ namespace WzComparerR2.Avatar.UI
         {
             InitializeComponent();
             this.avatar = new AvatarCanvas();
+            this.animator = new Animator();
             this.avatarContainer1.Origin = new Point(this.avatarContainer1.Width / 2, this.avatarContainer1.Height / 2);
+            FillWeaponIdx();
+            chkHairOverHead.Checked = true;
+            
         }
 
         public SuperTabControlPanel GetTabPanel()
         {
             this.TopLevel = false;
             this.Dock = DockStyle.Fill;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.FormBorderStyle = FormBorderStyle.None;
             this.DoubleBuffered = true;
             var pnl = new SuperTabControlPanel();
             pnl.Controls.Add(this);
@@ -43,6 +45,8 @@ namespace WzComparerR2.Avatar.UI
         bool inited;
         string partsTag;
         bool suspendUpdate;
+        bool needUpdate;
+        Animator animator;
 
         /// <summary>
         /// wz1节点选中事件。
@@ -66,7 +70,9 @@ namespace WzComparerR2.Avatar.UI
                     Wz_Image wzImg = e.Node.GetValue<Wz_Image>();
                     if (wzImg != null && wzImg.TryExtract())
                     {
+                        this.SuspendUpdateDisplay();
                         LoadPart(wzImg.Node);
+                        this.ResumeUpdateDisplay();
                     }
                     break;
             }
@@ -161,6 +167,10 @@ namespace WzComparerR2.Avatar.UI
                     this.avatar.LoadTamingActions();
                     FillTamingAction();
                 }
+                else if (part == avatar.Weapon) //同步武器类型
+                {
+                    FillWeaponTypes();
+                }
 
                 this.FillAvatarParts();
                 UpdateDisplay();
@@ -170,6 +180,7 @@ namespace WzComparerR2.Avatar.UI
         private void SuspendUpdateDisplay()
         {
             this.suspendUpdate = true;
+            this.needUpdate = false;
         }
 
         private void ResumeUpdateDisplay()
@@ -177,6 +188,10 @@ namespace WzComparerR2.Avatar.UI
             if (this.suspendUpdate)
             {
                 this.suspendUpdate = false;
+                if (this.needUpdate)
+                {
+                    this.UpdateDisplay();
+                }
             }
         }
 
@@ -187,6 +202,7 @@ namespace WzComparerR2.Avatar.UI
         {
             if (suspendUpdate)
             {
+                this.needUpdate = true;
                 return;
             }
 
@@ -216,13 +232,25 @@ namespace WzComparerR2.Avatar.UI
             selectedItem = this.cmbTamingFrame.SelectedItem as ComboItem;
             int tamingFrame = selectedItem != null ? Convert.ToInt32(selectedItem.Text) : -1;
 
-            string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5}",
+            //获取武器状态
+            selectedItem = this.cmbWeaponType.SelectedItem as ComboItem;
+            this.avatar.WeaponType = selectedItem != null ? Convert.ToInt32(selectedItem.Text) : 0;
+
+            selectedItem = this.cmbWeaponIdx.SelectedItem as ComboItem;
+            this.avatar.WeaponIndex = selectedItem != null ? Convert.ToInt32(selectedItem.Text) : 0;
+
+
+            string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5},{6},{7},{8},{9}",
                 this.avatar.ActionName,
                 bodyFrame,
                 this.avatar.EmotionName,
                 emoFrame,
                 this.avatar.TamingActionName,
-                tamingFrame);
+                tamingFrame,
+                this.avatar.ShowhairOverHead ? 1 : 0,
+                this.avatar.ShowEar ? 1 : 0,
+                this.avatar.WeaponType,
+                this.avatar.WeaponIndex);
 
             var actionFrames = avatar.GetActionFrames(avatar.ActionName);
             ActionFrame f = null;
@@ -342,6 +370,12 @@ namespace WzComparerR2.Avatar.UI
             FillComboItems(cmbActionTaming, avatar.TamingActions);
         }
 
+        private void FillWeaponTypes()
+        {
+            List<int> weaponTypes = avatar.GetCashWeaponTypes();
+            FillComboItems(cmbWeaponType, weaponTypes.ConvertAll(i => i.ToString()));
+        }
+
         /// <summary>
         /// 更新当前显示部件列表。
         /// </summary>
@@ -379,7 +413,7 @@ namespace WzComparerR2.Avatar.UI
             if (actionItem != null)
             {
                 var frames = avatar.GetActionFrames(actionItem.Text);
-                FillComboItems(cmbBodyFrame, GetFrameNames(frames.Length));
+                FillComboItems(cmbBodyFrame, frames);
             }
             else
             {
@@ -393,7 +427,7 @@ namespace WzComparerR2.Avatar.UI
             if (emotionItem != null)
             {
                 var frames = avatar.GetFaceFrames(emotionItem.Text);
-                FillComboItems(cmbEmotionFrame, GetFrameNames(frames.Length));
+                FillComboItems(cmbEmotionFrame, frames);
             }
             else
             {
@@ -407,7 +441,7 @@ namespace WzComparerR2.Avatar.UI
             if (actionItem != null)
             {
                 var frames = avatar.GetTamingFrames(actionItem.Text);
-                FillComboItems(cmbTamingFrame, GetFrameNames(frames.Length));
+                FillComboItems(cmbTamingFrame, frames);
             }
             else
             {
@@ -415,16 +449,53 @@ namespace WzComparerR2.Avatar.UI
             }
         }
 
-        private IEnumerable<string> GetFrameNames(int frameCount)
+        private void FillWeaponIdx()
         {
-            for (int i = 0; i < frameCount; i++)
+            FillComboItems(cmbWeaponIdx, 0, 4);
+        }
+
+        private void FillComboItems(ComboBoxEx comboBox, int start, int count)
+        {
+            List<ComboItem> items = new List<ComboItem>(count);
+            for (int i = 0; i < count; i++)
             {
-                yield return i.ToString();
+                ComboItem item = new ComboItem();
+                item.Text = (start + i).ToString();
+                items.Add(item);
             }
+            FillComboItems(comboBox, items);
         }
 
         private void FillComboItems(ComboBoxEx comboBox, IEnumerable<string> items)
         {
+            List<ComboItem> _items = new List<ComboItem>();
+            int i = 0;
+            foreach (var itemText in items)
+            {
+                ComboItem item = new ComboItem();
+                item.Text = itemText;
+                _items.Add(item);
+            }
+            FillComboItems(comboBox, _items);
+        }
+
+        private void FillComboItems(ComboBoxEx comboBox, IEnumerable<ActionFrame> frames)
+        {
+            List<ComboItem> items = new List<ComboItem>();
+            int i = 0;
+            foreach(var f in frames)
+            {
+                ComboItem item = new ComboItem();
+                item.Text = (i++).ToString();
+                item.Tag = Math.Abs(f.Delay);
+                items.Add(item);
+            }
+            FillComboItems(comboBox, items);
+        }
+
+        private void FillComboItems(ComboBoxEx comboBox, IEnumerable<ComboItem> items)
+        {
+            //保持原有选项
             var oldSelection = comboBox.SelectedItem as ComboItem;
             int? newSelection = null;
             comboBox.BeginUpdate();
@@ -432,19 +503,18 @@ namespace WzComparerR2.Avatar.UI
 
             foreach (var item in items)
             {
-                ComboItem cmbItem = new ComboItem(item);
-                cmbItem.Tag = item;
-                comboBox.Items.Add(cmbItem);
+                comboBox.Items.Add(item);
 
                 if (newSelection == null && oldSelection != null)
                 {
-                    if (cmbItem.Text == oldSelection.Text)
+                    if (item.Text == oldSelection.Text)
                     {
                         newSelection = comboBox.Items.Count - 1;
                     }
                 }
             }
-
+            
+            //恢复原有选项
             if (comboBox.Items.Count > 0)
             {
                 comboBox.SelectedIndex = newSelection ?? 0;
@@ -493,19 +563,267 @@ namespace WzComparerR2.Avatar.UI
             UpdateDisplay();
         }
 
+        private void cmbWeaponType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateDisplay();
+        }
+
+        private void cmbWeaponIdx_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateDisplay();
+        }
+
         private void chkBodyPlay_CheckedChanged(object sender, EventArgs e)
         {
+            if (chkBodyPlay.Checked)
+            {
+                if (!this.timer1.Enabled)
+                {
+                    AnimateStart();
+                }
 
+                var item = cmbBodyFrame.SelectedItem as ComboItem;
+                int? delay;
+                if (item != null && ((delay = item.Tag as int?) != null) && delay.Value >= 0)
+                {
+                    this.animator.BodyDelay = delay.Value;
+                }
+            }
+            else
+            {
+                this.animator.BodyDelay = -1;
+                TimerEnabledCheck();
+            }
         }
 
         private void chkEmotionPlay_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (chkEmotionPlay.Checked)
+            {
+                if (!this.timer1.Enabled)
+                {
+                    AnimateStart();
+                }
+                var item = cmbEmotionFrame.SelectedItem as ComboItem;
+                int? delay;
+                if (item != null && ((delay = item.Tag as int?) != null) && delay.Value >= 0)
+                {
+                    this.animator.EmotionDelay = delay.Value;
+                }
+            }
+            else
+            {
+                this.animator.EmotionDelay = -1;
+                TimerEnabledCheck();
+            }
         }
 
         private void chkTamingPlay_CheckedChanged(object sender, EventArgs e)
         {
+            if (chkTamingPlay.Checked)
+            {
+                if (!this.timer1.Enabled)
+                {
+                    AnimateStart();
+                }
+                var item = cmbTamingFrame.SelectedItem as ComboItem;
+                int? delay;
+                if (item != null && ((delay = item.Tag as int?) != null) && delay.Value >= 0)
+                {
+                    this.animator.TamingDelay = delay.Value;
+                }
+            }
+            else
+            {
+                this.animator.TamingDelay = -1;
+                TimerEnabledCheck();
+            }
+        }
 
+        private void chkHairOverHead_CheckedChanged(object sender, EventArgs e)
+        {
+            avatar.ShowhairOverHead = chkHairOverHead.Checked;
+            UpdateDisplay();
+        }
+
+        private void chkEar_CheckedChanged(object sender, EventArgs e)
+        {
+            avatar.ShowEar = chkEar.Checked;
+            UpdateDisplay();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            this.animator.Elapse(timer1.Interval);
+            this.AnimateUpdate();
+            int interval = this.animator.NextFrameDelay;
+
+            if (interval <= 0)
+            {
+                this.timer1.Stop();
+            }
+            else
+            {
+                this.timer1.Interval = interval;
+            }
+        }
+
+        private void AnimateUpdate()
+        {
+            this.SuspendUpdateDisplay();
+
+            if (this.animator.BodyDelay == 0 && FindNextFrame(cmbBodyFrame))
+            {
+                this.animator.BodyDelay = (int)(cmbBodyFrame.SelectedItem as ComboItem).Tag;
+            }
+
+            if (this.animator.EmotionDelay == 0 && FindNextFrame(cmbEmotionFrame))
+            {
+                this.animator.EmotionDelay = (int)(cmbEmotionFrame.SelectedItem as ComboItem).Tag;
+            }
+
+            if (this.animator.TamingDelay == 0 && FindNextFrame(cmbTamingFrame))
+            {
+                this.animator.TamingDelay = (int)(cmbTamingFrame.SelectedItem as ComboItem).Tag;
+            }
+
+            this.ResumeUpdateDisplay();
+        }
+
+        private void AnimateStart()
+        {
+            TimerEnabledCheck();
+            if (timer1.Enabled)
+            {
+                AnimateUpdate();
+            }
+        }
+
+        private void TimerEnabledCheck()
+        {
+            if (chkBodyPlay.Checked || chkEmotionPlay.Checked || chkTamingPlay.Checked)
+            {
+                if (!this.timer1.Enabled)
+                {
+                    this.timer1.Interval = 0;
+                    this.timer1.Start();
+                }
+            }
+            else
+            {
+                AnimateStop();
+            }
+        }
+
+        private void AnimateStop()
+        {
+            chkBodyPlay.Checked = false;
+            chkEmotionPlay.Checked = false;
+            chkTamingPlay.Checked = false;
+            this.timer1.Stop();
+        }
+
+        private bool FindNextFrame(ComboBoxEx cmbFrames)
+        {
+            ComboItem item = cmbFrames.SelectedItem as ComboItem;
+            if (item == null)
+            {
+                if (cmbFrames.Items.Count > 0)
+                {
+                    cmbFrames.SelectedIndex = 0;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            int selectedIndex = cmbFrames.SelectedIndex;
+            int i = selectedIndex;
+            do
+            {
+                i = (++i) % cmbFrames.Items.Count;
+                item = cmbFrames.Items[i] as ComboItem;
+                if (item != null && item.Tag is int)
+                {
+                    int delay = (int)item.Tag;
+                    if (delay > 0)
+                    {
+                        cmbFrames.SelectedIndex = i;
+                        return true;
+                    }
+                }
+            }
+            while (i != selectedIndex);
+
+            return false;
+        }
+
+        private class Animator
+        {
+            public Animator()
+            {
+                this.delays = new int[3] { -1, -1, -1 };
+            }
+
+            private int[] delays;
+            
+            public int NextFrameDelay { get; private set; }
+
+            public int BodyDelay
+            {
+                get { return this.delays[0]; }
+                set
+                {
+                    this.delays[0] = value;
+                    Update();
+                }
+            }
+
+            public int EmotionDelay
+            {
+                get { return this.delays[1]; }
+                set
+                {
+                    this.delays[1] = value;
+                    Update();
+                }
+            }
+
+            public int TamingDelay
+            {
+                get { return this.delays[2]; }
+                set
+                {
+                    this.delays[2] = value;
+                    Update();
+                }
+            }
+
+            public void Elapse(int millisecond)
+            {
+                for (int i = 0; i < delays.Length; i++)
+                {
+                    if (delays[i] >= 0)
+                    {
+                        delays[i] = delays[i] > millisecond ? (delays[i] - millisecond) : 0;
+                    }
+                }
+            }
+
+            private void Update()
+            {
+                int nextFrame = 0;
+                foreach (int delay in this.delays)
+                {
+                    if (delay > 0)
+                    {
+                        nextFrame = nextFrame <= 0 ? delay : Math.Min(nextFrame, delay);
+                    }
+                }
+                this.NextFrameDelay = nextFrame;
+            }
         }
     }
 }

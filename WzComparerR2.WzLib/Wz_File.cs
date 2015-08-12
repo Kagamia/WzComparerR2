@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace WzComparerR2.WzLib
 {
@@ -85,7 +86,7 @@ namespace WzComparerR2.WzLib
         {
             this.fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             this.bReader = new BinaryReader(this.FileStream);
-            
+
             return GetHeader(fileName);
         }
 
@@ -285,7 +286,7 @@ namespace WzComparerR2.WzLib
                         cs32 = this.ReadInt32();
                         uint pos = (uint)this.bReader.BaseStream.Position;
                         uint hashOffset = this.bReader.ReadUInt32();
-                       
+
                         on_list = all_lst
                              || (parentBase ? this.WzStructure.encryption.list_contains(name.ToLower()) :
                             this.WzStructure.encryption.list_contains(getFullPath(parent, name)));
@@ -321,7 +322,7 @@ namespace WzComparerR2.WzLib
                         if (File.Exists(filePath))
                             this.WzStructure.LoadFile(filePath, t);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                     }
                 }
@@ -332,7 +333,7 @@ namespace WzComparerR2.WzLib
             }
         }
 
-       private string getFullPath(Wz_Node parent, string name)
+        private string getFullPath(Wz_Node parent, string name)
         {
             List<string> path = new List<string>(5);
             path.Add(name.ToLower());
@@ -348,102 +349,111 @@ namespace WzComparerR2.WzLib
             return string.Join("/", path.ToArray());
         }
 
-       public void DetectWzType()
-       {
-           this.type = Wz_Type.Unknown;
-           if (this.node == null)
-           {
-               return;
-           }
-           if (this.node.Nodes.Count < 100)
-           {
-               foreach (Wz_Node subNode in this.node.Nodes)
-               {
-                   switch (subNode.Text)
-                   {
-                       case "smap.img":
-                       case "zmap.img":
-                           this.type = Wz_Type.Base;
-                           break;
+        public void DetectWzType()
+        {
+            this.type = Wz_Type.Unknown;
+            if (this.node == null)
+            {
+                return;
+            }
+            if (this.node.Nodes.Count < 100)
+            {
+                foreach (Wz_Node subNode in this.node.Nodes)
+                {
+                    switch (subNode.Text)
+                    {
+                        case "smap.img":
+                        case "zmap.img":
+                            this.type = Wz_Type.Base;
+                            break;
 
-                       case "00002000.img":
-                       case "Accessory":
-                       case "Weapon":
-                           this.type = Wz_Type.Character;
-                           break;
+                        case "00002000.img":
+                        case "Accessory":
+                        case "Weapon":
+                            this.type = Wz_Type.Character;
+                            break;
 
-                       case "BasicEff.img":
-                       case "SetItemInfoEff.img":
-                           this.type = Wz_Type.Effect;
-                           break;
+                        case "BasicEff.img":
+                        case "SetItemInfoEff.img":
+                            this.type = Wz_Type.Effect;
+                            break;
 
-                       case "Commodity.img":
-                       case "Curse.img":
-                           this.type = Wz_Type.Etc;
-                           break;
+                        case "Commodity.img":
+                        case "Curse.img":
+                            this.type = Wz_Type.Etc;
+                            break;
 
-                       case "Cash":
-                       case "Consume":
-                           this.type = Wz_Type.Item;
-                           break;
+                        case "Cash":
+                        case "Consume":
+                            this.type = Wz_Type.Item;
+                            break;
 
-                       case "Back":
-                       case "Physics.img":
-                           this.type = Wz_Type.Map;
-                           break;
+                        case "Back":
+                        case "Physics.img":
+                            this.type = Wz_Type.Map;
+                            break;
 
-                       case "PQuest.img":
-                       case "QuestData":
-                           this.type = Wz_Type.Quest;
-                           break;
+                        case "PQuest.img":
+                        case "QuestData":
+                            this.type = Wz_Type.Quest;
+                            break;
 
-                       case "Attacktype.img":
-                       case "MobSkill.img":
-                           this.type = Wz_Type.Skill;
-                           break;
+                        case "Attacktype.img":
+                        case "MobSkill.img":
+                            this.type = Wz_Type.Skill;
+                            break;
 
-                       case "Bgm00.img":
-                       case "BgmUI.img":
-                           this.type = Wz_Type.Sound;
-                           break;
+                        case "Bgm00.img":
+                        case "BgmUI.img":
+                            this.type = Wz_Type.Sound;
+                            break;
 
-                       case "MonsterBook.img":
-                       case "EULA.img":
-                           this.type = Wz_Type.String;
-                           break;
+                        case "MonsterBook.img":
+                        case "EULA.img":
+                            this.type = Wz_Type.String;
+                            break;
 
-                       case "CashShop.img":
-                       case "UIWindow.img":
-                           this.type = Wz_Type.UI;
-                           break;
+                        case "CashShop.img":
+                        case "UIWindow.img":
+                            this.type = Wz_Type.UI;
+                            break;
 
-                   }
-                   if (this.type != Wz_Type.Unknown)
-                       return;
-               }
-           }
+                    }
+                    if (this.type != Wz_Type.Unknown)
+                        return;
+                }
+            }
 
 
-           if (this.type == Wz_Type.Unknown)
-           {
-               string wzName = this.node.Text;
-               int idx = wzName.IndexOf(".wz", StringComparison.CurrentCultureIgnoreCase);
-               if (idx >= 0)
-                   wzName = wzName.Substring(0, idx);
-               try
-               {
-                   this.type = (Wz_Type)Enum.Parse(typeof(Wz_Type), wzName, true);
-               }
-               catch
-               {
-                   this.type = Wz_Type.Unknown;
-               }
-           }
-       }
+            if (this.type == Wz_Type.Unknown) //用文件名来判断
+            {
+                string wzName = this.node.Text;
+                int idx = wzName.IndexOf(".wz", StringComparison.CurrentCultureIgnoreCase);
+                if (idx >= 0)
+                {
+                    wzName = wzName.Substring(0, idx);
+                }
+
+                Match m = Regex.Match(wzName, @"^([A-Za-z]+)\d$");
+                if (m.Success)
+                {
+                    wzName = m.Result("$1");
+                }
+
+                try
+                {
+                    this.type = (Wz_Type)Enum.Parse(typeof(Wz_Type), wzName, true);
+                }
+                catch
+                {
+                    this.type = Wz_Type.Unknown;
+                }
+            }
+        }
 
         public void DetectWzVersion()
         {
-            if (!this.header.VersionChecked) 
+            if (!this.header.VersionChecked)
             {
                 //选择最小的img作为实验品
                 Wz_Image minSizeImg = null;
