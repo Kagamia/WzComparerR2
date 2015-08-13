@@ -178,7 +178,6 @@ namespace WzComparerR2.WzLib
         public unsafe string ReadString(bool use_enc)
         {
             use_enc |= this.WzStructure.encryption.all_strings_encrypted;
-            char[] retStr;
             int size = this.BReader.ReadSByte();
 
             if (size < 0)

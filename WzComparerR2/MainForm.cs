@@ -888,7 +888,12 @@ namespace WzComparerR2
             }
             else
             {
-                return Convert.ToString(value);
+                String cellVal = Convert.ToString(value);
+                if (cellVal != null && cellVal.Length > 50)
+                {
+                    cellVal = cellVal.Substring(0, 50);
+                }
+                return cellVal;
             }
         }
 
@@ -929,7 +934,7 @@ namespace WzComparerR2
             {
                 if (pictureBox1.Image != null)
                     pictureBox1.Image.Dispose();
-                pictureBox1.Location = new Point();
+                //pictureBox1.Location = new Point();
                 pictureBox1.Image = png.ExtractPng();
                 if (pictureBox1.Image != null)
                 {

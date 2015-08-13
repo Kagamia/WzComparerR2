@@ -13,6 +13,7 @@ namespace WzComparerR2.WzLib
             this.header = header;
             this.ms = ms;
             this.wz_f = wz_f;
+            TryDecryptHeader();
         }
 
         private int offset;
@@ -135,6 +136,28 @@ namespace WzComparerR2.WzLib
                     }
             }
             return null;
+        }
+
+        private void TryDecryptHeader()
+        {
+            if (this.header == null)
+            {
+                return;
+            }
+            if (this.header.Length > 51)
+            {
+                byte waveFormatLen = this.header[51];
+                if (this.header.Length != 52 + waveFormatLen) //长度错误
+                {
+                    return;
+                }
+                int cbSize = BitConverter.ToUInt16(this.header, 52 + 16);
+                if (cbSize + 18 != waveFormatLen)
+                {
+                    var enc = this.WzFile.WzStructure.encryption;
+                    enc.keys.Decrypt(this.header, 52, waveFormatLen);
+                }
+            }
         }
     }
 }
