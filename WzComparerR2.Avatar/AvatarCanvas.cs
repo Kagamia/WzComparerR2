@@ -31,7 +31,8 @@ namespace WzComparerR2.Avatar
         public string EmotionName { get; set; }
         public string TamingActionName { get; set; }
 
-        public bool ShowhairOverHead { get; set; }
+        public bool HairCover { get; set; }
+        public bool ShowHairShade { get; set; }
         public bool ShowEar { get; set; }
         public int WeaponIndex { get; set; }
         public int WeaponType { get; set; }
@@ -541,6 +542,14 @@ namespace WzComparerR2.Avatar
                             continue;
                         }
                     }
+                    if (childNode.Text == "hairShade")
+                    {
+                        linkNode = childNode.FindNodeByPath("0");
+                        if (linkNode == null)
+                        {
+                            continue;
+                        }
+                    }
                     if (linkNode.Value is Wz_Png)
                     {
                         //过滤纹理
@@ -548,7 +557,12 @@ namespace WzComparerR2.Avatar
                         {
                             case "face": if (!(bodyFace ?? face)) continue; break;
                             case "ear": if (!ShowEar) continue; break;
-                            case "hairOverHead": if (!ShowhairOverHead) continue; break;
+                            case "hairOverHead":
+                            case "backHairOverCape":
+                            case "backHair": if (HairCover) continue; break;
+                            case "hair":
+                            case "backHairBelowCap": if (!HairCover) continue; break;
+                            case "hairShade": if (!ShowHairShade) continue; break;
                             default:
                                 if (childNode.Text.StartsWith("weapon"))
                                 {

@@ -28,15 +28,35 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.btnItemShow = new DevComponents.DotNetBar.ButtonItem();
+            this.btnItemDel = new DevComponents.DotNetBar.ButtonItem();
+            // 
+            // btnItemShow
+            // 
+            this.btnItemShow.Name = "btnItemShow";
+            this.btnItemShow.Text = "显示/隐藏";
+            // 
+            // btnItemDel
+            // 
+            this.btnItemDel.Name = "btnItemDel";
+            this.btnItemDel.Text = "移除";
             // 
             // AvatarPartButtonItem
             // 
             this.AutoCheckOnClick = true;
             this.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText;
+            this.GlobalItem = false;
             this.ImageFixedSize = new System.Drawing.Size(32, 32);
+            this.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.btnItemShow,
+            this.btnItemDel});
+            this.SubItemsExpandWidth = 16;
 
         }
 
         #endregion
+
+        public DevComponents.DotNetBar.ButtonItem btnItemShow;
+        public DevComponents.DotNetBar.ButtonItem btnItemDel;
     }
 }

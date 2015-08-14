@@ -32,12 +32,6 @@
             this.dotNetBarManager1 = new DevComponents.DotNetBar.DotNetBarManager(this.components);
             this.dockSite4 = new DevComponents.DotNetBar.DockSite();
             this.dockSite1 = new DevComponents.DotNetBar.DockSite();
-            this.bar3 = new DevComponents.DotNetBar.Bar();
-            this.panelDockContainer3 = new DevComponents.DotNetBar.PanelDockContainer();
-            this.itemPanel2 = new DevComponents.DotNetBar.ItemPanel();
-            this.buttonItem2 = new DevComponents.DotNetBar.ButtonItem();
-            this.buttonItem1 = new DevComponents.DotNetBar.ButtonItem();
-            this.dockContainerItem3 = new DevComponents.DotNetBar.DockContainerItem();
             this.dockSite2 = new DevComponents.DotNetBar.DockSite();
             this.bar1 = new DevComponents.DotNetBar.Bar();
             this.panelDockContainer1 = new DevComponents.DotNetBar.PanelDockContainer();
@@ -49,7 +43,6 @@
             this.cmbWeaponType = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.labelX4 = new DevComponents.DotNetBar.LabelX();
             this.chkEar = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.chkHairOverHead = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkTamingPlay = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkEmotionPlay = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkBodyPlay = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -62,20 +55,20 @@
             this.labelX2 = new DevComponents.DotNetBar.LabelX();
             this.labelX1 = new DevComponents.DotNetBar.LabelX();
             this.cmbActionBody = new DevComponents.DotNetBar.Controls.ComboBoxEx();
+            this.chkHairShade = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkHairCover = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.dockContainerItem2 = new DevComponents.DotNetBar.DockContainerItem();
             this.dockSite8 = new DevComponents.DotNetBar.DockSite();
             this.dockSite5 = new DevComponents.DotNetBar.DockSite();
             this.dockSite6 = new DevComponents.DotNetBar.DockSite();
             this.dockSite7 = new DevComponents.DotNetBar.DockSite();
+            this.bar3 = new DevComponents.DotNetBar.Bar();
+            this.buttonItem1 = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonItem2 = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonItem3 = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.avatarContainer1 = new WzComparerR2.Avatar.UI.AvatarContainer();
-            this.bar4 = new DevComponents.DotNetBar.Bar();
-            this.buttonItem3 = new DevComponents.DotNetBar.ButtonItem();
-            this.dockSite1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.bar3)).BeginInit();
-            this.bar3.SuspendLayout();
-            this.panelDockContainer3.SuspendLayout();
             this.dockSite2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bar1)).BeginInit();
             this.bar1.SuspendLayout();
@@ -84,7 +77,7 @@
             this.bar2.SuspendLayout();
             this.panelDockContainer2.SuspendLayout();
             this.dockSite7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.bar4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bar3)).BeginInit();
             this.SuspendLayout();
             // 
             // dotNetBarManager1
@@ -124,92 +117,13 @@
             // dockSite1
             // 
             this.dockSite1.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
-            this.dockSite1.Controls.Add(this.bar3);
             this.dockSite1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.dockSite1.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer(new DevComponents.DotNetBar.DocumentBaseContainer[] {
-            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar3, 88, 385)))}, DevComponents.DotNetBar.eOrientation.Horizontal);
+            this.dockSite1.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer();
             this.dockSite1.Location = new System.Drawing.Point(0, 26);
             this.dockSite1.Name = "dockSite1";
-            this.dockSite1.Size = new System.Drawing.Size(91, 385);
+            this.dockSite1.Size = new System.Drawing.Size(0, 385);
             this.dockSite1.TabIndex = 0;
             this.dockSite1.TabStop = false;
-            // 
-            // bar3
-            // 
-            this.bar3.AccessibleDescription = "DotNetBar Bar (bar3)";
-            this.bar3.AccessibleName = "DotNetBar Bar";
-            this.bar3.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping;
-            this.bar3.AutoSyncBarCaption = true;
-            this.bar3.CloseSingleTab = true;
-            this.bar3.Controls.Add(this.panelDockContainer3);
-            this.bar3.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.bar3.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Caption;
-            this.bar3.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.dockContainerItem3});
-            this.bar3.LayoutType = DevComponents.DotNetBar.eLayoutType.DockContainer;
-            this.bar3.Location = new System.Drawing.Point(0, 0);
-            this.bar3.Name = "bar3";
-            this.bar3.Size = new System.Drawing.Size(88, 385);
-            this.bar3.Stretch = true;
-            this.bar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.bar3.TabIndex = 0;
-            this.bar3.TabStop = false;
-            this.bar3.Text = "菜单";
-            // 
-            // panelDockContainer3
-            // 
-            this.panelDockContainer3.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.panelDockContainer3.Controls.Add(this.itemPanel2);
-            this.panelDockContainer3.DisabledBackColor = System.Drawing.Color.Empty;
-            this.panelDockContainer3.Location = new System.Drawing.Point(3, 23);
-            this.panelDockContainer3.Name = "panelDockContainer3";
-            this.panelDockContainer3.Size = new System.Drawing.Size(82, 359);
-            this.panelDockContainer3.Style.Alignment = System.Drawing.StringAlignment.Center;
-            this.panelDockContainer3.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarBackground;
-            this.panelDockContainer3.Style.BorderColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarDockedBorder;
-            this.panelDockContainer3.Style.ForeColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.ItemText;
-            this.panelDockContainer3.Style.GradientAngle = 90;
-            this.panelDockContainer3.TabIndex = 0;
-            // 
-            // itemPanel2
-            // 
-            this.itemPanel2.AutoScroll = true;
-            // 
-            // 
-            // 
-            this.itemPanel2.BackgroundStyle.Class = "ItemPanel";
-            this.itemPanel2.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemPanel2.ContainerControlProcessDialogKey = true;
-            this.itemPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.itemPanel2.DragDropSupport = true;
-            this.itemPanel2.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItem2,
-            this.buttonItem1});
-            this.itemPanel2.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
-            this.itemPanel2.Location = new System.Drawing.Point(0, 0);
-            this.itemPanel2.Name = "itemPanel2";
-            this.itemPanel2.Size = new System.Drawing.Size(82, 359);
-            this.itemPanel2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.itemPanel2.TabIndex = 0;
-            this.itemPanel2.Text = "itemPanel2";
-            // 
-            // buttonItem2
-            // 
-            this.buttonItem2.Name = "buttonItem2";
-            this.buttonItem2.Text = "buttonItem2";
-            this.buttonItem2.Click += new System.EventHandler(this.buttonItem2_Click);
-            // 
-            // buttonItem1
-            // 
-            this.buttonItem1.Name = "buttonItem1";
-            this.buttonItem1.Text = "buttonItem1";
-            this.buttonItem1.Click += new System.EventHandler(this.buttonItem1_Click);
-            // 
-            // dockContainerItem3
-            // 
-            this.dockContainerItem3.Control = this.panelDockContainer3;
-            this.dockContainerItem3.Name = "dockContainerItem3";
-            this.dockContainerItem3.Text = "菜单";
             // 
             // dockSite2
             // 
@@ -218,8 +132,8 @@
             this.dockSite2.Controls.Add(this.bar2);
             this.dockSite2.Dock = System.Windows.Forms.DockStyle.Right;
             this.dockSite2.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer(new DevComponents.DotNetBar.DocumentBaseContainer[] {
-            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar1, 213, 231))),
-            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar2, 213, 151)))}, DevComponents.DotNetBar.eOrientation.Vertical);
+            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar1, 213, 214))),
+            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar2, 213, 168)))}, DevComponents.DotNetBar.eOrientation.Vertical);
             this.dockSite2.Location = new System.Drawing.Point(368, 26);
             this.dockSite2.Name = "dockSite2";
             this.dockSite2.Size = new System.Drawing.Size(216, 385);
@@ -241,7 +155,7 @@
             this.bar1.LayoutType = DevComponents.DotNetBar.eLayoutType.DockContainer;
             this.bar1.Location = new System.Drawing.Point(3, 0);
             this.bar1.Name = "bar1";
-            this.bar1.Size = new System.Drawing.Size(213, 231);
+            this.bar1.Size = new System.Drawing.Size(213, 214);
             this.bar1.Stretch = true;
             this.bar1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar1.TabIndex = 0;
@@ -255,7 +169,7 @@
             this.panelDockContainer1.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelDockContainer1.Location = new System.Drawing.Point(3, 23);
             this.panelDockContainer1.Name = "panelDockContainer1";
-            this.panelDockContainer1.Size = new System.Drawing.Size(207, 205);
+            this.panelDockContainer1.Size = new System.Drawing.Size(207, 188);
             this.panelDockContainer1.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelDockContainer1.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarBackground;
             this.panelDockContainer1.Style.BorderColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarDockedBorder;
@@ -277,7 +191,7 @@
             this.itemPanel1.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
             this.itemPanel1.Location = new System.Drawing.Point(0, 0);
             this.itemPanel1.Name = "itemPanel1";
-            this.itemPanel1.Size = new System.Drawing.Size(207, 205);
+            this.itemPanel1.Size = new System.Drawing.Size(207, 188);
             this.itemPanel1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.itemPanel1.TabIndex = 8;
             this.itemPanel1.Text = "itemPanel1";
@@ -301,9 +215,9 @@
             this.bar2.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.dockContainerItem2});
             this.bar2.LayoutType = DevComponents.DotNetBar.eLayoutType.DockContainer;
-            this.bar2.Location = new System.Drawing.Point(3, 234);
+            this.bar2.Location = new System.Drawing.Point(3, 217);
             this.bar2.Name = "bar2";
-            this.bar2.Size = new System.Drawing.Size(213, 151);
+            this.bar2.Size = new System.Drawing.Size(213, 168);
             this.bar2.Stretch = true;
             this.bar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar2.TabIndex = 1;
@@ -318,7 +232,6 @@
             this.panelDockContainer2.Controls.Add(this.cmbWeaponType);
             this.panelDockContainer2.Controls.Add(this.labelX4);
             this.panelDockContainer2.Controls.Add(this.chkEar);
-            this.panelDockContainer2.Controls.Add(this.chkHairOverHead);
             this.panelDockContainer2.Controls.Add(this.chkTamingPlay);
             this.panelDockContainer2.Controls.Add(this.chkEmotionPlay);
             this.panelDockContainer2.Controls.Add(this.chkBodyPlay);
@@ -331,10 +244,12 @@
             this.panelDockContainer2.Controls.Add(this.labelX2);
             this.panelDockContainer2.Controls.Add(this.labelX1);
             this.panelDockContainer2.Controls.Add(this.cmbActionBody);
+            this.panelDockContainer2.Controls.Add(this.chkHairShade);
+            this.panelDockContainer2.Controls.Add(this.chkHairCover);
             this.panelDockContainer2.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelDockContainer2.Location = new System.Drawing.Point(3, 23);
             this.panelDockContainer2.Name = "panelDockContainer2";
-            this.panelDockContainer2.Size = new System.Drawing.Size(207, 125);
+            this.panelDockContainer2.Size = new System.Drawing.Size(207, 142);
             this.panelDockContainer2.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelDockContainer2.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarBackground;
             this.panelDockContainer2.Style.BorderColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarDockedBorder;
@@ -353,7 +268,7 @@
             this.cmbWeaponIdx.Name = "cmbWeaponIdx";
             this.cmbWeaponIdx.Size = new System.Drawing.Size(50, 21);
             this.cmbWeaponIdx.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbWeaponIdx.TabIndex = 15;
+            this.cmbWeaponIdx.TabIndex = 13;
             this.cmbWeaponIdx.SelectedIndexChanged += new System.EventHandler(this.cmbWeaponIdx_SelectedIndexChanged);
             // 
             // cmbWeaponType
@@ -367,7 +282,7 @@
             this.cmbWeaponType.Name = "cmbWeaponType";
             this.cmbWeaponType.Size = new System.Drawing.Size(50, 21);
             this.cmbWeaponType.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbWeaponType.TabIndex = 14;
+            this.cmbWeaponType.TabIndex = 12;
             this.cmbWeaponType.SelectedIndexChanged += new System.EventHandler(this.cmbWeaponType_SelectedIndexChanged);
             // 
             // labelX4
@@ -393,29 +308,13 @@
             // 
             // 
             this.chkEar.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkEar.Location = new System.Drawing.Point(106, 84);
+            this.chkEar.Location = new System.Drawing.Point(160, 84);
             this.chkEar.Name = "chkEar";
-            this.chkEar.Size = new System.Drawing.Size(45, 19);
+            this.chkEar.Size = new System.Drawing.Size(45, 16);
             this.chkEar.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkEar.TabIndex = 12;
+            this.chkEar.TabIndex = 11;
             this.chkEar.Text = "ear";
             this.chkEar.CheckedChanged += new System.EventHandler(this.chkEar_CheckedChanged);
-            // 
-            // chkHairOverHead
-            // 
-            this.chkHairOverHead.AutoSize = true;
-            this.chkHairOverHead.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.chkHairOverHead.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkHairOverHead.Location = new System.Drawing.Point(5, 84);
-            this.chkHairOverHead.Name = "chkHairOverHead";
-            this.chkHairOverHead.Size = new System.Drawing.Size(109, 19);
-            this.chkHairOverHead.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkHairOverHead.TabIndex = 9;
-            this.chkHairOverHead.Text = "hairOverHead";
-            this.chkHairOverHead.CheckedChanged += new System.EventHandler(this.chkHairOverHead_CheckedChanged);
             // 
             // chkTamingPlay
             // 
@@ -425,11 +324,11 @@
             // 
             // 
             this.chkTamingPlay.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkTamingPlay.Location = new System.Drawing.Point(187, 57);
+            this.chkTamingPlay.Location = new System.Drawing.Point(184, 57);
             this.chkTamingPlay.Name = "chkTamingPlay";
             this.chkTamingPlay.Size = new System.Drawing.Size(15, 21);
             this.chkTamingPlay.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkTamingPlay.TabIndex = 11;
+            this.chkTamingPlay.TabIndex = 8;
             this.chkTamingPlay.TextVisible = false;
             this.chkTamingPlay.CheckedChanged += new System.EventHandler(this.chkTamingPlay_CheckedChanged);
             // 
@@ -441,11 +340,11 @@
             // 
             // 
             this.chkEmotionPlay.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkEmotionPlay.Location = new System.Drawing.Point(187, 30);
+            this.chkEmotionPlay.Location = new System.Drawing.Point(184, 30);
             this.chkEmotionPlay.Name = "chkEmotionPlay";
             this.chkEmotionPlay.Size = new System.Drawing.Size(15, 21);
             this.chkEmotionPlay.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkEmotionPlay.TabIndex = 10;
+            this.chkEmotionPlay.TabIndex = 7;
             this.chkEmotionPlay.TextVisible = false;
             this.chkEmotionPlay.CheckedChanged += new System.EventHandler(this.chkEmotionPlay_CheckedChanged);
             // 
@@ -457,11 +356,11 @@
             // 
             // 
             this.chkBodyPlay.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkBodyPlay.Location = new System.Drawing.Point(187, 3);
+            this.chkBodyPlay.Location = new System.Drawing.Point(184, 3);
             this.chkBodyPlay.Name = "chkBodyPlay";
             this.chkBodyPlay.Size = new System.Drawing.Size(15, 21);
             this.chkBodyPlay.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkBodyPlay.TabIndex = 9;
+            this.chkBodyPlay.TabIndex = 6;
             this.chkBodyPlay.TextVisible = false;
             this.chkBodyPlay.CheckedChanged += new System.EventHandler(this.chkBodyPlay_CheckedChanged);
             // 
@@ -473,11 +372,11 @@
             this.cmbTamingFrame.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbTamingFrame.FormattingEnabled = true;
             this.cmbTamingFrame.ItemHeight = 15;
-            this.cmbTamingFrame.Location = new System.Drawing.Point(131, 57);
+            this.cmbTamingFrame.Location = new System.Drawing.Point(128, 57);
             this.cmbTamingFrame.Name = "cmbTamingFrame";
             this.cmbTamingFrame.Size = new System.Drawing.Size(50, 21);
             this.cmbTamingFrame.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbTamingFrame.TabIndex = 8;
+            this.cmbTamingFrame.TabIndex = 5;
             this.cmbTamingFrame.SelectedIndexChanged += new System.EventHandler(this.cmbTamingFrame_SelectedIndexChanged);
             // 
             // cmbEmotionFrame
@@ -488,11 +387,11 @@
             this.cmbEmotionFrame.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEmotionFrame.FormattingEnabled = true;
             this.cmbEmotionFrame.ItemHeight = 15;
-            this.cmbEmotionFrame.Location = new System.Drawing.Point(131, 30);
+            this.cmbEmotionFrame.Location = new System.Drawing.Point(128, 30);
             this.cmbEmotionFrame.Name = "cmbEmotionFrame";
             this.cmbEmotionFrame.Size = new System.Drawing.Size(50, 21);
             this.cmbEmotionFrame.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbEmotionFrame.TabIndex = 7;
+            this.cmbEmotionFrame.TabIndex = 4;
             this.cmbEmotionFrame.SelectedIndexChanged += new System.EventHandler(this.cmbEmotionFrame_SelectedIndexChanged);
             // 
             // cmbBodyFrame
@@ -503,11 +402,11 @@
             this.cmbBodyFrame.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbBodyFrame.FormattingEnabled = true;
             this.cmbBodyFrame.ItemHeight = 15;
-            this.cmbBodyFrame.Location = new System.Drawing.Point(131, 3);
+            this.cmbBodyFrame.Location = new System.Drawing.Point(128, 3);
             this.cmbBodyFrame.Name = "cmbBodyFrame";
             this.cmbBodyFrame.Size = new System.Drawing.Size(50, 21);
             this.cmbBodyFrame.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbBodyFrame.TabIndex = 6;
+            this.cmbBodyFrame.TabIndex = 3;
             this.cmbBodyFrame.SelectedIndexChanged += new System.EventHandler(this.cmbBodyFrame_SelectedIndexChanged);
             // 
             // cmbActionTaming
@@ -521,9 +420,9 @@
             this.cmbActionTaming.ItemHeight = 15;
             this.cmbActionTaming.Location = new System.Drawing.Point(35, 57);
             this.cmbActionTaming.Name = "cmbActionTaming";
-            this.cmbActionTaming.Size = new System.Drawing.Size(90, 21);
+            this.cmbActionTaming.Size = new System.Drawing.Size(87, 21);
             this.cmbActionTaming.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbActionTaming.TabIndex = 5;
+            this.cmbActionTaming.TabIndex = 2;
             this.cmbActionTaming.SelectedIndexChanged += new System.EventHandler(this.cmbActionTaming_SelectedIndexChanged);
             // 
             // cmbEmotion
@@ -537,9 +436,9 @@
             this.cmbEmotion.ItemHeight = 15;
             this.cmbEmotion.Location = new System.Drawing.Point(35, 30);
             this.cmbEmotion.Name = "cmbEmotion";
-            this.cmbEmotion.Size = new System.Drawing.Size(90, 21);
+            this.cmbEmotion.Size = new System.Drawing.Size(87, 21);
             this.cmbEmotion.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbEmotion.TabIndex = 4;
+            this.cmbEmotion.TabIndex = 1;
             this.cmbEmotion.SelectedIndexChanged += new System.EventHandler(this.cmbEmotion_SelectedIndexChanged);
             // 
             // labelX3
@@ -598,10 +497,42 @@
             this.cmbActionBody.ItemHeight = 15;
             this.cmbActionBody.Location = new System.Drawing.Point(35, 3);
             this.cmbActionBody.Name = "cmbActionBody";
-            this.cmbActionBody.Size = new System.Drawing.Size(90, 21);
+            this.cmbActionBody.Size = new System.Drawing.Size(87, 21);
             this.cmbActionBody.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.cmbActionBody.TabIndex = 0;
             this.cmbActionBody.SelectedIndexChanged += new System.EventHandler(this.cmbActionBody_SelectedIndexChanged);
+            // 
+            // chkHairShade
+            // 
+            this.chkHairShade.AutoSize = true;
+            this.chkHairShade.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkHairShade.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkHairShade.Location = new System.Drawing.Point(82, 84);
+            this.chkHairShade.Name = "chkHairShade";
+            this.chkHairShade.Size = new System.Drawing.Size(82, 16);
+            this.chkHairShade.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkHairShade.TabIndex = 10;
+            this.chkHairShade.Text = "hairShade";
+            this.chkHairShade.CheckedChanged += new System.EventHandler(this.chkHairShade_CheckedChanged);
+            // 
+            // chkHairCover
+            // 
+            this.chkHairCover.AutoSize = true;
+            this.chkHairCover.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkHairCover.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkHairCover.Location = new System.Drawing.Point(5, 84);
+            this.chkHairCover.Name = "chkHairCover";
+            this.chkHairCover.Size = new System.Drawing.Size(82, 16);
+            this.chkHairCover.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkHairCover.TabIndex = 9;
+            this.chkHairCover.Text = "hairCover";
+            this.chkHairCover.CheckedChanged += new System.EventHandler(this.chkHairCover_CheckedChanged);
             // 
             // dockContainerItem2
             // 
@@ -642,13 +573,47 @@
             // dockSite7
             // 
             this.dockSite7.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
-            this.dockSite7.Controls.Add(this.bar4);
+            this.dockSite7.Controls.Add(this.bar3);
             this.dockSite7.Dock = System.Windows.Forms.DockStyle.Top;
             this.dockSite7.Location = new System.Drawing.Point(0, 0);
             this.dockSite7.Name = "dockSite7";
             this.dockSite7.Size = new System.Drawing.Size(584, 26);
             this.dockSite7.TabIndex = 6;
             this.dockSite7.TabStop = false;
+            // 
+            // bar3
+            // 
+            this.bar3.AccessibleDescription = "工具 (bar3)";
+            this.bar3.AccessibleName = "工具";
+            this.bar3.AccessibleRole = System.Windows.Forms.AccessibleRole.ToolBar;
+            this.bar3.DockSide = DevComponents.DotNetBar.eDockSide.Top;
+            this.bar3.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Office2003;
+            this.bar3.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItem1,
+            this.buttonItem2,
+            this.buttonItem3});
+            this.bar3.Location = new System.Drawing.Point(0, 0);
+            this.bar3.Name = "bar3";
+            this.bar3.Size = new System.Drawing.Size(264, 26);
+            this.bar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.bar3.TabIndex = 0;
+            this.bar3.TabStop = false;
+            this.bar3.Text = "工具";
+            // 
+            // buttonItem1
+            // 
+            this.buttonItem1.Name = "buttonItem1";
+            this.buttonItem1.Text = "buttonItem1";
+            // 
+            // buttonItem2
+            // 
+            this.buttonItem2.Name = "buttonItem2";
+            this.buttonItem2.Text = "buttonItem2";
+            // 
+            // buttonItem3
+            // 
+            this.buttonItem3.Name = "buttonItem3";
+            this.buttonItem3.Text = "buttonItem3";
             // 
             // dockSite3
             // 
@@ -669,36 +634,12 @@
             // 
             this.avatarContainer1.BackColor = System.Drawing.Color.White;
             this.avatarContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.avatarContainer1.Location = new System.Drawing.Point(91, 26);
+            this.avatarContainer1.Location = new System.Drawing.Point(0, 26);
             this.avatarContainer1.Name = "avatarContainer1";
             this.avatarContainer1.Origin = new System.Drawing.Point(0, 0);
-            this.avatarContainer1.Size = new System.Drawing.Size(277, 385);
+            this.avatarContainer1.Size = new System.Drawing.Size(368, 385);
             this.avatarContainer1.TabIndex = 8;
             this.avatarContainer1.Text = "avatarContainer1";
-            // 
-            // bar4
-            // 
-            this.bar4.AccessibleDescription = "bar4 (bar4)";
-            this.bar4.AccessibleName = "bar4";
-            this.bar4.AccessibleRole = System.Windows.Forms.AccessibleRole.MenuBar;
-            this.bar4.DockSide = DevComponents.DotNetBar.eDockSide.Top;
-            this.bar4.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
-            this.bar4.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItem3});
-            this.bar4.Location = new System.Drawing.Point(0, 0);
-            this.bar4.MenuBar = true;
-            this.bar4.Name = "bar4";
-            this.bar4.Size = new System.Drawing.Size(584, 25);
-            this.bar4.Stretch = true;
-            this.bar4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.bar4.TabIndex = 0;
-            this.bar4.TabStop = false;
-            this.bar4.Text = "bar4";
-            // 
-            // buttonItem3
-            // 
-            this.buttonItem3.Name = "buttonItem3";
-            this.buttonItem3.Text = "buttonItem3";
             // 
             // AvatarForm
             // 
@@ -715,10 +656,6 @@
             this.DoubleBuffered = true;
             this.Name = "AvatarForm";
             this.Text = "Avatar";
-            this.dockSite1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.bar3)).EndInit();
-            this.bar3.ResumeLayout(false);
-            this.panelDockContainer3.ResumeLayout(false);
             this.dockSite2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.bar1)).EndInit();
             this.bar1.ResumeLayout(false);
@@ -728,7 +665,7 @@
             this.panelDockContainer2.ResumeLayout(false);
             this.panelDockContainer2.PerformLayout();
             this.dockSite7.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.bar4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bar3)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -763,20 +700,17 @@
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbTamingFrame;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbEmotionFrame;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbBodyFrame;
-        private DevComponents.DotNetBar.Bar bar3;
-        private DevComponents.DotNetBar.PanelDockContainer panelDockContainer3;
-        private DevComponents.DotNetBar.ItemPanel itemPanel2;
-        private DevComponents.DotNetBar.ButtonItem buttonItem2;
-        private DevComponents.DotNetBar.DockContainerItem dockContainerItem3;
-        private DevComponents.DotNetBar.ButtonItem buttonItem1;
         private System.Windows.Forms.Timer timer1;
         private AvatarContainer avatarContainer1;
-        private DevComponents.DotNetBar.Controls.CheckBoxX chkHairOverHead;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkHairCover;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEar;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWeaponIdx;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWeaponType;
         private DevComponents.DotNetBar.LabelX labelX4;
-        private DevComponents.DotNetBar.Bar bar4;
+        private DevComponents.DotNetBar.Bar bar3;
+        private DevComponents.DotNetBar.ButtonItem buttonItem1;
+        private DevComponents.DotNetBar.ButtonItem buttonItem2;
         private DevComponents.DotNetBar.ButtonItem buttonItem3;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkHairShade;
     }
 }

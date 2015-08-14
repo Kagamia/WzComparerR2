@@ -22,8 +22,6 @@ namespace WzComparerR2.Avatar.UI
             this.animator = new Animator();
             this.avatarContainer1.Origin = new Point(this.avatarContainer1.Width / 2, this.avatarContainer1.Height / 2);
             FillWeaponIdx();
-            chkHairOverHead.Checked = true;
-            
         }
 
         public SuperTabControlPanel GetTabPanel()
@@ -240,14 +238,15 @@ namespace WzComparerR2.Avatar.UI
             this.avatar.WeaponIndex = selectedItem != null ? Convert.ToInt32(selectedItem.Text) : 0;
 
 
-            string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5},{6},{7},{8},{9}",
+            string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5},{6},{7},{8},{9},{10}",
                 this.avatar.ActionName,
                 bodyFrame,
                 this.avatar.EmotionName,
                 emoFrame,
                 this.avatar.TamingActionName,
                 tamingFrame,
-                this.avatar.ShowhairOverHead ? 1 : 0,
+                this.avatar.HairCover ? 1 : 0,
+                this.avatar.ShowHairShade ? 1 : 0,
                 this.avatar.ShowEar ? 1 : 0,
                 this.avatar.WeaponType,
                 this.avatar.WeaponIndex);
@@ -289,16 +288,6 @@ namespace WzComparerR2.Avatar.UI
             return string.Join(",", partsID);
         }
 
-        private void buttonItem2_Click(object sender, EventArgs e)
-        {
-            this.avatar.LoadZ();
-            this.avatar.LoadActions();
-            this.avatar.LoadEmotions();
-
-            FillBodyAction();
-            FillEmotion();
-        }
-
         private void buttonItem1_Click(object sender, EventArgs e)
         {
             AddPart("Character\\00002000.img");
@@ -308,6 +297,7 @@ namespace WzComparerR2.Avatar.UI
             AddPart("Character\\Coat\\01040036.img");
             AddPart("Character\\Pants\\01060026.img");
             FillAvatarParts();
+            UpdateDisplay();
         }
 
         void AddPart(string imgPath)
@@ -387,7 +377,7 @@ namespace WzComparerR2.Avatar.UI
             {
                 if (part != null)
                 {
-                    AvatarPartButtonItem btn = new AvatarPartButtonItem();
+                    var btn = new AvatarPartButtonItem();
                     var stringLinker = this.PluginEntry.Context.DefaultStringLinker;
                     StringResult sr;
                     string text;
@@ -400,11 +390,60 @@ namespace WzComparerR2.Avatar.UI
                         text = string.Format("{0}\r\n{1}", "(null)", part.ID == null ? "-" : part.ID.ToString());
                     }
                     btn.Text = text;
-                    btn.Image = part.Icon.Bitmap;
+                    btn.SetIcon(part.Icon.Bitmap);
+                    btn.Tag = part;
+                    btn.Checked = part.Visible;
+                    btn.btnItemShow.Click += BtnItemShow_Click;
+                    btn.btnItemDel.Click += BtnItemDel_Click;
+                    btn.CheckedChanged += Btn_CheckedChanged;
                     itemPanel1.Items.Add(btn);
                 }
             }
             itemPanel1.EndUpdate();
+        }
+
+
+
+        private void BtnItemShow_Click(object sender, EventArgs e)
+        {
+            var btn = (sender as BaseItem).Parent as AvatarPartButtonItem;
+            if (btn != null)
+            {
+                btn.Checked = !btn.Checked;
+            }
+        }
+
+        private void BtnItemDel_Click(object sender, EventArgs e)
+        {
+            var btn = (sender as BaseItem).Parent as AvatarPartButtonItem;
+            if (btn != null)
+            {
+                var part = btn.Tag as AvatarPart;
+                if (part != null)
+                {
+                    int index = Array.IndexOf(this.avatar.Parts, part);
+                    if (index > -1)
+                    {
+                        this.avatar.Parts[index] = null;
+                        this.FillAvatarParts();
+                        this.UpdateDisplay();
+                    }
+                }
+            }
+        }
+
+        private void Btn_CheckedChanged(object sender, EventArgs e)
+        {
+            var btn = sender as AvatarPartButtonItem;
+            if (btn != null)
+            {
+                var part = btn.Tag as AvatarPart;
+                if (part != null)
+                {
+                    part.Visible = btn.Checked;
+                    this.UpdateDisplay();
+                }
+            }
         }
 
         private void FillBodyActionFrame()
@@ -640,9 +679,15 @@ namespace WzComparerR2.Avatar.UI
             }
         }
 
-        private void chkHairOverHead_CheckedChanged(object sender, EventArgs e)
+        private void chkHairCover_CheckedChanged(object sender, EventArgs e)
         {
-            avatar.ShowhairOverHead = chkHairOverHead.Checked;
+            avatar.HairCover = chkHairCover.Checked;
+            UpdateDisplay();
+        }
+
+        private void chkHairShade_CheckedChanged(object sender, EventArgs e)
+        {
+            avatar.ShowHairShade = chkHairShade.Checked;
             UpdateDisplay();
         }
 
@@ -825,5 +870,6 @@ namespace WzComparerR2.Avatar.UI
                 this.NextFrameDelay = nextFrame;
             }
         }
+
     }
 }
