@@ -705,7 +705,7 @@ namespace WzComparerR2.Avatar.UI
             {
                 if (!this.timer1.Enabled)
                 {
-                    this.timer1.Interval = 0;
+                    this.timer1.Interval = 1;
                     this.timer1.Start();
                 }
             }

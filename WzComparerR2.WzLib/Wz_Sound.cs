@@ -84,22 +84,36 @@ namespace WzComparerR2.WzLib
         {
             get
             {
-                int soundType;
+                Wz_SoundType soundType;
                 if (this.header == null)
                 {
-                    soundType = 0;
+                    soundType = Wz_SoundType.Mp3;
                 }
                 else
                 {
                     switch (this.header.Length)
                     {
-                        case 0x52: soundType = 0; break;
-                        case 0x46: soundType = 1; break;
-                        default: soundType = 0; break;
+                        default:
+                        case 0x52:
+                            soundType = Wz_SoundType.Mp3;
+                            break;
+
+                        case 0x46:
+                            {
+                                if (this.Frequency == this.dataLength && this.Ms == 1000)
+                                {
+                                    soundType = Wz_SoundType.Binary;
+                                }
+                                else
+                                {
+                                    soundType = Wz_SoundType.WavRaw;
+                                }
+                            }
+                            break;
                     }
                 }
 
-                return (Wz_SoundType)soundType;
+                return soundType;
             }
         }
 
@@ -154,8 +168,15 @@ namespace WzComparerR2.WzLib
                 int cbSize = BitConverter.ToUInt16(this.header, 52 + 16);
                 if (cbSize + 18 != waveFormatLen)
                 {
+                    byte[] tempHeader = new byte[waveFormatLen];
+                    Buffer.BlockCopy(this.header, 52, tempHeader, 0, tempHeader.Length);
                     var enc = this.WzFile.WzStructure.encryption;
-                    enc.keys.Decrypt(this.header, 52, waveFormatLen);
+                    enc.keys.Decrypt(tempHeader, 0, tempHeader.Length); //解密
+                    cbSize = BitConverter.ToUInt16(tempHeader, 16); //重新验证
+                    if (cbSize + 18 == waveFormatLen)
+                    {
+                        Buffer.BlockCopy(tempHeader, 0, this.header, 52, tempHeader.Length);
+                    }
                 }
             }
         }

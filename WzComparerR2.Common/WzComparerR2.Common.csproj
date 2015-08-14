@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="ImageManipulation">
       <HintPath>..\References\ImageManipulation.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />

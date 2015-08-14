@@ -963,7 +963,8 @@ namespace WzComparerR2
                     "offset: " + sound.Offset + "\r\n" +
                     "time: " + sound.Ms + " ms\r\n" +
                     "headerLength: " + (sound.Header == null ? 0 : sound.Header.Length) + " bytes\r\n" +
-                    "freq: " + sound.Frequency + " Hz";
+                    "freq: " + sound.Frequency + " Hz\r\n" +
+                    "type: " + sound.SoundType.ToString();
             }
             else if (e.Node.Tag is Wz_Image)
             {
@@ -1752,6 +1753,10 @@ namespace WzComparerR2
         private void preLoadSound(Wz_Sound sound, string soundName)
         {
             byte[] data = sound.ExtractSound();
+            if (data == null || data.Length <= 0)
+            {
+                return;
+            }
             soundPlayer.PreLoad(data);
             labelItemSoundTitle.Text = soundName;
 
@@ -1916,6 +1921,82 @@ namespace WzComparerR2
         #endregion
 
         #region contextMenuStrip2
+        private void tsmi2SaveAs_Click(object sender, EventArgs e)
+        {
+            if (advTree3.SelectedNode == null)
+                return;
+
+            object item = advTree3.SelectedNode.Tag;
+
+            if (item is string)
+            {
+                SaveFileDialog dlg = new SaveFileDialog();
+                dlg.FileName = advTree3.SelectedNode.Text;
+                if (!dlg.FileName.Contains("."))
+                {
+                    dlg.FileName += ".txt";
+                }
+                dlg.Filter = "*.*|*.*";
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        File.WriteAllText(dlg.FileName, (string)item);
+                        this.labelItemStatus.Text = "保存成功。";
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBoxEx.Show("文件保存失败。\r\n" + ex.ToString(), "提示");
+                    }
+                }
+            }
+            else if (item is Wz_Sound)
+            {
+                var wzSound = (Wz_Sound)item;
+                SaveFileDialog dlg = new SaveFileDialog();
+                dlg.FileName = advTree3.SelectedNode.Text;
+                if (!dlg.FileName.Contains("."))
+                {
+                    switch (wzSound.SoundType)
+                    {
+                        case Wz_SoundType.Mp3: dlg.FileName += ".mp3"; break;
+                        case Wz_SoundType.WavRaw: dlg.FileName += ".pcm"; break;
+                    }
+                }
+                dlg.Filter = "*.*|*.*";
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        using (var f = File.Create(dlg.FileName))
+                        {
+                            wzSound.WzFile.FileStream.Seek(wzSound.Offset, SeekOrigin.Begin);
+                            byte[] buffer = new byte[4096];
+                            int bytes = wzSound.DataLength;
+                            while(bytes > 0)
+                            {
+                                int count = wzSound.WzFile.FileStream.Read(buffer, 0, Math.Min(buffer.Length, bytes));
+                                if (count > 0)
+                                {
+                                    f.Write(buffer, 0, count);
+                                    bytes -= count;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                        this.labelItemStatus.Text = "保存成功。";
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBoxEx.Show("文件保存失败。\r\n" + ex.ToString(), "提示");
+                    }
+                }
+            }
+        }
+
         private void tsmi2ExpandAll_Click(object sender, EventArgs e)
         {
             if (advTree3.SelectedNode == null)
@@ -2660,6 +2741,7 @@ namespace WzComparerR2
         {
 
         }
+
 
     }
 }

@@ -469,6 +469,7 @@ namespace WzComparerR2.Avatar
                         bodyRoot.Children.Add(childBone);
                     }
                 }
+                bodyRoot.Skins.AddRange(tamingRoot.Skins);
             }
 
             return bodyRoot;

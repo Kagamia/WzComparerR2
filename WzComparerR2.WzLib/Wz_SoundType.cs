@@ -7,6 +7,7 @@ namespace WzComparerR2.WzLib
     public enum Wz_SoundType
     {
         Mp3 = 0,
-        WavRaw = 1
+        WavRaw = 1,
+        Binary = 2,
     }
 }

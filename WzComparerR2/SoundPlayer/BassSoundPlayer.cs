@@ -136,6 +136,10 @@ namespace WzComparerR2
                 if (this.autoPlay)
                     this.Play();
             }
+            else
+            {
+                var lastErr = Bass.BASS_ErrorGetCode();
+            }
         }
 
         public void UnLoad()
