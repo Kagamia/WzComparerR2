@@ -2151,7 +2151,10 @@ namespace WzComparerR2
                     }
                     var gear = Gear.CreateFromNode(image.Node, PluginManager.FindWz);
                     obj = gear;
-                    fileName = gear.ItemID + ".png";
+                    if (gear != null)
+                    {
+                        fileName = gear.ItemID + ".png";
+                    }
                     break;
                 case Wz_Type.Item:
                     Wz_Node itemNode = getWzNodeByNode(node);
@@ -2159,7 +2162,10 @@ namespace WzComparerR2
                     {
                         var item = Item.CreateFromNode(itemNode);
                         obj = item;
-                        fileName = item.ItemID + ".png";
+                        if (item != null)
+                        {
+                            fileName = item.ItemID + ".png";
+                        }
                     }
                     else if( Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\Pet\\\d{7}.img"))
                     {
@@ -2169,7 +2175,10 @@ namespace WzComparerR2
                         }
                         var item = Item.CreateFromNode(itemNode);
                         obj = item;
-                        fileName = item.ItemID + ".png";
+                        if (item != null)
+                        {
+                            fileName = item.ItemID + ".png";
+                        }
                     }
                     
                     break;
@@ -2180,7 +2189,10 @@ namespace WzComparerR2
                     {
                         Recipe recipe = Recipe.CreateFromNode(skillNode);
                         obj = recipe;
-                        fileName = "recipe_" + recipe.RecipeID + ".png";
+                        if (recipe != null)
+                        {
+                            fileName = "recipe_" + recipe.RecipeID + ".png";
+                        }
                     }
                     else if (Regex.IsMatch(skillNode.FullPathToFile, @"^Skill\\\d+.img\\skill\\\d+$"))
                     {

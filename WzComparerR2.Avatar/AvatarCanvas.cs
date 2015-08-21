@@ -240,6 +240,10 @@ namespace WzComparerR2.Avatar
         public AvatarPart AddPart(Wz_Node imgNode)
         {
             Wz_Node infoNode = imgNode.FindNodeByPath("info");
+            if (infoNode == null)
+            {
+                return null;
+            }
             AvatarPart part = new AvatarPart(imgNode);
 
             var gearType = Gear.GetGearType(part.ID.Value);
@@ -631,18 +635,7 @@ namespace WzComparerR2.Avatar
 
         private Bone AppendBone(Bone root, Bone parentBone, Skin skin, string mapName, Point mapOrigin)
         {
-            Bone bone;
-            switch (mapName)
-            {
-                case "muzzle":
-                    bone = root.FindChild("navel");
-                    break;
-                default:
-                    bone = root.FindChild(mapName);
-                    break;
-            }
-
-            
+            Bone bone = root.FindChild(mapName);
             bool exists;
             if (bone == null) //创建骨骼
             {
@@ -686,26 +679,6 @@ namespace WzComparerR2.Avatar
                 {
                     bone.Parent = parentBone;
                     bone.Position = mapOrigin;
-                    /*
-                    if (parentBone == root) //翻转
-                    {
-                        Bone bone0 = new Bone("@" + bone.Name + "_" + skin.Name); //创建虚关节
-                        bone0.Position = new Point(-mapOrigin.X, -mapOrigin.Y); //偏移差值
-                        for (int j = root.Children.Count - 1; j >= 0; j--) //对root所有子骨骼进行重定位
-                        {
-                            Bone child = root.Children[j];
-                            if (child != bone)
-                            {
-                                child.Parent = bone0;
-                            }
-                        }
-                        bone0.Parent = bone;
-                        return bone0; //翻转后返回映射的骨骼
-                    }
-                    else //替换
-                    {
-                       
-                    }*/
                 }
 
                 return null;
@@ -936,10 +909,10 @@ namespace WzComparerR2.Avatar
             List<Wz_Node> partNode = new List<Wz_Node>();
 
             //链接马
-            if (this.Taming != null && tamingAction != null)
+            if (this.Taming != null && this.Taming.Visible && tamingAction != null)
             {
                 partNode.Add(FindActionFrameNode(this.Taming.Node, tamingAction));
-                if (this.Saddle != null)
+                if (this.Saddle != null && this.Saddle.Visible)
                 {
                     var saddleNode = this.Saddle.Node.FindNodeByPath(false, this.Taming.ID.ToString());
                     partNode.Add(FindActionFrameNode(saddleNode, tamingAction));

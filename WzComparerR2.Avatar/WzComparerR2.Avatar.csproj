@@ -47,6 +47,12 @@
   <ItemGroup>
     <Compile Include="Action.cs" />
     <Compile Include="ActionFrame.cs" />
+    <Compile Include="UI\AvatarCodeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\AvatarCodeForm.Designer.cs">
+      <DependentUpon>AvatarCodeForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\AvatarContainer.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -95,6 +101,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="UI\AvatarCodeForm.resx">
+      <DependentUpon>AvatarCodeForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\AvatarForm.resx">
       <DependentUpon>AvatarForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -105,6 +114,18 @@
     <EmbeddedResource Include="UI\AvatarPartButtonItem.resx">
       <DependentUpon>AvatarPartButtonItem.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\user.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow_in.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\lock.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\script_code.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -63,9 +63,12 @@
             this.dockSite6 = new DevComponents.DotNetBar.DockSite();
             this.dockSite7 = new DevComponents.DotNetBar.DockSite();
             this.bar3 = new DevComponents.DotNetBar.Bar();
-            this.buttonItem1 = new DevComponents.DotNetBar.ButtonItem();
-            this.buttonItem2 = new DevComponents.DotNetBar.ButtonItem();
-            this.buttonItem3 = new DevComponents.DotNetBar.ButtonItem();
+            this.btnCode = new DevComponents.DotNetBar.ButtonItem();
+            this.btnCharac = new DevComponents.DotNetBar.ButtonItem();
+            this.btnMale = new DevComponents.DotNetBar.ButtonItem();
+            this.btnFemale = new DevComponents.DotNetBar.ButtonItem();
+            this.btnReset = new DevComponents.DotNetBar.ButtonItem();
+            this.btnLock = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.avatarContainer1 = new WzComparerR2.Avatar.UI.AvatarContainer();
@@ -96,6 +99,7 @@
             this.dotNetBarManager1.LeftDockSite = this.dockSite1;
             this.dotNetBarManager1.ParentForm = this;
             this.dotNetBarManager1.RightDockSite = this.dockSite2;
+            this.dotNetBarManager1.ShowCustomizeContextMenu = false;
             this.dotNetBarManager1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.dotNetBarManager1.ToolbarBottomDockSite = this.dockSite8;
             this.dotNetBarManager1.ToolbarLeftDockSite = this.dockSite5;
@@ -119,9 +123,9 @@
             this.dockSite1.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite1.Dock = System.Windows.Forms.DockStyle.Left;
             this.dockSite1.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer();
-            this.dockSite1.Location = new System.Drawing.Point(0, 26);
+            this.dockSite1.Location = new System.Drawing.Point(0, 25);
             this.dockSite1.Name = "dockSite1";
-            this.dockSite1.Size = new System.Drawing.Size(0, 385);
+            this.dockSite1.Size = new System.Drawing.Size(0, 386);
             this.dockSite1.TabIndex = 0;
             this.dockSite1.TabStop = false;
             // 
@@ -132,11 +136,11 @@
             this.dockSite2.Controls.Add(this.bar2);
             this.dockSite2.Dock = System.Windows.Forms.DockStyle.Right;
             this.dockSite2.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer(new DevComponents.DotNetBar.DocumentBaseContainer[] {
-            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar1, 213, 214))),
-            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar2, 213, 168)))}, DevComponents.DotNetBar.eOrientation.Vertical);
-            this.dockSite2.Location = new System.Drawing.Point(368, 26);
+            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar1, 213, 213))),
+            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar2, 213, 170)))}, DevComponents.DotNetBar.eOrientation.Vertical);
+            this.dockSite2.Location = new System.Drawing.Point(368, 25);
             this.dockSite2.Name = "dockSite2";
-            this.dockSite2.Size = new System.Drawing.Size(216, 385);
+            this.dockSite2.Size = new System.Drawing.Size(216, 386);
             this.dockSite2.TabIndex = 1;
             this.dockSite2.TabStop = false;
             // 
@@ -155,7 +159,7 @@
             this.bar1.LayoutType = DevComponents.DotNetBar.eLayoutType.DockContainer;
             this.bar1.Location = new System.Drawing.Point(3, 0);
             this.bar1.Name = "bar1";
-            this.bar1.Size = new System.Drawing.Size(213, 214);
+            this.bar1.Size = new System.Drawing.Size(213, 213);
             this.bar1.Stretch = true;
             this.bar1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar1.TabIndex = 0;
@@ -169,7 +173,7 @@
             this.panelDockContainer1.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelDockContainer1.Location = new System.Drawing.Point(3, 23);
             this.panelDockContainer1.Name = "panelDockContainer1";
-            this.panelDockContainer1.Size = new System.Drawing.Size(207, 188);
+            this.panelDockContainer1.Size = new System.Drawing.Size(207, 187);
             this.panelDockContainer1.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelDockContainer1.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarBackground;
             this.panelDockContainer1.Style.BorderColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarDockedBorder;
@@ -191,7 +195,7 @@
             this.itemPanel1.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
             this.itemPanel1.Location = new System.Drawing.Point(0, 0);
             this.itemPanel1.Name = "itemPanel1";
-            this.itemPanel1.Size = new System.Drawing.Size(207, 188);
+            this.itemPanel1.Size = new System.Drawing.Size(207, 187);
             this.itemPanel1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.itemPanel1.TabIndex = 8;
             this.itemPanel1.Text = "itemPanel1";
@@ -215,9 +219,9 @@
             this.bar2.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.dockContainerItem2});
             this.bar2.LayoutType = DevComponents.DotNetBar.eLayoutType.DockContainer;
-            this.bar2.Location = new System.Drawing.Point(3, 217);
+            this.bar2.Location = new System.Drawing.Point(3, 216);
             this.bar2.Name = "bar2";
-            this.bar2.Size = new System.Drawing.Size(213, 168);
+            this.bar2.Size = new System.Drawing.Size(213, 170);
             this.bar2.Stretch = true;
             this.bar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar2.TabIndex = 1;
@@ -249,7 +253,7 @@
             this.panelDockContainer2.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelDockContainer2.Location = new System.Drawing.Point(3, 23);
             this.panelDockContainer2.Name = "panelDockContainer2";
-            this.panelDockContainer2.Size = new System.Drawing.Size(207, 142);
+            this.panelDockContainer2.Size = new System.Drawing.Size(207, 144);
             this.panelDockContainer2.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelDockContainer2.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarBackground;
             this.panelDockContainer2.Style.BorderColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarDockedBorder;
@@ -310,7 +314,7 @@
             this.chkEar.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.chkEar.Location = new System.Drawing.Point(160, 84);
             this.chkEar.Name = "chkEar";
-            this.chkEar.Size = new System.Drawing.Size(45, 16);
+            this.chkEar.Size = new System.Drawing.Size(45, 19);
             this.chkEar.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkEar.TabIndex = 11;
             this.chkEar.Text = "ear";
@@ -512,7 +516,7 @@
             this.chkHairShade.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.chkHairShade.Location = new System.Drawing.Point(82, 84);
             this.chkHairShade.Name = "chkHairShade";
-            this.chkHairShade.Size = new System.Drawing.Size(82, 16);
+            this.chkHairShade.Size = new System.Drawing.Size(85, 19);
             this.chkHairShade.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkHairShade.TabIndex = 10;
             this.chkHairShade.Text = "hairShade";
@@ -528,7 +532,7 @@
             this.chkHairCover.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.chkHairCover.Location = new System.Drawing.Point(5, 84);
             this.chkHairCover.Name = "chkHairCover";
-            this.chkHairCover.Size = new System.Drawing.Size(82, 16);
+            this.chkHairCover.Size = new System.Drawing.Size(83, 19);
             this.chkHairCover.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkHairCover.TabIndex = 9;
             this.chkHairCover.Text = "hairCover";
@@ -554,9 +558,9 @@
             // 
             this.dockSite5.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite5.Dock = System.Windows.Forms.DockStyle.Left;
-            this.dockSite5.Location = new System.Drawing.Point(0, 26);
+            this.dockSite5.Location = new System.Drawing.Point(0, 25);
             this.dockSite5.Name = "dockSite5";
-            this.dockSite5.Size = new System.Drawing.Size(0, 385);
+            this.dockSite5.Size = new System.Drawing.Size(0, 386);
             this.dockSite5.TabIndex = 4;
             this.dockSite5.TabStop = false;
             // 
@@ -564,9 +568,9 @@
             // 
             this.dockSite6.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite6.Dock = System.Windows.Forms.DockStyle.Right;
-            this.dockSite6.Location = new System.Drawing.Point(584, 26);
+            this.dockSite6.Location = new System.Drawing.Point(584, 25);
             this.dockSite6.Name = "dockSite6";
-            this.dockSite6.Size = new System.Drawing.Size(0, 385);
+            this.dockSite6.Size = new System.Drawing.Size(0, 386);
             this.dockSite6.TabIndex = 5;
             this.dockSite6.TabStop = false;
             // 
@@ -577,50 +581,81 @@
             this.dockSite7.Dock = System.Windows.Forms.DockStyle.Top;
             this.dockSite7.Location = new System.Drawing.Point(0, 0);
             this.dockSite7.Name = "dockSite7";
-            this.dockSite7.Size = new System.Drawing.Size(584, 26);
+            this.dockSite7.Size = new System.Drawing.Size(584, 25);
             this.dockSite7.TabIndex = 6;
             this.dockSite7.TabStop = false;
             // 
             // bar3
             // 
-            this.bar3.AccessibleDescription = "工具 (bar3)";
-            this.bar3.AccessibleName = "工具";
+            this.bar3.AccessibleDescription = "DotNetBar Bar (bar3)";
+            this.bar3.AccessibleName = "DotNetBar Bar";
             this.bar3.AccessibleRole = System.Windows.Forms.AccessibleRole.ToolBar;
+            this.bar3.CanCustomize = false;
             this.bar3.DockSide = DevComponents.DotNetBar.eDockSide.Top;
+            this.bar3.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
             this.bar3.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Office2003;
             this.bar3.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItem1,
-            this.buttonItem2,
-            this.buttonItem3});
+            this.btnCode,
+            this.btnCharac,
+            this.btnReset,
+            this.btnLock});
             this.bar3.Location = new System.Drawing.Point(0, 0);
             this.bar3.Name = "bar3";
-            this.bar3.Size = new System.Drawing.Size(264, 26);
+            this.bar3.Size = new System.Drawing.Size(118, 25);
             this.bar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar3.TabIndex = 0;
             this.bar3.TabStop = false;
             this.bar3.Text = "工具";
             // 
-            // buttonItem1
+            // btnCode
             // 
-            this.buttonItem1.Name = "buttonItem1";
-            this.buttonItem1.Text = "buttonItem1";
+            this.btnCode.Image = global::WzComparerR2.Avatar.Properties.Resources.script_code;
+            this.btnCode.Name = "btnCode";
+            this.btnCode.Tooltip = "代码";
+            this.btnCode.Click += new System.EventHandler(this.btnCode_Click);
             // 
-            // buttonItem2
+            // btnCharac
             // 
-            this.buttonItem2.Name = "buttonItem2";
-            this.buttonItem2.Text = "buttonItem2";
+            this.btnCharac.AutoExpandOnClick = true;
+            this.btnCharac.Image = global::WzComparerR2.Avatar.Properties.Resources.user;
+            this.btnCharac.Name = "btnCharac";
+            this.btnCharac.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.btnMale,
+            this.btnFemale});
+            this.btnCharac.Tooltip = "初始化";
             // 
-            // buttonItem3
+            // btnMale
             // 
-            this.buttonItem3.Name = "buttonItem3";
-            this.buttonItem3.Text = "buttonItem3";
+            this.btnMale.Name = "btnMale";
+            this.btnMale.Text = "男性角色";
+            this.btnMale.Click += new System.EventHandler(this.btnMale_Click);
+            // 
+            // btnFemale
+            // 
+            this.btnFemale.Name = "btnFemale";
+            this.btnFemale.Text = "女性角色";
+            this.btnFemale.Click += new System.EventHandler(this.btnFemale_Click);
+            // 
+            // btnReset
+            // 
+            this.btnReset.Image = global::WzComparerR2.Avatar.Properties.Resources.arrow_in;
+            this.btnReset.Name = "btnReset";
+            this.btnReset.Tooltip = "坐标重置";
+            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
+            // 
+            // btnLock
+            // 
+            this.btnLock.AutoCheckOnClick = true;
+            this.btnLock.Image = global::WzComparerR2.Avatar.Properties.Resources._lock;
+            this.btnLock.Name = "btnLock";
+            this.btnLock.Tooltip = "锁定";
             // 
             // dockSite3
             // 
             this.dockSite3.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite3.Dock = System.Windows.Forms.DockStyle.Top;
             this.dockSite3.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer();
-            this.dockSite3.Location = new System.Drawing.Point(0, 26);
+            this.dockSite3.Location = new System.Drawing.Point(0, 25);
             this.dockSite3.Name = "dockSite3";
             this.dockSite3.Size = new System.Drawing.Size(584, 0);
             this.dockSite3.TabIndex = 2;
@@ -634,10 +669,10 @@
             // 
             this.avatarContainer1.BackColor = System.Drawing.Color.White;
             this.avatarContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.avatarContainer1.Location = new System.Drawing.Point(0, 26);
+            this.avatarContainer1.Location = new System.Drawing.Point(0, 25);
             this.avatarContainer1.Name = "avatarContainer1";
             this.avatarContainer1.Origin = new System.Drawing.Point(0, 0);
-            this.avatarContainer1.Size = new System.Drawing.Size(368, 385);
+            this.avatarContainer1.Size = new System.Drawing.Size(368, 386);
             this.avatarContainer1.TabIndex = 8;
             this.avatarContainer1.Text = "avatarContainer1";
             // 
@@ -708,9 +743,12 @@
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWeaponType;
         private DevComponents.DotNetBar.LabelX labelX4;
         private DevComponents.DotNetBar.Bar bar3;
-        private DevComponents.DotNetBar.ButtonItem buttonItem1;
-        private DevComponents.DotNetBar.ButtonItem buttonItem2;
-        private DevComponents.DotNetBar.ButtonItem buttonItem3;
+        private DevComponents.DotNetBar.ButtonItem btnCode;
+        private DevComponents.DotNetBar.ButtonItem btnCharac;
+        private DevComponents.DotNetBar.ButtonItem btnReset;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHairShade;
+        private DevComponents.DotNetBar.ButtonItem btnLock;
+        private DevComponents.DotNetBar.ButtonItem btnMale;
+        private DevComponents.DotNetBar.ButtonItem btnFemale;
     }
 }

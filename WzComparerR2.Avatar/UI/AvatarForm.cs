@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using DevComponents.DotNetBar;
 using DevComponents.Editors;
@@ -20,7 +21,7 @@ namespace WzComparerR2.Avatar.UI
             InitializeComponent();
             this.avatar = new AvatarCanvas();
             this.animator = new Animator();
-            this.avatarContainer1.Origin = new Point(this.avatarContainer1.Width / 2, this.avatarContainer1.Height / 2);
+            btnReset_Click(btnReset, EventArgs.Empty);
             FillWeaponIdx();
         }
 
@@ -51,7 +52,8 @@ namespace WzComparerR2.Avatar.UI
         /// </summary>
         public void OnSelectedNode1Changed(object sender, WzNodeEventArgs e)
         {
-            if (PluginEntry.Context.SelectedTab != PluginEntry.Tab || e.Node == null)
+            if (PluginEntry.Context.SelectedTab != PluginEntry.Tab || e.Node == null
+                || this.btnLock.Checked)
             {
                 return;
             }
@@ -131,47 +133,72 @@ namespace WzComparerR2.Avatar.UI
             AvatarPart part = this.avatar.AddPart(imgNode);
             if (part != null)
             {
-                if (part == avatar.Body) //同步head
-                {
-                    int headID = 10000 + part.ID.Value % 10000;
-                    if (avatar.Head == null || avatar.Head.ID != headID)
-                    {
-                        var headImgNode = PluginBase.PluginManager.FindWz(string.Format("Character\\{0:D8}.img", headID));
-                        if (headImgNode != null)
-                        {
-                            this.avatar.AddPart(headImgNode);
-                        }
-                    }
-                }
-                else if (part == avatar.Head) //同步body
-                {
-                    int bodyID = part.ID.Value % 10000;
-                    if (avatar.Body == null || avatar.Body.ID != bodyID)
-                    {
-                        var bodyImgNode = PluginBase.PluginManager.FindWz(string.Format("Character\\{0:D8}.img", bodyID));
-                        if (bodyImgNode != null)
-                        {
-                            this.avatar.AddPart(bodyImgNode);
-                        }
-                    }
-                }
-                else if (part == avatar.Face) //同步表情
-                {
-                    this.avatar.LoadEmotions();
-                    FillEmotion();
-                }
-                else if (part == avatar.Taming) //同步座驾动作
-                {
-                    this.avatar.LoadTamingActions();
-                    FillTamingAction();
-                }
-                else if (part == avatar.Weapon) //同步武器类型
-                {
-                    FillWeaponTypes();
-                }
-
-                this.FillAvatarParts();
+                OnNewPartAdded(part);
+                FillAvatarParts();
                 UpdateDisplay();
+            }
+        }
+
+        private void OnNewPartAdded(AvatarPart part)
+        {
+            if (part == null)
+            {
+                return;
+            }
+
+            if (part == avatar.Body) //同步head
+            {
+                int headID = 10000 + part.ID.Value % 10000;
+                if (avatar.Head == null || avatar.Head.ID != headID)
+                {
+                    var headImgNode = PluginBase.PluginManager.FindWz(string.Format("Character\\{0:D8}.img", headID));
+                    if (headImgNode != null)
+                    {
+                        this.avatar.AddPart(headImgNode);
+                    }
+                }
+            }
+            else if (part == avatar.Head) //同步body
+            {
+                int bodyID = part.ID.Value % 10000;
+                if (avatar.Body == null || avatar.Body.ID != bodyID)
+                {
+                    var bodyImgNode = PluginBase.PluginManager.FindWz(string.Format("Character\\{0:D8}.img", bodyID));
+                    if (bodyImgNode != null)
+                    {
+                        this.avatar.AddPart(bodyImgNode);
+                    }
+                }
+            }
+            else if (part == avatar.Face) //同步表情
+            {
+                this.avatar.LoadEmotions();
+                FillEmotion();
+            }
+            else if (part == avatar.Taming) //同步座驾动作
+            {
+                this.avatar.LoadTamingActions();
+                FillTamingAction();
+                SelectBodyAction("sit");
+            }
+            else if (part == avatar.Weapon) //同步武器类型
+            {
+                FillWeaponTypes();
+            }
+            else if (part == avatar.Pants || part == avatar.Coat) //隐藏套装
+            {
+                if (avatar.Longcoat != null)
+                {
+                    avatar.Longcoat.Visible = false;
+                }
+            }
+            else if (part == avatar.Longcoat) //还是。。隐藏套装
+            {
+                if (avatar.Pants != null && avatar.Pants.Visible
+                    || avatar.Coat != null && avatar.Coat.Visible)
+                {
+                    avatar.Longcoat.Visible = false;
+                }
             }
         }
 
@@ -251,17 +278,17 @@ namespace WzComparerR2.Avatar.UI
                 this.avatar.WeaponType,
                 this.avatar.WeaponIndex);
 
-            var actionFrames = avatar.GetActionFrames(avatar.ActionName);
-            ActionFrame f = null;
-            if (bodyFrame > -1 && bodyFrame < actionFrames.Length)
-            {
-                f = actionFrames[bodyFrame];
-            }
-
             if (!avatarContainer1.HasCache(actionTag))
             {
                 try
                 {
+                    var actionFrames = avatar.GetActionFrames(avatar.ActionName);
+                    ActionFrame f = null;
+                    if (bodyFrame > -1 && bodyFrame < actionFrames.Length)
+                    {
+                        f = actionFrames[bodyFrame];
+                    }
+
                     var bone = avatar.CreateFrame(bodyFrame, emoFrame, tamingFrame);
                     var bmp = avatar.DrawFrame(bone, f);
                     avatarContainer1.AddCache(actionTag, bmp);
@@ -306,6 +333,19 @@ namespace WzComparerR2.Avatar.UI
             if (imgNode != null)
             {
                 this.avatar.AddPart(imgNode);
+            }
+        }
+
+        private void SelectBodyAction(string actionName)
+        {
+            for (int i = 0; i < cmbActionBody.Items.Count; i++)
+            {
+                ComboItem item = cmbActionBody.Items[i] as ComboItem;
+                if (item != null && item.Text == actionName)
+                {
+                    cmbActionBody.SelectedIndex = i;
+                    return;
+                }
             }
         }
 
@@ -401,8 +441,6 @@ namespace WzComparerR2.Avatar.UI
             }
             itemPanel1.EndUpdate();
         }
-
-
 
         private void BtnItemShow_Click(object sender, EventArgs e)
         {
@@ -508,7 +546,6 @@ namespace WzComparerR2.Avatar.UI
         private void FillComboItems(ComboBoxEx comboBox, IEnumerable<string> items)
         {
             List<ComboItem> _items = new List<ComboItem>();
-            int i = 0;
             foreach (var itemText in items)
             {
                 ComboItem item = new ComboItem();
@@ -522,7 +559,7 @@ namespace WzComparerR2.Avatar.UI
         {
             List<ComboItem> items = new List<ComboItem>();
             int i = 0;
-            foreach(var f in frames)
+            foreach (var f in frames)
             {
                 ComboItem item = new ComboItem();
                 item.Text = (i++).ToString();
@@ -552,7 +589,7 @@ namespace WzComparerR2.Avatar.UI
                     }
                 }
             }
-            
+
             //恢复原有选项
             if (comboBox.Items.Count > 0)
             {
@@ -805,6 +842,150 @@ namespace WzComparerR2.Avatar.UI
             return false;
         }
 
+        private void btnCode_Click(object sender, EventArgs e)
+        {
+            var dlg = new AvatarCodeForm();
+            string code = GetAllPartsTag();
+            dlg.CodeText = code;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                if (dlg.CodeText != code && !string.IsNullOrEmpty(dlg.CodeText))
+                {
+                    LoadCode(dlg.CodeText, dlg.LoadType);
+                }
+            }
+        }
+
+        private void btnMale_Click(object sender, EventArgs e)
+        {
+            if (MessageBoxEx.Show("初始化为男性角色？", "提示") == DialogResult.OK)
+            {
+                LoadCode("2000,12000,20000,30000,1040036,1060026", 0);
+            }
+        }
+
+        private void btnFemale_Click(object sender, EventArgs e)
+        {
+            if (MessageBoxEx.Show("初始化为女性角色？", "提示") == DialogResult.OK)
+            {
+                LoadCode("2000,12000,21000,31000,1041046,1061039", 0);
+            }
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            this.avatarContainer1.Origin = new Point(this.avatarContainer1.Width / 2, this.avatarContainer1.Height / 2 + 40);
+            this.avatarContainer1.Invalidate();
+        }
+
+        private void LoadCode(string code, int loadType)
+        {
+            //解析
+            var matches = Regex.Matches(code, @"(\d+)([,\s]|$)");
+            if (matches.Count <= 0)
+            {
+                MessageBoxEx.Show("无法解析的装备代码。", "错误");
+                return;
+            }
+
+            var characWz = PluginManager.FindWz(Wz_Type.Character);
+            if (characWz == null)
+            {
+                MessageBoxEx.Show("没有打开Character.Wz。", "错误");
+                return;
+            }
+
+            //试图初始化
+            if (!this.inited && !this.AvatarInit())
+            {
+                MessageBoxEx.Show("Avatar初始化失败。", "错误");
+                return;
+            }
+
+            if (loadType == 0) //先清空。。
+            {
+                Array.Clear(this.avatar.Parts, 0, this.avatar.Parts.Length);
+            }
+
+            List<int> failList = new List<int>();
+
+            foreach (Match m in matches)
+            {
+                int gearID;
+                if (Int32.TryParse(m.Result("$1"), out gearID))
+                {
+                    Wz_Node imgNode = FindNodeByGearID(characWz, gearID);
+                    if (imgNode != null)
+                    {
+                        var part = this.avatar.AddPart(imgNode);
+                        OnNewPartAdded(part);
+                    }
+                    else
+                    {
+                        failList.Add(gearID);
+                    }
+                }
+            }
+
+            //刷新
+            this.FillAvatarParts();
+            this.UpdateDisplay();
+
+            //其他提示
+            if (failList.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("以下部件没有找到：");
+                foreach (var gearID in failList)
+                {
+                    sb.Append("  ").AppendLine(gearID.ToString("D8"));
+                }
+                MessageBoxEx.Show(sb.ToString(), "嗯..");
+            }
+
+        }
+
+        private Wz_Node FindNodeByGearID(Wz_Node characWz, int id)
+        {
+            string imgName = id.ToString("D8") + ".img";
+            Wz_Node imgNode = null;
+
+            foreach (var node1 in characWz.Nodes)
+            {
+                if (node1.Text == imgName)
+                {
+                    imgNode = node1;
+                    break;
+                }
+                else if (node1.Nodes.Count > 0)
+                {
+                    foreach (var node2 in node1.Nodes)
+                    {
+                        if (node2.Text == imgName)
+                        {
+                            imgNode = node2;
+                            break;
+                        }
+                    }
+                    if (imgNode != null)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (imgNode != null)
+            {
+                Wz_Image img = imgNode.GetValue<Wz_Image>();
+                if (img != null && img.TryExtract())
+                {
+                    return img.Node;
+                }
+            }
+
+            return null;
+        }
+
         private class Animator
         {
             public Animator()
@@ -813,7 +994,7 @@ namespace WzComparerR2.Avatar.UI
             }
 
             private int[] delays;
-            
+
             public int NextFrameDelay { get; private set; }
 
             public int BodyDelay
@@ -870,6 +1051,5 @@ namespace WzComparerR2.Avatar.UI
                 this.NextFrameDelay = nextFrame;
             }
         }
-
     }
 }
