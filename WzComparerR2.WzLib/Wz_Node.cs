@@ -221,7 +221,25 @@ namespace WzComparerR2.WzLib
             public new void Add(Wz_Node item)
             {
                 base.Add(item);
+                if (item.parentNode != null)
+                {
+                    int index = item.parentNode.nodes.Items.IndexOf(item);
+                    if (index > -1)
+                    {
+                        item.parentNode.nodes.RemoveItem(index);
+                    }
+                }
                 item.parentNode = this.parentNode;
+            }
+
+            protected override void RemoveItem(int index)
+            {
+                var item = this[index];
+                if (item != null)
+                {
+                    item.parentNode = null;
+                }
+                base.RemoveItem(index);
             }
 
             private Wz_Node parentNode;
@@ -259,7 +277,6 @@ namespace WzComparerR2.WzLib
             foreach (Wz_Node node in this.nodes)
             {
                 Wz_Node newChild = node.Clone() as Wz_Node;
-                newChild.parentNode = newNode;
                 newNode.nodes.Add(newChild);
             }
             return newNode;

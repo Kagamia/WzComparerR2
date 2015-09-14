@@ -1161,11 +1161,11 @@ namespace WzComparerR2.MapRender
 
         private Wz_Image FindMapByID(int mapID)
         {
-            Wz_Node mapWz = PluginManager.FindWz(Wz_Type.Map);
+            string fullPath = string.Format(@"Map\Map\Map{0}\{1:D9}.img", (mapID / 100000000), mapID);
+            Wz_Node mapImgNode = PluginManager.FindWz(fullPath);
             Wz_Image mapImg;
-            if (mapWz != null && (mapImg =
-                mapWz.FindNodeByPath(string.Format(@"Map\Map{0}\{1:D9}.img", (mapID / 100000000), mapID))
-                    .GetValueEx<Wz_Image>(null)) != null
+            if (mapImgNode != null
+                && (mapImg = mapImgNode.GetValueEx<Wz_Image>(null)) != null
                 && mapImg.TryExtract())
             {
                 return mapImg;
@@ -1214,13 +1214,9 @@ namespace WzComparerR2.MapRender
 
         private void LoadMinimap()
         {
-            Wz_Node mapWz = PluginManager.FindWz(Wz_Type.Map);
-            if (mapWz == null)
-                return;
-
             if (this.uiMinimap != null && !this.uiMinimap.ResourceLoaded)
             {
-                this.uiMinimap.LoadResource(this.GraphicsDevice, mapWz);
+                this.uiMinimap.LoadResource(this.GraphicsDevice);
             }
 
             MiniMap miniMap = new MiniMap();
@@ -1230,7 +1226,7 @@ namespace WzComparerR2.MapRender
             //读取小地图标记
             if (mapMark != null)
             {
-                Wz_Node markNode = mapWz.FindNodeByPath(true, "MapHelper.img", "mark", mapMark);
+                Wz_Node markNode = PluginManager.FindWz("Map\\MapHelper.img\\mark\\" + mapMark);
                 Wz_Png markImage = markNode.GetValueEx<Wz_Png>(null);
                 if (markImage != null)
                 {
@@ -1292,13 +1288,10 @@ namespace WzComparerR2.MapRender
 
         private void LoadObjTile()
         {
-            Wz_Node mapWz = PluginManager.FindWz(Wz_Type.Map);
             Dictionary<string, RenderFrame> loadedObjRes = new Dictionary<string, RenderFrame>();
             Dictionary<string, RenderFrame> loadedTileRes = new Dictionary<string, RenderFrame>();
             Dictionary<string, RenderFrame[]> loadedFrames = new Dictionary<string, RenderFrame[]>();
 
-            if (mapWz == null)
-                return;
             for (int layer = 0; ; layer++)
             {
                 Wz_Node objTileNode = mapImg.Node.FindNodeByPath(layer.ToString());
@@ -1322,7 +1315,9 @@ namespace WzComparerR2.MapRender
                             y = node.FindNodeByPath("y"),
                             z = node.FindNodeByPath("z"),
                             f = node.FindNodeByPath("f"),
-                            zM = node.FindNodeByPath("zM");
+                            zM = node.FindNodeByPath("zM"),
+                            tags = node.FindNodeByPath("tags");
+                        
                         if (oS != null && l0 != null && l1 != null && l2 != null)
                         {
                             path[0] = "Obj";
@@ -1333,7 +1328,7 @@ namespace WzComparerR2.MapRender
                             string key = string.Join("\\", path);
 
                             RenderFrame[] frames;
-                            Wz_Node objResNode = mapWz.FindNodeByPath(true, path);
+                            Wz_Node objResNode = PluginManager.FindWz("Map\\" + key);
                             if (objResNode == null)
                                 continue;
 
@@ -1357,6 +1352,7 @@ namespace WzComparerR2.MapRender
                             patch.Frames.Repeat = objResNode.FindNodeByPath("repeat").GetValueEx<int>(0);
 
                             patch.Name = string.Format("obj_{0}_{1}", layer, node.Text);
+                            //patch.RenderArgs.Visible = string.IsNullOrEmpty(tags.GetValueEx<string>(null));
                             this.renderingList.Add(patch);
                         }
                         loadIndex++;
@@ -1390,7 +1386,7 @@ namespace WzComparerR2.MapRender
                             RenderFrame[] frames;
                             if (!loadedFrames.TryGetValue(key, out frames))
                             {
-                                Wz_Node objResNode = mapWz.FindNodeByPath(true, path);
+                                Wz_Node objResNode = PluginManager.FindWz("Map\\" + key);
                                 if (objResNode == null)
                                     continue;
                                 frames = LoadFrames(objResNode, loadedObjRes);
@@ -1419,11 +1415,9 @@ namespace WzComparerR2.MapRender
 
         private void LoadBack()
         {
-            Wz_Node mapWz = PluginManager.FindWz(Wz_Type.Map);
             Dictionary<string, RenderFrame> loadedBackRes = new Dictionary<string, RenderFrame>();
             Dictionary<string, RenderFrame[]> loadedFrames = new Dictionary<string, RenderFrame[]>();
-            if (mapWz == null)
-                return;
+
             Wz_Node backLstNode = mapImg.Node.FindNodeByPath("back");
             if (backLstNode != null)
             {
@@ -1461,7 +1455,7 @@ namespace WzComparerR2.MapRender
                         RenderFrame[] frames;
                         if (!loadedFrames.TryGetValue(key, out frames))
                         {
-                            Wz_Node objResNode = mapWz.FindNodeByPath(true, path);
+                            Wz_Node objResNode = PluginManager.FindWz("Map\\" + key);
                             if (objResNode == null)
                                 continue;
                             frames = LoadFrames(objResNode, loadedBackRes);
@@ -1579,8 +1573,6 @@ namespace WzComparerR2.MapRender
 
         private void LoadLife()
         {
-            Wz_Node mobWz = PluginManager.FindWz(Wz_Type.Mob);
-            Wz_Node npcWz = PluginManager.FindWz(Wz_Type.Npc);
             Dictionary<int, Dictionary<string, RenderFrame[]>> loadedMob = new Dictionary<int, Dictionary<string, RenderFrame[]>>();
             Dictionary<int, Dictionary<string, RenderFrame[]>> loadedNpc = new Dictionary<int, Dictionary<string, RenderFrame[]>>();
 
@@ -1611,19 +1603,19 @@ namespace WzComparerR2.MapRender
 
                         path[0] = string.Format("{0:D7}.img", _id);
                         Dictionary<int, Dictionary<string, RenderFrame[]>> loadedLife;
-                        Wz_Node lifeWz;
+                        string lifeWz;
 
                         switch (type.GetValueEx<string>(null))
                         {
                             case "m":
                                 loadedLife = loadedMob;
-                                lifeWz = mobWz;
+                                lifeWz = "Mob\\";
                                 patch.ObjectType = RenderObjectType.Mob;
                                 break;
 
                             case "n":
                                 loadedLife = loadedNpc;
-                                lifeWz = npcWz;
+                                lifeWz = "Npc\\";
                                 patch.ObjectType = RenderObjectType.Npc;
                                 break;
 
@@ -1635,7 +1627,7 @@ namespace WzComparerR2.MapRender
                             continue;
 
                         // load info
-                        Wz_Node lifeImgNode = lifeWz.FindNodeByPath(path[0], true);
+                        Wz_Node lifeImgNode = PluginManager.FindWz(lifeWz+ path[0]);
                         if (lifeImgNode == null)
                             continue;
 
@@ -1652,7 +1644,7 @@ namespace WzComparerR2.MapRender
                             {
                                 if (!loadedLife.TryGetValue(_link, out actions))
                                 {
-                                    Wz_Node linkImgNode = lifeWz.FindNodeByPath(string.Format("{0:D7}.img", _link), true);
+                                    Wz_Node linkImgNode = PluginManager.FindWz(lifeWz + string.Format("{0:D7}.img", _link));
                                     if (linkImgNode == null)
                                         continue;
                                     actions = LoadLifeActions(linkImgNode);
@@ -1748,14 +1740,10 @@ namespace WzComparerR2.MapRender
 
         private void LoadPortal()
         {
-            Wz_Node mapWz = PluginManager.FindWz(Wz_Type.Map);
             Dictionary<string, RenderFrame> loadedRes = new Dictionary<string, RenderFrame>();
             Dictionary<string, RenderFrame[]> loadedFrames = new Dictionary<string, RenderFrame[]>();
 
-            if (mapWz == null)
-                return;
-
-            Wz_Node portalImageNode = mapWz.FindNodeByPath(true, "MapHelper.img", "portal");
+            Wz_Node portalImageNode = PluginManager.FindWz("Map\\MapHelper.img\\portal");
 
             if (portalImageNode == null)
                 return;

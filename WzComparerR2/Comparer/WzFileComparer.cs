@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using WzComparerR2.WzLib;
 
-namespace WzComparerR2
+namespace WzComparerR2.Comparer
 {
     public class WzFileComparer
     {
@@ -13,8 +13,45 @@ namespace WzComparerR2
         }
 
         public WzPngComparison PngComparison { get; set; }
+        public bool IgnoreWzFile { get; set; }
 
         public IEnumerable<CompareDifference> Compare(Wz_Node nodeNew, Wz_Node nodeOld)
+        {
+            var cmp = Compare(
+                nodeNew == null ? null : new WzNodeAgent(nodeNew).Children,
+                nodeOld == null ? null : new WzNodeAgent(nodeOld).Children);
+
+            foreach (var diff in cmp)
+            {
+                yield return diff;
+            }
+        }
+
+        public IEnumerable<CompareDifference> Compare(WzVirtualNode nodeNew, WzVirtualNode nodeOld)
+        {
+            var cmp = Compare(
+               nodeNew == null ? null : new WzVirtualNodeAgent(nodeNew).Children,
+               nodeOld == null ? null : new WzVirtualNodeAgent(nodeOld).Children);
+
+            foreach (var diff in cmp)
+            {
+                yield return diff;
+            }
+        }
+
+        private IEnumerable<CompareDifference> Compare(ComparableNode nodeNew, ComparableNode nodeOld)
+        {
+            var cmp = Compare(
+                nodeNew == null ? null : nodeNew.Children,
+                nodeOld == null ? null : nodeOld.Children);
+
+            foreach (var diff in cmp)
+            {
+                yield return diff;
+            }
+        }
+
+        private IEnumerable<CompareDifference> Compare(IEnumerable<ComparableNode> nodeNew, IEnumerable<ComparableNode> nodeOld)
         {
             if (nodeNew == null && nodeOld == null) //do nothing
             {
@@ -22,72 +59,80 @@ namespace WzComparerR2
             }
 
             //初始化 排序
-            Wz_Node[] arrayNew = new Wz_Node[nodeNew == null ? 0 : nodeNew.Nodes.Count];
-            Wz_Node[] arrayOld = new Wz_Node[nodeOld == null ? 0 : nodeOld.Nodes.Count];
+            var arrayNew = new List<ComparableNode>();
+            var arrayOld = new List<ComparableNode>();
 
             if (nodeNew != null)
             {
-                nodeNew.Nodes.CopyTo(arrayNew, 0);
-                if (arrayNew.Length > 1)
-                    Array.Sort<Wz_Node>(arrayNew);
+                arrayNew.AddRange(nodeNew);
+                arrayNew.Sort();
             }
 
             if (nodeOld != null)
             {
-                nodeOld.Nodes.CopyTo(arrayOld, 0);
-                if (arrayOld.Length > 1)
-                    Array.Sort<Wz_Node>(arrayOld);
+                arrayOld.AddRange(nodeOld);
+                arrayOld.Sort();
             }
 
             //逐层对比
             int l = 0, r = 0;
-            while (l < arrayNew.Length || r < arrayOld.Length)
+            while (l < arrayNew.Count || r < arrayOld.Count)
             {
                 int comp = -2;
-                if (r == arrayOld.Length) //输出左边
+                if (r == arrayOld.Count) //输出左边
                 {
                     comp = -1;
                 }
-                else if (l == arrayNew.Length) //输出右边
+                else if (l == arrayNew.Count) //输出右边
                 {
                     comp = 1;
                 }
                 else
                 {
-                    comp = string.Compare(arrayNew[l].Text, arrayOld[r].Text);
+                    comp = string.Compare(arrayNew[l].Name, arrayOld[r].Name);
                 }
 
                 switch (comp)
                 {
                     case -1:
-                        yield return new CompareDifference(arrayNew[l], null, DifferenceType.Append);
-                        foreach (CompareDifference diff in Compare(arrayNew[l], null))
+                        yield return new CompareDifference(arrayNew[l].LinkNode, null, DifferenceType.Append);
+                        if (CompareChild(arrayNew[l], null))
                         {
-                            yield return diff;
+                            foreach (CompareDifference diff in Compare(arrayNew[l], null))
+                            {
+                                yield return diff;
+                            }
                         }
                         l++;
                         break;
                     case 0:
+                        //TODO: 试着比较多linkNode的场合。。
                         if (!CompareData(arrayNew[l].Value, arrayOld[r].Value))
                         {
-                            yield return new CompareDifference(arrayNew[l], arrayOld[r], DifferenceType.Changed);
+                            yield return new CompareDifference(arrayNew[l].LinkNode, arrayOld[r].LinkNode, DifferenceType.Changed);
                         }
-                        foreach (CompareDifference diff in Compare(arrayNew[l], arrayOld[r]))
+                        if (CompareChild(arrayNew[l], arrayOld[r]))
                         {
-                            yield return diff;
+                            foreach (CompareDifference diff in Compare(arrayNew[l], arrayOld[r]))
+                            {
+                                yield return diff;
+                            }
                         }
                         l++; r++;
                         break;
                     case 1:
-                        yield return new CompareDifference(null, arrayOld[r], DifferenceType.Remove);
-                        foreach (CompareDifference diff in Compare(null, arrayOld[r]))
+                        yield return new CompareDifference(null, arrayOld[r].LinkNode, DifferenceType.Remove);
+                        if (CompareChild(null, arrayOld[r]))
                         {
-                            yield return diff;
+                            foreach (CompareDifference diff in Compare(null, arrayOld[r]))
+                            {
+                                yield return diff;
+                            }
                         }
                         r++;
                         break;
                     default:
-                        throw new Exception("未知的比较结果。");
+                        throw new Exception("什么鬼");
                 }
             }
 
@@ -95,7 +140,17 @@ namespace WzComparerR2
             arrayNew = null;
             arrayOld = null;
         }
-    
+
+        private bool CompareChild(ComparableNode node1, ComparableNode node2)
+        {
+            if ((node1 != null && node1.Value is Wz_File)
+                || (node2 != null && node2.Value is Wz_File))
+            {
+                return !IgnoreWzFile;
+            }
+            return true;
+        }
+
         /// <summary>
         /// 比较两个节点绑定的值是否相同。
         /// </summary>
@@ -173,7 +228,7 @@ namespace WzComparerR2
 
                         default:
                             goto case WzPngComparison.SizeAndDataLength;
-                        
+
                     }
                 }
                 else if ((vector = dataNew as Wz_Vector) != null)
@@ -195,6 +250,139 @@ namespace WzComparerR2
             }
 
             return object.Equals(dataNew, dataOld);
+        }
+
+        private abstract class ComparableNode : IComparable<ComparableNode>
+        {
+            public abstract string Name { get; }
+            public abstract object Value { get; }
+            public abstract IEnumerable<ComparableNode> Children { get; }
+            public virtual Wz_Node LinkNode
+            {
+                get { return null; }
+            }
+
+            int IComparable<ComparableNode>.CompareTo(ComparableNode other)
+            {
+                return string.CompareOrdinal(this.Name, other.Name);
+            }
+        }
+
+        private class WzNodeAgent : ComparableNode
+        {
+            public WzNodeAgent(Wz_Node target)
+            {
+                this.Target = target;
+            }
+
+            public Wz_Node Target { get; private set; }
+
+            public override string Name
+            {
+                get { return this.Target.Text; }
+            }
+
+            public override object Value
+            {
+                get { return this.Target.Value; }
+            }
+
+            public override IEnumerable<ComparableNode> Children
+            {
+                get
+                {
+                    foreach (var node in this.Target.Nodes)
+                    {
+                        yield return new WzNodeAgent(node);
+                    }
+                }
+            }
+
+            public override Wz_Node LinkNode
+            {
+                get
+                {
+                    return this.Target;
+                }
+            }
+        }
+
+        private class WzVirtualNodeAgent : ComparableNode
+        {
+            public WzVirtualNodeAgent(WzVirtualNode target)
+            {
+                this.Target = target;
+            }
+
+            public WzVirtualNode Target { get; private set; }
+
+            public override string Name
+            {
+                get { return this.Target.Name; }
+            }
+
+            public override object Value
+            {
+                get
+                {
+                    if (this.Target.LinkNodes.Count <= 0)
+                    {
+                        return null;
+                    }
+                    else if (this.Target.LinkNodes.Count == 1)
+                    {
+                        return this.Target.LinkNodes[0].Value;
+                    }
+                    else
+                    {
+                        foreach (var node in this.Target.LinkNodes)
+                        {
+                            if (node.Value != null)
+                            {
+                                return node.Value;
+                            }
+                        }
+                        return null;
+                    }
+                }
+            }
+        
+            public override IEnumerable<ComparableNode> Children
+            {
+                get
+                {
+                    foreach (var node in this.Target.ChildNodes)
+                    {
+                        yield return new WzVirtualNodeAgent(node);
+                    }
+                }
+            }
+
+            public override Wz_Node LinkNode
+            {
+                get
+                {
+                    if (this.Target.LinkNodes.Count <= 0)
+                    {
+                        return null;
+                    }
+                    else if (this.Target.LinkNodes.Count == 1)
+                    {
+                        return this.Target.LinkNodes[0];
+                    }
+                    else
+                    {
+                        foreach (var node in this.Target.LinkNodes)
+                        {
+                            if (node.Value != null)
+                            {
+                                return node;
+                            }
+                        }
+                        return this.Target.LinkNodes[0];
+                    }
+                }
+            }
         }
     }
 }

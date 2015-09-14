@@ -17,6 +17,7 @@ using WzComparerR2.Common;
 using WzComparerR2.CharaSimControl;
 using WzComparerR2.PluginBase;
 using WzComparerR2.CharaSim;
+using WzComparerR2.Comparer;
 
 namespace WzComparerR2
 {
@@ -145,6 +146,7 @@ namespace WzComparerR2
                 }
             }
 
+            List<Wz_Node> preSearch = new List<Wz_Node>();
             if (e.WzType != Wz_Type.Unknown) //用wztype作为输入参数
             {
                 foreach (Wz_Structure wzs in openedWz)
@@ -152,12 +154,14 @@ namespace WzComparerR2
                     if (e.WzFile == null || e.WzFile.WzStructure == wzs)
                     {
                         Wz_File baseWz = null;
+                        bool find = false;
                         foreach (Wz_File wz_f in wzs.wz_files)
                         {
                             if (wz_f.Type == e.WzType)
                             {
-                                e.WzFile = wz_f;
-                                goto success;
+                                preSearch.Add(wz_f.Node);
+                                find = true;
+                                //e.WzFile = wz_f;
                             }
                             if (wz_f.Type == Wz_Type.Base)
                             {
@@ -166,15 +170,14 @@ namespace WzComparerR2
                         }
 
                         // detect data.wz
-                        if (baseWz != null)
+                        if (baseWz != null && !find)
                         {
                             string key = e.WzType.ToString();
                             foreach (Wz_Node node in baseWz.Node.Nodes)
                             {
                                 if (node.Text == key && node.Nodes.Count > 0)
                                 {
-                                    e.WzNode = node;
-                                    goto success;
+                                    preSearch.Add(node);
                                 }
                             }
                         }
@@ -182,18 +185,31 @@ namespace WzComparerR2
                 }
             }
 
-        success:
             if (fullPath == null || fullPath.Length <= 1)
+            {
+                if (e.WzType != Wz_Type.Unknown && preSearch.Count > 0) //返回wzFile
+                {
+                    e.WzNode = preSearch[0];
+                    e.WzFile = preSearch[0].Value as Wz_File;
+                }
                 return;
-            Wz_Node wzFileNode = e.WzNode ?? (e.WzFile != null ? e.WzFile.Node : null);
-            if (wzFileNode == null)
-                return;
+            }
+            //拼接剩余路径
             string[] fullPath2 = new string[fullPath.Length - 1];
             Array.Copy(fullPath, 1, fullPath2, 0, fullPath2.Length);
-            e.WzNode = wzFileNode.FindNodeByPath(true, true, fullPath2);
-            if (e.WzNode == null)
+
+            if (preSearch.Count <= 0)
             {
-                e.WzFile = null;
+                return;
+            }
+            foreach (var wzFileNode in preSearch)
+            {
+                e.WzNode = wzFileNode.FindNodeByPath(true, true, fullPath2);
+                if (e.WzNode != null)
+                {
+                    e.WzFile = wzFileNode.Value as Wz_File;
+                    return;
+                }
             }
         }
 

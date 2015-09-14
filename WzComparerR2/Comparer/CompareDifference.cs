@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using WzComparerR2.WzLib;
 
-namespace WzComparerR2
+namespace WzComparerR2.Comparer
 {
     public class CompareDifference
     {

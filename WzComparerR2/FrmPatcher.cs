@@ -12,6 +12,7 @@ using System.IO;
 using System.Threading;
 using WzComparerR2.WzLib;
 using WzComparerR2.Patcher;
+using WzComparerR2.Comparer;
 
 namespace WzComparerR2
 {

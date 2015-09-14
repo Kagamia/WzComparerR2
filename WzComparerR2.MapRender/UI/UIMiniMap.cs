@@ -265,9 +265,9 @@ namespace WzComparerR2.MapRender.UI
                 MathHelper2.Max(this.minSize.Y, minimapSize.Y));
         }
 
-        public void LoadResource(GraphicsDevice graphicsDevice, Wz_Node mapWz)
+        public void LoadResource(GraphicsDevice graphicsDevice)
         {
-            Wz_Node minimapNode = mapWz.FindNodeByPath(true, "MapHelper.img", "minimap");
+            Wz_Node minimapNode = PluginBase.PluginManager.FindWz("Map\\MapHelper.img\\minimap");
             if (minimapNode != null)
             {
                 Wz_Node portalNode = minimapNode.FindNodeByPath("portal");

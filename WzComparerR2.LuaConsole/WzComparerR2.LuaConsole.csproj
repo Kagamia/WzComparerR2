@@ -47,6 +47,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\KopiLua.dll</HintPath>
     </Reference>
+    <Reference Include="LinqBridge, Version=1.3.0.0, Culture=neutral, PublicKeyToken=09cffe95ae3dc720, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\LinqBridge.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="NLua, Version=1.3.1.0, Culture=neutral, PublicKeyToken=8df2ab518030ea95, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\NLua.dll</HintPath>

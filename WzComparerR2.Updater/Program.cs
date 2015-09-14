@@ -75,7 +75,7 @@ namespace WzComparerR2.Updater
                         bool exit = false;
                         for (int retry = 1; retry <= 5; retry++)
                         {
-                            exit = p.WaitForExit(retry * 1000);
+                            exit = p.WaitForExit(1000);
                             if (exit)
                             {
                                 break;

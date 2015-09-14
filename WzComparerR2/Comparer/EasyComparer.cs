@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Drawing;
+using System.Linq;
 using WzComparerR2.WzLib;
 
-namespace WzComparerR2
+namespace WzComparerR2.Comparer
 {
     public class EasyComparer
     {
@@ -58,73 +59,113 @@ namespace WzComparerR2
 
         public void EasyCompareWzFiles(Wz_File fileNew, Wz_File fileOld, string outputDir)
         {
-            Dictionary<Wz_Type, List<CompareDifference>> differences = new Dictionary<Wz_Type, List<CompareDifference>>();
-
-            WzFileComparer comparer = new WzFileComparer();
-            IEnumerable<CompareDifference> comp = comparer.Compare(fileNew.Node, fileOld.Node);
-            int count = 0;
-
             StateInfo = "正在对比wz概况...";
-
-            foreach (CompareDifference diff in comp)
+           
+            if (fileNew.Type == Wz_Type.Base || fileOld.Type == Wz_Type.Base) //至少有一个base 拆分对比
             {
-                Wz_File wzf = null;
-                if (diff.NodeNew != null)
-                {
-                    wzf = diff.NodeNew.GetNodeWzFile();
-                }
-                else if (diff.NodeOld != null)
-                {
-                    wzf = diff.NodeOld.GetNodeWzFile();
-                }
+                var virtualNodeNew = RebuildWzFile(fileNew);
+                var virtualNodeOld = RebuildWzFile(fileOld);
+                WzFileComparer comparer = new WzFileComparer();
+                comparer.IgnoreWzFile = true;
 
-                Wz_Type wztype = (wzf == null) ? wzf.Type : Wz_Type.Unknown;
+                var dictNew = SplitVirtualNode(virtualNodeNew);
+                var dictOld = SplitVirtualNode(virtualNodeOld);
 
-                List<CompareDifference> diffLst;
-                if (!differences.TryGetValue(wzf.Type, out diffLst))
+                //寻找共同wzType
+                var wzTypeList = dictNew.Select(kv => kv.Key)
+                    .Where(wzType => dictOld.ContainsKey(wzType));
+
+                CreateStyleSheet(outputDir);
+
+                foreach (var wzType in wzTypeList)
                 {
-                    diffLst = new List<CompareDifference>();
-                    differences[wzf.Type] = diffLst;
+                    var vNodeNew = dictNew[wzType];
+                    var vNodeOld = dictOld[wzType];
+                    var cmp = comparer.Compare(vNodeNew, vNodeOld);
+                    OutputFile(vNodeNew.LinkNodes.Select(node => node.Value).OfType<Wz_File>().ToList(),
+                        vNodeOld.LinkNodes.Select(node => node.Value).OfType<Wz_File>().ToList(),
+                        wzType,
+                        cmp.ToList(),
+                        outputDir);
                 }
-                diffLst.Add(diff);
-
-                count++;
+            }
+            else //执行传统对比
+            {
+                WzFileComparer comparer = new WzFileComparer();
+                comparer.IgnoreWzFile = false;
+                var cmp = comparer.Compare(fileNew.Node, fileOld.Node);
+                CreateStyleSheet(outputDir);
+                OutputFile(fileNew, fileOld, fileNew.Type, cmp.ToList(), outputDir);
             }
 
-            CreateStyleSheet(outputDir);
+            GC.Collect();
+        }
 
-            foreach (var kv in differences)
+        private WzVirtualNode RebuildWzFile(Wz_File wzFile)
+        {
+            //分组
+            List<Wz_File> subFiles = new List<Wz_File>();
+            WzVirtualNode topNode = new WzVirtualNode(wzFile.Node);
+
+            foreach (var childNode in wzFile.Node.Nodes)
             {
-                Wz_File f1 = null, f2 = null;
-                foreach (Wz_File f in fileNew.WzStructure.wz_files)
+                var subFile = childNode.GetValue<Wz_File>();
+                if (subFile != null) //wz子文件
                 {
-                    if (f.Type == kv.Key)
-                    {
-                        f1 = f;
-                        break;
-                    }
+                    subFiles.Add(subFile);
                 }
-                foreach (Wz_File f in fileOld.WzStructure.wz_files)
+                else //其他
                 {
-                    if (f.Type == kv.Key)
-                    {
-                        f2 = f;
-                        break;
-                    }
+                    topNode.AddChild(childNode, true);
                 }
-                if (f1 != null && f2 != null)
-                {
-                    OutputFile(f1, f2, kv.Key, kv.Value, outputDir);
-                }
-                else
-                {
-                    throw new Exception("怎么可能呢...");
-                }
-                GC.Collect();
             }
+
+            if (wzFile.Type == Wz_Type.Base)
+            {
+                foreach (var grp in subFiles.GroupBy(f => f.Type))
+                {
+                    WzVirtualNode fileNode = new WzVirtualNode();
+                    fileNode.Name = grp.Key.ToString();
+                    foreach (var file in grp)
+                    {
+                        fileNode.Combine(file.Node);
+                    }
+                    topNode.AddChild(fileNode);
+                }
+            }
+            return topNode;
+        }
+
+        private Dictionary<Wz_Type, WzVirtualNode> SplitVirtualNode(WzVirtualNode node)
+        {
+            var dict = new Dictionary<Wz_Type, WzVirtualNode>();
+            Wz_File wzFile = node.LinkNodes[0].Value as Wz_File;
+            dict[wzFile.Type] = node;
+
+            if (wzFile.Type == Wz_Type.Base) //额外处理
+            {
+                var wzFileList = node.ChildNodes
+                    .Select(child => new { Node = child, WzFile = child.LinkNodes[0].Value as Wz_File })
+                    .Where(item => item.WzFile != null);
+
+                foreach (var item in wzFileList)
+                {
+                    dict[item.WzFile.Type] = item.Node;
+                }
+            }
+
+            return dict;
         }
 
         private void OutputFile(Wz_File fileNew, Wz_File fileOld, Wz_Type type, List<CompareDifference> diffLst, string outputDir)
+        {
+            OutputFile(new List<Wz_File>() { fileNew },
+                new List<Wz_File>() { fileOld },
+                type,
+                diffLst,
+                outputDir);
+        }
+        private void OutputFile(List<Wz_File> fileNew, List<Wz_File> fileOld, Wz_Type type, List<CompareDifference> diffLst, string outputDir)
         {
             string htmlFilePath = Path.Combine(outputDir, type.ToString() + ".html");
             string srcDirPath = Path.Combine(outputDir, type.ToString() + "_files");
@@ -143,17 +184,26 @@ namespace WzComparerR2
                 sw.WriteLine("<html>");
                 sw.WriteLine("<head>");
                 sw.WriteLine("<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">");
-                sw.WriteLine("<title>{0} {1}←{2}</title>", type, fileNew.Header.WzVersion, fileOld.Header.WzVersion);
+                sw.WriteLine("<title>{0} {1}←{2}</title>", type, fileNew[0].Header.WzVersion, fileOld[0].Header.WzVersion);
                 sw.WriteLine("<link type=\"text/css\" rel=\"stylesheet\" href=\"style.css\" />");
                 sw.WriteLine("</head>");
                 sw.WriteLine("<body>");
                 //输出概况
                 sw.WriteLine("<p class=\"wzf\">");
-                sw.WriteLine("新文件：{0}<br />", fileNew.Header.FileName);
-                sw.WriteLine("旧文件：{0}<br />", fileOld.Header.FileName);
-                sw.WriteLine("文件大小：{0:n0} bytes ← {1:n0} bytes<br />", fileNew.Header.FileSize, fileOld.Header.FileSize);
-                sw.WriteLine("文件版本：{0} ← {1}<br />", fileNew.Header.WzVersion, fileOld.Header.WzVersion);
-                sw.WriteLine("对比时间：{0:yyyy-MM-dd HH:mm:ss.fff}<br />", DateTime.Now);
+                sw.WriteLine("<table>");
+                sw.WriteLine("<tr><th>&nbsp;</th><th>文件名</th><th>文件大小</th><th>文件版本</th></tr>");
+                sw.WriteLine("<tr><td>新文件</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
+                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileName).ToArray()),
+                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileSize.ToString("N0")).ToArray()),
+                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.WzVersion.ToString()).ToArray())
+                    );
+                sw.WriteLine("<tr><td>旧文件</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
+                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileName).ToArray()),
+                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileSize.ToString("N0")).ToArray()),
+                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.WzVersion.ToString()).ToArray())
+                    );
+                sw.WriteLine("<tr><td>对比时间</td><td colspan='3'>{0:yyyy-MM-dd HH:mm:ss.fff}</td></tr>", DateTime.Now);
+                sw.WriteLine("</table>");
                 sw.WriteLine("</p>");
 
                 //输出目录
