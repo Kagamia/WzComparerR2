@@ -87,6 +87,8 @@ namespace WzComparerR2
         private static string patchFile;
         private static string comparerOutputFolder;
         private static int selectedFontIndex;
+        private static string styleType;
+        private static int styleColor;
 
         private static bool autoQuickView;
         private static bool skillShowID;
@@ -171,6 +173,18 @@ namespace WzComparerR2
         {
             get { return selectedFontIndex; }
             set { selectedFontIndex = value; Save(); }
+        }
+
+        public static string StyleType
+        {
+            get { return styleType; }
+            set { styleType = value; Save(); }
+        }
+
+        public static Color StyleColor
+        {
+            get { return Color.FromArgb(styleColor); }
+            set { styleColor = value.ToArgb(); Save(); }
         }
 
         #region QuickView相关属性
@@ -297,6 +311,14 @@ namespace WzComparerR2
             
             //selectedFontIndex
             propNode = CreateNode(xmlDoc, "SelectedFontIndex", "value", selectedFontIndex.ToString());
+            settingNode.AppendChild(propNode);
+
+            //styleType
+            propNode = CreateNode(xmlDoc, "StyleType", "value", styleType);
+            settingNode.AppendChild(propNode);
+
+            //styleColor
+            propNode = CreateNode(xmlDoc, "StyleColor", "value", styleColor.ToString());
             settingNode.AppendChild(propNode);
 
 
@@ -446,6 +468,22 @@ namespace WzComparerR2
                     XmlAttribute attr = node.Attributes["value"];
                     if (attr != null)
                         Int32.TryParse(attr.Value, out selectedFontIndex);
+                }
+
+                node = xmlDoc.SelectSingleNode("WzComparerR2/Settings/StyleType");
+                if (node != null)
+                {
+                    XmlAttribute attr = node.Attributes["value"];
+                    if (attr != null)
+                        styleType = attr.Value;
+                }
+
+                node = xmlDoc.SelectSingleNode("WzComparerR2/Settings/StyleColor");
+                if (node != null)
+                {
+                    XmlAttribute attr = node.Attributes["value"];
+                    if (attr != null)
+                        Int32.TryParse(attr.Value, out styleColor);
                 }
 
 

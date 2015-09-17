@@ -323,6 +323,18 @@ namespace WzComparerR2.CharaSimControl
 
             picH += 3;
 
+            if (item.Sample.Bitmap != null)
+            {
+                if (picH < iconY + 84)
+                {
+                    picH = iconY + 84;
+                }
+                g.DrawImage(item.Sample.Bitmap, (tooltip.Width - item.Sample.Bitmap.Width) / 2, picH);
+                picH += item.Sample.Bitmap.Height;
+                picH += 2;
+            }
+
+
             //绘制配方需求
             if (item.Specs.TryGetValue(ItemSpecType.recipe, out value))
             {

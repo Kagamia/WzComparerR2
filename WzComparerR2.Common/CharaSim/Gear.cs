@@ -326,6 +326,13 @@ namespace WzComparerR2.CharaSim
                             }
                             break;
 
+                        case "sample":
+                            if (subNode.Value is Wz_Png)
+                            {
+                                gear.Sample = BitmapOrigin.CreateFromNode(subNode, findNode);
+                            }
+                            break;
+
                         case "addition": //附加属性信息
                             foreach (Wz_Node addiNode in subNode.Nodes)
                             {

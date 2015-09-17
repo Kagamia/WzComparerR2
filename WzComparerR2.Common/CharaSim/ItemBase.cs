@@ -10,31 +10,14 @@ namespace WzComparerR2.CharaSim
         {
         }
 
-        private BitmapOrigin icon;
-        private BitmapOrigin iconRaw;
-        private int itemID;
-
-        public int ItemID
-        {
-            get { return itemID; }
-            set { itemID = value; }
-        }
-
-        public BitmapOrigin Icon
-        {
-            get { return icon; }
-            set { icon = value; }
-        }
-
-        public BitmapOrigin IconRaw
-        {
-            get { return iconRaw; }
-            set { iconRaw = value; }
-        }
+        public int ItemID { get; set; }
+        public BitmapOrigin Icon { get; set; }
+        public BitmapOrigin IconRaw { get; set; }
+        public BitmapOrigin Sample { get; set; }
 
         public virtual ItemBaseType Type
         {
-            get { return (ItemBaseType)(this.itemID / 1000000); }
+            get { return (ItemBaseType)(this.ItemID / 1000000); }
         }
 
         public virtual object Clone()

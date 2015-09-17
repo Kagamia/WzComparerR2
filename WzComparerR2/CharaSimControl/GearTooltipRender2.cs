@@ -647,13 +647,19 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
 
-            if (!string.IsNullOrEmpty(sr.Desc) || desc.Count > 0)
+            if (!string.IsNullOrEmpty(sr.Desc) || desc.Count > 0 || gear.Sample.Bitmap != null)
             {
                 //分割线4号
                 if (hasPart2)
                 {
                     g.DrawImage(res["dotline"].Image, 0, picH);
                     picH += 8;
+                }
+                if (gear.Sample.Bitmap != null)
+                {
+                    g.DrawImage(gear.Sample.Bitmap, (bitmap.Width - gear.Sample.Bitmap.Width) / 2, picH);
+                    picH += gear.Sample.Bitmap.Height;
+                    picH += 4;
                 }
                 if (!string.IsNullOrEmpty(sr.Desc))
                 {

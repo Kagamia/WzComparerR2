@@ -65,6 +65,7 @@ namespace WzComparerR2.MapRender
                         FrmMapRender frm = new MapRender.FrmMapRender(img);
                         frm.StringLinker = sl;
                         frm.Run();
+
 #if !DEBUG
                         }
                         catch (Exception ex)

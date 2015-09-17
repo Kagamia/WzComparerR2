@@ -216,6 +216,18 @@ namespace WzComparerR2
         #region 界面初始
         private void createStyleItems()
         {
+            //更新界面颜色
+            try
+            {
+                styleManager1.ManagerStyle = (eStyle)Enum.Parse(typeof(eStyle), Setting.StyleType, false);
+            }
+            catch
+            {
+            }
+
+            styleManager1.ManagerColorTint = Setting.StyleColor;
+            
+            //添加菜单
             foreach (eStyle style in Enum.GetValues(typeof(eStyle)))
             {
                 ButtonItem buttonItem = new ButtonItem() { Tag = style, Text = style.ToString(), Checked = (styleManager1.ManagerStyle == style) };
@@ -230,7 +242,8 @@ namespace WzComparerR2
 
         void buttonItem_Click(object sender, EventArgs e)
         {
-            styleManager1.ManagerStyle = (eStyle)((sender as ButtonItem).Tag);
+            var style = (eStyle)((sender as ButtonItem).Tag);
+            styleManager1.ManagerStyle = style;
             foreach (BaseItem item in buttonItemStyle.SubItems)
             {
                 ButtonItem buttonItem = item as ButtonItem;
@@ -239,11 +252,14 @@ namespace WzComparerR2
                     buttonItem.Checked = (buttonItem == sender);
                 }
             }
+            Setting.StyleType = style.ToString();
         }
 
         void colorPicker_SelectedColorChanged(object sender, EventArgs e)
         {
-            styleManager1.ManagerColorTint = (sender as ColorPickerDropDown).SelectedColor;
+            var color = (sender as ColorPickerDropDown).SelectedColor;
+            styleManager1.ManagerColorTint = color;
+            Setting.StyleColor = color;
         }
         #endregion
 

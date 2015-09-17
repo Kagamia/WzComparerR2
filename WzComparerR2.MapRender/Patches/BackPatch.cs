@@ -86,7 +86,7 @@ namespace WzComparerR2.MapRender.Patches
 
             if ((this.TileMode & TileMode.ScrollVertical) != 0)
             {
-                origin2.Y += (float)((this.ry * 5 * ms) % cy);// +this.Camera.Center.Y * (100 - Math.Abs(this.ry)) / 100;
+                origin2.Y = (float)((this.ry * 5 * ms) % cy);// +this.Camera.Center.Y * (100 - Math.Abs(this.ry)) / 100;
             }
             else
             {
