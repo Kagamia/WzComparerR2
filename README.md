@@ -13,6 +13,7 @@
 - **WzComparerR2.Updater** 程序更新器(未完成)
 - **WzComparerR2.LuaConsole** (可选插件)Lua控制台
 - **WzComparerR2.MapRender** (可选插件)地图仿真器
+- **WzComparerR2.MonsterCard** (可选插件)怪物卡
 
 # Credits
 - **Fiel** ([Southperry](http://www.southperry.net))  wz文件读取代码改造自WzExtract 以及WzPatcher
