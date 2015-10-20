@@ -48,6 +48,7 @@
     </Reference>
     <Reference Include="LinqBridge">
       <HintPath>..\References\LinqBridge.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="NLua">
       <HintPath>..\References\NLua.dll</HintPath>
