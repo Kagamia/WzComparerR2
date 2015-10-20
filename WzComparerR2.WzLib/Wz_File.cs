@@ -262,7 +262,7 @@ namespace WzComparerR2.WzLib
             string name = null;
             int size = 0;
             int cs32 = 0;
-            int offs = 0;
+            //int offs = 0;
             bool on_list = false;
             bool all_lst = allChildOnList || this.WzStructure.encryption.List.Contains(parent.Text.ToLower() + '/');
             bool parentBase = parent.Text.Equals("base.wz", StringComparison.CurrentCultureIgnoreCase);

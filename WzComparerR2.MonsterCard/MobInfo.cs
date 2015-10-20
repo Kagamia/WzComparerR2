@@ -10,7 +10,7 @@ namespace WzComparerR2.MonsterCard
         {
             this.ElemAttr = new MobElemAttr(null);
             this.Revive = new List<int>();
-            this.Animates = new MobAnimateCollection();
+            this.Animates = new LifeAnimateCollection();
 
             this.FirstAttack = false;
             this.BodyAttack = true;
@@ -50,8 +50,9 @@ namespace WzComparerR2.MonsterCard
         public MobElemAttr ElemAttr { get; set; }
 
         public int? Link { get; set; }
+        public bool Skeleton { get; set; }
 
         public List<int> Revive { get; private set; }
-        public MobAnimateCollection Animates { get; private set; }
+        public LifeAnimateCollection Animates { get; private set; }
     }
 }

@@ -5,6 +5,7 @@ using System.Drawing;
 using WzComparerR2.CharaSimControl;
 using System.Drawing.Imaging;
 using WzComparerR2.Common;
+using static WzComparerR2.MonsterCard.UI.RenderHelper;
 
 namespace WzComparerR2.MonsterCard.UI
 {
@@ -14,7 +15,7 @@ namespace WzComparerR2.MonsterCard.UI
         {
         }
 
-        public StringLinker StringLinker {get;set;}
+        public StringLinker StringLinker { get; set; }
 
         public Bitmap Render(MobInfo mobInfo, Bitmap mobImg)
         {
@@ -201,42 +202,6 @@ namespace WzComparerR2.MonsterCard.UI
             return bmp;
         }
 
-        private Rectangle Measure(IEnumerable<TextBlock> blocks)
-        {
-            Rectangle rect = Rectangle.Empty;
-
-            foreach (var block in blocks)
-            {
-                var blockRect = block.Rectangle;
-                if (!blockRect.IsEmpty)
-                {
-                    rect = Rectangle.Union(rect, blockRect);
-                }
-            }
-            return rect;
-        }
-
-        private TextBlock PrepareText(Graphics g, string text, Font font, Brush brush, int x, int y)
-        {
-            SizeF size = g.MeasureString(text, font, Int32.MaxValue, StringFormat.GenericTypographic);
-            TextBlock block = new TextBlock()
-            {
-                Text = text,
-                Font = font,
-                Brush = brush,
-                Position = new Point(x, y),
-                Size = new Size((int)Math.Round(size.Width), (int)Math.Round(size.Height))
-            };
-            return block;
-        }
-
-        private void DrawText(Graphics g, TextBlock block, Point offset)
-        {
-            g.DrawString(block.Text, block.Font, block.Brush,
-                block.Position.X + offset.X, block.Position.Y + offset.Y,
-                StringFormat.GenericTypographic);
-        }
-
         private string GetMobName(int mobID)
         {
             StringResult sr;
@@ -275,22 +240,6 @@ namespace WzComparerR2.MonsterCard.UI
                 case ElemResistance.Weak: e = "◎"; break;
             }
             return e ?? "  ";
-        }
-
-        private class TextBlock
-        {
-            public string Text { get; set; }
-            public Brush Brush { get; set; }
-            public Font Font { get; set; }
-            public Point Position { get; set; }
-            public Size Size { get; set; }
-            public Rectangle Rectangle
-            {
-                get
-                {
-                    return new Rectangle(Position, Size);
-                }
-            }
         }
     }
 }
