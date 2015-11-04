@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Security.Cryptography;
 using System.Collections.Specialized;
+using System.Text.RegularExpressions;
 
 namespace WzComparerR2.WzLib
 {
@@ -107,7 +108,7 @@ namespace WzComparerR2.WzLib
                 sb.Append((char)bytes[i]);
             }
 
-            if (sb.ToString().Contains(".img") || sb.ToString().Contains("Cash"))
+            if (IsLegalNodeName(sb.ToString()))
             {
                 this.all_strings_encrypted = false;
             }
@@ -121,7 +122,7 @@ namespace WzComparerR2.WzLib
                         bytes[i] ^= this.keys[i];
                         sb.Append((char)bytes[i]);
                     }
-                    if (sb.ToString().Contains(".img") || sb.ToString().Contains("Cash"))
+                    if (IsLegalNodeName(sb.ToString()))
                     {
                         this.all_strings_encrypted = true;
                         this.encryption_detected = true;
@@ -130,7 +131,7 @@ namespace WzComparerR2.WzLib
                 else
                 {
                     for (int i = 0; i < len; i++) { sb.Append((char)(bytes[i] ^ keys_kms[i])); }
-                    if (sb.ToString().Contains(".img") || sb.ToString().Contains("Cash"))
+                    if (IsLegalNodeName(sb.ToString()))
                     {
                         this.EncType = Wz_CryptoKeyType.KMS;
                         this.all_strings_encrypted = true;
@@ -140,7 +141,7 @@ namespace WzComparerR2.WzLib
                     {
                         sb.Remove(0, sb.Length);
                         for (int i = 0; i < len; i++) { sb.Append((char)(bytes[i] ^ keys_gms[i])); }
-                        if (sb.ToString().Contains(".img") || sb.ToString().Contains("Cash"))
+                        if (IsLegalNodeName(sb.ToString()))
                         {
                             this.EncType = Wz_CryptoKeyType.GMS;
                             this.all_strings_encrypted = true;
@@ -151,6 +152,11 @@ namespace WzComparerR2.WzLib
             }
 
             f.FileStream.Position = old_off;
+        }
+
+        private bool IsLegalNodeName(string nodeName)
+        {
+            return nodeName.EndsWith(".img") || Regex.IsMatch(nodeName, @"^[A-Za-z-9_]+$");
         }
 
         static readonly byte[] iv_gms = { 0x4d, 0x23, 0xc7, 0x2b };
