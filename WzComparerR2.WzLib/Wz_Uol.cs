@@ -29,15 +29,44 @@ namespace WzComparerR2.WzLib
             string[] dirs = this.uol.Split('/');
             currentNode = currentNode.ParentNode;
 
+            bool outImg = false;
+
             foreach (string dir in dirs)
             {
                 if (dir == "..")
                 {
-                    currentNode = currentNode.ParentNode;
+                    if (currentNode.ParentNode == null)
+                    {
+                        Wz_Image img = currentNode.GetValueEx<Wz_Image>(null);
+                        if (img != null)
+                        {
+                            currentNode = img.OwnerNode.ParentNode;
+                            outImg = true;
+                        }
+                        else
+                        {
+                            currentNode = null;
+                        }
+                    }
+                    else
+                    {
+                        currentNode = currentNode.ParentNode;
+                    }
                 }
                 else
                 {
-                    currentNode = currentNode.FindNodeByPath(dir);
+                    if (outImg)
+                    {
+                        currentNode = currentNode.FindNodeByPath(true, dir + ".img");
+                        if (currentNode.GetValueEx<Wz_Image>(null) != null)
+                        {
+                            outImg = false;
+                        }
+                    }
+                    else
+                    {
+                        currentNode = currentNode.FindNodeByPath(dir);
+                    }
                 }
                 if (currentNode == null)
                     return null;
