@@ -22,4 +22,5 @@
 - **[NLua](https://github.com/NLua)**
 - **[LinqBridge](http://code.google.com/p/linqbridge)**
 - **[IMEHelper](https://github.com/JLChnToZ/IMEHelper)**  
+- **[Spine-Runtime](https://github.com/EsotericSoftware/spine-runtimes)**
 - 以及...忠实的<s>小白鼠</s>测试用户们
