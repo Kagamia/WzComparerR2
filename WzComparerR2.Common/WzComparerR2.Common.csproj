@@ -34,6 +34,9 @@
       <HintPath>..\References\ImageManipulation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="spine-csharp">
+      <HintPath>..\References\spine-csharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -85,6 +88,7 @@
     <Compile Include="IGifFrame.cs" />
     <Compile Include="ImageDataObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpineLoader.cs" />
     <Compile Include="StringLinker.cs" />
     <Compile Include="StringResult.cs" />
   </ItemGroup>

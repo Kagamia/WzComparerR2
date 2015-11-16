@@ -55,18 +55,18 @@ namespace WzComparerR2.WzLib
                 }
                 else
                 {
-                    if (outImg)
+                    var dirNode = currentNode.FindNodeByPath(dir);
+
+                    if (dirNode == null && outImg)
                     {
-                        currentNode = currentNode.FindNodeByPath(true, dir + ".img");
-                        if (currentNode.GetValueEx<Wz_Image>(null) != null)
+                        dirNode = currentNode.FindNodeByPath(true, dir + ".img");
+                        if (dirNode.GetValueEx<Wz_Image>(null) != null)
                         {
                             outImg = false;
                         }
                     }
-                    else
-                    {
-                        currentNode = currentNode.FindNodeByPath(dir);
-                    }
+
+                    currentNode = dirNode;
                 }
                 if (currentNode == null)
                     return null;

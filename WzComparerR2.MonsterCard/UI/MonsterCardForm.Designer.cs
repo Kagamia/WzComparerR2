@@ -45,10 +45,12 @@
             this.dockSite5 = new DevComponents.DotNetBar.DockSite();
             this.dockSite6 = new DevComponents.DotNetBar.DockSite();
             this.dockSite7 = new DevComponents.DotNetBar.DockSite();
-            this.bar3 = new DevComponents.DotNetBar.Bar();
-            this.buttonItem1 = new DevComponents.DotNetBar.ButtonItem();
+            this.bar2 = new DevComponents.DotNetBar.Bar();
+            this.lblMode = new DevComponents.DotNetBar.LabelItem();
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.superTabStripAnimes = new DevComponents.DotNetBar.SuperTabStrip();
+            this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
+            this.comboBoxItem1 = new DevComponents.DotNetBar.ComboBoxItem();
             this.gifControl1 = new WzComparerR2.MonsterCard.UI.GifControl();
             this.dockSite2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bar1)).BeginInit();
@@ -56,8 +58,9 @@
             this.panelDockContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.advTreeMobInfo)).BeginInit();
             this.dockSite7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.bar3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bar2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.superTabStripAnimes)).BeginInit();
+            this.panelEx1.SuspendLayout();
             this.SuspendLayout();
             // 
             // dotNetBarManager1
@@ -99,9 +102,9 @@
             this.dockSite1.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite1.Dock = System.Windows.Forms.DockStyle.Left;
             this.dockSite1.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer();
-            this.dockSite1.Location = new System.Drawing.Point(0, 25);
+            this.dockSite1.Location = new System.Drawing.Point(0, 28);
             this.dockSite1.Name = "dockSite1";
-            this.dockSite1.Size = new System.Drawing.Size(0, 336);
+            this.dockSite1.Size = new System.Drawing.Size(0, 333);
             this.dockSite1.TabIndex = 3;
             this.dockSite1.TabStop = false;
             // 
@@ -111,10 +114,10 @@
             this.dockSite2.Controls.Add(this.bar1);
             this.dockSite2.Dock = System.Windows.Forms.DockStyle.Right;
             this.dockSite2.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer(new DevComponents.DotNetBar.DocumentBaseContainer[] {
-            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar1, 209, 336)))}, DevComponents.DotNetBar.eOrientation.Horizontal);
-            this.dockSite2.Location = new System.Drawing.Point(372, 25);
+            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar1, 209, 333)))}, DevComponents.DotNetBar.eOrientation.Horizontal);
+            this.dockSite2.Location = new System.Drawing.Point(372, 28);
             this.dockSite2.Name = "dockSite2";
-            this.dockSite2.Size = new System.Drawing.Size(212, 336);
+            this.dockSite2.Size = new System.Drawing.Size(212, 333);
             this.dockSite2.TabIndex = 4;
             this.dockSite2.TabStop = false;
             // 
@@ -134,7 +137,7 @@
             this.bar1.LayoutType = DevComponents.DotNetBar.eLayoutType.DockContainer;
             this.bar1.Location = new System.Drawing.Point(3, 0);
             this.bar1.Name = "bar1";
-            this.bar1.Size = new System.Drawing.Size(209, 336);
+            this.bar1.Size = new System.Drawing.Size(209, 333);
             this.bar1.Stretch = true;
             this.bar1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar1.TabIndex = 0;
@@ -148,7 +151,7 @@
             this.panelDockContainer1.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelDockContainer1.Location = new System.Drawing.Point(3, 23);
             this.panelDockContainer1.Name = "panelDockContainer1";
-            this.panelDockContainer1.Size = new System.Drawing.Size(203, 310);
+            this.panelDockContainer1.Size = new System.Drawing.Size(203, 307);
             this.panelDockContainer1.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelDockContainer1.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarBackground;
             this.panelDockContainer1.Style.BorderColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarDockedBorder;
@@ -181,7 +184,7 @@
             this.advTreeMobInfo.NodesConnector = this.nodeConnector1;
             this.advTreeMobInfo.NodeStyle = this.elementStyle1;
             this.advTreeMobInfo.PathSeparator = ";";
-            this.advTreeMobInfo.Size = new System.Drawing.Size(203, 310);
+            this.advTreeMobInfo.Size = new System.Drawing.Size(203, 307);
             this.advTreeMobInfo.Styles.Add(this.elementStyle1);
             this.advTreeMobInfo.TabIndex = 0;
             this.advTreeMobInfo.Text = "advTree1";
@@ -230,9 +233,9 @@
             // 
             this.dockSite5.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite5.Dock = System.Windows.Forms.DockStyle.Left;
-            this.dockSite5.Location = new System.Drawing.Point(0, 25);
+            this.dockSite5.Location = new System.Drawing.Point(0, 28);
             this.dockSite5.Name = "dockSite5";
-            this.dockSite5.Size = new System.Drawing.Size(0, 336);
+            this.dockSite5.Size = new System.Drawing.Size(0, 333);
             this.dockSite5.TabIndex = 7;
             this.dockSite5.TabStop = false;
             // 
@@ -240,52 +243,57 @@
             // 
             this.dockSite6.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite6.Dock = System.Windows.Forms.DockStyle.Right;
-            this.dockSite6.Location = new System.Drawing.Point(584, 25);
+            this.dockSite6.Location = new System.Drawing.Point(584, 28);
             this.dockSite6.Name = "dockSite6";
-            this.dockSite6.Size = new System.Drawing.Size(0, 336);
+            this.dockSite6.Size = new System.Drawing.Size(0, 333);
             this.dockSite6.TabIndex = 8;
             this.dockSite6.TabStop = false;
             // 
             // dockSite7
             // 
             this.dockSite7.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
-            this.dockSite7.Controls.Add(this.bar3);
+            this.dockSite7.Controls.Add(this.bar2);
             this.dockSite7.Dock = System.Windows.Forms.DockStyle.Top;
             this.dockSite7.Location = new System.Drawing.Point(0, 0);
             this.dockSite7.Name = "dockSite7";
-            this.dockSite7.Size = new System.Drawing.Size(584, 25);
+            this.dockSite7.Size = new System.Drawing.Size(584, 28);
             this.dockSite7.TabIndex = 9;
             this.dockSite7.TabStop = false;
             // 
-            // bar3
+            // bar2
             // 
-            this.bar3.AccessibleDescription = "DotNetBar Bar (bar3)";
-            this.bar3.AccessibleName = "DotNetBar Bar";
-            this.bar3.AccessibleRole = System.Windows.Forms.AccessibleRole.ToolBar;
-            this.bar3.DockSide = DevComponents.DotNetBar.eDockSide.Top;
-            this.bar3.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
-            this.bar3.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Office2003;
-            this.bar3.IsMaximized = false;
-            this.bar3.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItem1});
-            this.bar3.Location = new System.Drawing.Point(0, 0);
-            this.bar3.Name = "bar3";
-            this.bar3.Size = new System.Drawing.Size(15, 25);
-            this.bar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.bar3.TabIndex = 1;
-            this.bar3.TabStop = false;
-            this.bar3.Text = "bar3";
+            this.bar2.AccessibleDescription = "DotNetBar Bar (bar2)";
+            this.bar2.AccessibleName = "DotNetBar Bar";
+            this.bar2.AccessibleRole = System.Windows.Forms.AccessibleRole.ToolBar;
+            this.bar2.CanAutoHide = false;
+            this.bar2.CanCustomize = false;
+            this.bar2.DockSide = DevComponents.DotNetBar.eDockSide.Top;
+            this.bar2.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            this.bar2.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Office2003;
+            this.bar2.IsMaximized = false;
+            this.bar2.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.lblMode,
+            this.comboBoxItem1});
+            this.bar2.Location = new System.Drawing.Point(0, 0);
+            this.bar2.Name = "bar2";
+            this.bar2.Size = new System.Drawing.Size(121, 28);
+            this.bar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.bar2.TabIndex = 0;
+            this.bar2.TabStop = false;
+            this.bar2.Text = "bar2";
             // 
-            // buttonItem1
+            // lblMode
             // 
-            this.buttonItem1.Name = "buttonItem1";
+            this.lblMode.ForeColor = System.Drawing.Color.Black;
+            this.lblMode.Name = "lblMode";
+            this.lblMode.Text = "mode";
             // 
             // dockSite3
             // 
             this.dockSite3.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite3.Dock = System.Windows.Forms.DockStyle.Top;
             this.dockSite3.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer();
-            this.dockSite3.Location = new System.Drawing.Point(0, 25);
+            this.dockSite3.Location = new System.Drawing.Point(0, 28);
             this.dockSite3.Name = "dockSite3";
             this.dockSite3.Size = new System.Drawing.Size(584, 0);
             this.dockSite3.TabIndex = 5;
@@ -331,15 +339,42 @@
             this.superTabStripAnimes.TextAlignment = DevComponents.DotNetBar.eItemAlignment.Center;
             this.superTabStripAnimes.SelectedTabChanged += new System.EventHandler<DevComponents.DotNetBar.SuperTabStripSelectedTabChangedEventArgs>(this.superTabStripAnimes_SelectedTabChanged);
             // 
+            // panelEx1
+            // 
+            this.panelEx1.CanvasColor = System.Drawing.SystemColors.Control;
+            this.panelEx1.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.panelEx1.Controls.Add(this.gifControl1);
+            this.panelEx1.DisabledBackColor = System.Drawing.Color.Empty;
+            this.panelEx1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelEx1.Location = new System.Drawing.Point(0, 28);
+            this.panelEx1.Name = "panelEx1";
+            this.panelEx1.Size = new System.Drawing.Size(372, 323);
+            this.panelEx1.Style.Alignment = System.Drawing.StringAlignment.Center;
+            this.panelEx1.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground;
+            this.panelEx1.Style.BackColor2.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBackground2;
+            this.panelEx1.Style.Border = DevComponents.DotNetBar.eBorderType.SingleLine;
+            this.panelEx1.Style.BorderColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelBorder;
+            this.panelEx1.Style.ForeColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelText;
+            this.panelEx1.Style.GradientAngle = 90;
+            this.panelEx1.TabIndex = 13;
+            this.panelEx1.Text = "panelEx1";
+            // 
+            // comboBoxItem1
+            // 
+            this.comboBoxItem1.BeginGroup = true;
+            this.comboBoxItem1.DropDownHeight = 106;
+            this.comboBoxItem1.ItemHeight = 17;
+            this.comboBoxItem1.Name = "comboBoxItem1";
+            this.comboBoxItem1.Visible = false;
+            // 
             // gifControl1
             // 
             this.gifControl1.AnimateGif = null;
             this.gifControl1.BackColor = System.Drawing.Color.White;
             this.gifControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gifControl1.Location = new System.Drawing.Point(0, 25);
+            this.gifControl1.Location = new System.Drawing.Point(0, 0);
             this.gifControl1.Name = "gifControl1";
-            this.gifControl1.Origin = new System.Drawing.Point(0, 0);
-            this.gifControl1.Size = new System.Drawing.Size(372, 326);
+            this.gifControl1.Size = new System.Drawing.Size(372, 323);
             this.gifControl1.TabIndex = 12;
             this.gifControl1.Text = "gifControl1";
             this.gifControl1.Paint += new System.Windows.Forms.PaintEventHandler(this.gifControl1_Paint);
@@ -347,7 +382,7 @@
             // MonsterCardForm
             // 
             this.ClientSize = new System.Drawing.Size(584, 361);
-            this.Controls.Add(this.gifControl1);
+            this.Controls.Add(this.panelEx1);
             this.Controls.Add(this.superTabStripAnimes);
             this.Controls.Add(this.dockSite2);
             this.Controls.Add(this.dockSite1);
@@ -366,8 +401,9 @@
             this.panelDockContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.advTreeMobInfo)).EndInit();
             this.dockSite7.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.bar3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bar2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.superTabStripAnimes)).EndInit();
+            this.panelEx1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -391,9 +427,11 @@
         private DevComponents.AdvTree.ColumnHeader columnHeader2;
         private DevComponents.AdvTree.NodeConnector nodeConnector1;
         private DevComponents.DotNetBar.ElementStyle elementStyle1;
-        private GifControl gifControl1;
-        private DevComponents.DotNetBar.Bar bar3;
-        private DevComponents.DotNetBar.ButtonItem buttonItem1;
         internal DevComponents.AdvTree.AdvTree advTreeMobInfo;
+        internal GifControl gifControl1;
+        internal DevComponents.DotNetBar.PanelEx panelEx1;
+        private DevComponents.DotNetBar.Bar bar2;
+        internal DevComponents.DotNetBar.ComboBoxItem comboBoxItem1;
+        internal DevComponents.DotNetBar.LabelItem lblMode;
     }
 }

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Text;
+using System.Linq;
 using System.Windows.Forms;
 using DevComponents.DotNetBar;
 using WzComparerR2.PluginBase;
@@ -17,8 +18,13 @@ namespace WzComparerR2.MonsterCard.UI
         public MonsterCardForm()
         {
             InitializeComponent();
-            this.gifControl1.Origin = new Point(this.gifControl1.Width / 2, this.gifControl1.Height / 2);
             this.mobGage = new MobGage();
+
+            this.aniArgs = new AnimationDrawArgs();
+            this.aniArgs.OriginX = gifControl1.Width / 2;
+            this.aniArgs.OriginY = (int)(gifControl1.Height * 0.6);
+            this.aniArgs.RegisterEvents(this.gifControl1);
+            this.gifControl1.AniDrawArgs = this.aniArgs;
         }
 
         public SuperTabControlPanel GetTabPanel()
@@ -40,6 +46,8 @@ namespace WzComparerR2.MonsterCard.UI
         private MobGage mobGage;
         private MobHandler mobHandler;
         private NpcHandler npcHandler;
+
+        internal AnimationDrawArgs aniArgs;
         
         private bool showTooltip = true;
 
@@ -144,6 +152,11 @@ namespace WzComparerR2.MonsterCard.UI
             {
                 superTabStripAnimes.EndUpdate();
             }
+
+            if (superTabStripAnimes.SelectedTab != null)
+            {
+                this.handler.OnShowAnimate(superTabStripAnimes.SelectedTab.Text);
+            }
         }
 
         private void DisplayInfo()
@@ -200,12 +213,12 @@ namespace WzComparerR2.MonsterCard.UI
         private void superTabStripAnimes_SelectedTabChanged(object sender, SuperTabStripSelectedTabChangedEventArgs e)
         {
             SuperTabItem tab = e.NewValue as SuperTabItem;
-            if (tab == null || this.handler == null)
+            if (tab == null || this.handler == null || superTabStripAnimes.IsUpdateSuspended)
             {
                 return;
             }
 
-            this.gifControl1.AnimateGif = handler.GetAnimate(tab.Text);
+            this.handler.OnShowAnimate(tab.Text);
         }
 
         private void gifControl1_Paint(object sender, PaintEventArgs e)
@@ -215,6 +228,11 @@ namespace WzComparerR2.MonsterCard.UI
                 this.mobGage.DrawGage(e.Graphics, gifControl1.Size);
             }
             //e.Graphics.DrawString(DateTime.Now.ToString("HH:mm:ss.fff"), this.Font, Brushes.Blue, PointF.Empty);
+        }
+
+        private void labelItem1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -21,6 +21,7 @@ namespace WzComparerR2.MonsterCard.UI
 
         private MobTooltipRender tooltipRender;
         private MobInfo mobInfo;
+        private Wz_Node imgNode;
 
         public override void OnLoad(Wz_Node imgNode)
         {
@@ -78,6 +79,7 @@ namespace WzComparerR2.MonsterCard.UI
 
                         case "link": mobInfo.Link = node.GetValueEx<int>(0); break;
                         case "skeleton": mobInfo.Skeleton = node.GetValueEx<int>(0) != 0; break;
+                        case "jsonLoad": mobInfo.JsonLoad = node.GetValueEx<int>(0) != 0; break;
 
                         case "skill": LoadSkill(mobInfo, node); break;
                         case "attack": LoadAttack(mobInfo, node); break;
@@ -88,6 +90,7 @@ namespace WzComparerR2.MonsterCard.UI
             }
 
             this.mobInfo = mobInfo;
+            this.imgNode = imgNode;
         }
 
         private void LoadSkill(MobInfo mobInfo, Wz_Node propNode)
@@ -150,7 +153,7 @@ namespace WzComparerR2.MonsterCard.UI
             return imageFrame.Bitmap;
         }
 
-        public override Gif GetAnimate(string aniName)
+        private Gif GetAnimate(string aniName)
         {
             if (this.mobInfo == null || !this.mobInfo.Animates.Contains(aniName))
             {
@@ -181,35 +184,82 @@ namespace WzComparerR2.MonsterCard.UI
                 return;
             }
 
-            var aniList = new[] { "stand", "regen", "move", "fly" };
+            var aniList = new[] { "stand", "regen", "move", "fly", "say", "turn" };
             foreach (string aniName in aniList)
             {
-                var ani = LoadAnimateByName(linkNode, aniName);
+                var ani = LoadAnimateByNameMob(linkNode, aniName);
                 if (ani != null)
                 {
                     mobInfo.Animates.Add(ani);
                 }
             }
 
-            foreach (var ani in LoadAllAnimate(linkNode, "attack"))
+            foreach (var ani in LoadAllAnimateMob(linkNode, "attack"))
             {
                 mobInfo.Animates.Add(ani);
             }
 
-            foreach (var ani in LoadAllAnimate(linkNode, "skill"))
+            foreach (var ani in LoadAllAnimateMob(linkNode, "skill"))
             {
                 mobInfo.Animates.Add(ani);
             }
 
-            foreach (var ani in LoadAllAnimate(linkNode, "hit"))
+            foreach (var ani in LoadAllAnimateMob(linkNode, "hit"))
             {
                 mobInfo.Animates.Add(ani);
             }
 
-            foreach (var ani in LoadAllAnimate(linkNode, "die"))
+            foreach (var ani in LoadAllAnimateMob(linkNode, "die"))
             {
                 mobInfo.Animates.Add(ani);
             }
+        }
+
+        private IEnumerable<LifeAnimate> LoadAllAnimateMob(Wz_Node imgNode, string aniPrefix)
+        {
+            for (int i = 0; ; i++)
+            {
+                var aniList = new[] {
+                    aniPrefix + (i > 0 ? i.ToString() : ""),
+                    aniPrefix + "After" +(i > 0 ? i.ToString() : "")
+                };
+
+                int aniCount = 0;
+                foreach (var aniName in aniList)
+                {
+                    LifeAnimate ani = LoadAnimateByNameMob(imgNode, aniName);
+
+                    if (ani != null)
+                    {
+                        aniCount++;
+                        yield return ani;
+                    }
+                }
+
+                if (aniCount <= 0 && i >= 1)
+                {
+                    yield break;
+                }
+            }
+        }
+
+        private LifeAnimate LoadAnimateByNameMob(Wz_Node imgNode, string aniName)
+        {
+            return mobInfo != null && mobInfo.Skeleton ?
+                        LoadSpineAnimateByName(imgNode, aniName) :
+                        LoadAnimateByName(imgNode, aniName);
+        }
+
+        private LifeAnimate LoadSpineAnimateByName(Wz_Node imgNode, string aniName)
+        {
+            var aniNode = imgNode.FindNodeByPath(aniName);
+            if (aniNode == null)
+            {
+                return null;
+            }
+            var ani = new LifeAnimate(aniName);
+            ani.AniName = aniNode.FindNodeByPath("aniName").GetValueEx<string>(null);
+            return ani;
         }
 
         public override void ShowTooltipWindow(Wz_Node imgNode)
@@ -233,6 +283,26 @@ namespace WzComparerR2.MonsterCard.UI
                     tooltipWnd.Show();
                 }
             }
+        }
+
+        public override void OnShowAnimate(string aniName)
+        {
+            if (this.mobInfo != null)
+            {
+                if (this.mobInfo.Skeleton)
+                {
+                    if (this.mobInfo != null && this.mobInfo.Animates.Contains(aniName))
+                    {
+                        var ani = this.mobInfo.Animates[aniName];
+                        TryDisplaySpine(imgNode, ani.AniName, mobInfo.JsonLoad);
+                    }
+                }
+                else
+                {
+                    DisplayGif(GetAnimate(aniName));
+                }
+            }
+            
         }
 
         public override void DisplayInfo(AdvTree advTreeMobInfo)

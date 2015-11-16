@@ -13,6 +13,7 @@ namespace WzComparerR2.MonsterCard
         }
 
         public string Name { get; private set; }
+        public string AniName { get; set; }
         public Gif AnimateGif { get; set; }
     }
 }

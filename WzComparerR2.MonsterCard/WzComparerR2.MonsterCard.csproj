@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,12 +29,28 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DevComponents.DotNetBar2, Version=12.1.0.0, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="LinqBridge">
+      <HintPath>..\References\LinqBridge.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework">
+      <HintPath>..\References\Microsoft.Xna.Framework.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="spine-csharp">
+      <HintPath>..\References\spine-csharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="spine-xna">
+      <HintPath>..\References\spine-xna.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -51,7 +68,14 @@
     <Compile Include="MobInfo.cs" />
     <Compile Include="MobSkill.cs" />
     <Compile Include="NpcInfo.cs" />
+    <Compile Include="UI\AnimationDrawArgs.cs" />
     <Compile Include="UI\RenderHelper.cs" />
+    <Compile Include="UI\SpineControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\SpineControl.Designer.cs">
+      <DependentUpon>SpineControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\TextBlock.cs" />
     <Compile Include="UI\Handler.cs" />
     <Compile Include="UI\MobGage.cs" />
@@ -72,6 +96,11 @@
     </Compile>
     <Compile Include="UI\NpcHandler.cs" />
     <Compile Include="UI\NpcTooltipRender.cs" />
+    <Compile Include="UI\Xna\GraphicsDeviceControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\Xna\GraphicsDeviceService.cs" />
+    <Compile Include="UI\Xna\ServiceContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj">

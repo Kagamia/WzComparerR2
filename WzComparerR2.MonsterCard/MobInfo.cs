@@ -51,6 +51,7 @@ namespace WzComparerR2.MonsterCard
 
         public int? Link { get; set; }
         public bool Skeleton { get; set; }
+        public bool JsonLoad { get; set; }
 
         public List<int> Revive { get; private set; }
         public LifeAnimateCollection Animates { get; private set; }

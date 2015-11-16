@@ -91,7 +91,7 @@ namespace WzComparerR2.MonsterCard.UI
             return imageFrame.Bitmap;
         }
 
-        public override Gif GetAnimate(string aniName)
+        private Gif GetAnimate(string aniName)
         {
             if (this.npcInfo == null || !this.npcInfo.Animates.Contains(aniName))
             {
@@ -131,6 +131,11 @@ namespace WzComparerR2.MonsterCard.UI
                     this.npcInfo.Animates.Add(ani);
                 }
             }
+        }
+
+        public override void OnShowAnimate(string aniName)
+        {
+            this.DisplayGif(GetAnimate(aniName));
         }
 
         public override void ShowTooltipWindow(Wz_Node imgNode)

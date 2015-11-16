@@ -21,9 +21,9 @@ namespace WzComparerR2.MonsterCard.UI
         }
 
         /// <summary>
-        /// 获取或设置GIF的绘图原点。
+        /// 获取或设置GIF的绘图参数。
         /// </summary>
-        public Point Origin { get; set; }
+        internal AnimationDrawArgs AniDrawArgs { get; set; }
 
         /// <summary>
         /// 获取或设置控件正在播放的动画。
@@ -45,11 +45,6 @@ namespace WzComparerR2.MonsterCard.UI
         Gif gif;
         int currentFrame;
 
-
-        //事件相关
-        bool isDragging;
-        Point lastPressingPoint;
-
         protected override void OnPaint(PaintEventArgs pe)
         {
             Graphics g = pe.Graphics;
@@ -59,7 +54,18 @@ namespace WzComparerR2.MonsterCard.UI
                 var frame = gif.Frames[currentFrame];
                 if (frame != null)
                 {
-                    frame.Draw(g, new Rectangle(-this.Origin.X, -this.Origin.Y, this.Width, this.Height));
+                    int origX, origY;
+                    if (AniDrawArgs != null)
+                    {
+                        origX = AniDrawArgs.OriginX;
+                        origY = AniDrawArgs.OriginY;
+                    }
+                    else
+                    {
+                        origX = this.Width / 2;
+                        origY = this.Height / 2;
+                    }
+                    frame.Draw(g, new Rectangle(-origX, -origY, this.Width, this.Height));
                 }
             }
 
@@ -117,38 +123,6 @@ namespace WzComparerR2.MonsterCard.UI
                 this.timer1.Interval = delay <= 0 ? 1 : delay;
             }
             this.Invalidate();
-        }
-
-        protected override void OnMouseDown(MouseEventArgs e)
-        {
-            if ((e.Button & System.Windows.Forms.MouseButtons.Left) == System.Windows.Forms.MouseButtons.Left)
-            {
-                isDragging = true;
-                lastPressingPoint = e.Location;
-            }
-            base.OnMouseDown(e);
-        }
-
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
-            if (isDragging)
-            {
-                int dx = e.X - lastPressingPoint.X;
-                int dy = e.Y - lastPressingPoint.Y;
-                this.Origin = new Point(Origin.X + dx, Origin.Y + dy);
-                this.lastPressingPoint = new Point(e.X, e.Y);
-                this.Invalidate();
-            }
-            base.OnMouseMove(e);
-        }
-
-        protected override void OnMouseUp(MouseEventArgs e)
-        {
-            if ((e.Button & System.Windows.Forms.MouseButtons.Left) == System.Windows.Forms.MouseButtons.Left)
-            {
-                isDragging = false;
-            }
-            base.OnMouseUp(e);
         }
     }
 }
