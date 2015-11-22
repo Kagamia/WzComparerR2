@@ -52,62 +52,6 @@ namespace WzComparerR2.MonsterCard.UI
         {
         }
 
-        public void DisplayGif(Gif gif)
-        {
-            HideSpineControl();
-            this.Form.gifControl1.Visible = true;
-            this.Form.lblMode.Text = "mode-gif";
-            this.Form.gifControl1.AnimateGif = gif;
-        }
-
-        public void TryDisplaySpine(Wz_Node imgNode, string aniName, bool? useJson)
-        {
-            if (CanShowSpine())
-            {
-                this.Form.gifControl1.Visible = false;
-                LoadSpineAndShow(imgNode, aniName, useJson);
-            }
-        }
-
-        private bool CanShowSpine()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies().Any(asm =>
-                string.Equals("Microsoft.Xna.Framework.dll",
-                    asm.ManifestModule?.Name,
-                    StringComparison.CurrentCultureIgnoreCase));
-        }
-
-        private void LoadSpineAndShow(Wz_Node imgNode, string aniName, bool? useJson)
-        {
-            SpineControl spineControl = this.Form.panelEx1.Controls.OfType<SpineControl>().FirstOrDefault();
-            if (spineControl == null)
-            {
-                spineControl = new SpineControl();
-                spineControl.Dock = System.Windows.Forms.DockStyle.Fill;
-                this.Form.panelEx1.Controls.Add(spineControl);
-                this.Form.aniArgs.RegisterEvents(spineControl);
-                spineControl.AniDrawArgs = this.Form.aniArgs;
-            }
-
-            spineControl.Visible = true;
-            this.Form.lblMode.Text = "mode-xna";
-            spineControl.LoadSkeleton(imgNode, aniName, useJson);
-        }
-
-        private void FillSpineActions()
-        {
-
-        }
-
-        public void HideSpineControl()
-        {
-            SpineControl spineControl = this.Form.panelEx1.Controls.OfType<SpineControl>().FirstOrDefault();
-            if (spineControl != null)
-            {
-                spineControl.Visible = false;
-            }
-        }
-
         public IEnumerable<LifeAnimate> LoadAllAnimate(Wz_Node imgNode, string aniPrefix)
         {
             for (int i = 0; ; i++)

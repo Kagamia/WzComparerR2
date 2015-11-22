@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using DevComponents.DotNetBar;
 using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
+using WzComparerR2.Common;
 using System.Reflection;
 
 namespace WzComparerR2.MonsterCard.UI
@@ -48,7 +49,7 @@ namespace WzComparerR2.MonsterCard.UI
         private NpcHandler npcHandler;
 
         internal AnimationDrawArgs aniArgs;
-        
+
         private bool showTooltip = true;
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace WzComparerR2.MonsterCard.UI
                     {
                         this.mobHandler = new MobHandler(this);
                     }
-                    
+
                     this.handler = mobHandler;
                     this.mobGage.Visible = true;
                     break;
@@ -85,14 +86,14 @@ namespace WzComparerR2.MonsterCard.UI
                     {
                         this.npcHandler = new NpcHandler(this);
                     }
-                    
+
                     this.handler = npcHandler;
                     this.mobGage.Visible = false;
                     break;
 
                 default: return;
             }
-            
+
             Wz_Image mobImg = e.Node.GetValue<Wz_Image>();
             if (mobImg == null || !mobImg.TryExtract())
             {
@@ -133,6 +134,62 @@ namespace WzComparerR2.MonsterCard.UI
         }
 
         #region 显示相关
+        public void DisplayGif(Gif gif)
+        {
+            HideSpineControl();
+            this.gifControl1.Visible = true;
+            this.lblMode.Text = "mode-gif";
+            this.gifControl1.AnimateGif = gif;
+        }
+
+        public void TryDisplaySpine(Wz_Node imgNode, string aniName, bool? useJson)
+        {
+            if (CanShowSpine())
+            {
+                this.gifControl1.Visible = false;
+                LoadSpineAndShow(imgNode, aniName, useJson);
+            }
+        }
+
+        public bool CanShowSpine()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies().Any(asm =>
+                string.Equals("Microsoft.Xna.Framework.dll",
+                    asm.ManifestModule?.Name,
+                    StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        public void LoadSpineAndShow(Wz_Node imgNode, string aniName, bool? useJson)
+        {
+            SpineControl spineControl = this.panelEx1.Controls.OfType<SpineControl>().FirstOrDefault();
+            if (spineControl == null)
+            {
+                spineControl = new SpineControl();
+                spineControl.Dock = System.Windows.Forms.DockStyle.Fill;
+                this.panelEx1.Controls.Add(spineControl);
+                this.aniArgs.RegisterEvents(spineControl);
+                spineControl.AniDrawArgs = this.aniArgs;
+                spineControl.ShowBoundingBox = this.chkShowBoundingBox.Checked;
+                spineControl.ShowDrawingArea = this.chkShowDrawingArea.Checked;
+                spineControl.EnableEffect = this.chkShowEffect.Checked;
+            }
+
+            spineControl.Visible = true;
+            this.itemContainerSpine.Visible = true;
+            this.lblMode.Text = "mode-xna";
+            spineControl.LoadSkeleton(imgNode, aniName, useJson);
+        }
+
+        public void HideSpineControl()
+        {
+            SpineControl spineControl = this.panelEx1.Controls.OfType<SpineControl>().FirstOrDefault();
+            if (spineControl != null)
+            {
+                spineControl.Visible = false;
+            }
+            this.itemContainerSpine.Visible = false;
+        }
+
         private void PrepareTabs()
         {
             try
@@ -188,7 +245,7 @@ namespace WzComparerR2.MonsterCard.UI
             }
         }
 
-        private  void InvokeScroll(int value)
+        private void InvokeScroll(int value)
         {
             if (advTreeMobInfo.VScrollBarVisible && advTreeMobInfo.VScrollBar != null)
             {
@@ -227,12 +284,65 @@ namespace WzComparerR2.MonsterCard.UI
             {
                 this.mobGage.DrawGage(e.Graphics, gifControl1.Size);
             }
-            //e.Graphics.DrawString(DateTime.Now.ToString("HH:mm:ss.fff"), this.Font, Brushes.Blue, PointF.Empty);
         }
 
-        private void labelItem1_Click(object sender, EventArgs e)
+        public void OnResize()
         {
+            this.PerformLayout(this.superTabStripAnimes, null);
+        }
 
+        private void btnSpineSave_Click(object sender, EventArgs e)
+        {
+            SpineControl spineControl = this.panelEx1.Controls.OfType<SpineControl>().FirstOrDefault();
+            if (spineControl != null)
+            {
+                SaveFileDialog dlg = new SaveFileDialog();
+                dlg.OverwritePrompt = true;
+                dlg.Filter = "*.gif|*.gif|*.*|*.*";
+                dlg.FileName = spineControl.CurrentAniName + ".gif";
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    var gif = spineControl.SaveAsGif(100);
+                    if (gif != null)
+                    {
+                        gif.Save(dlg.FileName);
+                        gif.Dispose();
+                        gif = null;
+                        GC.Collect();
+                    }
+                    else
+                    {
+                        MessageBox.Show("没有动画可以保存。");
+                    }
+                }
+            }
+        }
+
+        private void chkShowEffect_Click(object sender, EventArgs e)
+        {
+            SpineControl spineControl = this.panelEx1.Controls.OfType<SpineControl>().FirstOrDefault();
+            if (spineControl != null)
+            {
+                spineControl.EnableEffect = chkShowEffect.Checked;
+            }
+        }
+
+        private void chkShowBoundingBox_Click(object sender, EventArgs e)
+        {
+            SpineControl spineControl = this.panelEx1.Controls.OfType<SpineControl>().FirstOrDefault();
+            if (spineControl != null)
+            {
+                spineControl.ShowBoundingBox = chkShowBoundingBox.Checked;
+            }
+        }
+
+        private void chkShowDrawingArea_Click(object sender, EventArgs e)
+        {
+            SpineControl spineControl = this.panelEx1.Controls.OfType<SpineControl>().FirstOrDefault();
+            if (spineControl != null)
+            {
+                spineControl.ShowDrawingArea = chkShowDrawingArea.Checked;
+            }
         }
     }
 }

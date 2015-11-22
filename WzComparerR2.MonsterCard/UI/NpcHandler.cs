@@ -135,7 +135,7 @@ namespace WzComparerR2.MonsterCard.UI
 
         public override void OnShowAnimate(string aniName)
         {
-            this.DisplayGif(GetAnimate(aniName));
+            this.Form.DisplayGif(GetAnimate(aniName));
         }
 
         public override void ShowTooltipWindow(Wz_Node imgNode)

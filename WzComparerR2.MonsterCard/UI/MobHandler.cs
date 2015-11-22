@@ -294,12 +294,12 @@ namespace WzComparerR2.MonsterCard.UI
                     if (this.mobInfo != null && this.mobInfo.Animates.Contains(aniName))
                     {
                         var ani = this.mobInfo.Animates[aniName];
-                        TryDisplaySpine(imgNode, ani.AniName, mobInfo.JsonLoad);
+                        this.Form.TryDisplaySpine(imgNode, ani.AniName, mobInfo.JsonLoad);
                     }
                 }
                 else
                 {
-                    DisplayGif(GetAnimate(aniName));
+                    this.Form.DisplayGif(GetAnimate(aniName));
                 }
             }
             
