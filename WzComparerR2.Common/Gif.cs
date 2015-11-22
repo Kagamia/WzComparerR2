@@ -124,6 +124,7 @@ namespace WzComparerR2.Common
                 enc = new GifEncoder(tempFileName, rect.Width, rect.Height, 256, Color.Transparent);
             }
 
+            Bitmap picFrame = new Bitmap(rect.Width, rect.Height, PixelFormat.Format32bppArgb);
             for (int i = startIndex, j = startIndex + frameCount; i < j; i++)
             {
                 if (i >= this.Frames.Count)
@@ -133,10 +134,11 @@ namespace WzComparerR2.Common
                 {
                     continue;
                 }
-                Bitmap picFrame = PrepareFrame(frame, rect, backgrnd, minAlpha);
+
+                PrepareFrame(picFrame, frame, rect, backgrnd, minAlpha);
                 enc.AppendFrame(picFrame, frame.Delay);
-                picFrame.Dispose();
             }
+            picFrame.Dispose();
             enc.Dispose();
 
             Bitmap gifBitmap = new Bitmap(tempFileName);
@@ -179,13 +181,19 @@ namespace WzComparerR2.Common
         private static readonly byte[] gifEnd = new byte[] { 0x3b };//结束信息
 
 
-        /// <summary>
-        /// 预处理帧坐标，生成新的图片。
-        /// </summary>
+
         private static Bitmap PrepareFrame(IGifFrame frame, Rectangle canvasRect, Color backgrnd, int minAlpha)
         {
             Bitmap gifFrame = new Bitmap(canvasRect.Width, canvasRect.Height, PixelFormat.Format32bppArgb);
-            Graphics g = Graphics.FromImage(gifFrame);
+            PrepareFrame(gifFrame, frame, canvasRect, backgrnd, minAlpha);
+            return gifFrame;
+        }
+        /// <summary>
+        /// 预处理帧坐标，生成新的图片。
+        /// </summary>
+        private static void PrepareFrame(Bitmap canvas, IGifFrame frame, Rectangle canvasRect, Color backgrnd, int minAlpha)
+        {
+            Graphics g = Graphics.FromImage(canvas);
 
             if (backgrnd.A == 0xff) //背景色
             {
@@ -194,41 +202,41 @@ namespace WzComparerR2.Common
             }
             else //透明混合色
             {
+                g.Clear(Color.Transparent);
                 Rectangle frameRect = frame.Region;
                 frameRect.Offset(-canvasRect.X, -canvasRect.Y);
                 frame.Draw(g, canvasRect);
 
-                BitmapData data = gifFrame.LockBits(new Rectangle(Point.Empty, gifFrame.Size), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-                byte[] buffer = new byte[data.Stride * data.Height];
-                Marshal.Copy(data.Scan0, buffer, 0, buffer.Length);
-
-                for (int y = frameRect.Top; y < frameRect.Bottom; y++)
+                BitmapData data = canvas.LockBits(new Rectangle(Point.Empty, canvas.Size), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                unsafe
                 {
-                    for (int x = frameRect.Left; x < frameRect.Right; x++)
-                    {
-                        int i = 4 * x + y * data.Stride;
+                    byte* buffer = (byte*)data.Scan0.ToPointer();
 
-                        byte a = buffer[i + 3];
-                        if (a <= minAlpha)
+                    for (int y = frameRect.Top; y < frameRect.Bottom; y++)
+                    {
+                        for (int x = frameRect.Left; x < frameRect.Right; x++)
                         {
-                            buffer[i] = buffer[i + 1] = buffer[i + 2] = buffer[i + 3] = 0;
-                        }
-                        else if (a < 0xff)
-                        {
-                            float al = a / 255f;
-                            float be = (1 - al);
-                            buffer[i] = (byte)(buffer[i] * al + backgrnd.B * be);
-                            buffer[i + 1] = (byte)(buffer[i + 1] * al + backgrnd.G * be);
-                            buffer[i + 2] = (byte)(buffer[i + 2] * al + backgrnd.R * be);
-                            buffer[i + 3] = 0xff;
+                            int i = 4 * x + y * data.Stride;
+
+                            byte a = buffer[i + 3];
+                            if (a <= minAlpha)
+                            {
+                                buffer[i] = buffer[i + 1] = buffer[i + 2] = buffer[i + 3] = 0;
+                            }
+                            else if (a < 0xff)
+                            {
+                                float al = a / 255f;
+                                float be = (1 - al);
+                                buffer[i] = (byte)(buffer[i] * al + backgrnd.B * be);
+                                buffer[i + 1] = (byte)(buffer[i + 1] * al + backgrnd.G * be);
+                                buffer[i + 2] = (byte)(buffer[i + 2] * al + backgrnd.R * be);
+                                buffer[i + 3] = 0xff;
+                            }
                         }
                     }
                 }
-                Marshal.Copy(buffer, 0, data.Scan0, buffer.Length);
-                gifFrame.UnlockBits(data);
+                canvas.UnlockBits(data);
             }
-
-            return gifFrame;
         }
 
         /// <summary>
