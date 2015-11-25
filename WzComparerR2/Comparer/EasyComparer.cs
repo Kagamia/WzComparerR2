@@ -445,13 +445,14 @@ namespace WzComparerR2.Comparer
             Wz_Uol uol;
             Wz_Sound sound;
             Wz_Vector vector;
-
+            
             if ((png = value as Wz_Png) != null)
             {
                 if (OutputPng)
                 {
                     char[] invalidChars = Path.GetInvalidFileNameChars();
-                    string filePath = fullPath.Replace('\\', '.') + "_" + col + ".png";
+                    string colName = col == 0 ? "new" : (col == 1 ? "old" : col.ToString());
+                    string filePath = fullPath.Replace('\\', '.') + "_" + colName + ".png";
 
                     for (int i = 0; i < invalidChars.Length; i++)
                     {

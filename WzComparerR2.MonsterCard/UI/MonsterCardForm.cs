@@ -302,7 +302,13 @@ namespace WzComparerR2.MonsterCard.UI
                 dlg.FileName = spineControl.CurrentAniName + ".gif";
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    var gif = spineControl.SaveAsGif(100);
+                    int delay;
+                    if (!Int32.TryParse(txtDelay.Text, out delay)
+                        || (delay = (delay / 10 * 10)) <= 0)
+                    {
+                        delay = 100;
+                    }
+                    var gif = spineControl.SaveAsGif(delay);
                     if (gif != null)
                     {
                         gif.Save(dlg.FileName);
@@ -342,6 +348,18 @@ namespace WzComparerR2.MonsterCard.UI
             if (spineControl != null)
             {
                 spineControl.ShowDrawingArea = chkShowDrawingArea.Checked;
+            }
+        }
+
+        private void txtDelay_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                int delay;
+                if (Int32.TryParse(txtDelay.Text, out delay))
+                {
+                    btnSpineSave.ClosePopup();
+                }
             }
         }
     }

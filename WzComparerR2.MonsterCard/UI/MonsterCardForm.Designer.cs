@@ -53,6 +53,9 @@
             this.chkShowDrawingArea = new DevComponents.DotNetBar.CheckBoxItem();
             this.chkShowEffect = new DevComponents.DotNetBar.CheckBoxItem();
             this.btnSpineSave = new DevComponents.DotNetBar.ButtonItem();
+            this.itemContainer1 = new DevComponents.DotNetBar.ItemContainer();
+            this.labelItem1 = new DevComponents.DotNetBar.LabelItem();
+            this.txtDelay = new DevComponents.DotNetBar.TextBoxItem();
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.superTabStripAnimes = new DevComponents.DotNetBar.SuperTabStrip();
             this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
@@ -281,7 +284,7 @@
             this.itemContainerSpine});
             this.bar2.Location = new System.Drawing.Point(0, 0);
             this.bar2.Name = "bar2";
-            this.bar2.Size = new System.Drawing.Size(164, 26);
+            this.bar2.Size = new System.Drawing.Size(177, 26);
             this.bar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar2.TabIndex = 0;
             this.bar2.TabStop = false;
@@ -346,8 +349,39 @@
             // btnSpineSave
             // 
             this.btnSpineSave.Name = "btnSpineSave";
+            this.btnSpineSave.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer1});
             this.btnSpineSave.Text = "Save";
             this.btnSpineSave.Click += new System.EventHandler(this.btnSpineSave_Click);
+            // 
+            // itemContainer1
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer1.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer1.Name = "itemContainer1";
+            this.itemContainer1.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.labelItem1,
+            this.txtDelay});
+            // 
+            // 
+            // 
+            this.itemContainer1.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // labelItem1
+            // 
+            this.labelItem1.Name = "labelItem1";
+            this.labelItem1.Text = "delay";
+            // 
+            // txtDelay
+            // 
+            this.txtDelay.MaxLength = 5;
+            this.txtDelay.Name = "txtDelay";
+            this.txtDelay.TextBoxWidth = 40;
+            this.txtDelay.Tooltip = "Gif frame delay, 100 default";
+            this.txtDelay.WatermarkColor = System.Drawing.SystemColors.GrayText;
+            this.txtDelay.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtDelay_KeyDown);
             // 
             // dockSite3
             // 
@@ -494,5 +528,8 @@
         private DevComponents.DotNetBar.CheckBoxItem chkShowBoundingBox;
         private DevComponents.DotNetBar.CheckBoxItem chkShowDrawingArea;
         private DevComponents.DotNetBar.CheckBoxItem chkShowEffect;
+        private DevComponents.DotNetBar.ItemContainer itemContainer1;
+        private DevComponents.DotNetBar.LabelItem labelItem1;
+        private DevComponents.DotNetBar.TextBoxItem txtDelay;
     }
 }
