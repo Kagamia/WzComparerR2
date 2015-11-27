@@ -321,8 +321,8 @@ namespace WzComparerR2.MapRender
                     StringResult sr;
                     if (this.stringLinker != null && this.stringLinker.StringMap.TryGetValue(this.mapID, out sr))
                     {
-                        this.uiMinimap.MapName = sr.AllValues["mapName"];
-                        this.uiMinimap.StreetName = sr.AllValues["streetName"];
+                        this.uiMinimap.MapName = sr["mapName"];
+                        this.uiMinimap.StreetName = sr["streetName"];
                     }
                     else
                     {
@@ -1442,12 +1442,18 @@ namespace WzComparerR2.MapRender
 
                     if (bs != null && no != null)
                     {
-                        bool _ani = ani.GetValueEx<int>(0) != 0;
+                        int _ani = ani.GetValueEx<int>(0);
+                        
                         int _type = type.GetValueEx<int>(0);
 
                         path[0] = "Back";
                         path[1] = bs.GetValue<string>() + ".img";
-                        path[2] = _ani ? "ani" : "back";
+                        switch (_ani)
+                        {
+                            case 0: path[2] = "back"; break;
+                            case 1: path[2] = "ani"; break;
+                            case 2: path[2] = "spine"; break;
+                        }
                         path[3] = no.GetValue<string>();
 
                         string key = string.Join("\\", path);
