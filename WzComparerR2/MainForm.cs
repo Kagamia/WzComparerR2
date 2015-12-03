@@ -1240,7 +1240,7 @@ namespace WzComparerR2
                 sb.Append(item.Text).Append(" ");
             }
             sb.Remove(sb.Length - 1, 1);
-            Clipboard.SetText(sb.ToString(), TextDataFormat.Text);
+            Clipboard.SetText(sb.ToString(), TextDataFormat.UnicodeText);
             labelItemStatus.Text = "已复制string条目到剪切板。";
         }
 
