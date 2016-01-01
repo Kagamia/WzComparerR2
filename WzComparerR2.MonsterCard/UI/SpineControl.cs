@@ -208,7 +208,7 @@ namespace WzComparerR2.MonsterCard.UI
             this.pixel = new Texture2D(this.GraphicsDevice, 1, 1, 1, TextureUsage.None, SurfaceFormat.Color);
             pixel.SetData<uint>(new uint[] { 0xffffffff });
             this.renderer = new SkeletonMeshRenderer(GraphicsDevice);
-            this.renderer.PremultipliedAlpha = false;
+            this.renderer.PremultipliedAlpha = true;
             this.timer1.Enabled = true;
         }
 
@@ -283,7 +283,7 @@ namespace WzComparerR2.MonsterCard.UI
 
             var renderer = new SkeletonMeshRenderer(this.GraphicsDevice);
             var shader = CreateAlphaHandlerEffect();
-            renderer.PremultipliedAlpha = false;
+            renderer.PremultipliedAlpha = true;
 
             Gif gif = new Gif();
             List<byte[]> bmpCache = new List<byte[]>();

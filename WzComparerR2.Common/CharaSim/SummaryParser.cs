@@ -126,6 +126,7 @@ namespace WzComparerR2.CharaSim
                     {
                         switch (H[idx + 1])
                         {
+                            case 'c': break; // \c忽略掉 原因不明
                             case 'r': sb.Append(param.R); break;
                             case 'n': sb.Append(param.N); break;
                             case '\\': sb.Append('\\'); break;

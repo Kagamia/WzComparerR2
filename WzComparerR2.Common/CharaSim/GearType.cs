@@ -161,6 +161,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         magicStick = 125,
         /// <summary>
+        /// ESP限制器
+        /// </summary>
+        espLimiter = 126,
+        /// <summary>
         /// 单手剑 130
         /// </summary>
         ohSword = 130,
@@ -304,6 +308,10 @@ namespace WzComparerR2.CharaSim
         /// 狐狸珠 135310
         /// </summary>
         foxPearl = 135310,
+        /// <summary>
+        /// 棋子 135310
+        /// </summary>
+        chess = 135320,
         /// <summary>
         /// 手杖
         /// </summary>

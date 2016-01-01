@@ -259,6 +259,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.cygnusGem: return "珠宝";
                 case GearType.powerSource: return "能量源";
                 case GearType.foxPearl: return "狐狸珠";
+                case GearType.chess: return "棋子";
 
                 case GearType.energySword: return "能量剑";
                 case GearType.desperado: return "亡命剑";
@@ -266,6 +267,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.whistle: return "哨子";
                 case GearType.boxingClaw: return "拳爪";
                 case GearType.katana2: return "小太刀";
+                case GearType.espLimiter: return "ESP限制器";
                 default: return null;
             }
         }
@@ -360,6 +362,10 @@ namespace WzComparerR2.CharaSim
                 case GearType.katana:
                 case GearType.katana2: return "剑豪可以装备";
                 case GearType.fan: return "阴阳师可以装备";
+
+                case GearType.espLimiter:
+                case GearType.chess: return "超能力者可以装备";
+
                 default: return null;
             }
         }
@@ -591,6 +597,12 @@ namespace WzComparerR2.CharaSim
                 case 11210: return "林之灵(2次)";
                 case 11211: return "林之灵(3次)";
                 case 11212: return "林之灵(4次)";
+
+                case 14000: return "超能力者";
+                case 14200: return "超能力者(1次)";
+                case 14210: return "超能力者(2次)";
+                case 14211: return "超能力者(3次)";
+                case 14212: return "超能力者(4次)";
             }
             return null;
         }

@@ -156,9 +156,9 @@ namespace WzComparerR2.CharaSim
         /// <returns></returns>
         public static bool IsDoubleHandWeapon(GearType type)
         {
-            return (int)type >= 140 && (int)type <= 157
-                && type != GearType.shovel
-                && type != GearType.pickaxe;
+            int _type = (int)type;
+            return (_type >= 140 && _type <= 149)
+                || (_type >= 152 && _type <= 158);
         }
 
         public static bool IsMechanicGear(GearType type)
