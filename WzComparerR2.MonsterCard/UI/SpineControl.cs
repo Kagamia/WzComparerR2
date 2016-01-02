@@ -23,7 +23,7 @@ namespace WzComparerR2.MonsterCard.UI
             this.timer1 = new Timer();
             this.timer1.Interval = 30;
             this.timer1.Tick += Timer1_Tick;
-            this.effectSkeletonData = new List<KeyValuePair<string, SkeletonData>>();
+            this.effectSkeletonData = new List<KeyValuePair<string, SkeletonDataEx>>();
         }
 
         private void Timer1_Tick(object sender, EventArgs e)
@@ -59,8 +59,8 @@ namespace WzComparerR2.MonsterCard.UI
         Texture2D pixel;
 
         Wz_Node imgNode;
-        SkeletonData skeletonData;
-        List<KeyValuePair<string, SkeletonData>> effectSkeletonData;
+        SkeletonDataEx skeletonData;
+        List<KeyValuePair<string, SkeletonDataEx>> effectSkeletonData;
 
         AnimateItem aniItem;
 
@@ -68,28 +68,28 @@ namespace WzComparerR2.MonsterCard.UI
         {
             if (this.imgNode != imgNode)
             {
-                var data = LoadMobSkeleton(imgNode, useJson);
-                if (data == null) //加载失败
+                var dataEx = LoadMobSkeleton(imgNode, useJson);
+                if (dataEx.data == null) //加载失败
                 {
                     return false;
                 }
 
                 var effListNode = imgNode.FindNodeByPath("spine_effect");
-                var effList = new List<KeyValuePair<string, SkeletonData>>();
+                var effList = new List<KeyValuePair<string, SkeletonDataEx>>();
                 if (effListNode != null)
                 {
                     foreach (var effNode in effListNode.Nodes)
                     {
-                        var effData = LoadEffectSkeleton(effNode);
-                        if (effData != null)
+                        var effDataEx = LoadEffectSkeleton(effNode);
+                        if (effDataEx.data != null)
                         {
-                            effList.Add(new KeyValuePair<string, SkeletonData>(effNode.Text, effData));
+                            effList.Add(new KeyValuePair<string, SkeletonDataEx>(effNode.Text, effDataEx));
                         }
                     }
                 }
 
                 this.imgNode = imgNode;
-                this.skeletonData = data;
+                this.skeletonData = dataEx;
                 this.effectSkeletonData.Clear();
                 this.effectSkeletonData.AddRange(effList);
             }
@@ -100,40 +100,22 @@ namespace WzComparerR2.MonsterCard.UI
             return true;
         }
 
-        private SkeletonData LoadMobSkeleton(Wz_Node imgNode, bool? useJson = null)
+        private SkeletonDataEx LoadMobSkeleton(Wz_Node imgNode, bool? useJson = null)
         {
             var m = Regex.Match(imgNode.Text, "^(.+).img$");
-            if (!m.Success)
+            if (m.Success)
             {
-                goto _failed;
+                var atlasNode = imgNode.FindNodeByPath(m.Result("$1") + ".atlas");
+                if (atlasNode != null)
+                {
+                    return LoadSkeletonData(atlasNode, useJson);
+                }
             }
 
-            var atlasNode = imgNode.FindNodeByPath(m.Result("$1") + ".atlas");
-            if (atlasNode == null)
-            {
-                goto _failed;
-            }
-
-            var loadType = SkeletonLoadType.Auto;
-            if (useJson != null)
-            {
-                loadType = useJson.Value ? SkeletonLoadType.Json : SkeletonLoadType.Binary;
-            }
-
-            var skeletonData = SpineLoader.LoadSkeleton(atlasNode, loadType,
-                new WzTextureLoader(imgNode, GraphicsDevice));
-            if (skeletonData == null)
-            {
-                goto _failed;
-            }
-            return skeletonData;
-
-
-            _failed:
-            return null;
+            return new SkeletonDataEx() { data = null };
         }
 
-        private SkeletonData LoadEffectSkeleton(Wz_Node effectNode)
+        private SkeletonDataEx LoadEffectSkeleton(Wz_Node effectNode)
         {
             var regex = new Regex(@"^(.+)\.atlas$");
             Match m;
@@ -143,21 +125,38 @@ namespace WzComparerR2.MonsterCard.UI
                 return m.Success;
             });
 
-            if (atlasNode == null)
+            if (atlasNode != null)
             {
-                goto _failed;
+                return LoadSkeletonData(atlasNode, null);
+            }
+            else
+            {
+                return new SkeletonDataEx() { data = null };
+            }
+        }
+
+        private SkeletonDataEx LoadSkeletonData(Wz_Node atlasNode, bool? useJson)
+        {
+            var parentNode = atlasNode.ParentNode;
+
+            var loadType = SkeletonLoadType.Auto;
+            if (useJson != null)
+            {
+                loadType = useJson.Value ? SkeletonLoadType.Json : SkeletonLoadType.Binary;
             }
 
-            var skeletonData = SpineLoader.LoadSkeleton(atlasNode, SkeletonLoadType.Auto,
-                new WzTextureLoader(effectNode, GraphicsDevice));
+            var skeletonData = SpineLoader.LoadSkeleton(atlasNode, loadType,
+               new WzTextureLoader(parentNode, GraphicsDevice));
             if (skeletonData == null)
             {
                 goto _failed;
             }
-            return skeletonData;
 
-            _failed:
-            return null;
+            bool pma = parentNode.FindNodeByPath("PMA").GetValueEx<int>(0) != 0;
+            return new SkeletonDataEx() { data = skeletonData, preMultiAlpha = pma };
+
+        _failed:
+            return new SkeletonDataEx() { data = null };
         }
 
         private void AnimationState_Event(AnimateItem aniItem, AnimationState state, int trackIndex, Event e)
@@ -170,7 +169,7 @@ namespace WzComparerR2.MonsterCard.UI
             if (e.Data.Name == "effect")
             {
                 var aniData = this.effectSkeletonData.SelectMany(kv =>
-                    kv.Value.Animations.Select(ani => new { data = kv.Value, ani = ani })
+                    kv.Value.data.Animations.Select(ani => new { data = kv.Value, ani = ani })
                     ).FirstOrDefault(ani => ani.ani.Name == e.String);
 
                 if (aniData != null)
@@ -186,12 +185,12 @@ namespace WzComparerR2.MonsterCard.UI
             }
             else if (e.Data.Name == "mobEffect")
             {
-                var data = this.effectSkeletonData.FirstOrDefault(kv => kv.Key == e.String).Value;
+                var dataEx = this.effectSkeletonData.FirstOrDefault(kv => kv.Key == e.String).Value;
 
-                if (data != null)
+                if (dataEx.data != null)
                 {
-                    var effItem = new AnimateItem(data);
-                    effItem.ChangeAnime(data.Animations.Items[0], false);
+                    var effItem = new AnimateItem(dataEx);
+                    effItem.ChangeAnime(dataEx.data.Animations.Items[0], false);
                     effItem.AnimationEnd += (o, s, i) =>
                     {
                         aniItem.subItems.Remove(effItem);
@@ -208,7 +207,7 @@ namespace WzComparerR2.MonsterCard.UI
             this.pixel = new Texture2D(this.GraphicsDevice, 1, 1, 1, TextureUsage.None, SurfaceFormat.Color);
             pixel.SetData<uint>(new uint[] { 0xffffffff });
             this.renderer = new SkeletonMeshRenderer(GraphicsDevice);
-            this.renderer.PremultipliedAlpha = true;
+            this.renderer.PremultipliedAlpha = false;
             this.timer1.Enabled = true;
         }
 
@@ -262,6 +261,7 @@ namespace WzComparerR2.MonsterCard.UI
                 sb.End();
 
                 //渲染骨骼
+                renderer.PremultipliedAlpha = aniItem.dataEx.preMultiAlpha;
                 renderer.Begin();
                 renderer.Draw(aniItem.skeleton);
                 foreach (var eff in aniItem.subItems)
@@ -269,28 +269,26 @@ namespace WzComparerR2.MonsterCard.UI
                     renderer.Draw(eff.skeleton);
                 }
                 renderer.End();
-
-
             }
         }
 
         public System.Drawing.Bitmap SaveAsGif(int frameDelay)
         {
-            if (this.aniItem == null || this.skeletonData == null)
+            if (this.aniItem == null || this.skeletonData.data == null)
             {
                 return null;
             }
 
             var renderer = new SkeletonMeshRenderer(this.GraphicsDevice);
             var shader = CreateAlphaHandlerEffect();
-            renderer.PremultipliedAlpha = true;
+            renderer.PremultipliedAlpha = false;
 
             Gif gif = new Gif();
             List<byte[]> bmpCache = new List<byte[]>();
 
             var aniItem = new AnimateItem(this.skeletonData);
             aniItem.AnimationEvent += this.AnimationState_Event;
-            var ani = this.skeletonData.FindAnimation(this.aniItem.aniName);
+            var ani = this.skeletonData.data.FindAnimation(this.aniItem.aniName);
             aniItem.ChangeAnime(ani, false);
             aniItem.SetPosition(0, 0);
 
@@ -319,6 +317,7 @@ namespace WzComparerR2.MonsterCard.UI
                     GraphicsDevice.DepthStencilBuffer = stencil;
                     GraphicsDevice.Clear(Color.TransparentBlack);
                     renderer.Effect.World = Matrix.CreateTranslation(-rect.Left, -rect.Top, 0);
+                    renderer.PremultipliedAlpha = aniItem.dataEx.preMultiAlpha;
                     renderer.Begin();
                     renderer.Draw(aniItem.skeleton);
                     foreach (var eff in aniItem.subItems)
@@ -543,9 +542,9 @@ technique Technique0
 
         private class AnimateItem
         {
-            public AnimateItem(SkeletonData data)
+            public AnimateItem(SkeletonDataEx data)
             {
-                this.data = data;
+                this.dataEx = data;
                 this.subItems = new List<AnimateItem>();
             }
 
@@ -560,12 +559,12 @@ technique Technique0
 
             public List<AnimateItem> subItems;
 
-            private SkeletonData data;
+            public SkeletonDataEx dataEx;
 
             public void ChangeAnime(string aniName, bool loop)
             {
-                this.skeleton = new Skeleton(this.data);
-                this.aniState = new AnimationState(new AnimationStateData(data));
+                this.skeleton = new Skeleton(this.dataEx.data);
+                this.aniState = new AnimationState(new AnimationStateData(dataEx.data));
                 this.aniName = aniName;
                 this.aniState.SetAnimation(0, aniName, loop);
                 this.InitAnime();
@@ -573,8 +572,8 @@ technique Technique0
 
             public void ChangeAnime(Animation ani, bool loop)
             {
-                this.skeleton = new Skeleton(this.data);
-                this.aniState = new AnimationState(new AnimationStateData(data));
+                this.skeleton = new Skeleton(this.dataEx.data);
+                this.aniState = new AnimationState(new AnimationStateData(dataEx.data));
                 this.aniName = ani.Name;
                 this.aniState.SetAnimation(0, ani, loop);
                 this.InitAnime();
@@ -622,6 +621,12 @@ technique Technique0
 
             public delegate void EventDelegate(AnimateItem aniItem, AnimationState state, int trackIndex, Event e);
             public delegate void StartEndDelegate(AnimateItem aniItem, AnimationState state, int trackIndex);
+        }
+
+        private struct SkeletonDataEx
+        {
+            public SkeletonData data;
+            public bool preMultiAlpha;
         }
 
         private struct ModelBounds
