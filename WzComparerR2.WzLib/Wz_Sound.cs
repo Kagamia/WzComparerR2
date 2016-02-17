@@ -135,14 +135,17 @@ namespace WzComparerR2.WzLib
                         this.wz_f.FileStream.Read(data, 44, this.dataLength);
                         byte[] wavHeader = new byte[44]{
                           0x52,0x49,0x46,0x46, //"RIFF"
-                          0,0,0,0, //fileLength
-                          0x57,0x41,0x56,0x45,0x66,0x6d,0x74,0x20, //"WAVEfmt "
-                          0x10,0,0,0,
+                          0,0,0,0, //ChunkSize
+                          0x57,0x41,0x56,0x45, //"WAVE"
+
+                          0x66,0x6d,0x74,0x20, //"fmt "
+                          0x10,0,0,0, //chunk1Size
                           0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // copy16字节
-                          0x64,0x61,0x74,0x61,
-                          0,0,0,0 //dataLength
+
+                          0x64,0x61,0x74,0x61, //"data"
+                          0,0,0,0 //chunk2Size
                         };
-                        Array.Copy(BitConverter.GetBytes(this.dataLength + 44), 0, wavHeader, 4, 4);
+                        Array.Copy(BitConverter.GetBytes(this.dataLength + 36), 0, wavHeader, 4, 4);
                         Array.Copy(this.header, 0x34, wavHeader, 20, 16);
                         Array.Copy(BitConverter.GetBytes(this.dataLength), 0, wavHeader, 40, 4);
                         Array.Copy(wavHeader, data, wavHeader.Length);
