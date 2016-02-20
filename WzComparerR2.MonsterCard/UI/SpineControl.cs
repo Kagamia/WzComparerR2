@@ -294,6 +294,12 @@ namespace WzComparerR2.MonsterCard.UI
 
             int length = (int)Math.Round(ani.Duration * 1000);
             int time = 0;
+
+            var gifBgColor = Setting.GifBackGroundColor;
+            var clearColor = gifBgColor.A == 255 ? new Color(gifBgColor.R, gifBgColor.G, gifBgColor.B, 255) :
+                Color.TransparentBlack;
+            bool isTransparent = gifBgColor.A < 255;
+
             do
             {
                 aniItem.aniState.Apply(aniItem.skeleton);
@@ -315,7 +321,7 @@ namespace WzComparerR2.MonsterCard.UI
                     //渲染
                     GraphicsDevice.SetRenderTarget(0, rt);
                     GraphicsDevice.DepthStencilBuffer = stencil;
-                    GraphicsDevice.Clear(Color.TransparentBlack);
+                    GraphicsDevice.Clear(clearColor);
                     renderer.Effect.World = Matrix.CreateTranslation(-rect.Left, -rect.Top, 0);
                     renderer.PremultipliedAlpha = aniItem.dataEx.preMultiAlpha;
                     renderer.Begin();
@@ -327,17 +333,23 @@ namespace WzComparerR2.MonsterCard.UI
                     renderer.End();
 
                     //处理透明度
-                    RenderTarget2D rt2 = new RenderTarget2D(this.GraphicsDevice, rect.Width, rect.Height, 1, SurfaceFormat.Color, RenderTargetUsage.PreserveContents);
-                    GraphicsDevice.SetRenderTarget(0, rt2);
-                    GraphicsDevice.Clear(Color.TransparentBlack);
+                    if (isTransparent)
+                    {
+                        RenderTarget2D rt2 = new RenderTarget2D(this.GraphicsDevice, rect.Width, rect.Height, 1, SurfaceFormat.Color, RenderTargetUsage.PreserveContents);
+                        GraphicsDevice.SetRenderTarget(0, rt2);
+                        GraphicsDevice.Clear(Color.TransparentBlack);
 
-                    shader.Begin(SaveStateMode.None);
-                    shader.Techniques[0].Passes[0].Begin();
-                    sb.Begin(SpriteBlendMode.None);
-                    sb.Draw(rt.GetTexture(), new Rectangle(0, 0, rect.Width, rect.Height), Color.White);
-                    sb.End();
-                    shader.Techniques[0].Passes[0].End();
-                    shader.End();
+                        shader.Begin(SaveStateMode.None);
+                        shader.Techniques[0].Passes[0].Begin();
+                        sb.Begin(SpriteBlendMode.None);
+                        sb.Draw(rt.GetTexture(), new Rectangle(0, 0, rect.Width, rect.Height), Color.White);
+                        sb.End();
+                        shader.Techniques[0].Passes[0].End();
+                        shader.End();
+
+                        rt.Dispose();
+                        rt = rt2;
+                    }
 
                     //结束
                     GraphicsDevice.SetRenderTarget(0, null);
@@ -345,7 +357,7 @@ namespace WzComparerR2.MonsterCard.UI
 
                     //保存
                     byte[] bmpData = new byte[rt.Width * rt.Height * 4];
-                    rt2.GetTexture().GetData(bmpData);
+                    rt.GetTexture().GetData(bmpData);
                     bmpCache.Add(bmpData);
                     unsafe
                     {
@@ -362,7 +374,6 @@ namespace WzComparerR2.MonsterCard.UI
                     //清理
                     stencil.Dispose();
                     rt.Dispose();
-                    rt2.Dispose();
                 }
 
                 //更新时间轴
@@ -377,7 +388,7 @@ namespace WzComparerR2.MonsterCard.UI
 
             shader.Dispose();
 
-            var gifBmp = gif.EncodeGif2(Setting.GifBackGroundColor, Setting.GifMinAlphaMixed);
+            var gifBmp = gif.EncodeGif2(gifBgColor, Setting.GifMinAlphaMixed);
             bmpCache = null;
             return gifBmp;
             //this.effItems.Clear();
