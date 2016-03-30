@@ -111,7 +111,9 @@ namespace WzComparerR2.CharaSimControl
 
             if (sr.Desc != null)
             {
-                GearGraphics.DrawString(g, sr.Desc, GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
+                string hdesc = SummaryParser.GetSkillSummary(sr.Desc, skill.Level, skill.Common, SummaryParams.Default);
+                //string hStr = SummaryParser.GetSkillSummary(skill, skill.Level, sr, SummaryParams.Default);
+                GearGraphics.DrawString(g, hdesc, GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
             }
             if (skill.ReqLevel > 0)
             {
