@@ -192,7 +192,7 @@ namespace WzComparerR2.CharaSimControl
                 case GearGrade.B: return GearNameBrushD;
                 case GearGrade.A: return GearNameBrushE;
                 case GearGrade.S: return GearNameBrushF;
-                case GearGrade.SS: return GearNameBrushG;
+                case GearGrade.SS: return GreenBrush2;
             }
             return null;
         }

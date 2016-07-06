@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Drawing;
 using WzComparerR2.WzLib;
 
@@ -292,22 +293,19 @@ namespace WzComparerR2.CharaSim
 
         public static Gear CreateFromNode(Wz_Node node, GlobalFindNodeFunction findNode)
         {
-            Gear gear = new Gear();
-            int value;
-            if (node == null
-                || (value = node.Text.IndexOf(".img")) == -1
-                || !Int32.TryParse(node.Text.Substring(0, value), out value))
+            int gearID;
+            Match m = Regex.Match(node.Text, @"^(\d{8})\.img$");
+            if (!(m.Success && Int32.TryParse(m.Result("$1"), out gearID)))
+            {
                 return null;
-            gear.ItemID = value;
+            }
+            Gear gear = new Gear();
+            gear.ItemID = gearID;
             gear.type = Gear.GetGearType(gear.ItemID);
             Wz_Node infoNode = node.FindNodeByPath("info");
 
             if (infoNode != null)
             {
-                Dictionary<string, GearPropType> gearPropTypeDict = new Dictionary<string, GearPropType>();
-                foreach (GearPropType type in Enum.GetValues(typeof(GearPropType)))
-                    gearPropTypeDict[type.ToString()] = type;
-
                 foreach (Wz_Node subNode in infoNode.Nodes)
                 {
                     switch (subNode.Text)
@@ -471,7 +469,7 @@ namespace WzComparerR2.CharaSim
                             foreach (Wz_Node statNode in subNode.Nodes)
                             {
                                 GearPropType type;
-                                if (gearPropTypeDict.TryGetValue(statNode.Text, out type))
+                                if (Enum.TryParse(statNode.Text, out type))
                                 {
                                     try
                                     {
@@ -487,7 +485,7 @@ namespace WzComparerR2.CharaSim
                         default:
                             {
                                 GearPropType type;
-                                if (gearPropTypeDict.TryGetValue(subNode.Text, out type))
+                                if (Enum.TryParse(subNode.Text, out type))
                                 {
                                     try
                                     {
@@ -502,6 +500,8 @@ namespace WzComparerR2.CharaSim
                     }
                 }
             }
+            int value;
+
             //读取默认可升级状态
             if (gear.Props.TryGetValue(GearPropType.tuc, out value) && value > 0)
             {

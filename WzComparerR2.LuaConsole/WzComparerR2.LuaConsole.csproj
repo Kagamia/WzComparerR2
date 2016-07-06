@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WzComparerR2.LuaConsole</RootNamespace>
     <AssemblyName>WzComparerR2.LuaConsole</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,10 +46,6 @@
     </Reference>
     <Reference Include="KopiLua">
       <HintPath>..\References\KopiLua.dll</HintPath>
-    </Reference>
-    <Reference Include="LinqBridge">
-      <HintPath>..\References\LinqBridge.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="NLua">
       <HintPath>..\References\NLua.dll</HintPath>

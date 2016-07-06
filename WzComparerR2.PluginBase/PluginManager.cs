@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Collections.ObjectModel;
 using DevComponents.DotNetBar;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace WzComparerR2.PluginBase
 {
@@ -105,52 +106,29 @@ namespace WzComparerR2.PluginBase
             return fileList.ToArray();
         }
 
-        internal static void LoadPlugin(AppDomain appDomain, string pluginFileName, PluginContext context)
+        internal static IEnumerable<PluginInfo> LoadPlugin(Assembly assembly, PluginContext context)
         {
-            try
-            {
-                //加载程序集
-                var asmName = AssemblyName.GetAssemblyName(pluginFileName);
-                Assembly asm = appDomain.Load(asmName);
-                //寻找入口类
-                Type baseType = typeof(PluginEntry);
-                foreach (var type in asm.GetExportedTypes())
+            var baseType = typeof(PluginEntry);
+            return assembly.GetExportedTypes().Where(type => type.IsSubclassOf(baseType) && !type.IsAbstract)
+                .Select(type =>
                 {
-                    if (type.IsSubclassOf(baseType) && !type.IsAbstract)
+                    try
                     {
-                        ConstructorInfo ctor = type.GetConstructor(new[] { typeof(PluginContext) });
-                        if (ctor != null)
+                        var entry = Activator.CreateInstance(type, context) as PluginEntry;
+                        var plugin = new PluginInfo()
                         {
-                            try
-                            {
-                                var instance = ctor.Invoke(new object[] { context });
-                                loadedPlugins.Add(new PluginInfo()
-                                {
-                                    Assembly = asm,
-                                    FileName = pluginFileName,
-                                    Instance = instance as PluginEntry
-                                });
-                            }
-                            catch //构造函数执行失败
-                            {
-                            }
-                        }
+                            Assembly = assembly,
+                            FileName = assembly.CodeBase,
+                            Instance = entry,
+                        };
+                        loadedPlugins.Add(plugin);
+                        return plugin;
                     }
-                }
-            }
-            catch //加载程序集失败
-            {
-            }
-        }
-
-        internal static void LoadPlugin(PluginContext context)
-        {
-            string[] allFiles = GetPluginFiles();
-
-            foreach (var file in allFiles)
-            {
-                LoadPlugin(AppDomain.CurrentDomain, file, context);
-            }
+                    catch
+                    {
+                        return null;
+                    }
+                }).OfType<PluginInfo>();
         }
 
         internal static void PluginOnLoad()

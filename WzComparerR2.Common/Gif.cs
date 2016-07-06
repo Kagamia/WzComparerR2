@@ -112,16 +112,16 @@ namespace WzComparerR2.Common
             Rectangle rect = this.GetRect();
             string tempFileName = Path.GetTempFileName();
 
-            GifEncoder enc;
+            IndexGifEncoder enc;
             byte a = backgrnd.A;
             Color backgrndColor = Color.FromArgb(255, backgrnd);
             if (a == 0xff) //纯色
             {
-                enc = new GifEncoder(tempFileName, rect.Width, rect.Height, 256, backgrnd);
+                enc = new IndexGifEncoder(tempFileName, rect.Width, rect.Height, 256, backgrnd);
             }
             else //透明混色
             {
-                enc = new GifEncoder(tempFileName, rect.Width, rect.Height, 256, Color.Transparent);
+                enc = new IndexGifEncoder(tempFileName, rect.Width, rect.Height, 256, Color.Transparent);
             }
 
             Bitmap picFrame = new Bitmap(rect.Width, rect.Height, PixelFormat.Format32bppArgb);
@@ -180,14 +180,13 @@ namespace WzComparerR2.Common
                 0x03,0x01,0x00,0x00,0x00};//循环信息 其他信息
         private static readonly byte[] gifEnd = new byte[] { 0x3b };//结束信息
 
-
-
         private static Bitmap PrepareFrame(IGifFrame frame, Rectangle canvasRect, Color backgrnd, int minAlpha)
         {
             Bitmap gifFrame = new Bitmap(canvasRect.Width, canvasRect.Height, PixelFormat.Format32bppArgb);
             PrepareFrame(gifFrame, frame, canvasRect, backgrnd, minAlpha);
             return gifFrame;
         }
+
         /// <summary>
         /// 预处理帧坐标，生成新的图片。
         /// </summary>
@@ -301,16 +300,8 @@ namespace WzComparerR2.Common
             }
             if (frameNode.Value is Wz_Png)
             {
-                string source = frameNode.Nodes["source"].GetValueEx<string>(null);
-                Wz_Png png = null;
-                if (!string.IsNullOrEmpty(source) && findNode != null)
-                {
-                    png = findNode(source).GetValueEx<Wz_Png>(null);
-                }
-                if (png == null)
-                {
-                    png = (Wz_Png)frameNode.Value;
-                }
+                var linkNode = frameNode.GetLinkedSourceNode(findNode);
+                Wz_Png png = linkNode?.GetValue<Wz_Png>() ?? (Wz_Png)frameNode.Value;
 
                 var gifFrame = new GifFrame(png.ExtractPng());
                 foreach (Wz_Node propNode in frameNode.Nodes)

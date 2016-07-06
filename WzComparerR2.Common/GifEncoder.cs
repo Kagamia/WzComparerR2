@@ -1,52 +1,49 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
 
 namespace WzComparerR2.Common
 {
-    public class GifEncoder : IDisposable
+    public abstract class GifEncoder : IDisposable
     {
-        public GifEncoder(string location, int width, int height, int max_color, Color back_color)
+        protected GifEncoder(string fileName, int width, int height)
         {
-            encoder_pointer = construct(location, width, height, max_color, back_color.ToArgb());
+            this.FileName = fileName;
+            this.Width = width;
+            this.Height = height;
         }
 
-        private IntPtr encoder_pointer;
+        public string FileName { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
 
-        public void AppendFrame(Bitmap image, int delay)
+        public virtual void AppendFrame(Bitmap image, int delay)
         {
             BitmapData data = image.LockBits(new Rectangle(Point.Empty, image.Size), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-
-            encoder.append_frame(data.Scan0, delay, encoder_pointer);
-
+            this.AppendFrame(data.Scan0, delay);
             image.UnlockBits(data);
         }
 
+        public abstract void AppendFrame(IntPtr pBuffer, int delay);
+
+
         public void Dispose()
         {
-            encoder.destruct(encoder_pointer);
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        private gif_encoder_structure encoder
+        protected virtual void Dispose(bool disposing)
         {
-            get
-            {
-                return (gif_encoder_structure)Marshal.PtrToStructure(encoder_pointer, typeof(gif_encoder_structure));
-            }
+
         }
 
-        [DllImport("libgif.dll", EntryPoint = "#1", CharSet = CharSet.Unicode)]
-        private extern static IntPtr construct(string location, int width, int height, int maxColor, int backColor);
-
-        private delegate void gif_encoder_destruct(IntPtr encoder_pointer);
-        private delegate void gif_encoder_append_frame(IntPtr pixels, int delay, IntPtr encoder_pointer);
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct gif_encoder_structure
+        ~GifEncoder()
         {
-            public gif_encoder_destruct destruct;
-            public gif_encoder_append_frame append_frame;
+            this.Dispose(false);
         }
     }
 }

@@ -29,6 +29,7 @@ namespace WzComparerR2.WzLib
         public readonly object ReadLock = new object();
 
         internal Dictionary<int, string> stringTable;
+        internal byte[] tempBuffer;
 
         public FileStream FileStream
         {
@@ -125,21 +126,16 @@ namespace WzComparerR2.WzLib
 
         public string ReadString(int offset)
         {
-            return ReadString(offset, false);
-        }
-
-        public string ReadString(int offset, bool use_enc)
-        {
             byte b = this.BReader.ReadByte();
             switch (b)
             {
                 case 0x00:
                 case 0x73:
-                    return ReadString(use_enc);
+                    return ReadString();
 
                 case 0x01:
                 case 0x1B:
-                    return ReadStringAt(offset + this.BReader.ReadInt32(), use_enc);
+                    return ReadStringAt(offset + this.BReader.ReadInt32());
 
                 case 0x04:
                     this.FileStream.Position += 8;
@@ -151,33 +147,22 @@ namespace WzComparerR2.WzLib
             return string.Empty;
         }
 
-        public string ReadStringAt(int offset)
-        {
-            return ReadStringAt(offset, false);
-        }
-
-        public string ReadStringAt(int offset, bool use_enc)
+        public string ReadStringAt(int offset, bool useEnc = false)
         {
             long oldoffset = this.FileStream.Position;
             string str;
             if (!stringTable.TryGetValue(offset, out str))
             {
                 this.FileStream.Position = offset;
-                str = ReadString(use_enc);
+                str = ReadString();
                 stringTable[offset] = str;
                 this.FileStream.Position = oldoffset;
             }
             return str;
         }
 
-        public string ReadString()
+        public unsafe string ReadString()
         {
-            return ReadString(false);
-        }
-
-        public unsafe string ReadString(bool use_enc)
-        {
-            use_enc |= this.WzStructure.encryption.all_strings_encrypted;
             int size = this.BReader.ReadSByte();
 
             if (size < 0)
@@ -185,13 +170,11 @@ namespace WzComparerR2.WzLib
                 byte mask = 0xAA;
                 size = (size == -128) ? this.BReader.ReadInt32() : -size;
 
-                byte[] data = this.BReader.ReadBytes(size);
+                var buffer = GetStringBuffer(size);
+                this.fileStream.Read(buffer, 0, size);
+                this.WzStructure.encryption.keys.Decrypt(buffer, 0, size);
 
-                if (use_enc)
-                {
-                    this.WzStructure.encryption.keys.Decrypt(data, 0, data.Length);
-                }
-                fixed (byte* pData = data)
+                fixed (byte* pData = buffer)
                 {
                     for (int i = 0; i < size; i++)
                     {
@@ -210,14 +193,11 @@ namespace WzComparerR2.WzLib
                     size = this.BReader.ReadInt32();
                 }
 
-                byte[] data = this.BReader.ReadBytes(size * 2);
+                var buffer = GetStringBuffer(size * 2);
+                this.fileStream.Read(buffer, 0, size * 2);
+                this.WzStructure.encryption.keys.Decrypt(buffer, 0, size * 2);
 
-                if (use_enc)
-                {
-                    this.WzStructure.encryption.keys.Decrypt(data, 0, data.Length);
-                }
-
-                fixed (byte* pData = data)
+                fixed (byte* pData = buffer)
                 {
                     ushort* pChar = (ushort*)pData;
                     for (int i = 0; i < size; i++)
@@ -232,6 +212,27 @@ namespace WzComparerR2.WzLib
             else
             {
                 return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// 为字符串解密提供缓冲区。
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        private byte[] GetStringBuffer(int size)
+        {
+            if (size <= 4096)
+            {
+                if (tempBuffer == null || tempBuffer.Length < size)
+                {
+                    Array.Resize(ref tempBuffer, size);
+                }
+                return tempBuffer;
+            }
+            else
+            {
+                return new byte[size];
             }
         }
 

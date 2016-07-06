@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WzComparerR2</RootNamespace>
     <AssemblyName>WzComparerR2</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <PublishUrl>发布\</PublishUrl>
@@ -70,10 +70,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
     </Reference>
-    <Reference Include="LinqBridge">
-      <HintPath>..\References\LinqBridge.dll</HintPath>
+    <Reference Include="MonoGame.Framework, Version=3.4.0.456, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -99,7 +101,10 @@
     <Compile Include="CharaSimControl\ItemMouseEventArgs.cs" />
     <Compile Include="CharaSimControl\ItemMouseEventHandler.cs" />
     <Compile Include="CharaSimControl\ItemTooltipRender2.cs" />
+    <Compile Include="CharaSimControl\MobTooltipRenderer.cs" />
+    <Compile Include="CharaSimControl\NpcTooltipRenderer.cs" />
     <Compile Include="CharaSimControl\RecipeTooltipRender.cs" />
+    <Compile Include="CharaSimControl\RenderHelper.cs" />
     <Compile Include="CharaSimControl\SetItemTooltipRender.cs" />
     <Compile Include="CharaSimControl\SkillTooltipRender.cs" />
     <Compile Include="CharaSimControl\SkillTooltipRender2.cs" />
@@ -108,6 +113,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="CharaSimControl\GearGraphics.cs" />
+    <Compile Include="CharaSimControl\TextBlock.cs" />
     <Compile Include="CharaSim\Character.cs" />
     <Compile Include="CharaSim\CharacterStatus.cs" />
     <Compile Include="CharaSim\CharaEquip.cs" />
@@ -115,6 +121,16 @@
     <Compile Include="CharaSim\CharaSimLoader.cs" />
     <Compile Include="Comparer\WzVirtualNode.cs" />
     <Compile Include="Comparer\WzPngComparison.cs" />
+    <Compile Include="Config\CharaSimConfig.cs" />
+    <Compile Include="Config\CharaSimGearConfig.cs" />
+    <Compile Include="Config\CharaSimItemConfig.cs" />
+    <Compile Include="Config\CharaSimMobConfig.cs" />
+    <Compile Include="Config\CharaSimNpcConfig.cs" />
+    <Compile Include="Config\CharaSimRecipeConfig.cs" />
+    <Compile Include="Config\CharaSimSkillConfig.cs" />
+    <Compile Include="Config\ImageHandlerConfig.cs" />
+    <Compile Include="Config\MosaicInfo.cs" />
+    <Compile Include="Config\WcR2Config.cs" />
     <Compile Include="DBConnection.cs" />
     <Compile Include="FrmAbout.cs">
       <SubType>Form</SubType>
@@ -160,6 +176,7 @@
     <Compile Include="Patcher\Builder\BuildInstruction.cs" />
     <Compile Include="Patcher\Builder\BuildType.cs" />
     <Compile Include="Patcher\Builder\PatchPart.cs" />
+    <Compile Include="Patcher\PatcherSettingCollection.cs" />
     <Compile Include="Patcher\ReversePatcherBuilder.cs" />
     <Compile Include="Patcher\PatcherSetting.cs" />
     <Compile Include="Patcher\PatchingEventArgs.cs" />
@@ -167,8 +184,9 @@
     <Compile Include="Patcher\PatchPartContext.cs" />
     <Compile Include="Patcher\Builder\WzPatcherReader.cs" />
     <Compile Include="Patcher\Builder\WzPatcherWriter.cs" />
-    <Compile Include="SettingItem.cs" />
-    <Compile Include="SettingItemCollection.cs" />
+    <Compile Include="PictureBoxEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="SoundPlayer\CustomSoundFile.cs" />
     <Compile Include="SoundPlayer\ISoundFile.cs" />
     <Compile Include="SoundPlayer\ISoundPlayer.cs" />
@@ -186,7 +204,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="QueryPerformance.cs" />
-    <Compile Include="Setting.cs" />
     <Compile Include="SoundPlayer\BassSoundPlayer.cs" />
     <Compile Include="SoundPlayer\PlayState.cs" />
     <Compile Include="HistoryList.cs" />
@@ -293,14 +310,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="libgif.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <Content Include="wcr2_256.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(SolutionDir)References\x86\*" "$(TargetDir)x86" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(SolutionDir)References\x86\*" "$(TargetDir)Lib\x86" /Y /I
+xcopy "$(SolutionDir)References\x64\*" "$(TargetDir)Lib\x64" /Y /I</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

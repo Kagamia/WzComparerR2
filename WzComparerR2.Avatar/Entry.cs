@@ -8,6 +8,7 @@ using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
 using WzComparerR2.Common;
 using WzComparerR2.Avatar.UI;
+using System.Linq;
 
 namespace WzComparerR2.Avatar
 {
@@ -31,7 +32,7 @@ namespace WzComparerR2.Avatar
 
         public SuperTabItem Tab { get; private set; }
 
-        void btnSetting_Click(object sender, EventArgs e)
+        public void btnSetting_Click(object sender, EventArgs e)
         {
             AvatarCanvas canvas = new AvatarCanvas();
             canvas.LoadZ();
@@ -66,10 +67,10 @@ namespace WzComparerR2.Avatar
             AddPart(canvas, "Character\\Hair\\00030000.img");
             AddPart(canvas, "Character\\Coat\\01040036.img");
             AddPart(canvas, "Character\\Pants\\01060026.img");
-            //AddPart(canvas, "Character\\Weapon\\01442000.img");
+            AddPart(canvas, "Character\\Weapon\\01442000.img");
             //AddPart(canvas, "Character\\Weapon\\01382007.img");
-            AddPart(canvas, "Character\\Weapon\\01332000.img");
-            AddPart(canvas, "Character\\Weapon\\01342000.img");
+            //AddPart(canvas, "Character\\Weapon\\01332000.img");
+            //AddPart(canvas, "Character\\Weapon\\01342000.img");
 
             var faceFrames = canvas.GetFaceFrames(canvas.EmotionName);
 
@@ -101,19 +102,21 @@ namespace WzComparerR2.Avatar
 
             {
 
-                Gif gif = CreateContinueAction(canvas);
-                var gifFile = gif.EncodeGif(Color.Gray);
-                string fileName = "D:\\d4";
+                Gif gif = CreateKeyDownAction(canvas);
+                var gifFile = gif.EncodeGif(Color.Transparent, 0);
+                string fileName = "D:\\d12";
 
-                var fd = new System.Drawing.Imaging.FrameDimension(gifFile.FrameDimensionsList[0]);
-                //获取帧数(gif图片可能包含多帧，其它格式图片一般仅一帧)
-                int count = gifFile.GetFrameCount(fd);
-                for (int i = 0; i < count; i++)
+                if (false)
                 {
-                    gifFile.SelectActiveFrame(fd, i);
-                    gifFile.Save(fileName + "_" + i + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                    var fd = new System.Drawing.Imaging.FrameDimension(gifFile.FrameDimensionsList[0]);
+                    //获取帧数(gif图片可能包含多帧，其它格式图片一般仅一帧)
+                    int count = gifFile.GetFrameCount(fd);
+                    for (int i = 0; i < count; i++)
+                    {
+                        gifFile.SelectActiveFrame(fd, i);
+                        gifFile.Save(fileName + "_" + i + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                    }
                 }
-
                 gifFile.Save(fileName + (gif.Frames.Count == 1 ? ".png" : ".gif"));
                 gifFile.Dispose();
             }
@@ -138,10 +141,13 @@ namespace WzComparerR2.Avatar
             //foreach (string act in new[] { "alert", "swingP1PoleArm", "doubleSwing", "tripleSwing" })
             //foreach (var act in new object[] { "alert", "swingP1PoleArm", "overSwingDouble", "overSwingTriple" })
             var faceFrames = canvas.GetFaceFrames(canvas.EmotionName);
+            //foreach (string act in new[] { "PBwalk1", "PBstand4", "PBstand5" })
 
             foreach (var act in new object[] {
-                //PluginManager.FindWz("Skill\\2112.img\\skill\\21120015"),
-                //PluginManager.FindWz("Skill\\2112.img\\skill\\21120009"),
+                
+                PluginManager.FindWz("Skill\\2312.img\\skill\\23121004"),
+                "stand1",
+                PluginManager.FindWz("Skill\\2312.img\\skill\\23121052"),
                 //PluginManager.FindWz("Skill\\2112.img\\skill\\21120010"),
 
                 //PluginManager.FindWz("Skill\\200.img\\skill\\2001002"),
@@ -149,8 +155,8 @@ namespace WzComparerR2.Avatar
                 //PluginManager.FindWz("Skill\\230.img\\skill\\2301004"),
                 //PluginManager.FindWz("Skill\\231.img\\skill\\2311003"),
 
-                PluginManager.FindWz("Skill\\433.img\\skill\\4331006"),
-                "alert"
+                //PluginManager.FindWz("Skill\\13100.img\\skill\\131001010"),
+                //"PBwalk1"
             })
             {
                 string actionName = null;
@@ -163,12 +169,13 @@ namespace WzComparerR2.Avatar
                 }
                 else if (act is Wz_Node)
                 {
-                    Wz_Node skillNode = (Wz_Node)act;
+                    Wz_Node skillNode = (Wz_Node)(object)act;
                     actionName = skillNode.FindNodeByPath("action\\0").GetValueEx<string>(null);
-                    if (!string.IsNullOrEmpty("afterImage"))
+                    if (!string.IsNullOrEmpty(afterImage))
                     {
                         afterImageNode = skillNode.FindNodeByPath("afterimage\\" + afterImage);
                     }
+
                     for (int i = -1; ; i++)
                     {
                         Wz_Node effNode = skillNode.FindNodeByPath("effect" + (i > -1 ? i.ToString() : ""));
@@ -182,7 +189,8 @@ namespace WzComparerR2.Avatar
                 {
                     continue;
                 }
-                afterImageNode = afterImageNode ?? defaultAfterImageNode;
+
+                //afterImageNode = afterImageNode ?? defaultAfterImageNode;
 
 
                 //添加特效帧
@@ -209,7 +217,7 @@ namespace WzComparerR2.Avatar
                     if (frame.Delay != 0)
                     {
                         //绘制角色主动作
-                        var bone = canvas.CreateFrame(frame, faceFrames[0], null);
+                        var bone = canvas.CreateFrame(frame, null, null);
                         var bmp = canvas.DrawFrame(bone, frame);
                         GifFrame f = new GifFrame(bmp.Bitmap, bmp.Origin, Math.Abs(frame.Delay));
                         gifCanvas.Layers[0].Frames.Add(f);
@@ -240,6 +248,105 @@ namespace WzComparerR2.Avatar
                 }
 
             }
+
+            return gifCanvas.Combine();
+        }
+
+        private Gif CreateKeyDownAction(AvatarCanvas canvas)
+        {
+            string afterImage = null;
+            Wz_Node defaultAfterImageNode = null;
+            if (canvas.Weapon != null)
+            {
+                afterImage = canvas.Weapon.Node.FindNodeByPath(false, "info", "afterImage").GetValueEx<string>(null);
+                if (!string.IsNullOrEmpty(afterImage))
+                {
+                    defaultAfterImageNode = PluginManager.FindWz("Character\\Afterimage\\" + afterImage + ".img\\10");
+                }
+            }
+
+            GifCanvas gifCanvas = new GifCanvas();
+            var layers = new List<Tuple<GifLayer, int>>();
+            var actLayer = new GifLayer();
+
+            //gifCanvas.Layers.Add(new GifLayer());
+            int delay = 0;
+            var faceFrames = canvas.GetFaceFrames(canvas.EmotionName);
+
+            var skillNode = PluginManager.FindWz("Skill\\2112.img\\skill\\21120018");
+            var actionName = skillNode.FindNodeByPath("action\\0").GetValueEx<string>(null);
+
+            int keydownCount = 2;
+
+            foreach (var part in new [] {"prepare", "keydown", "keydownend"})
+            {
+                var effects = new List<Tuple<Gif,int>>();
+
+                for (int i = -1; ; i++)
+                {
+                    Wz_Node effNode = skillNode.FindNodeByPath(part + (i > -1 ? i.ToString() : ""));
+                    if (effNode == null)
+                        break;
+                    var gif = Gif.CreateFromNode(effNode, PluginManager.FindWz);
+                    var z = effNode.FindNodeByPath("z").GetValueEx(0);
+                    effects.Add(new Tuple<Gif, int>(gif, z));
+                }
+
+                int effDelay = 0;
+                //添加特效帧
+                foreach (var effGif in effects)
+                {
+                    if (effGif.Item1 != null && effGif.Item1.Frames.Count > 0)
+                    {
+                        var layer = new GifLayer();
+                        if (delay > 0)
+                        {
+                            layer.AddBlank(delay);
+                        }
+
+                        int fDelay = 0;
+
+                        for(int i = 0, i0 = part == "keydown" ? keydownCount : 1; i < i0; i++)
+                        {
+                            effGif.Item1.Frames.ForEach(af => layer.AddFrame((GifFrame)af));
+                            layers.Add(new Tuple<GifLayer, int>(layer,effGif.Item2));
+                            fDelay+= effGif.Item1.Frames.Select(f => f.Delay).Sum();
+                        }
+
+                        effDelay = Math.Max(fDelay, effDelay);
+                    }
+                }
+
+                delay += effDelay;
+            }
+
+
+            //添加角色帧
+            ActionFrame[] actionFrames = canvas.GetActionFrames(actionName);
+            int adelay = 0;
+            while (adelay < delay)
+            {
+                for (int i = 0; i < actionFrames.Length; i++)
+                {
+                    var frame = actionFrames[i];
+
+                    if (frame.Delay != 0)
+                    {
+                        //绘制角色主动作
+                        var bone = canvas.CreateFrame(frame, null, null);
+                        var bmp = canvas.DrawFrame(bone, frame);
+                        GifFrame f = new GifFrame(bmp.Bitmap, bmp.Origin, Math.Abs(frame.Delay));
+                        actLayer.Frames.Add(f);
+                        adelay += f.Delay;
+                        //delay += f.Delay;
+                    }
+                }
+            }
+
+            layers.Add(new Tuple<GifLayer, int>(actLayer, 0));
+            //按照z排序
+            layers.Sort((a, b) => a.Item2.CompareTo(b.Item2));
+            gifCanvas.Layers.AddRange(layers.Select(t => t.Item1));
 
             return gifCanvas.Combine();
         }

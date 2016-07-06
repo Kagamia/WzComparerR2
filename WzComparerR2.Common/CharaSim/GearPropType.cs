@@ -16,14 +16,19 @@ namespace WzComparerR2.CharaSim
         incLUK,
         incLUKr,
         incAllStat,
+        incMHP_incMMP,
+        incMHPr_incMMPr,
         incMHP,
         incMHPr,
         incMMP,
         incMMPr,
+        incPAD_incMAD,
         incPAD,
         incMAD,
+        incPDD_incMDD,
         incPDD,
         incMDD,
+        incACC_incEVA,
         incACC,
         incEVA,
         incSpeed,
@@ -149,6 +154,6 @@ namespace WzComparerR2.CharaSim
         limitBreak,
         nActivatedSocket,
         jokerToSetItem,
-        
+        medalTag,
     }
 }

@@ -7,281 +7,300 @@ namespace WzComparerR2
 {
     public static class Calculator
     {
-        public static double Parse(string mathExpression, params double[] args)
+        public static decimal Parse(string mathExpression, params decimal[] args)
         {
-            
-            List<string> split = Split(mathExpression);
-            PreTreat(split);
-            SuffixExpression(split);
-            Dictionary<string, double> argDict = null;
+            var tokens = Lexer(mathExpression);
+            var inst = Suffix(tokens);
+
+            var paramList = new Dictionary<string, object>(){
+                { "u", (Func<decimal,decimal>)Math.Ceiling },
+                { "d", (Func<decimal,decimal>)Math.Floor },
+            };
+
             if (args != null)
             {
-                argDict = new Dictionary<string, double>(args.Length);
                 for (int i = 0; i < args.Length; i++)
                 {
                     switch (i)
                     {
-                        case 0: argDict["x"] = args[0]; break;
-                        case 1: argDict["y"] = args[1]; break;
-                        case 2: argDict["z"] = args[2]; break;
-                        case 3: argDict["w"] = args[3]; break;
+                        case 0: paramList["x"] = args[0]; break;
+                        case 1: paramList["y"] = args[1]; break;
+                        case 2: paramList["z"] = args[2]; break;
+                        case 3: paramList["w"] = args[3]; break;
                     }
                 }
             }
-            double value = Calculate(split, argDict);
-            return value;
+
+            return Execute(inst, paramList);
         }
 
-        private static List<string> Split(string mathExpression)
+        private static List<Token> Lexer(string expr)
         {
-            List<string> listStr = new List<string>();
-            if (string.IsNullOrEmpty(mathExpression))
-                return listStr;
+            var tokens = new List<Token>();
+            if (string.IsNullOrEmpty(expr))
+                return tokens;
 
-            int begin = -1, len = 0, type = -1;
-            for (int i = 0; i <= mathExpression.Length; i++)
+            int begin;
+            for (int i = 0; i < expr.Length; i++)
             {
-                int t = (i == mathExpression.Length) ? 0 : GetCharType(mathExpression[i]);
-                if (t == 0)
+                switch (expr[i])
                 {
-                    if (len != 0)
-                    {
-                        listStr.Add(mathExpression.Substring(begin, len));
-                        len = 0;
-                    }
-                }
-                else
-                {
-                    if (len > 0 && !(t == type || t + type == 9))//符号类别和当前缓存不相同
-                    {
-                        listStr.Add(mathExpression.Substring(begin, len));
-                        len = 0;
-                    }
-                    if (len == 0)
-                    {
-                        begin = i;
-                        type = t;
-                    }
-                    len++;
-                }
-            }
-            return listStr;
-        }
-
-        private static void PreTreat(List<string> split)
-        {
-            if (split == null)
-                return;
-            for (int i = 0; i < split.Count; i++)
-            {
-                if ((split[i] == "+" || split[i] == "-")
-                    && (i == 0 || split[i - 1] == "("))
-                {
-                    split.Insert(i++, "0");
-                }
-            }
-        }
-
-        private static void SuffixExpression(List<string> split)
-        {
-            List<string> result = new List<string>(split.Count);
-            Stack<string> stack = new Stack<string>(split.Count);
-
-            foreach (string str in split)
-            {
-                if (IsOperator(str) || IsFunction(str))
-                {
-                    if (str == "(")
-                    {
-                        stack.Push(str);
-                    }
-                    else if (str == ")")
-                    {
-                        while (stack.Count > 0)
-                        {
-                            string temp = stack.Pop();
-                            if (temp == "(")
-                                break;
-                            else
-                                result.Add(temp);
-                        }
-                    }
-                    else
-                    {
-                        if (stack.Count > 0)
-                        {
-                            while (stack.Count > 0)
+                    case '+':
+                    case '-':
+                    case '*':
+                    case '/': tokens.Add(new Token(TokenType.Operator, expr[i].ToString())); break;
+                    case '.': tokens.Add(new Token(TokenType.Dot, null)); break;
+                    case '(': tokens.Add(new Token(TokenType.BracketStart, null)); break;
+                    case ')': tokens.Add(new Token(TokenType.BracketEnd, null)); break;
+                    case ',': tokens.Add(new Token(TokenType.Comma, null)); break;
+                    case ' ': break; //whitespace当不存在
+                    default:
+                        if (char.IsDigit(expr[i]))
+                        { //尽力读取number
+                            begin = i;
+                            bool dot = false;
+                            while (++i < expr.Length)
                             {
-                                string temp = stack.Pop();
-                                if (GetPriority(str) > GetPriority(temp))
+                                if (char.IsDigit(expr[i]))
                                 {
-                                    stack.Push(temp);
-                                    stack.Push(str);
-                                    break;
+                                    //继续读
+                                }
+                                else if (expr[i] == '.' && !dot)
+                                {
+                                    dot = true;
                                 }
                                 else
                                 {
-                                    result.Add(temp);
-                                    if (stack.Count == 0)
-                                    {
-                                        stack.Push(str);
-                                        break;
-                                    }
+                                    break;
                                 }
+                            }
+                            tokens.Add(new Token(TokenType.Number, expr.Substring(begin, i - begin)));
+                            i--;
+                        }
+                        else if (char.IsLetter(expr[i]))
+                        { //尽力读取id
+                            begin = i;
+                            while (++i < expr.Length)
+                            {
+                                if (!char.IsLetterOrDigit(expr[i]))
+                                {
+                                    break;
+                                }
+                            }
+                            tokens.Add(new Token(TokenType.ID, expr.Substring(begin, i - begin)));
+                            i--;
+                        }
+                        else
+                        { //无效字符
+                            throw new Exception("Unknown char '" + expr[i] + "'.");
+                        }
+                        break;
+                }
+            }
+            return tokens;
+        }
+
+        //suffix 逆波兰表达式
+        private static List<Token> Suffix(List<Token> tokens)
+        {
+            var value = new List<Token>();
+            var stack = new Stack<Token>();
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                var token = tokens[i];
+                switch (token.Type)
+                {
+                    case TokenType.BracketStart: //括号 推进stack
+                        stack.Push(token);
+                        if (token.Tag ==  Tag.Call)
+                            value.Add(new Token(TokenType.CallStart, ""));
+                        break;
+
+                    case TokenType.BracketEnd: //括号结束 弹出到上一个括号
+                        {
+                            Token t;
+                            int count = 0;
+                            while ((t = stack.Pop()) != null)
+                            {
+                                if (t.Type != TokenType.BracketStart)
+                                {
+                                    value.Add(t);
+                                    count++;
+                                }
+                                else
+                                {
+                                    if (t.Tag == Tag.Call)
+                                        value.Add(new Token(TokenType.CallEnd, ""));
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+
+                    case TokenType.Operator: //运算符
+                        if (i == 0 || tokens[i - 1].Type == TokenType.BracketStart || tokens[i - 1].Type == TokenType.Operator)
+                        { //独立判定一元运算符
+                            token.Tag = Tag.Unary;
+                        }
+                        goto case TokenType.Dot;
+                    case TokenType.Dot: //取成员
+                        while (stack.Count > 0)
+                        { //比较优先级
+                            Token t = stack.Peek();
+                            if (Priority(token) > Priority(t)
+                                || (token.Tag == Tag.Unary && t.Tag == Tag.Unary))
+                            { //优先级比上个高
+                                break;
+                            }
+                            else
+                            {
+                                value.Add(stack.Pop());
+                            }
+                        }
+                        stack.Push(token);
+                        break;
+
+                    case TokenType.ID: //预判如果后面是括号 当成函数处理
+                        value.Add(token);
+                        if (i + 1 < tokens.Count && tokens[i + 1].Type == TokenType.BracketStart)
+                        {
+                            while (stack.Count > 0)
+                            {
+                                Token t = stack.Peek();
+                                if (t.Type == TokenType.Dot)
+                                {
+                                    value.Add(stack.Pop());
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            //标记下一个括号为call
+                            tokens[i + 1].Tag = Tag.Call;
+                        }
+                        break;
+
+                    case TokenType.Number:
+                        value.Add(token);
+                        break;
+
+                    case TokenType.Comma: //逗号 忽略好像也没事..感觉像卖萌的..
+                        break;
+                }
+            }
+
+            value.AddRange(stack);
+            return value;
+        }
+
+        private static decimal Execute(List<Token> inst, Dictionary<string, object> param)
+        {
+            var stack = new Stack<object>();
+            object obj;
+            decimal d1, d2;
+            foreach (var token in inst)
+            {
+                switch (token.Type)
+                {
+                    case TokenType.Number: stack.Push(Convert.ToDecimal(token.Value)); break;
+                    case TokenType.ID:
+                        if (param.TryGetValue(token.Value, out obj))
+                        {
+                            stack.Push(obj);
+                        }
+                        else
+                        {
+                            throw new Exception("ID '" + token.Value + "' not found.");
+                        }
+                        break;
+                    case TokenType.Operator:
+                        if (token.Tag == Tag.Unary)
+                        {
+                            d1 = Convert.ToDecimal(stack.Pop());
+                            switch (token.Value)
+                            {
+                                case "+": stack.Push(d1); break;
+                                case "-": stack.Push(-d1); break;
                             }
                         }
                         else
                         {
-                            stack.Push(str);
+                            d2 = Convert.ToDecimal(stack.Pop());
+                            d1 = Convert.ToDecimal(stack.Pop());
+                            switch (token.Value)
+                            {
+                                case "+": stack.Push(d1 + d2); break;
+                                case "-": stack.Push(d1 - d2); break;
+                                case "*": stack.Push(d1 * d2); break;
+                                case "/": stack.Push(d1 / d2); break;
+                            }
                         }
-                    }
+                        break;
+                    case TokenType.Dot:
+                        throw new NotSupportedException();
+                    case TokenType.CallStart: stack.Push(TokenType.CallStart); break;
+                    case TokenType.CallEnd:
+                        var p = new Stack<object>();
+                        while (!TokenType.CallStart.Equals(obj = stack.Pop()))
+                        {
+                            p.Push(obj);
+                        }
+                        obj = (stack.Pop() as Delegate).DynamicInvoke(p.ToArray());
+                        stack.Push(obj);
+                        break;
                 }
-                else
-                {
-                    result.Add(str);
-                }
             }
-            while (stack.Count > 0)
-            {
-                result.Add(stack.Pop());
-            }
-
-            split.Clear();
-            split.AddRange(result);
+            return stack.Count <= 0 ? 0 : Convert.ToDecimal(stack.Pop());
         }
 
-        private static int GetCharType(char c)
+
+        private class Token
         {
-            switch (c)
+            public Token(TokenType type, String value)
             {
-                case '.':
-                    return 1; //数字
-                case '+':
-                case '-':
-                case '*':
-                case '/':
-                    return 2; //运算符
-                case '(':
-                case ')':
-                    return 4; //括号
-                default:
-                    if (c >= '0' && c <= '9')
-                        return 1;
-                    else if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z')
-                        return 8; //函数
-                    break;
+                this.Type = type;
+                this.Value = value;
             }
-            return 0; //无效字符
+            public TokenType Type;
+            public string Value;
+            public Tag Tag;
         }
 
-        private static string[] operatorList = new string[] { "+", "-", "*", "/", "(", ")" };
-        private static string[] functionList = new string[] { "u", "d" };
-
-        private static bool IsOperator(string str)
+        //优先级
+        private static int Priority(Token token)
         {
-            foreach (string op in operatorList)
-            {
-                if (op == str) return true;
-            }
-            return false;
-        }
-
-        private static bool IsFunction(string str)
-        {
-            foreach (string func in functionList)
-            {
-                if (func == str) return true;
-            }
-            return false;
-        }
-
-        private static int GetPriority(string str)
-        {
-            switch (str)
+            if (token.Tag == Tag.Unary) return 4;
+            switch (token.Value)
             {
                 case "+":
-                case "-":
-                    return 1;
+                case "-": return 1;
                 case "*":
-                case "/":
-                    return 2;
-                case "u":
-                case "d":
-                    return 3;
-                default:
-                    return 0;
+                case "/": return 2;
+                case ".": return 3;
+                default: return 0;
             }
         }
 
-        private static double Calculate(List<string> split, Dictionary<string, double> args)
+        private enum TokenType
         {
-            Stack<double> stack = new Stack<double>(split.Count);
+            ID, //x,funcName
+            Number, //123.45
+            BracketStart, //(
+            BracketEnd, //)
+            Dot, //.成员运算符
+            Operator, //+-*/
+            Comma, //,逗号 函数参数分隔符
 
-            foreach (string str in split)
-            {
-                if (IsOperator(str))
-                {
-                    OperatorEntry(str,stack);
-                }
-                else if (IsFunction(str))
-                {
-                    FunctionEntry(str,stack);
-                }
-                else
-                {
-                    stack.Push(ParseArgValue(args, str));
-                }
-            }
-            return stack.Pop();
+            CallStart = 100, //标记用 参数开始
+            CallEnd, //标记用
         }
 
-        private static double ParseArgValue(Dictionary<string, double> args, string arg)
+        private enum Tag
         {
-            double value;
-            if (!double.TryParse(arg, out value))
-            {
-                if (args != null)
-                {
-                    args.TryGetValue(arg, out value);
-                }
-            }
-            return value;
-        }
-
-        private static void FunctionEntry(string func, Stack<double> stack)
-        {
-            switch (func)
-            {
-                case "u":
-                    stack.Push(Math.Ceiling(stack.Pop()));
-                    break;
-                case "d":
-                    stack.Push(Math.Floor(stack.Pop()));
-                    break;
-            }
-        }
-
-        private static void OperatorEntry(string op, Stack<double> stack)
-        {
-            double sec = stack.Pop(), fir = stack.Pop();
-            switch (op)
-            {
-                case "+":
-                    stack.Push(fir + sec);
-                    break;
-                case "-":
-                    stack.Push(fir - sec);
-                    break;
-                case "*":
-                    stack.Push(fir * sec);
-                    break;
-                case "/":
-                    stack.Push(fir / sec);
-                    break;
-                default:
-                    stack.Push(0);
-                    break;
-            }
+            None = 0,
+            Call,
+            Unary,
         }
     }
 }

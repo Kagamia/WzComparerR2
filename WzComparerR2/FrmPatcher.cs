@@ -13,6 +13,7 @@ using System.Threading;
 using WzComparerR2.WzLib;
 using WzComparerR2.Patcher;
 using WzComparerR2.Comparer;
+using WzComparerR2.Config;
 
 namespace WzComparerR2
 {
@@ -23,7 +24,15 @@ namespace WzComparerR2
             InitializeComponent();
             panelEx1.AutoScroll = true;
 
-            foreach (PatcherSetting p in Setting.PatcherSettings)
+            var settings = WcR2Config.Default.PatcherSettings;
+            if (settings.Count <= 0)
+            {
+                settings.Add(new PatcherSetting("KMST", "http://maplestory.dn.nexoncdn.co.kr/PatchT/{1:d5}/{0:d5}to{1:d5}.patch"));
+                settings.Add(new PatcherSetting("KMS", "http://maplestory.dn.nexoncdn.co.kr/Patch/{1:d5}/{0:d5}to{1:d5}.patch"));
+                settings.Add(new PatcherSetting("JMS", "ftp://download2.nexon.co.jp/maple/patch/patchdir/{1:d5}/{0:d5}to{1:d5}.patch"));
+            }
+
+            foreach (PatcherSetting p in settings)
             {
                 comboBoxEx1.Items.Add(p);
             }
@@ -106,7 +115,7 @@ namespace WzComparerR2
             {
                 patchThread.Abort();
             }
-            Setting.Save();
+            ConfigManager.Save();
         }
 
         private void NewFile(BinaryReader reader, string fileName, string patchDir)

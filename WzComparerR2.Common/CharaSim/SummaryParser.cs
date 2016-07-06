@@ -56,7 +56,7 @@ namespace WzComparerR2.CharaSim
                     }
                     if (prop != null)
                     {
-                        double val = Calculator.Parse(prop, Level);
+                        var val = Calculator.Parse(prop, Level);
                         sb.Append(val);
                         idx += len + 1;
                         continue;
@@ -76,7 +76,7 @@ namespace WzComparerR2.CharaSim
                         {
                             if (prop != "" && GetValueIgnoreCase(CommonProps, prop, out prop))
                             {
-                                double val = Calculator.Parse(prop, Level);
+                                var val = Calculator.Parse(prop, Level);
                                 sb.Append(val);
                             }
                             else

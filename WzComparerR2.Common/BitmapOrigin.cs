@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using WzComparerR2.WzLib;
+using WzComparerR2.Common;
 
 namespace WzComparerR2
 {
@@ -76,23 +77,11 @@ namespace WzComparerR2
                 node = uol.HandleUol(node);
             }
 
-            Wz_Png png = node.GetValue<Wz_Png>(null);
-            //---2013-12-04 by kagamia---
-            Wz_Node sourceNode = node.Nodes["source"];
-            if (sourceNode != null)
-            {
-                string source = sourceNode.GetValue<string>();
-                if (!string.IsNullOrEmpty(source))
-                {
-                    sourceNode = findNode != null ? findNode(source) : null;
-                    if (sourceNode != null)
-                    {
-                        png = sourceNode.GetValue<Wz_Png>();
-                    }
-                }
-            }
-            //---------------------------
-            bp.Bitmap = (png == null) ? null : png.ExtractPng();
+            //获取linkNode
+            var linkNode = node.GetLinkedSourceNode(findNode);
+            Wz_Png png = linkNode?.GetValue<Wz_Png>() ?? (Wz_Png)node.Value;
+
+            bp.Bitmap = png?.ExtractPng();
             Wz_Node originNode = node.FindNodeByPath("origin");
             Wz_Vector vec = (originNode == null) ? null : originNode.GetValue<Wz_Vector>();
             bp.Origin = (vec == null) ? new Point() : new Point(vec.X, vec.Y);

@@ -39,11 +39,6 @@ namespace WzComparerR2.CharaSim
                 return null;
             recipe.RecipeID = recipeID;
 
-            //propType缓存
-            Dictionary<string, RecipePropType> recipePropDict = new Dictionary<string, RecipePropType>();
-            foreach (RecipePropType type in Enum.GetValues(typeof(RecipePropType)))
-                recipePropDict[type.ToString()] = type;
-
             foreach (Wz_Node subNode in node.Nodes)
             {
                 switch (subNode.Text)
@@ -104,7 +99,7 @@ namespace WzComparerR2.CharaSim
 
                     default:
                         RecipePropType type;
-                        if (recipePropDict.TryGetValue(subNode.Text, out type))
+                        if (Enum.TryParse(subNode.Text, out type))
                         {
                             try
                             {

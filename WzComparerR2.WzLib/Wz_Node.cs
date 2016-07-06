@@ -333,5 +333,19 @@ namespace WzComparerR2.WzLib
             }
             return wzfile;
         }
+
+        public static Wz_Image GetNodeWzImage(this Wz_Node node)
+        {
+            Wz_Image wzImg = null;
+            while (node != null)
+            {
+                if ((wzImg = node.Value as Wz_Image) != null)
+                {
+                    break;
+                }
+                node = node.ParentNode;
+            }
+            return wzImg;
+        }
     }
 }

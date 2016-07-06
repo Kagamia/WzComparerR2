@@ -26,11 +26,6 @@ namespace WzComparerR2.CharaSim
 
             SetItem setItem = new SetItem();
 
-            //GearPropType缓存
-            Dictionary<string, GearPropType> gearPropTypeDict = new Dictionary<string, GearPropType>();
-            foreach (GearPropType type in Enum.GetValues(typeof(GearPropType)))
-                gearPropTypeDict[type.ToString()] = type;
-
             Dictionary<string, string> desc = new Dictionary<string, string>();
 
             foreach (Wz_Node subNode in setItemNode.Nodes)
@@ -137,7 +132,7 @@ namespace WzComparerR2.CharaSim
                                                     default:
                                                         {
                                                             GearPropType type;
-                                                            if (gearPropTypeDict.TryGetValue(pNode.Text, out type))
+                                                            if (Enum.TryParse(pNode.Text, out type))
                                                             {
                                                                 option.Props.Add(type, pNode.GetValue<int>());
                                                             }
@@ -183,7 +178,7 @@ namespace WzComparerR2.CharaSim
                                     default:
                                         {
                                             GearPropType type;
-                                            if (gearPropTypeDict.TryGetValue(propNode.Text, out type))
+                                            if (Enum.TryParse(propNode.Text, out type))
                                             {
                                                 effect.Props.Add(type, Convert.ToInt32(propNode.Value));
                                             }

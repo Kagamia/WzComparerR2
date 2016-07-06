@@ -1051,5 +1051,11 @@ namespace WzComparerR2.Avatar.UI
                 this.NextFrameDelay = nextFrame;
             }
         }
+
+        private void buttonItem1_Click_1(object sender, EventArgs e)
+        {
+            this.PluginEntry.btnSetting_Click(sender, e);
+
+        }
     }
 }

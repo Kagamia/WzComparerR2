@@ -7,10 +7,11 @@
     <ProjectGuid>{818060BC-404C-470A-94B3-5160716C5247}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WzComparerR2.Common</RootNamespace>
+    <RootNamespace>WzComparerR2</RootNamespace>
     <AssemblyName>WzComparerR2.Common</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,19 +33,60 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DevComponents.DotNetBar2, Version=12.5.0.2, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL" />
     <Reference Include="ImageManipulation">
       <HintPath>..\References\ImageManipulation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="spine-csharp">
-      <HintPath>..\References\spine-csharp.dll</HintPath>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MonoGame.Framework, Version=3.4.0.456, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="spine-monogame">
+      <HintPath>..\References\spine-monogame.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AlphaForm.cs">
+    <Compile Include="Animation\KeyFrame.cs" />
+    <Compile Include="BuildInGifEncoder.cs" />
+    <Compile Include="Controls\AnimationItemEventArgs.cs" />
+    <Compile Include="Controls\AnimationRecoder.cs" />
+    <Compile Include="Animation\Frame.cs" />
+    <Compile Include="Animation\FrameAnimator.cs" />
+    <Compile Include="Animation\FrameAnimationData.cs" />
+    <Compile Include="Animation\ModelBound.cs" />
+    <Compile Include="Animation\SpineAnimator.cs" />
+    <Compile Include="Animation\SpineAnimationData.cs" />
+    <Compile Include="Animation\WzSpineTextureLoader.cs" />
+    <Compile Include="CharaSim\MobElemAttr.cs" />
+    <Compile Include="CharaSim\Mob.cs" />
+    <Compile Include="CharaSim\Npc.cs" />
+    <Compile Include="Config\ConfigItem.cs" />
+    <Compile Include="Config\ConfigItemCollectionBase.cs" />
+    <Compile Include="Config\ConfigArrayList.cs" />
+    <Compile Include="Config\ConfigManager.cs" />
+    <Compile Include="Config\ConfigSectionBase.cs" />
+    <Compile Include="Config\SectionNameAttribute.cs" />
+    <Compile Include="Controls\AlphaForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="BitmapOrigin.cs" />
@@ -61,7 +103,20 @@
     <Compile Include="CharaSim\GearSealedInfo.cs" />
     <Compile Include="CharaSim\GearState.cs" />
     <Compile Include="CharaSim\GearType.cs" />
+    <Compile Include="Controls\AnimationControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\AnimationControl.Designer.cs">
+      <DependentUpon>AnimationControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\AnimationItem.cs" />
+    <Compile Include="Controls\GraphicsDeviceControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\GraphicsDeviceService.cs" />
+    <Compile Include="Controls\ServiceContainer.cs" />
     <Compile Include="GifCanvas.cs" />
+    <Compile Include="GifEncoder.cs" />
     <Compile Include="GifLayer.cs" />
     <Compile Include="GlobalFindNodeFunction.cs" />
     <Compile Include="CharaSim\HyperSkillType.cs" />
@@ -85,14 +140,23 @@
     <Compile Include="CharaSim\SummaryParams.cs" />
     <Compile Include="CharaSim\SummaryParser.cs" />
     <Compile Include="Gif.cs" />
-    <Compile Include="GifEncoder.cs" />
+    <Compile Include="IndexGifEncoder.cs" />
     <Compile Include="GifFrame.cs" />
+    <Compile Include="Rendering\AnimationGraphics.cs" />
+    <Compile Include="Rendering\BlendEx.cs" />
+    <Compile Include="Rendering\PngEffect.cs" />
+    <Compile Include="Rendering\MonogameUtils.cs" />
+    <Compile Include="Rendering\SpriteBatchEx.cs" />
+    <Compile Include="Rendering\TextUtils.cs" />
+    <Compile Include="Rendering\WzLibExtension.cs" />
     <Compile Include="IGifFrame.cs" />
     <Compile Include="ImageDataObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rendering\XnaFont.cs" />
     <Compile Include="SpineLoader.cs" />
     <Compile Include="StringLinker.cs" />
     <Compile Include="StringResult.cs" />
+    <Compile Include="Wz_NodeExtension2.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj">
@@ -100,6 +164,10 @@
       <Name>WzComparerR2.WzLib</Name>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Rendering\Effect\PngEffect.fx" />
+    <EmbeddedResource Include="Rendering\Effect\PngEffect.mgfxo" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

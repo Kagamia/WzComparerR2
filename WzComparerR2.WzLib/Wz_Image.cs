@@ -65,7 +65,7 @@ namespace WzComparerR2.WzLib
                 }
                 if (!this.checEnc)
                 {
-                    TryDetectEnc();
+                    //TryDetectEnc();
                 }
 
                 try
@@ -130,7 +130,7 @@ namespace WzComparerR2.WzLib
         {
             int entries = 0;
 
-            switch (this.WzFile.ReadString(offset, this.IsOnList))
+            switch (this.WzFile.ReadString(offset))
             {
                 case "Property":
                     this.WzFile.FileStream.Position += 2;
@@ -185,7 +185,7 @@ namespace WzComparerR2.WzLib
 
                 case "UOL":
                     this.WzFile.FileStream.Position++;
-                    parent.Value = new Wz_Uol(this.WzFile.ReadString(offset, this.IsOnList));
+                    parent.Value = new Wz_Uol(this.WzFile.ReadString(offset));
                     break;
 
                 default:
@@ -193,6 +193,7 @@ namespace WzComparerR2.WzLib
             }
         }
 
+        /*
         private void TryDetectEnc()
         {
             Wz_Crypto crypto = this.WzFile.WzStructure.encryption;
@@ -264,10 +265,11 @@ namespace WzComparerR2.WzLib
                     return false;
             }
         }
+        */
 
         private void ExtractValue(int offset, Wz_Node parent)
         {
-            parent = parent.Nodes.Add(this.WzFile.ReadString(offset, this.IsOnList));
+            parent = parent.Nodes.Add(this.WzFile.ReadString(offset));
             byte flag = this.WzFile.BReader.ReadByte();
             switch (flag)
             {
@@ -299,7 +301,7 @@ namespace WzComparerR2.WzLib
                     break;
 
                 case 0x08:
-                    parent.Value = this.WzFile.ReadString(offset, this.IsOnList);
+                    parent.Value = this.WzFile.ReadString(offset);
                     break;
 
                 case 0x09:

@@ -309,9 +309,13 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         foxPearl = 135310,
         /// <summary>
-        /// 棋子 135310
+        /// 棋子 135320
         /// </summary>
         chess = 135320,
+        /// <summary>
+        /// 装弹 135340
+        /// </summary>
+        ExplosivePill = 135340,
         /// <summary>
         /// 手杖
         /// </summary>
@@ -401,7 +405,10 @@ namespace WzComparerR2.CharaSim
         /// 太刀 157
         /// </summary>
         swordZL = 157,
-
+        /// <summary>
+        /// 机甲手枪 158
+        /// </summary>
+        GauntletBuster = 158,
         /// <summary>
         /// 拼图 168
         /// </summary>

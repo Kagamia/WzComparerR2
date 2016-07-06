@@ -14,37 +14,22 @@ namespace WzComparerR2.CharaSimControl
         {
         }
 
-        Skill skill;
-        bool showDelay;
-        bool showReqSkill = true;
-
-        public Skill Skill
-        {
-            get { return skill; }
-            set { skill = value; }
-        }
+        public Skill Skill { get; set; }
 
         public override object TargetItem
         {
-            get { return this.skill; }
-            set { this.skill = value as Skill; }
+            get { return this.Skill; }
+            set { this.Skill = value as Skill; }
         }
 
-        public bool ShowDelay
-        {
-            get { return showDelay; }
-            set { showDelay = value; }
-        }
-
-        public bool ShowReqSkill
-        {
-            get { return showReqSkill; }
-            set { showReqSkill = value; }
-        }
+        public bool ShowProperties { get; set; } = true;
+        public bool ShowDelay { get; set; }
+        public bool ShowReqSkill { get; set; } = true;
+       
 
         public override Bitmap Render()
         {
-            if (this.skill == null)
+            if (this.Skill == null)
             {
                 return null;
             }
@@ -65,7 +50,7 @@ namespace WzComparerR2.CharaSimControl
 
             if (this.ShowObjectID)
             {
-                GearGraphics.DrawGearDetailNumber(g, 3, 3, skill.SkillID.ToString("d7"), true);
+                GearGraphics.DrawGearDetailNumber(g, 3, 3, Skill.SkillID.ToString("d7"), true);
             }
 
             if (originBmp != null)
@@ -84,7 +69,7 @@ namespace WzComparerR2.CharaSimControl
 
             //获取文字
             StringResult sr;
-            if (StringLinker == null || !StringLinker.StringSkill.TryGetValue(skill.SkillID, out sr))
+            if (StringLinker == null || !StringLinker.StringSkill.TryGetValue(Skill.SkillID, out sr))
             {
                 sr = new StringResult(true);
                 sr.Name = "(null)";
@@ -97,31 +82,31 @@ namespace WzComparerR2.CharaSimControl
             //绘制图标
             picH = 33;
             g.FillRectangle(GearGraphics.GearIconBackBrush2, 14, picH, 68, 68);
-            if (skill.Icon.Bitmap != null)
+            if (Skill.Icon.Bitmap != null)
             {
-                g.DrawImage(GearGraphics.EnlargeBitmap(skill.Icon.Bitmap),
-                14 + (1 - skill.Icon.Origin.X) * 2,
-                picH + (33 - skill.Icon.Bitmap.Height) * 2);
+                g.DrawImage(GearGraphics.EnlargeBitmap(Skill.Icon.Bitmap),
+                14 + (1 - Skill.Icon.Origin.X) * 2,
+                picH + (33 - Skill.Icon.Bitmap.Height) * 2);
             }
 
             //绘制desc
             picH = 35;
-            if (!skill.PreBBSkill)
-                GearGraphics.DrawString(g, "[最高等级：" + skill.MaxLevel + "]", GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
+            if (!Skill.PreBBSkill)
+                GearGraphics.DrawString(g, "[最高等级：" + Skill.MaxLevel + "]", GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
 
             if (sr.Desc != null)
             {
-                string hdesc = SummaryParser.GetSkillSummary(sr.Desc, skill.Level, skill.Common, SummaryParams.Default);
+                string hdesc = SummaryParser.GetSkillSummary(sr.Desc, Skill.Level, Skill.Common, SummaryParams.Default);
                 //string hStr = SummaryParser.GetSkillSummary(skill, skill.Level, sr, SummaryParams.Default);
                 GearGraphics.DrawString(g, hdesc, GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
             }
-            if (skill.ReqLevel > 0)
+            if (Skill.ReqLevel > 0)
             {
-                GearGraphics.DrawString(g, "#c[要求等级：" + skill.ReqLevel.ToString() + "]#", GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
+                GearGraphics.DrawString(g, "#c[要求等级：" + Skill.ReqLevel.ToString() + "]#", GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
             }
-            if (skill.ReqAmount > 0)
+            if (Skill.ReqAmount > 0)
             {
-                GearGraphics.DrawString(g, "#c" + ItemStringHelper.GetSkillReqAmount(skill.SkillID, skill.ReqAmount) + "#", GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
+                GearGraphics.DrawString(g, "#c" + ItemStringHelper.GetSkillReqAmount(Skill.SkillID, Skill.ReqAmount) + "#", GearGraphics.ItemDetailFont2, 92, 272, ref picH, 16);
             }
 
             //分割线
@@ -129,20 +114,20 @@ namespace WzComparerR2.CharaSimControl
             g.DrawLine(Pens.White, 6, picH, 283, picH);
             picH += 9;
 
-            if (skill.Level > 0)
+            if (Skill.Level > 0)
             {
-                string hStr = SummaryParser.GetSkillSummary(skill, skill.Level, sr, SummaryParams.Default);
-                GearGraphics.DrawString(g, "[现在等级 " + skill.Level + "]", GearGraphics.ItemDetailFont, 10, 274, ref picH, 16);
+                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default);
+                GearGraphics.DrawString(g, "[现在等级 " + Skill.Level + "]", GearGraphics.ItemDetailFont, 10, 274, ref picH, 16);
                 if (hStr != null)
                 {
                     GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, 10, 274, ref picH, 16);
                 }
             }
 
-            if (skill.Level < skill.MaxLevel)
+            if (Skill.Level < Skill.MaxLevel)
             {
-                string hStr = SummaryParser.GetSkillSummary(skill, skill.Level + 1, sr, SummaryParams.Default);
-                GearGraphics.DrawString(g, "[下次等级 " + (skill.Level + 1) + "]", GearGraphics.ItemDetailFont, 10, 274, ref picH, 16);
+                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level + 1, sr, SummaryParams.Default);
+                GearGraphics.DrawString(g, "[下次等级 " + (Skill.Level + 1) + "]", GearGraphics.ItemDetailFont, 10, 274, ref picH, 16);
                 if (hStr != null)
                 {
                     GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, 10, 274, ref picH, 16);
@@ -151,28 +136,28 @@ namespace WzComparerR2.CharaSimControl
             picH += 9;
 
             List<string> skillDescEx = new List<string>();
-
+            if (ShowProperties)
             {
                 List<string> attr = new List<string>();
-                if (skill.Invisible)
+                if (Skill.Invisible)
                 {
                     attr.Add("隐藏技能");
                 }
-                if (skill.Hyper != HyperSkillType.None)
+                if (Skill.Hyper != HyperSkillType.None)
                 {
-                    attr.Add("超级技能:" + skill.Hyper);
+                    attr.Add("超级技能:" + Skill.Hyper);
                 }
-                if (skill.CombatOrders)
+                if (Skill.CombatOrders)
                 {
                     attr.Add("战斗命令加成");
                 } 
-                if (skill.NotRemoved)
+                if (Skill.NotRemoved)
                 {
                     attr.Add("无法被移除");
                 }
-                if (skill.MasterLevel > 0 && skill.MasterLevel < skill.MaxLevel)
+                if (Skill.MasterLevel > 0 && Skill.MasterLevel < Skill.MaxLevel)
                 {
-                    attr.Add("初始掌握:Lv." + skill.MasterLevel);
+                    attr.Add("初始掌握:Lv." + Skill.MasterLevel);
                 }
 
                 if (attr.Count > 0)
@@ -181,17 +166,17 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
 
-            if (showDelay && skill.Action.Count > 0)
+            if (ShowDelay && Skill.Action.Count > 0)
             {
-                foreach (string action in skill.Action)
+                foreach (string action in Skill.Action)
                 {
                     skillDescEx.Add("#c[技能延时] " + action + ": " + CharaSimLoader.GetActionDelay(action) + " ms#");
                 }
             }
 
-            if (showReqSkill && skill.ReqSkill.Count > 0)
+            if (ShowReqSkill && Skill.ReqSkill.Count > 0)
             {
-                foreach (var kv in skill.ReqSkill)
+                foreach (var kv in Skill.ReqSkill)
                 {
                     string skillName;
                     if (this.StringLinker != null && this.StringLinker.StringSkill.TryGetValue(kv.Key, out sr))

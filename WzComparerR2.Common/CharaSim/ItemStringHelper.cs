@@ -95,9 +95,9 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incPVPDamage: return "大乱斗时追加攻击力" + sign + value;
                 case GearPropType.incPQEXPr: return "组队任务经验值增加" + value + "%";
                 case GearPropType.incBDR:
-                case GearPropType.bdR: return "攻击BOSS时，伤害+" + value + "%";
+                case GearPropType.bdR: return "攻击BOSS怪物时，伤害+" + value + "%";
                 case GearPropType.incIMDR:
-                case GearPropType.imdR: return "无视怪物防御力：+" + value + "%";
+                case GearPropType.imdR: return "无视怪物防御率：+" + value + "%";
                 case GearPropType.limitBreak: return "伤害上限突破至" + value + "。";
                 case GearPropType.reduceReq: return "装备等级降低：- " + value;
 
@@ -125,6 +125,13 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.superiorEqp: return value == 0 ? null : "道具强化成功时，可以获得更高的效果。";
                 case GearPropType.nActivatedSocket: return value == 0 ? null : "#c可以镶嵌星岩#";
                 case GearPropType.jokerToSetItem: return value == 0 ? null : " #c可以当作任何套装组件的幸运道具!#";
+
+                case GearPropType.incMHP_incMMP: return "MaxHP / MaxMP : " + sign + value;
+                case GearPropType.incMHPr_incMMPr: return "MaxHP / MaxMP : " + sign + value + "%";
+                case GearPropType.incPAD_incMAD: return "攻击力/魔力：" + sign + value;
+                case GearPropType.incPDD_incMDD: return "物理/魔法防御力：" + sign + value;
+                case GearPropType.incACC_incEVA: return "命中值/回避值：" + sign + value;
+
                 default: return null;
             }
         }
@@ -268,6 +275,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.boxingClaw: return "拳爪";
                 case GearType.katana2: return "小太刀";
                 case GearType.espLimiter: return "ESP限制器";
+
+                case GearType.GauntletBuster: return "机甲手枪";
+                case GearType.ExplosivePill: return "装弹";
                 default: return null;
             }
         }
@@ -365,6 +375,9 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.espLimiter:
                 case GearType.chess: return "超能力者可以装备";
+
+                case GearType.GauntletBuster:
+                case GearType.ExplosivePill: return "爆破手可使用";
 
                 default: return null;
             }

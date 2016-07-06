@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
+using WzComparerR2.Controls;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -23,6 +24,8 @@ namespace WzComparerR2.CharaSimControl
             this.ItemRender = new ItemTooltipRender2();
             this.SkillRender = new SkillTooltipRender2();
             this.RecipeRender = new RecipeTooltipRender();
+            this.MobRender = new MobTooltipRenderer();
+            this.NpcRender = new NpcTooltipRenderer();
             this.SizeChanged += AfrmTooltip_SizeChanged;
 
             this.MouseClick += AfrmTooltip_MouseClick;
@@ -47,6 +50,8 @@ namespace WzComparerR2.CharaSimControl
         public ItemTooltipRender2 ItemRender { get; private set; }
         public SkillTooltipRender2 SkillRender { get; private set; }
         public RecipeTooltipRender RecipeRender { get; private set; }
+        public MobTooltipRenderer MobRender { get; private set; }
+        public NpcTooltipRenderer NpcRender { get; private set; }
 
         public string ImageFileName { get; set; }
 
@@ -144,6 +149,16 @@ namespace WzComparerR2.CharaSimControl
             {
                 renderer = RecipeRender;
                 RecipeRender.Recipe = this.item as Recipe;
+            }
+            else if (item is Mob)
+            {
+                renderer = MobRender;
+                MobRender.MobInfo = this.item as Mob;
+            }
+            else if (item is Npc)
+            {
+                renderer = NpcRender;
+                NpcRender.NpcInfo = this.item as Npc;
             }
             else
             {

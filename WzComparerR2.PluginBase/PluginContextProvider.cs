@@ -5,6 +5,7 @@ using DevComponents.DotNetBar;
 using WzComparerR2.WzLib;
 using WzComparerR2;
 using WzComparerR2.Common;
+using WzComparerR2.Controls;
 
 namespace WzComparerR2.PluginBase
 {

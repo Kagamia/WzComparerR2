@@ -18,6 +18,7 @@ namespace WzComparerR2
         {
             InitializeComponent();
 
+            this.lblClrVer.Text = Environment.Version.ToString();
             this.lblAsmVer.Text = GetAsmVersion().ToString();
             this.lblFileVer.Text = GetFileVersion().ToString();
             this.lblCopyright.Text = GetAsmCopyright().ToString();
@@ -29,9 +30,9 @@ namespace WzComparerR2
             return this.GetType().Assembly.GetName().Version;
         }
 
-        private Version GetFileVersion()
+        private string GetFileVersion()
         {
-            return new Version(FileVersionInfo.GetVersionInfo(this.GetType().Assembly.Location).FileVersion);
+            return FileVersionInfo.GetVersionInfo(this.GetType().Assembly.Location).FileVersion;
         }
 
         private string GetAsmCopyright()

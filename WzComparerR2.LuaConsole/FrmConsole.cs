@@ -141,7 +141,15 @@ end
             {
                 if (format != null)
                 {
-                    string content = string.Format(format, args ?? new object[0]);
+                    string content;
+                    if (args == null || args.Length <= 0)
+                    {
+                        content = format;
+                    }
+                    else
+                    {
+                        content = string.Format(format, args ?? new object[0]);
+                    }
                     this.form.textBoxX2.AppendText(content);
                 }
                 this.form.textBoxX2.AppendText(Environment.NewLine);

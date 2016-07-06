@@ -45,11 +45,6 @@ namespace WzComparerR2.CharaSim
             }
             item.ItemID = value;
 
-            //propType缓存
-            Dictionary<string, ItemPropType> itemPropTypeDict = new Dictionary<string, ItemPropType>();
-            foreach (ItemPropType type in Enum.GetValues(typeof(ItemPropType)))
-                itemPropTypeDict[type.ToString()] = type;
-
             Wz_Node infoNode = node.FindNodeByPath("info");
             if (infoNode != null)
             {
@@ -101,7 +96,7 @@ namespace WzComparerR2.CharaSim
 
                         default:
                             ItemPropType type;
-                            if (itemPropTypeDict.TryGetValue(subNode.Text, out type))
+                            if (Enum.TryParse(subNode.Text, out type))
                             {
                                 try
                                 {
@@ -116,18 +111,13 @@ namespace WzComparerR2.CharaSim
                 }
             }
 
-            //propType缓存
-            Dictionary<string, ItemSpecType> itemSpecTypeDict = new Dictionary<string, ItemSpecType>();
-            foreach (ItemSpecType type in Enum.GetValues(typeof(ItemSpecType)))
-                itemSpecTypeDict[type.ToString()] = type;
-
             Wz_Node specNode = node.FindNodeByPath("spec");
             if (specNode != null)
             {
                 foreach (Wz_Node subNode in specNode.Nodes)
                 {
                     ItemSpecType type;
-                    if (itemSpecTypeDict.TryGetValue(subNode.Text, out type))
+                    if (Enum.TryParse(subNode.Text, out type))
                     {
                         try
                         {

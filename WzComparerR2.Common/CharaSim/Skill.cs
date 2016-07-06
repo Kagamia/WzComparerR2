@@ -45,7 +45,7 @@ namespace WzComparerR2.CharaSim
             get { return level; }
             set
             {
-                level = Math.Max(0, Math.Min(value, (this.CombatOrders ? 2 : 0) + this.MaxLevel));
+                level = Math.Max(0, Math.Min(value, (this.CombatOrders ? 100 : this.MaxLevel)));
             }
         }
 
