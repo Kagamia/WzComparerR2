@@ -198,3 +198,4 @@ FakesAssemblies/
 # Ignore WcR2 temp directory
 OldVer/
 !References/x86/
+!References/x64/
