@@ -5,7 +5,7 @@ using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
 using WzComparerR2.MapRender.Patches;
 using WzComparerR2.Common;
-
+using WzComparerR2.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -63,7 +63,7 @@ namespace WzComparerR2.MapRender
 
         public void Draw(GameTime gameTime, RenderEnv renderEnv)
         {
-            renderEnv.Sprite.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None);
+            renderEnv.Sprite.Begin(SpriteSortMode.Deferred, StateEx.NonPremultipled_Hidef());
             DrawNode(Base, gameTime, renderEnv);
             renderEnv.Sprite.End();
         }

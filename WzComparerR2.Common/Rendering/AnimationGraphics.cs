@@ -20,12 +20,14 @@ namespace WzComparerR2.Rendering
             this.GraphicsDevice = graphicsDevice;
             this.sprite = sprite;
             this.spineRenderer = new Spine.SkeletonMeshRenderer(graphicsDevice);
+            this.state = StateEx.NonPremultipled_Hidef();
         }
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         private SpriteBatch sprite;
         private Spine.SkeletonMeshRenderer spineRenderer;
+        private BlendState state;
 
         public void Draw(FrameAnimator animator, Matrix world)
         {
@@ -37,7 +39,7 @@ namespace WzComparerR2.Rendering
                     world *= Matrix.CreateTranslation(animator.Position.X, animator.Position.Y, 0);
                 }
 
-                sprite.Begin(SpriteSortMode.Deferred, BlendEx.NonPremultipled_Hidef, transformMatrix: world);
+                sprite.Begin(SpriteSortMode.Deferred, this.state, transformMatrix: world);
                 sprite.Draw(frame.Texture,
                     position: Vector2.Zero,
                     origin: frame.Origin.ToVector2(),

@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Resource = CharaSimResource.Resource;
 using WzComparerR2.WzLib;
+using WzComparerR2.Rendering;
 
 namespace WzComparerR2.MapRender.UI
 {
@@ -13,16 +14,16 @@ namespace WzComparerR2.MapRender.UI
         public UIMiniMap(GraphicsDevice graphicsDevice)
         {
             this.frame = new Dictionary<string, Texture2D>();
-            this.frame["n"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIWindow2_img_MiniMap_MaxMap_n);
-            this.frame["ne"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIWindow2_img_MiniMap_MaxMap_ne);
-            this.frame["e"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIWindow2_img_MiniMap_MaxMap_e);
-            this.frame["se"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIWindow2_img_MiniMap_MaxMap_se);
-            this.frame["s"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIWindow2_img_MiniMap_MaxMap_s);
-            this.frame["sw"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIWindow2_img_MiniMap_MaxMap_sw);
-            this.frame["w"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIWindow2_img_MiniMap_MaxMap_w);
-            this.frame["nw"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIWindow2_img_MiniMap_MaxMap_nw);
-            this.frame["c"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIWindow2_img_MiniMap_MaxMap_c);
-            this.frame["nw2"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIWindow2_img_MiniMap_MaxMap_nw2);
+            this.frame["n"] =  Resource.UIWindow2_img_MiniMap_MaxMap_n.ToTexture(graphicsDevice);
+            this.frame["ne"] = Resource.UIWindow2_img_MiniMap_MaxMap_ne.ToTexture(graphicsDevice);
+            this.frame["e"] =  Resource.UIWindow2_img_MiniMap_MaxMap_e.ToTexture(graphicsDevice);
+            this.frame["se"] = Resource.UIWindow2_img_MiniMap_MaxMap_se.ToTexture(graphicsDevice);
+            this.frame["s"] =  Resource.UIWindow2_img_MiniMap_MaxMap_s.ToTexture(graphicsDevice);
+            this.frame["sw"] = Resource.UIWindow2_img_MiniMap_MaxMap_sw.ToTexture(graphicsDevice);
+            this.frame["w"] =  Resource.UIWindow2_img_MiniMap_MaxMap_w.ToTexture(graphicsDevice);
+            this.frame["nw"] = Resource.UIWindow2_img_MiniMap_MaxMap_nw.ToTexture(graphicsDevice);
+            this.frame["c"] =  Resource.UIWindow2_img_MiniMap_MaxMap_c.ToTexture(graphicsDevice);
+            this.frame["nw2"] = Resource.UIWindow2_img_MiniMap_MaxMap_nw2.ToTexture(graphicsDevice);
 
             this.resource = new NineFormResource();
 
@@ -113,19 +114,19 @@ namespace WzComparerR2.MapRender.UI
 
             //绘制外框
             env.GraphicsDevice.ScissorRectangle = new Rectangle((int)this.Position.X, (int)this.Position.Y, (int)this.Size.X, (int)this.Size.Y);
-            env.GraphicsDevice.RenderState.ScissorTestEnable = true;
+            env.GraphicsDevice.RasterizerState = StateEx.Scissor();
 
-            env.Sprite.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None, trans);
+            env.Sprite.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, transformMatrix: trans);
             env.Sprite.FillRectangle(this.MinimapRectangle, new Color(Color.Black, 0.7f));
             UIGraphics.DrawNineForm(env, this.resource, Vector2.Zero, this.Size);
             env.Sprite.End();
 
-            env.GraphicsDevice.RenderState.ScissorTestEnable = false;
+            env.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
             //绘制标题
             if (this.MapNameFont != null)
             {
-                env.Sprite.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Texture, SaveStateMode.None, trans);
+                env.Sprite.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, transformMatrix: trans);
                 if (this.StreetName != null)
                 {
                     env.Sprite.DrawStringEx(this.MapNameFont, this.StreetName, this.streetNameOrigin, Color.White);
@@ -141,7 +142,7 @@ namespace WzComparerR2.MapRender.UI
             if (this.MiniMap != null)
             {
                 //绘制小地图标记
-                env.Sprite.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None, trans);
+                env.Sprite.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, transformMatrix: trans);
                 if (MapMarkVisible && this.MiniMap.MapMark != null)
                 {
                     env.Sprite.Draw(this.MiniMap.MapMark, mapMarkOrigin, Color.White);
@@ -174,10 +175,10 @@ namespace WzComparerR2.MapRender.UI
                     //设置剪裁区域
                     env.GraphicsDevice.ScissorRectangle = new Rectangle(
                       (int)this.Position.X + rect.X, (int)this.Position.Y + rect.Y, rect.Width, rect.Height);
-                    env.GraphicsDevice.RenderState.ScissorTestEnable = true;
+                    env.GraphicsDevice.RasterizerState = StateEx.Scissor();
 
                     //绘制小地图本体
-                    env.Sprite.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None, trans);
+                    env.Sprite.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, transformMatrix: trans);
                     env.Sprite.Draw(this.MiniMap.Canvas, miniMapOrigin + offset, Color.White);
 
                     if (this.ResourceLoaded)
@@ -216,7 +217,7 @@ namespace WzComparerR2.MapRender.UI
                     cameraRect.Y += (int)miniMapOrigin.Y;
                     env.Sprite.DrawRectangle(cameraRect, Color.Yellow);
                     env.Sprite.End();
-                    env.GraphicsDevice.RenderState.ScissorTestEnable = false;
+                    env.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
                 }
             }
 

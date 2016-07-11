@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace WzComparerR2
 {
@@ -12,10 +12,7 @@ namespace WzComparerR2
             var tokens = Lexer(mathExpression);
             var inst = Suffix(tokens);
 
-            var paramList = new Dictionary<string, object>(){
-                { "u", (Func<decimal,decimal>)Math.Ceiling },
-                { "d", (Func<decimal,decimal>)Math.Floor },
-            };
+            var paramList = new Dictionary<string, object>();
 
             if (args != null)
             {
@@ -31,7 +28,7 @@ namespace WzComparerR2
                 }
             }
 
-            return Execute(inst, paramList);
+            return Execute(inst, new EvalContext(paramList));
         }
 
         private static List<Token> Lexer(string expr)
@@ -90,6 +87,10 @@ namespace WzComparerR2
                             tokens.Add(new Token(TokenType.ID, expr.Substring(begin, i - begin)));
                             i--;
                         }
+                        else if (char.IsWhiteSpace(expr[i]))
+                        {
+                            //空白字符跳过
+                        }
                         else
                         { //无效字符
                             throw new Exception("Unknown char '" + expr[i] + "'.");
@@ -112,7 +113,7 @@ namespace WzComparerR2
                 {
                     case TokenType.BracketStart: //括号 推进stack
                         stack.Push(token);
-                        if (token.Tag ==  Tag.Call)
+                        if (token.Tag == Tag.Call)
                             value.Add(new Token(TokenType.CallStart, ""));
                         break;
 
@@ -194,7 +195,7 @@ namespace WzComparerR2
             return value;
         }
 
-        private static decimal Execute(List<Token> inst, Dictionary<string, object> param)
+        private static decimal Execute(List<Token> inst, EvalContext param)
         {
             var stack = new Stack<object>();
             object obj;
@@ -301,6 +302,60 @@ namespace WzComparerR2
             None = 0,
             Call,
             Unary,
+        }
+
+        private class EvalContext
+        {
+            public EvalContext()
+                : this(null)
+            {
+            }
+
+            public EvalContext(Dictionary<string, object> parameters)
+            {
+                this._dict = new Dictionary<string, object>();
+
+                if (parameters != null && parameters.Count > 0)
+                {
+                    foreach (var kv in parameters)
+                    {
+                        _dict.Add(kv.Key, kv.Value);
+                    }
+                }
+            }
+
+            public Dictionary<string, object> _dict;
+
+            public bool TryGetValue(string key, out object value)
+            {
+                return _dict.TryGetValue(key, out value)
+                    || TryGetFunction(key, out value);
+            }
+
+            private bool TryGetFunction(string key, out object value)
+            {
+                Match m;
+
+                if (key == "u")
+                {
+                    value = (Func<decimal, decimal>)Math.Ceiling;
+                    return true;
+                }
+                else if (key == "d")
+                {
+                    value = (Func<decimal, decimal>)Math.Floor;
+                    return true;
+                }
+                else if ((m = Regex.Match(key, @"log(\d+)")).Success)
+                {
+                    var logBase = int.Parse(m.Result("$1"));
+                    value = (Func<decimal, decimal>)(x => x <= 0 ? 0 : (decimal)Math.Floor(Math.Log(decimal.ToDouble(x), logBase)));
+                    return true;
+                }
+
+                value = null;
+                return false;
+            }
         }
     }
 }

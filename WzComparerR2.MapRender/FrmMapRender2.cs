@@ -14,7 +14,7 @@ using System.Threading;
 using Form = System.Windows.Forms.Form;
 using Un4seen.Bass;
 using WzComparerR2.MapRender.UI;
-
+using WzComparerR2.Rendering;
 using JLChnToZ.IMEHelper;
 
 

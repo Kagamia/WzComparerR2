@@ -134,7 +134,7 @@ namespace WzComparerR2.MapRender.Patches
         public virtual void Update(GameTime gameTime, RenderEnv env)
         {
             float played;
-            int index = this.UpdateCurrentFrameIndex(gameTime.TotalRealTime, out played);
+            int index = this.UpdateCurrentFrameIndex(gameTime.TotalGameTime, out played);
             if (index > -1)
             {
                 //获取当前帧绘制参数

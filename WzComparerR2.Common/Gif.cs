@@ -16,11 +16,9 @@ namespace WzComparerR2.Common
         public Gif()
         {
             this.Frames = new List<IGifFrame>();
-            this.Loop = true;
         }
 
         public List<IGifFrame> Frames { get; private set; }
-        public bool Loop { get; set; }
 
         public Bitmap EncodeGif(Color backgrnd)
         {
@@ -39,62 +37,7 @@ namespace WzComparerR2.Common
                 return null;
             }
 
-            Rectangle rect = this.GetRect();
-            string tempFileName = Path.GetTempFileName();
-            FileStream gifStream = new FileStream(tempFileName, FileMode.Create);//gif文件流
-            MemoryStream mStream = new MemoryStream(); //存储frame的内存流
-            BinaryWriter bWriter = new BinaryWriter(gifStream); //写入流
-
-            //写入gif头信息
-            bWriter.Write(gifHeader);
-            bWriter.Write((ushort)rect.Width);
-            bWriter.Write((ushort)rect.Height);
-            bWriter.Write(logicalScreen);
-            if (Loop)
-            {
-                bWriter.Write(appExtension);
-            }
-
-            //写入帧信息
-            for (int i = startIndex, j = startIndex + frameCount; i < j; i++)
-            {
-                if (i >= this.Frames.Count)
-                    break;
-                IGifFrame frame = this.Frames[i];
-                if (frame == null)
-                {
-                    continue;
-                }
-                mStream.SetLength(0);
-                Bitmap tmpGif = Quantize(frame, rect, backgrnd, minAlpha);
-                tmpGif.Save(mStream, ImageFormat.Gif);
-                tmpGif.Dispose();
-
-                byte[] tempArray = mStream.GetBuffer();
-                // 781开始为Graphic Control Extension块 标志为21 F9 04 
-                tempArray[784] = (byte)0x09; //图像刷新时屏幕返回初始帧 貌似不打会bug 意味不明 测试用
-                int delay = frame.Delay / 10;
-                tempArray[785] = (byte)(delay & 0xff);
-                tempArray[786] = (byte)(delay >> 8 & 0xff); //写入2字节的帧delay 
-                // 787为透明色索引  788为块结尾0x00
-                tempArray[787] = (byte)0xff;
-                // 789开始为Image Descriptor块 标志位2C
-                // 790~793为帧偏移大小 默认为0
-                // 794~797为帧图像大小 默认他
-                tempArray[798] = (byte)(tempArray[798] | 0X87); //本地色彩表标志
-
-                //写入到gif文件
-                bWriter.Write(tempArray, 781, 18);
-                bWriter.Write(tempArray, 13, 768);
-                bWriter.Write(tempArray, 799, (int)mStream.Length - 800);
-                tempArray = null;
-            }
-            bWriter.Write(gifEnd);
-            mStream.Close();
-            gifStream.Close();
-
-            Bitmap gifBitmap = new Bitmap(tempFileName);
-            return gifBitmap;
+            return EncodeGif<BuildInGifEncoder>(backgrnd, minAlpha, startIndex, frameCount);
         }
 
         public Bitmap EncodeGif2(Color backgrnd, int minAlpha)
@@ -109,22 +52,19 @@ namespace WzComparerR2.Common
                 return null;
             }
 
+            return EncodeGif<IndexGifEncoder>(backgrnd, minAlpha, startIndex, frameCount);
+        }
+
+        private Bitmap EncodeGif<T>(Color backgrnd, int minAlpha, int startIndex, int frameCount)
+            where T : GifEncoder
+        {
+            //预判大小
             Rectangle rect = this.GetRect();
+            Bitmap canvas = new Bitmap(rect.Width, rect.Height, PixelFormat.Format32bppArgb);
             string tempFileName = Path.GetTempFileName();
+            GifEncoder enc = (GifEncoder)Activator.CreateInstance(typeof(T), tempFileName, rect.Width, rect.Height);
 
-            IndexGifEncoder enc;
-            byte a = backgrnd.A;
-            Color backgrndColor = Color.FromArgb(255, backgrnd);
-            if (a == 0xff) //纯色
-            {
-                enc = new IndexGifEncoder(tempFileName, rect.Width, rect.Height, 256, backgrnd);
-            }
-            else //透明混色
-            {
-                enc = new IndexGifEncoder(tempFileName, rect.Width, rect.Height, 256, Color.Transparent);
-            }
-
-            Bitmap picFrame = new Bitmap(rect.Width, rect.Height, PixelFormat.Format32bppArgb);
+            //写入帧信息
             for (int i = startIndex, j = startIndex + frameCount; i < j; i++)
             {
                 if (i >= this.Frames.Count)
@@ -135,14 +75,12 @@ namespace WzComparerR2.Common
                     continue;
                 }
 
-                PrepareFrame(picFrame, frame, rect, backgrnd, minAlpha);
-                enc.AppendFrame(picFrame, frame.Delay);
+                PrepareFrame(canvas, frame, rect, backgrnd, minAlpha);
+                enc.AppendFrame(canvas, frame.Delay);
             }
-            picFrame.Dispose();
-            enc.Dispose();
 
-            Bitmap gifBitmap = new Bitmap(tempFileName);
-            return gifBitmap;
+            enc.Dispose();
+            return Image.FromFile(tempFileName) as Bitmap;
         }
 
         public Rectangle GetRect()
@@ -172,13 +110,6 @@ namespace WzComparerR2.Common
             g.Dispose();
             return bmp;
         }
-
-        private static readonly byte[] gifHeader = new byte[] { 0x47, 0x49, 0x46, 0x38, 0x39, 0x61 };//GIF89a
-        private static readonly byte[] logicalScreen = new byte[] { 0x70, 0x00, 0x00 };//无全局色彩表 无视背景色 无视像素纵横比
-        private static readonly byte[] appExtension = new byte[] { 0x21,0xff,0x0b, //块标志
-                0x4e,0x45,0x54,0x53,0x43,0x41,0x50,0x45,0x32,0x2e,0x30, //NETSCAPE2.0
-                0x03,0x01,0x00,0x00,0x00};//循环信息 其他信息
-        private static readonly byte[] gifEnd = new byte[] { 0x3b };//结束信息
 
         private static Bitmap PrepareFrame(IGifFrame frame, Rectangle canvasRect, Color backgrnd, int minAlpha)
         {
@@ -237,27 +168,6 @@ namespace WzComparerR2.Common
                 canvas.UnlockBits(data);
             }
         }
-
-        /// <summary>
-        /// 对32位图像进行八叉树量化处理，生成Gif格式图像。
-        /// </summary>
-        /// <param Name="Bitmap">要处理的Bitmap。</param>
-        /// <param Name="backgrnd">若Alpha分量为0xff，则表示生成gif的全局背景色，否则取RGB视为透明混合背景色。</param>
-        /// <param Name="gifSize">表示将要生成Gif图像的全局大小。</param>
-        /// <param Name="Offset">表示bitmap在Gif图像的左上角坐标偏移。</param>
-        /// <param Name="minAlpha">表示参与透明色混合像素的最小alpha分量，小于或等于这个值将不进行混合。</param>
-        /// <returns></returns>
-        private static Bitmap Quantize(IGifFrame frame, Rectangle canvasRect, Color backgrnd, int minAlpha)
-        {
-            Bitmap gifFrame = PrepareFrame(frame, canvasRect, backgrnd, minAlpha);
-
-            Quantizer quantizer = new OctreeQuantizer(255, 8);
-            Bitmap quantBitmap = quantizer.Quantize(gifFrame);
-
-            gifFrame.Dispose();
-            return quantBitmap;
-        }
-
 
         public static Gif CreateFromNode(Wz_Node node, GlobalFindNodeFunction findNode)
         {

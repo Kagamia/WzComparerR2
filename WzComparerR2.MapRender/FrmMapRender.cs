@@ -18,6 +18,7 @@ using WzComparerR2.MapRender.UI;
 using JLChnToZ.IMEHelper;
 using WzComparerR2.MapRender.Patches;
 using WzComparerR2.Common;
+using WzComparerR2.Rendering;
 
 namespace WzComparerR2.MapRender
 {
@@ -44,6 +45,7 @@ namespace WzComparerR2.MapRender
             windowForm.GotFocus += windowForm_GotFocus;
             windowForm.LostFocus += windowForm_LostFocus;
 
+            GameExt.FixKeyboard(this);
             /*
             this.chat = new Chat();
             this.chat.Connected += chat_Connected;
@@ -148,8 +150,8 @@ namespace WzComparerR2.MapRender
         protected override void Initialize()
         {
             base.Initialize();
-            this.ime = new IMEHandler(this, true);
-            this.ime.onResultReceived += ime_onResultReceived;
+            //this.ime = new IMEHandler(this, true);
+            //this.ime.onResultReceived += ime_onResultReceived;
             ChangeDisplayMode(0);
             //ThreadPool.QueueUserWorkItem((o) => this.chat.Connect());
         }
@@ -266,7 +268,7 @@ namespace WzComparerR2.MapRender
             this.renderingList.Clear();
             Bass.BASS_StreamFree(this.bgmStream.ToInt32());
             this.renderEnv.Dispose();
-            this.ime.Dispose();
+           // this.ime.Dispose();
             //this.chat.Disconnect();
         }
 
@@ -341,7 +343,7 @@ namespace WzComparerR2.MapRender
                     UpdateCamera(gameTime);
                     UpdatePatch(gameTime);
                     {
-                        double time = (gameTime.TotalRealTime - stateChangedTime).TotalMilliseconds;
+                        double time = (gameTime.TotalGameTime - stateChangedTime).TotalMilliseconds;
                         if (willReloadBgm)
                         {
                             this.bgmVolume = (float)(time / EnteringTime);
@@ -362,7 +364,7 @@ namespace WzComparerR2.MapRender
                     UpdateInput(gameTime);
                     UpdatePatch(gameTime);
                     {
-                        double time = (gameTime.TotalRealTime - stateChangedTime).TotalMilliseconds;
+                        double time = (gameTime.TotalGameTime - stateChangedTime).TotalMilliseconds;
                         if (willReloadBgm)
                         {
                             this.bgmVolume = (float)(1 - time / ExitingTime);
@@ -384,7 +386,7 @@ namespace WzComparerR2.MapRender
 
             if (this.loadState != oldState)
             {
-                stateChangedTime = gameTime.TotalRealTime;
+                stateChangedTime = gameTime.TotalGameTime;
             }
 
             base.Update(gameTime);
@@ -708,17 +710,14 @@ namespace WzComparerR2.MapRender
             if (prepareCapture)
             {
                 //检查显卡支持纹理大小
-                var adapter = GraphicsDevice.CreationParameters.Adapter;
-                var cap = adapter.GetCapabilities(GraphicsDevice.CreationParameters.DeviceType);
+                var maxTextureWidth = 4096;
+                var maxTextureHeight = 4096;
+
                 Rectangle oldRect = this.renderEnv.Camera.WorldRect;
-                int width = Math.Min(oldRect.Width, cap.MaxTextureWidth);
-                int height = Math.Min(oldRect.Height, cap.MaxTextureHeight);
+                int width = Math.Min(oldRect.Width, maxTextureWidth);
+                int height = Math.Min(oldRect.Height, maxTextureHeight);
 
-                RenderTarget2D target2d = new RenderTarget2D(this.GraphicsDevice, width, height, 1, SurfaceFormat.Color);
-                DepthStencilBuffer depthBuf = new DepthStencilBuffer(this.GraphicsDevice,
-                    target2d.Width, target2d.Height, DepthFormat.Depth24);
-
-                DepthStencilBuffer oldDepthBuf = GraphicsDevice.DepthStencilBuffer;
+                var target2d = new RenderTarget2D(this.GraphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
 
                 //计算一组截图区
                 int horizonBlock = (int)Math.Ceiling(1.0 * oldRect.Width / width);
@@ -735,11 +734,10 @@ namespace WzComparerR2.MapRender
                             width,
                             height);
                         //绘制
-                        GraphicsDevice.DepthStencilBuffer = depthBuf;
-                        GraphicsDevice.SetRenderTarget(0, target2d);
+                        GraphicsDevice.SetRenderTarget(target2d);
                         GraphicsDevice.Clear(bgColor);
-                        this.renderEnv.Sprite.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None);
-                        this.SetRenderState();
+                        this.renderEnv.Sprite.Begin(SpriteSortMode.Deferred, StateEx.NonPremultipled_Hidef());
+                        //this.SetRenderState();
                         foreach (RenderPatch patch in this.renderingList)
                         {
                             if (this.patchVisibility.IsVisible(patch.ObjectType)
@@ -749,10 +747,9 @@ namespace WzComparerR2.MapRender
                             }
                         }
                         this.renderEnv.Sprite.End();
-                        GraphicsDevice.SetRenderTarget(0, null);
-                        GraphicsDevice.DepthStencilBuffer = oldDepthBuf;
+                        GraphicsDevice.SetRenderTarget(null);
                         //保存
-                        Texture2D t2d = target2d.GetTexture();
+                        Texture2D t2d = target2d;
                         Color[] data = new Color[target2d.Width * target2d.Height];
                         t2d.GetData<Color>(data);
                         picBlocks[i, j] = data;
@@ -760,7 +757,6 @@ namespace WzComparerR2.MapRender
                 }
 
                 target2d.Dispose();
-                depthBuf.Dispose();
                 SaveTexture(picBlocks, oldRect.Width, oldRect.Height, target2d.Width, target2d.Height);
 
                 //这帧就过去吧 阿门...
@@ -780,9 +776,9 @@ namespace WzComparerR2.MapRender
                     {
                         this.target2D.Dispose();
                     }
-                    this.target2D = new RenderTarget2D(this.GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Color);
+                    this.target2D = new RenderTarget2D(this.GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, false , SurfaceFormat.Color, DepthFormat.Depth24);
                 }
-                GraphicsDevice.SetRenderTarget(0, this.target2D);
+                GraphicsDevice.SetRenderTarget(this.target2D);
                 GraphicsDevice.Clear(bgColor);
 
                 switch (this.loadState)
@@ -790,8 +786,8 @@ namespace WzComparerR2.MapRender
                     case LoadState.Entering:
                     case LoadState.Rendering:
                     case LoadState.Exiting:
-                        this.renderEnv.Sprite.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None);
-                        this.SetRenderState();
+                        this.renderEnv.Sprite.Begin(SpriteSortMode.Deferred, StateEx.NonPremultipled_Hidef());
+                        //this.SetRenderState();
                         foreach (RenderPatch patch in this.renderingList)
                         {
                             if (this.patchVisibility.IsVisible(patch.ObjectType)
@@ -814,20 +810,20 @@ namespace WzComparerR2.MapRender
                         break;
                 }
 
-                GraphicsDevice.SetRenderTarget(0, null);
+                GraphicsDevice.SetRenderTarget(null);
                 GraphicsDevice.Clear(bgColor);
                 float alpha;
                 switch (this.loadState)
                 {
                     case LoadState.Entering:
                         {
-                            double time = (gameTime.TotalRealTime - stateChangedTime).TotalMilliseconds;
+                            double time = (gameTime.TotalGameTime - stateChangedTime).TotalMilliseconds;
                             alpha = MathHelper.Clamp((float)(time / EnteringTime), 0, 1);
                         }
                         break;
                     case LoadState.Exiting:
                         {
-                            double time = (gameTime.TotalRealTime - stateChangedTime).TotalMilliseconds;
+                            double time = (gameTime.TotalGameTime - stateChangedTime).TotalMilliseconds;
                             alpha = MathHelper.Clamp((float)(1 - time / ExitingTime), 0, 1);
                         }
                         break;
@@ -835,14 +831,14 @@ namespace WzComparerR2.MapRender
                     default: alpha = 0f; break;
                 }
 
-                this.renderEnv.Sprite.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None);
-                this.SetRenderState();
-                this.renderEnv.Sprite.Draw(this.target2D.GetTexture(),
+                this.renderEnv.Sprite.Begin(SpriteSortMode.Deferred, StateEx.NonPremultipled_Hidef());
+                //this.SetRenderState();
+                this.renderEnv.Sprite.Draw(this.target2D,
                     new Rectangle(0, 0, this.target2D.Width, this.target2D.Height),
                     new Color(Color.White, alpha));
                 this.renderEnv.Sprite.End();
 
-                this.renderEnv.Sprite.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None);
+                this.renderEnv.Sprite.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
                 if (showProfile)
                 {
                     profile.Remove(0, profile.Length);
@@ -882,7 +878,7 @@ namespace WzComparerR2.MapRender
                 this.renderEnv.Sprite.End();
 
                 //绘制文本框
-                this.renderEnv.Sprite.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None);
+                this.renderEnv.Sprite.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
                 if (this.isOnCommand)
                 {
                     Rectangle rect = new Rectangle(0, this.renderEnv.Camera.Height - 16, renderEnv.Camera.Width, 16);
@@ -905,31 +901,19 @@ namespace WzComparerR2.MapRender
                         origin = new Vector2(0, rect.Height - size.Y);
                     }
                     this.GraphicsDevice.ScissorRectangle = rect;
-                    this.GraphicsDevice.RenderState.ScissorTestEnable = true;
-                    this.renderEnv.Sprite.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None);
+                    this.GraphicsDevice.RasterizerState = StateEx.Scissor();
+                    this.renderEnv.Sprite.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
                     this.renderEnv.Sprite.FillRectangle(rect, new Color(Color.Black, this.isOnCommand ? 0.8f : 0.5f));
                     this.renderEnv.Sprite.DrawRectangle(rect, Color.Gray);
                     this.renderEnv.Sprite.DrawStringEx(font, txtChat, new Vector2(rect.X + origin.X, rect.Y + origin.Y), Color.White);
                     this.renderEnv.Sprite.End();
 
                     this.GraphicsDevice.ScissorRectangle = Rectangle.Empty;
-                    this.GraphicsDevice.RenderState.ScissorTestEnable = false;
+                    this.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
                 }
 
             }
             base.Draw(gameTime);
-        }
-
-        private void SetRenderState()
-        {
-            RenderState r = GraphicsDevice.RenderState;
-            r.SeparateAlphaBlendEnabled = true;
-            r.AlphaSourceBlend = Blend.One;
-            r.AlphaDestinationBlend = Blend.InverseSourceAlpha;
-            r.AlphaBlendOperation = BlendFunction.Add;
-            r.SourceBlend = Blend.SourceAlpha;
-            r.DestinationBlend = Blend.InverseSourceAlpha;
-            r.BlendFunction = BlendFunction.Add;
         }
 
         private void SaveTexture(Color[,][] picBlocks, int mapWidth, int mapHeight, int blockWidth, int blockHeight)
@@ -1019,7 +1003,11 @@ namespace WzComparerR2.MapRender
             {
                 string path = Path.Combine(dir.FullName, patch.Name + ".png");
                 if (patch.Frames != null)
-                    patch.Frames[0].Texture.Save(path, ImageFileFormat.Png);
+                {
+                    var texture = patch.Frames[0].Texture;
+                    using (var file = File.OpenWrite(path))
+                        texture.SaveAsPng(file, texture.Width, texture.Height);
+                }
             }
         }
 

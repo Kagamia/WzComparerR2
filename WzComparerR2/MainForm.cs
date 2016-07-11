@@ -2920,5 +2920,9 @@ namespace WzComparerR2
 
         }
 
+        private void buttonItemUpdate_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/Kagamia/WzComparerR2/releases");
+        }
     }
 }

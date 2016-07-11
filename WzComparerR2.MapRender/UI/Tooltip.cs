@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Resource = CharaSimResource.Resource;
 using WzComparerR2.MapRender.Patches;
 using WzComparerR2.Common;
+using WzComparerR2.Rendering;
 
 namespace WzComparerR2.MapRender.UI
 {
@@ -14,16 +15,16 @@ namespace WzComparerR2.MapRender.UI
         public Tooltip(GraphicsDevice graphicsDevice)
         {
             this.frame = new Dictionary<string, Texture2D>();
-            this.frame["n"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIToolTip_img_Item_Frame2_n);
-            this.frame["ne"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIToolTip_img_Item_Frame2_ne);
-            this.frame["e"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIToolTip_img_Item_Frame2_e);
-            this.frame["se"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIToolTip_img_Item_Frame2_se);
-            this.frame["s"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIToolTip_img_Item_Frame2_s);
-            this.frame["sw"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIToolTip_img_Item_Frame2_sw);
-            this.frame["w"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIToolTip_img_Item_Frame2_w);
-            this.frame["nw"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIToolTip_img_Item_Frame2_nw);
-            this.frame["c"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIToolTip_img_Item_Frame2_c);
-            this.frame["cover"] = Utils.BitmapToTexture(graphicsDevice, Resource.UIToolTip_img_Item_Frame2_cover);
+            this.frame["n"] = Resource.UIToolTip_img_Item_Frame2_n.ToTexture(graphicsDevice);
+            this.frame["ne"] = Resource.UIToolTip_img_Item_Frame2_ne.ToTexture(graphicsDevice);
+            this.frame["e"] = Resource.UIToolTip_img_Item_Frame2_e.ToTexture(graphicsDevice);
+            this.frame["se"] = Resource.UIToolTip_img_Item_Frame2_se.ToTexture(graphicsDevice);
+            this.frame["s"] = Resource.UIToolTip_img_Item_Frame2_s.ToTexture(graphicsDevice);
+            this.frame["sw"] = Resource.UIToolTip_img_Item_Frame2_sw.ToTexture(graphicsDevice);
+            this.frame["w"] = Resource.UIToolTip_img_Item_Frame2_w.ToTexture(graphicsDevice);
+            this.frame["nw"] = Resource.UIToolTip_img_Item_Frame2_nw.ToTexture(graphicsDevice);
+            this.frame["c"] = Resource.UIToolTip_img_Item_Frame2_c.ToTexture(graphicsDevice);
+            this.frame["cover"] = Resource.UIToolTip_img_Item_Frame2_cover.ToTexture(graphicsDevice);
         }
 
         private Dictionary<string, Texture2D> frame;

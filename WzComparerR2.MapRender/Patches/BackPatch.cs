@@ -73,7 +73,7 @@ namespace WzComparerR2.MapRender.Patches
                 cy = (this.cy == 0 ? frame.Texture.Height : this.cy);
             Vector2 origin2 = new Vector2();
 
-            double ms = gameTime.TotalRealTime.TotalSeconds;
+            double ms = gameTime.TotalGameTime.TotalSeconds;
 
             if ((this.TileMode & TileMode.ScrollHorizontial) != 0)
             {

@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WzComparerR2.MapRender</RootNamespace>
     <AssemblyName>WzComparerR2.MapRender</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,7 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bass.Net">
@@ -45,13 +46,19 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\IMEHelper.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Xna.Framework, Version=3.1.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=x86">
+    <Reference Include="MonoGame.Framework, Version=3.4.0.456, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\Microsoft.Xna.Framework.dll</HintPath>
+      <HintPath>..\References\MonoGame.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Xna.Framework.Game, Version=3.1.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=x86">
+    <Reference Include="SharpDX, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\Microsoft.Xna.Framework.Game.dll</HintPath>
+      <HintPath>..\References\SharpDX.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SharpDX.RawInput, Version=2.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\SharpDX.RawInput.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="SignalR.Client.20, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -68,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FrmMapRender2.cs" />
+    <Compile Include="GameExt.cs" />
     <Compile Include="MapScene.cs" />
     <Compile Include="Net\ChatClient.cs" />
     <Compile Include="Patches\BackPatch.cs" />
@@ -76,7 +84,6 @@
     <Compile Include="Entry.cs" />
     <Compile Include="Patches\FootholdPatch.cs" />
     <Compile Include="FpsCounter.cs" />
-    <Compile Include="Frm1.cs" />
     <Compile Include="FrmMapRender.cs" />
     <Compile Include="InputState.cs" />
     <Compile Include="ITooltip.cs" />
@@ -99,7 +106,6 @@
     <Compile Include="RenderFrame.cs" />
     <Compile Include="Patches\RenderObjectType.cs" />
     <Compile Include="Patches\RenderPatch.cs" />
-    <Compile Include="SpriteBatchEx.cs" />
     <Compile Include="TextureLoader.cs" />
     <Compile Include="TileMode.cs" />
     <Compile Include="UI\Tooltip.cs" />
@@ -107,8 +113,6 @@
     <Compile Include="UI\NineFormResource.cs" />
     <Compile Include="UI\UIGraphics.cs" />
     <Compile Include="UI\UIMiniMap.cs" />
-    <Compile Include="Utils.cs" />
-    <Compile Include="XnaFont.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CharaSimResource\CharaSimResource.csproj">
@@ -131,14 +135,6 @@
       <Name>WzComparerR2.WzLib</Name>
       <Private>False</Private>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="d3dx9_31.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="X3DAudio1_6.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

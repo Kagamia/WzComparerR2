@@ -50,12 +50,12 @@ namespace WzComparerR2.MapRender
             }
             else
             {
-                TimeSpan totalElapsed = gameTime.TotalRealTime - lastUpdate;
+                TimeSpan totalElapsed = gameTime.TotalGameTime - lastUpdate;
                 if (totalElapsed >= this.CountInterval)
                 {
                     this.UpdatePerSec = this.updateCount / totalElapsed.TotalSeconds;
                     this.updateCount = 0;
-                    this.lastUpdate = gameTime.TotalRealTime;
+                    this.lastUpdate = gameTime.TotalGameTime;
                 }
             }
         }
@@ -81,12 +81,12 @@ namespace WzComparerR2.MapRender
             }
             else
             {
-                TimeSpan totalElapsed = gameTime.TotalRealTime - lastDraw;
+                TimeSpan totalElapsed = gameTime.TotalGameTime - lastDraw;
                 if (totalElapsed >= this.CountInterval)
                 {
                     this.DrawPerSec = this.drawCount / totalElapsed.TotalSeconds;
                     this.drawCount = 0;
-                    this.lastDraw = gameTime.TotalRealTime;
+                    this.lastDraw = gameTime.TotalGameTime;
                 }
             }
         }

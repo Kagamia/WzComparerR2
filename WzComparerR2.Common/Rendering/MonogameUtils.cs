@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.InteropServices;
 using GdipColor = System.Drawing.Color;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -68,6 +69,23 @@ namespace WzComparerR2.Rendering
             SharpDX.Utilities.Dispose(ref oldRes);
             _textureField.SetValue(t2d, res);
 
+            return t2d;
+        }
+
+        public static Texture2D ToTexture(this System.Drawing.Bitmap bitmap, GraphicsDevice device)
+        {
+            var rect = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
+            var bmpData = bitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            byte[] buffer = new byte[bmpData.Stride * bmpData.Height];
+            Marshal.Copy(bmpData.Scan0, buffer, 0, buffer.Length);
+            bitmap.UnlockBits(bmpData);
+
+            //bgra->rgba
+            MonogameUtils.BgraToColor(buffer);
+
+            var t2d = new Texture2D(device, rect.Width, rect.Height, false, SurfaceFormat.Color);
+            t2d.SetData(buffer);
             return t2d;
         }
 
