@@ -57,6 +57,13 @@ namespace WzComparerR2.Config
             set { this["comparerOutputFolder"] = value; }
         }
 
+        [ConfigurationProperty("sortWzOnOpened")]
+        public ConfigItem<bool> SortWzOnOpened
+        {
+            get { return (ConfigItem<bool>)this["sortWzOnOpened"]; }
+            set { this["sortWzOnOpened"] = value; }
+        }
+
         [ConfigurationProperty("patcherSettings")]
         [ConfigurationCollection(typeof(PatcherSetting),CollectionType = ConfigurationElementCollectionType.AddRemoveClearMap)]
         public PatcherSettingCollection PatcherSettings

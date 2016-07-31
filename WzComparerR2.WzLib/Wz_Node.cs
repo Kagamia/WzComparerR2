@@ -291,7 +291,7 @@ namespace WzComparerR2.WzLib
         {
             if (other != null)
             {
-                return string.Compare(this.Text, other.Text);
+                return string.Compare(this.Text, other.Text, StringComparison.InvariantCulture);
             }
             else
             {
@@ -307,6 +307,13 @@ namespace WzComparerR2.WzLib
             if (node == null)
                 return defaultValue;
             return node.GetValue<T>(defaultValue);
+        }
+
+        public static T? GetValueEx<T>(this Wz_Node node) where T : struct
+        {
+            if (node == null)
+                return null;
+            return node.GetValue<T>();
         }
 
         /// <summary>

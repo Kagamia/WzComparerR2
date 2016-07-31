@@ -72,7 +72,7 @@ namespace WzComparerR2.Patcher
             if (r.ReadUInt16() == 0x5a4d)//"MZ"
             {
                 metaStream.Seek(-4, SeekOrigin.End);
-                uint check = r.ReadUInt32();
+                ulong check = r.ReadUInt32();
                 if (check == 0xf2f7fbf3)
                 {
                     metaStream.Seek(-12, SeekOrigin.End);
@@ -83,9 +83,24 @@ namespace WzComparerR2.Patcher
                     metaStream.Seek(patchBlockLength, SeekOrigin.Current);
                     noticeText = Encoding.Default.GetString(r.ReadBytes(noticeLength));
                 }
-                else
+                else //兼容TMS的patch.exe
                 {
-                    return null;
+                    metaStream.Seek(-8, SeekOrigin.End);
+                    check = r.ReadUInt64();
+                    if (check == 0xf2f7fbf3)
+                    {
+                        metaStream.Seek(-24, SeekOrigin.End);
+                        long patchBlockLength = r.ReadInt64();
+                        long noticeLength = r.ReadInt64();
+                        metaStream.Seek(-24 - noticeLength - patchBlockLength, SeekOrigin.End);
+                        patchBlock = new PartialStream(metaStream, metaStream.Position, patchBlockLength);
+                        metaStream.Seek(patchBlockLength, SeekOrigin.Current);
+                        noticeText = Encoding.Default.GetString(r.ReadBytes((int)noticeLength));
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
             else

@@ -132,6 +132,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incPDD_incMDD: return "物理/魔法防御力：" + sign + value;
                 case GearPropType.incACC_incEVA: return "命中值/回避值：" + sign + value;
 
+                case GearPropType.incARC: return "ARC : " + sign + value;
                 default: return null;
             }
         }

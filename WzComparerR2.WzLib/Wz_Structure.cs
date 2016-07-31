@@ -88,7 +88,7 @@ namespace WzComparerR2.WzLib
                 node.Value = file;
                 file.Node = node;
                 file.FileStream.Position = 62;
-                file.GetDirTree(node, false, useBaseWz);
+                file.GetDirTree(node, useBaseWz);
                 file.DetectWzType();
                 file.DetectWzVersion();
             }

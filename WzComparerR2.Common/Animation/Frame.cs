@@ -18,14 +18,21 @@ namespace WzComparerR2.Animation
             this.A1 = 255;
         }
 
-        public Frame(Texture2D texture) : this()
+        public Frame(Texture2D texture) : this(texture, null)
         {
-            this.Texture = texture;
+        }
+
+        public Frame(Texture2D atlasPage, Rectangle? atlasRect) : this()
+        {
+            this.Texture = atlasPage;
+            this.AtlasRect = atlasRect;
         }
 
         public Texture2D Texture { get; set; }
+        public Rectangle? AtlasRect { get; set; }
         public Wz_Png Png { get; set; }
         public Point Origin { get; set; }
+        public int Z { get; set; }
         public int Delay { get; set; }
         public int A0 { get; set; }
         public int A1 { get; set; }
@@ -34,8 +41,18 @@ namespace WzComparerR2.Animation
         {
             get
             {
-                return Texture == null ? Rectangle.Empty :
-                    new Rectangle(-Origin.X, -Origin.Y, Texture.Width, Texture.Height);
+                if (AtlasRect != null)
+                {
+                    return new Rectangle(-Origin.X, -Origin.Y, AtlasRect.Value.Width, AtlasRect.Value.Height);
+                }
+                else if (Texture != null)
+                {
+                    return new Rectangle(-Origin.X, -Origin.Y, Texture.Width, Texture.Height);
+                }
+                else
+                {
+                    return Rectangle.Empty;
+                }   
             }
         }
 
@@ -74,6 +91,9 @@ namespace WzComparerR2.Animation
                             break;
                         case "delay":
                             frame.Delay = propNode.GetValue<int>();
+                            break;
+                        case "z":
+                            frame.Z = propNode.GetValue<int>();
                             break;
                         case "a0":
                             frame.A0 = propNode.GetValue<int>();

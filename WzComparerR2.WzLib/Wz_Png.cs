@@ -180,16 +180,7 @@ namespace WzComparerR2.WzLib
             switch (this.form)
             {
                 case 1: //16位argba4444
-                    byte[] argb = new Byte[pixel.Length * 2];
-                    {
-                        int p;
-                        for (int i = 0; i < pixel.Length; i++)
-                        {
-                            p = pixel[i] & 0x0F; p |= (p << 4); argb[i * 2] = (byte)p;
-                            p = pixel[i] & 0xF0; p |= (p >> 4); argb[i * 2 + 1] = (byte)p;
-                        }
-                    }
-
+                    byte[] argb = GetPixelDataBgra4444(pixel, this.w, this.h);
                     pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format32bppArgb);
                     bmpdata = pngDecoded.LockBits(new Rectangle(Point.Empty, pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                     Marshal.Copy(argb, 0, bmpdata.Scan0, argb.Length);
@@ -324,7 +315,21 @@ namespace WzComparerR2.WzLib
             return pngDecoded;
         }
 
-        private static byte[] GetPixelDataDXT3(byte[] rawData, int width, int height)
+        public static byte[] GetPixelDataBgra4444(byte[] rawData, int width, int height)
+        {
+            byte[] argb = new byte[width * height * 4];
+            {
+                int p;
+                for (int i = 0; i < rawData.Length; i++)
+                {
+                    p = rawData[i] & 0x0F; p |= (p << 4); argb[i * 2] = (byte)p;
+                    p = rawData[i] & 0xF0; p |= (p >> 4); argb[i * 2 + 1] = (byte)p;
+                }
+            }
+            return argb;
+        }
+
+        public static byte[] GetPixelDataDXT3(byte[] rawData, int width, int height)
         {
             byte[] pixel = new byte[width * height * 4];
 
@@ -360,7 +365,7 @@ namespace WzComparerR2.WzLib
             return pixel;
         }
 
-        private static byte[] GetPixelDataDXT5(byte[] rawData, int width, int height)
+        public static byte[] GetPixelDataDXT5(byte[] rawData, int width, int height)
         {
             byte[] pixel = new byte[width * height * 4];
 

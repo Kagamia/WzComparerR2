@@ -15,7 +15,15 @@ namespace WzComparerR2.Config
             get
             {
                 string secName = ConfigManager.GetSectionName(typeof(T));
-                return ConfigManager.ConfigFile.GetSection(secName) as T;
+                try
+                {
+                    return ConfigManager.ConfigFile.GetSection(secName) as T;
+                }
+                catch (ConfigurationErrorsException e)
+                {
+                    ConfigManager.Reload();
+                    return ConfigManager.ConfigFile.GetSection(secName) as T;
+                }
             }
         }
     }

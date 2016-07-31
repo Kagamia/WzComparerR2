@@ -286,7 +286,7 @@ namespace WzComparerR2
             if (wzNode == null)
                 return null;
 
-            Node parentNode = new Node(wzNode.Text) { Tag = wzNode.Value };
+            Node parentNode = new Node(wzNode.Text) { Tag = new WeakReference(wzNode) };
             foreach (Wz_Node subNode in wzNode.Nodes)
             {
                 Node subTreeNode = createNode(subNode);
@@ -307,98 +307,6 @@ namespace WzComparerR2
                 sortWzNode(subNode);
             }
         }
-
-        /// <summary>
-        /// 搜索node所属的wz_file，若搜索不到则返回null。
-        /// </summary>
-        /// <param Name="node">要搜索的node。</param>
-        /// <returns></returns>
-        private Wz_File getNodeWzFile(Node node)
-        {
-            Wz_File wzfile = null;
-            Wz_Image wzImg = null;
-            while (node != null)
-            {
-                if ((wzfile = node.Tag as Wz_File) != null)
-                {
-                    break;
-                }
-                if ((wzImg = node.Tag as Wz_Image) != null)
-                {
-                    wzfile = wzImg.WzFile;
-                    break;
-                }
-                node = node.Parent;
-            }
-
-            if (wzfile != null && openedWz.Contains(wzfile.WzStructure))
-            {
-                return wzfile;
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// 搜索node对应的wz_node，若搜索不到则返回null。
-        /// </summary>
-        /// <param Name="node">要搜索的node。</param>
-        /// <returns></returns>
-        private Wz_Node getWzNodeByNode(Node node)
-        {
-            Stack<string> path = new Stack<string>();
-            Wz_File wzfile;
-            Wz_Image wzImg;
-            Wz_Node wzNode = null;
-            while (node != null)
-            {
-                if ((wzfile = node.Tag as Wz_File) != null)
-                {
-                    wzNode = wzfile.Node;
-                    break;
-                }
-                if ((wzImg = node.Tag as Wz_Image) != null)
-                {
-                    wzNode = wzImg.Node;
-                    break;
-                }
-                path.Push(node.Text);
-                node = node.Parent;
-            }
-
-            if (wzNode != null)
-            {
-                if (path.Count == 0)
-                    return wzNode;
-                else
-                    return wzNode.FindNodeByPath(string.Join("\\", path.ToArray()));
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// 搜索node对应的wz_node，若搜索不到则返回null。
-        /// </summary>
-        /// <param Name="node">要搜索的node。</param>
-        /// <param Name="topNode">要搜索node的顶级父节点所对应的wzNode。</param>
-        /// <returns></returns>
-        private Wz_Node getWzNodeByNode(Node node, Wz_Node topNode)
-        {
-            if (topNode == null)
-                return getWzNodeByNode(node);
-
-            Stack<string> path = new Stack<string>();
-            while (node != null && node.Parent != null)
-            {
-                path.Push(node.Text);
-                node = node.Parent;
-            }
-
-            if (path.Count == 0)
-                return topNode;
-            else
-                return topNode.FindNodeByPath(string.Join("\\", path.ToArray()));
-        }
-
         #endregion
 
         #region wz提取右侧
@@ -476,26 +384,6 @@ namespace WzComparerR2
             labelItemStatus.Text = "图片保存于" + gifFileName;
         }
 
-        private void buttonItemHandleUol_Click(object sender, EventArgs e)
-        {
-            if (advTree3.SelectedNode == null || !(advTree3.SelectedNode.Tag is Wz_Uol))
-            {
-                labelItemStatus.Text = "没有选中适当的uol节点...";
-                return;
-            }
-            Wz_Uol uol = advTree3.SelectedNode.Tag as Wz_Uol;
-            Node uolNode = handleUol(advTree3.SelectedNode, uol.Uol);
-            if (uolNode == null)
-            {
-                labelItemStatus.Text = "没有找到uol对应的节点...请试着载入更底层的父节点重新执行..";
-                return;
-            }
-            else
-            {
-                advTree3.SelectedNode = uolNode;
-            }
-        }
-
         private Node handleUol(Node currentNode, string uolString)
         {
             if (currentNode == null || currentNode.Parent == null || string.IsNullOrEmpty(uolString))
@@ -544,7 +432,7 @@ namespace WzComparerR2
             if (advTree3.SelectedNode == null)
                 return;
 
-            Wz_Node node = getWzNodeByNode(advTree3.SelectedNode, advTree3.Tag as Wz_Node);
+            Wz_Node node = advTree3.SelectedNode.AsWzNode();
             string aniName = GetSelectedNodeImageName();
 
             //添加到动画控件
@@ -577,7 +465,7 @@ namespace WzComparerR2
 
         private string GetSelectedNodeImageName()
         {
-            Wz_Node node = getWzNodeByNode(advTree3.SelectedNode, advTree3.Tag as Wz_Node);
+            Wz_Node node = advTree3.SelectedNode.AsWzNode();
 
             string aniName;
             switch (ImageHandlerConfig.Default.ImageNameMethod.Value)
@@ -672,6 +560,10 @@ namespace WzComparerR2
             try
             {
                 wz.Load(wzFilePath);
+                if (WcR2Config.Default.SortWzOnOpened)
+                {
+                    sortWzNode(wz.WzNode);
+                }
                 Node node = createNode(wz.WzNode);
                 node.Expand();
                 advTree1.Nodes.Add(node);
@@ -679,7 +571,7 @@ namespace WzComparerR2
                 OnWzOpened(new WzStructureEventArgs(wz)); //触发事件
                 QueryPerformance.End();
                 labelItemStatus.Text = "读取成功,用时" + (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000) + "ms,共读取" + wz.img_number + "img.";
-
+                
                 ConfigManager.Reload();
                 WcR2Config.Default.RecentDocuments.Remove(wzFilePath);
                 WcR2Config.Default.RecentDocuments.Insert(0, wzFilePath);
@@ -718,7 +610,7 @@ namespace WzComparerR2
                 return;
             }
 
-            Wz_File wz_f = getNodeWzFile(advTree1.SelectedNode);
+            Wz_File wz_f = advTree1.SelectedNode.AsWzNode()?.GetNodeWzFile();
             if (wz_f == null)
             {
                 MessageBoxEx.Show("没有正确选择要关闭的wz。", "喵~");
@@ -732,24 +624,17 @@ namespace WzComparerR2
 
             Wz_Image image = null;
             if (advTree2.Nodes.Count > 0
-                && (image = advTree2.Nodes[0].Tag as Wz_Image) != null
+                && (image = advTree2.Nodes[0].AsWzNode()?.Value as Wz_Image) != null
                 && image.WzFile.WzStructure == wz)
             {
                 advTree2.Nodes.Clear();
             }
 
-            if (advTree3.Nodes.Count > 0)
+            if (advTree3.Nodes.Count > 0
+                && (image = advTree3.Nodes[0].AsWzNode()?.GetNodeWzImage()) != null
+                && image.WzFile.WzStructure == wz)
             {
-                Wz_Node node = advTree3.Tag as Wz_Node;
-                while (node != null && node.ParentNode != null)
-                {
-                    node = node.ParentNode;
-                }
-                if ((image = node.Value as Wz_Image) != null
-                    && image.WzFile.WzStructure == wz)
-                {
-                    advTree3.Nodes.Clear();
-                }
+                advTree3.Nodes.Clear();
             }
 
             OnWzClosing(new WzStructureEventArgs(wz));
@@ -846,17 +731,24 @@ namespace WzComparerR2
 
         private void advTree1_AfterNodeSelect(object sender, AdvTreeNodeEventArgs e)
         {
-            if (e.Node == null)
+            Wz_Node selectedNode = e.Node.AsWzNode();
+
+            if (selectedNode == null)
+            {
                 return;
+            }
+
+            listViewExWzDetail.BeginUpdate();
             listViewExWzDetail.Items.Clear();
-            if (e.Node.Tag == null)
+
+            if (selectedNode.Value == null)
             {
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Dir Name", Path.GetFileName(e.Node.Text) }));
                 autoResizeColumns(listViewExWzDetail);
             }
-            else if (e.Node.Tag is Wz_File)
+            else if (selectedNode.Value is Wz_File)
             {
-                Wz_File wzFile = (Wz_File)e.Node.Tag;
+                Wz_File wzFile = (Wz_File)selectedNode.Value;
 
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "File Name", wzFile.Header.FileName }));
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "File Size", wzFile.Header.FileSize + " bytes" }));
@@ -865,14 +757,14 @@ namespace WzComparerR2
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Wz Type", wzFile.Type.ToString() }));
                 autoResizeColumns(listViewExWzDetail);
             }
-            else if (e.Node.Tag is Wz_Image)
+            else if (selectedNode.Value is Wz_Image)
             {
-                Wz_Image wzImage = (Wz_Image)e.Node.Tag;
+                Wz_Image wzImage = (Wz_Image)selectedNode.Value;
 
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Image Name", wzImage.Name }));
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Image Size", wzImage.Size + " bytes" }));
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Image Offset", wzImage.Offset + " bytes" }));
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Path", getImageFullPath(e.Node) }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Path", wzImage.Node.FullPathToFile }));
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Check Sum", wzImage.Checksum.ToString() }));
                 autoResizeColumns(listViewExWzDetail);
 
@@ -903,6 +795,7 @@ namespace WzComparerR2
                     labelItemStatus.Text = "读取image失败:" + ex.Message;
                 }
             }
+            listViewExWzDetail.EndUpdate();
         }
 
         private void autoResizeColumns(ListViewEx listView)
@@ -914,50 +807,42 @@ namespace WzComparerR2
             }
         }
 
-        private string getImageFullPath(Node imageNode)
-        {
-            if (imageNode == null) return null;
-            List<string> dirs = new List<string>();
-            dirs.Add(imageNode.Text);
-
-            while (imageNode.Parent != null)
-            {
-                imageNode = imageNode.Parent;
-
-                if (imageNode.Tag is Wz_File)
-                {
-                    dirs.Insert(0, Path.GetFileName((imageNode.Tag as Wz_File).Header.FileName));
-                    break;
-                }
-                else
-                {
-                    dirs.Insert(0, imageNode.Text);
-                }
-            }
-
-            return string.Join("\\", dirs.ToArray());
-        }
-
         private void advTree2_NodeDoubleClick(object sender, TreeNodeMouseEventArgs e)
         {
             if (e.Node == null || e.Button != MouseButtons.Left)
                 return;
             historyNodeList.Clear();
             advTree3.Nodes.Clear();
-            advTree3.Nodes.Add(createNodeDetail(e.Node));
-            advTree3.ExpandAll();
-            advTree3.Tag = getWzNodeByNode(e.Node); //记录打开的img;
-            if (advTree3.Nodes.Count > 0)
-                advTree3.SelectedNode = advTree3.Nodes[0];
+
+            var selectedNode = e.Node.AsWzNode();
+            if (selectedNode != null)
+            {
+                advTree3.BeginUpdate();
+                try
+                {
+                    var node = createNodeDetail(e.Node);
+                    node.ExpandAll();
+                    advTree3.Nodes.Add(node);
+                    advTree3.SelectedNode = node;
+                }
+                finally
+                {
+                    advTree3.EndUpdate();
+                }
+            }
         }
 
         private Node createNodeDetail(Node parentNode)
         {
             Node newNode = new Node(parentNode.Text);
             newNode.Tag = parentNode.Tag;
-            newNode.Cells.Add(new Cell(newNode.Tag == null ? "<" + parentNode.Nodes.Count + ">" : getValueString(newNode.Tag)));
-            newNode.Cells.Add(new Cell(newNode.Tag == null ? null : newNode.Tag.GetType().Name));
-            newNode.ImageKey = newNode.Tag == null ? "dir" : (getValueImageKey(newNode.Tag) ?? "num");
+            Wz_Node wzNode = newNode.AsWzNode();
+            if (wzNode != null)
+            {
+                newNode.Cells.Add(new Cell(wzNode.Value == null ? "<" + parentNode.Nodes.Count + ">" : getValueString(wzNode.Value)));
+                newNode.Cells.Add(new Cell(wzNode.Value == null ? null : wzNode.Value.GetType().Name));
+                newNode.ImageKey = wzNode.Value == null ? "dir" : (getValueImageKey(wzNode.Value) ?? "num");
+            }
             foreach (Node subNode in parentNode.Nodes)
             {
                 newNode.Nodes.Add(createNodeDetail(subNode));
@@ -1029,7 +914,8 @@ namespace WzComparerR2
                 historySelecting = false;
             }
 
-            if (e.Node.Tag == null)
+            Wz_Node selectedNode = e.Node.AsWzNode();
+            if (selectedNode == null)
                 return;
 
             Wz_Png png;
@@ -1037,7 +923,7 @@ namespace WzComparerR2
             Wz_Vector vector;
             Wz_Uol uol;
 
-            if ((png = e.Node.Tag as Wz_Png) != null)
+            if ((png = selectedNode.Value as Wz_Png) != null)
             {
                 pictureBoxEx1.PictureName = GetSelectedNodeImageName();
                 pictureBoxEx1.ShowImage(png);
@@ -1048,18 +934,18 @@ namespace WzComparerR2
                     "size: " + png.Width + "*" + png.Height + "\r\n" +
                     "png format: " + png.Form;
             }
-            else if ((vector = e.Node.Tag as Wz_Vector) != null)
+            else if ((vector = selectedNode.Value as Wz_Vector) != null)
             {
                 textBoxX1.Text = "x: " + vector.X + " px\r\n" +
                     "y: " + vector.Y + " px";
             }
-            else if ((uol = e.Node.Tag as Wz_Uol) != null)
+            else if ((uol = selectedNode.Value as Wz_Uol) != null)
             {
                 textBoxX1.Text = "uolPath: " + uol.Uol;
             }
-            else if ((sound = e.Node.Tag as Wz_Sound) != null)
+            else if ((sound = selectedNode.Value as Wz_Sound) != null)
             {
-                preLoadSound(sound, e.Node.Text);
+                preLoadSound(sound, selectedNode.Text);
                 textBoxX1.Text = "dataLength: " + sound.DataLength + " bytes\r\n" +
                     "offset: " + sound.Offset + "\r\n" +
                     "time: " + sound.Ms + " ms\r\n" +
@@ -1067,26 +953,26 @@ namespace WzComparerR2
                     "freq: " + sound.Frequency + " Hz\r\n" +
                     "type: " + sound.SoundType.ToString();
             }
-            else if (e.Node.Tag is Wz_Image)
+            else if (selectedNode.Value is Wz_Image)
             {
                 //do nothing;
             }
             else
             {
-                string valueStr = Convert.ToString(e.Node.Tag);
+                string valueStr = Convert.ToString(selectedNode.Value);
                 if (valueStr != null && valueStr.Contains("\n") && !valueStr.Contains("\r\n"))
                 {
                     valueStr = valueStr.Replace("\n", "\r\n");
                 }
                 textBoxX1.Text = Convert.ToString(valueStr);
 
-                switch (e.Node.Text)
+                switch (selectedNode.Text)
                 {
                     case "source":
                     case "_inlink":
                     case "_outlink":
                         {
-                            var parentNode = getWzNodeByNode(e.Node, advTree3.Tag as Wz_Node)?.ParentNode;
+                            var parentNode = selectedNode.ParentNode;
                             if (parentNode != null && parentNode.Value is Wz_Png)
                             {
                                 var linkNode = parentNode.GetLinkedSourceNode(PluginManager.FindWz);
@@ -1280,7 +1166,7 @@ namespace WzComparerR2
                     return false;
                 }
 
-                if (find.Tag is Wz_Image)
+                if (find.AsWzNode()?.Value is Wz_Image)
                 {
                     advTree1.SelectedNode = find;
                     if (advTree2.Nodes.Count > 0)
@@ -1470,7 +1356,7 @@ namespace WzComparerR2
         {
             foreach (Node baseNode in advTree1.Nodes)
             {
-                Wz_File wz_f = baseNode.Tag as Wz_File;
+                Wz_File wz_f = baseNode.AsWzNode()?.Value as Wz_File;
                 if (wz_f != null)
                 {
                     if (wz_f == wzFile)
@@ -1481,7 +1367,7 @@ namespace WzComparerR2
                     {
                         foreach (Node wzNode in baseNode.Nodes)
                         {
-                            if ((wz_f = wzNode.Tag as Wz_File) != null && wz_f == wzFile)
+                            if ((wz_f = wzNode.AsWzNode()?.Value as Wz_File) != null && wz_f == wzFile)
                             {
                                 return wzNode;
                             }
@@ -1549,8 +1435,8 @@ namespace WzComparerR2
 
         private void tsmi1Export_Click(object sender, EventArgs e)
         {
-            Wz_Image img;
-            if (advTree1.SelectedNode == null || (img = advTree1.SelectedNode.Tag as Wz_Image) == null)
+            Wz_Image img = advTree1.SelectedNode?.AsWzNode()?.Value as Wz_Image;
+            if (img == null)
             {
                 MessageBoxEx.Show("没有选中一个用于导出的wz_img。");
                 return;
@@ -1814,8 +1700,8 @@ namespace WzComparerR2
 
         private void buttonItemSelectStringWz_Click(object sender, EventArgs e)
         {
-            Wz_File stringWzFile;
-            if (advTree1.SelectedNode == null || (stringWzFile = advTree1.SelectedNode.Tag as Wz_File) == null)
+            Wz_File stringWzFile = advTree1.SelectedNode?.AsWzNode()?.GetNodeWzFile();
+            if (stringWzFile == null)
             {
                 MessageBoxEx.Show("没有选择一个用于初始化StringLinker的WzFile。", "喵...");
                 return;
@@ -2031,10 +1917,10 @@ namespace WzComparerR2
         #region contextMenuStrip2
         private void tsmi2SaveAs_Click(object sender, EventArgs e)
         {
-            if (advTree3.SelectedNode == null)
-                return;
+            object item = advTree3.SelectedNode?.AsWzNode()?.Value;
 
-            object item = advTree3.SelectedNode.Tag;
+            if (item == null)
+                return;
 
             if (item is string)
             {
@@ -2108,12 +1994,13 @@ namespace WzComparerR2
 
         private void tsmi2HandleUol_Click(object sender, EventArgs e)
         {
-            if (advTree3.SelectedNode == null || !(advTree3.SelectedNode.Tag is Wz_Uol))
+            Wz_Uol uol = advTree3.SelectedNode?.AsWzNode()?.Value as Wz_Uol;
+            if (uol == null)
             {
                 labelItemStatus.Text = "没有选中适当的uol节点...";
                 return;
             }
-            Wz_Uol uol = advTree3.SelectedNode.Tag as Wz_Uol;
+
             Node uolNode = handleUol(advTree3.SelectedNode, uol.Uol);
             if (uolNode == null)
             {
@@ -2194,6 +2081,7 @@ namespace WzComparerR2
                         nodeList.Enqueue(child);
                 }
             }
+
             while (nodeList.Count > 0)
             {
                 yield return nodeList.Dequeue();
@@ -2220,7 +2108,7 @@ namespace WzComparerR2
 
         private void contextMenuStrip2_Opening(object sender, CancelEventArgs e)
         {
-            var node = getWzNodeByNode(advTree3.SelectedNode, advTree3.Tag as Wz_Node);
+            var node = advTree3.SelectedNode.AsWzNode();
             tsmi2SaveAs.Visible = false;
             tsmi2HandleUol.Visible = false;
             if (node != null)
@@ -2277,9 +2165,15 @@ namespace WzComparerR2
 
         private void quickView(Node node)
         {
+            Wz_Node selectedNode = node.AsWzNode();
+            if (selectedNode == null)
+            {
+                return;
+            }
+
             Wz_Image image;
 
-            Wz_File wzf = getNodeWzFile(node);
+            Wz_File wzf = selectedNode.GetNodeWzFile();
             if (wzf == null)
             {
                 labelItemStatus.Text = "没有查询到节点所属的wzfile。";
@@ -2296,7 +2190,7 @@ namespace WzComparerR2
             switch (wzf.Type)
             {
                 case Wz_Type.Character:
-                    if ((image = node.Tag as Wz_Image) == null || !image.TryExtract())
+                    if ((image = selectedNode.Value as Wz_Image) == null || !image.TryExtract())
                         return;
                     if (CharaSimLoader.LoadedSetItems.Count == 0)
                     {
@@ -2310,7 +2204,7 @@ namespace WzComparerR2
                     }
                     break;
                 case Wz_Type.Item:
-                    Wz_Node itemNode = getWzNodeByNode(node);
+                    Wz_Node itemNode = selectedNode;
                     if (Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\(Cash|Consume|Etc|Install|Cash)\\\d{4}.img\\\d+$"))
                     {
                         var item = Item.CreateFromNode(itemNode);
@@ -2336,7 +2230,7 @@ namespace WzComparerR2
 
                     break;
                 case Wz_Type.Skill:
-                    Wz_Node skillNode = getWzNodeByNode(node);
+                    Wz_Node skillNode = selectedNode;
                     //模式路径分析
                     if (Regex.IsMatch(skillNode.FullPathToFile, @"^Skill\\Recipe_\d+.img\\\d+$"))
                     {
@@ -2366,7 +2260,7 @@ namespace WzComparerR2
                     break;
 
                 case Wz_Type.Mob:
-                    if ((image = node.Tag as Wz_Image) == null || !image.TryExtract())
+                    if ((image = selectedNode.Value as Wz_Image) == null || !image.TryExtract())
                         return;
                     if (CharaSimLoader.LoadedSetItems.Count == 0)
                     {
@@ -2381,7 +2275,7 @@ namespace WzComparerR2
                     break;
 
                 case Wz_Type.Npc:
-                    if ((image = node.Tag as Wz_Image) == null || !image.TryExtract())
+                    if ((image = selectedNode.Value as Wz_Image) == null || !image.TryExtract())
                         return;
                     if (CharaSimLoader.LoadedSetItems.Count == 0)
                     {
@@ -2542,17 +2436,17 @@ namespace WzComparerR2
 
         Wz_Node PluginContextProvider.SelectedNode1
         {
-            get { return getWzNodeByNode(advTree1.SelectedNode); }
+            get { return advTree1.SelectedNode.AsWzNode(); }
         }
 
         Wz_Node PluginContextProvider.SelectedNode2
         {
-            get { return getWzNodeByNode(advTree2.SelectedNode); }
+            get { return advTree2.SelectedNode.AsWzNode(); }
         }
 
         Wz_Node PluginContextProvider.SelectedNode3
         {
-            get { return getWzNodeByNode(advTree3.SelectedNode, advTree3.Tag as Wz_Node); }
+            get { return advTree3.SelectedNode.AsWzNode(); }
         }
 
         private EventHandler<WzNodeEventArgs> selectedNode1Changed;
@@ -2925,4 +2819,14 @@ namespace WzComparerR2
             System.Diagnostics.Process.Start("https://github.com/Kagamia/WzComparerR2/releases");
         }
     }
+
+    #region 内部用扩展方法
+    internal static partial class Ext
+    {
+        public static Wz_Node AsWzNode(this Node node)
+        {
+            return (node?.Tag as WeakReference)?.Target as Wz_Node;
+        }
+    }
+    #endregion
 }

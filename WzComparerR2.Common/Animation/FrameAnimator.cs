@@ -13,14 +13,12 @@ namespace WzComparerR2.Animation
         public FrameAnimator(FrameAnimationData data)
         {
             this.Data = data;
-            this._drawOrder = new List<Frame>();
-
             this.Load();
         }
 
         public FrameAnimationData Data { get; private set; }
 
-        public Frame CurrentFrame { get; private set; }
+        public Frame CurrentFrame { get; protected set; }
 
         public override int Length
         {
@@ -30,14 +28,12 @@ namespace WzComparerR2.Animation
         public int CurrentTime
         {
             get { return _timeOffset; }
+            protected set { _timeOffset = value; }
         }
-
-        private List<Frame> _drawOrder;
 
         private int _timeOffset;
         private int _length;
         private int[] _timeline;
-
 
         public override void Update(TimeSpan elapsedTime)
         {
@@ -71,7 +67,7 @@ namespace WzComparerR2.Animation
                 ).ToArray();
         }
 
-        private void Load()
+        protected virtual void Load()
         {
             _timeline = new int[this.Data.Frames.Count + 1];
             for (int i = 0; i < this.Data.Frames.Count; i++)
@@ -83,22 +79,30 @@ namespace WzComparerR2.Animation
             this.UpdateFrame();
         }
 
-        private void UpdateFrame()
+        protected virtual void UpdateFrame()
         {
-            int index = Array.BinarySearch(_timeline, _timeOffset);
-            float progress = 0;
-            if (index < 0)
-            {
-                index = ~index - 1;
-                progress = (float)(_timeOffset - _timeline[index]) / (_timeline[index + 1] - _timeline[index]);
-            }
+            float progress;
+            int index = GetProcessFromTimeline(_timeline, _timeOffset, out progress);
 
             var frame = this.Data.Frames[index];
-            this.CurrentFrame = new Frame(frame.Texture)
+            this.CurrentFrame = new Frame(frame.Texture, frame.AtlasRect)
             {
+                Z = frame.Z,
                 Origin = frame.Origin,
                 A0 = (int)MathHelper.Lerp(frame.A0, frame.A1, progress),
             };
+        }
+
+        public static int GetProcessFromTimeline(int[] timeline, int timeOffset, out float progress)
+        {
+            int index = Array.BinarySearch(timeline, timeOffset);
+            progress = 0;
+            if (index < 0)
+            {
+                index = ~index - 1;
+                progress = (float)(timeOffset - timeline[index]) / (timeline[index + 1] - timeline[index]);
+            }
+            return index;
         }
     }
 }

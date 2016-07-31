@@ -2206,7 +2206,6 @@
             this.columnHeader1,
             this.columnHeader2});
             this.listViewExWzDetail.DisabledBackColor = System.Drawing.Color.Empty;
-            this.listViewExWzDetail.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listViewExWzDetail.FullRowSelect = true;
             this.listViewExWzDetail.GridLines = true;
             this.listViewExWzDetail.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;

@@ -6,7 +6,7 @@ namespace WzComparerR2.WzLib
 {
     public class Wz_Image
     {
-        public Wz_Image(string name, int size, int cs32, uint hashOff, uint hashPos, bool on_list, Wz_File wz_f)
+        public Wz_Image(string name, int size, int cs32, uint hashOff, uint hashPos, Wz_File wz_f)
         {
             this.Name = name;
             this.WzFile = wz_f;
@@ -14,15 +14,12 @@ namespace WzComparerR2.WzLib
             this.Checksum = cs32;
             this.HashedOffset = hashOff;
             this.HashedOffsetPosition = hashPos;
-            this.IsOnList = on_list;
             this.Node = new Wz_Node(name) { Value = this };
 
             this.extr = false;
             this.chec = false;
             this.checEnc = false;
         }
-
-        private int offset;
 
         private bool extr;
         private bool chec;
@@ -34,11 +31,8 @@ namespace WzComparerR2.WzLib
         public int Checksum { get; set; }
         public uint HashedOffset { get; set; }
         public uint HashedOffsetPosition { get; set; }
-        public int Offset
-        {
-            get { return this.offset; }
-            set { this.offset = value; }
-        }
+        public int Offset { get; set; }
+        //已经废弃 使用BMS替代OnList
         public bool IsOnList { get; set; }
         public Wz_Node Node { get; private set; }
 
@@ -65,7 +59,7 @@ namespace WzComparerR2.WzLib
                 }
                 if (!this.checEnc)
                 {
-                    //TryDetectEnc();
+                    TryDetectEnc();
                 }
 
                 try
@@ -73,7 +67,7 @@ namespace WzComparerR2.WzLib
                     lock (this.WzFile.ReadLock)
                     {
                         this.WzFile.FileStream.Position = this.Offset;
-                        ExtractImg(this.offset, this.Node, 0);
+                        ExtractImg(this.Offset, this.Node, 0);
                         this.WzFile.stringTable.Clear();
                         this.extr = true;
                     }
@@ -99,7 +93,7 @@ namespace WzComparerR2.WzLib
         {
             lock (this.WzFile.ReadLock)
             {
-                this.WzFile.FileStream.Position = this.offset;
+                this.WzFile.FileStream.Position = this.Offset;
                 int cs = 0;
                 byte[] buffer = new byte[4096];
                 int count, size = this.Size;
@@ -129,8 +123,8 @@ namespace WzComparerR2.WzLib
         private void ExtractImg(int offset, Wz_Node parent, int eob)
         {
             int entries = 0;
-
-            switch (this.WzFile.ReadString(offset))
+            string tag = this.WzFile.ReadString(offset);
+            switch (tag)
             {
                 case "Property":
                     this.WzFile.FileStream.Position += 2;
@@ -189,70 +183,53 @@ namespace WzComparerR2.WzLib
                     break;
 
                 default:
-                    break;
+                    throw new Exception("unknown wz tag: " + tag);
             }
         }
 
-        /*
+
         private void TryDetectEnc()
         {
             Wz_Crypto crypto = this.WzFile.WzStructure.encryption;
 
-            if (IsIllegalTag(this.IsOnList))
+            if (crypto.EncType != Wz_Crypto.Wz_CryptoKeyType.Unknown)
+            {
+                if (IsIllegalTag())
+                {
+                    this.checEnc = true;
+                    return;
+                }
+            }
+
+            crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.KMS;
+            if (IsIllegalTag())
             {
                 this.checEnc = true;
+                return;
             }
-            else if (crypto.EncType != Wz_Crypto.Wz_CryptoKeyType.Unknown)
-            {
-                if (IsIllegalTag(false))
-                {
-                    this.IsOnList = false;
-                    this.checEnc = true;
-                }
-                else if (IsIllegalTag(true))
-                {
-                    this.IsOnList = true;
-                    this.checEnc = true;
-                }
-            }
-            else
-            {
-                crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.KMS;
-                if (IsIllegalTag(false))
-                {
-                    this.IsOnList = false;
-                    this.checEnc = true;
-                    return;
-                }
-                else if (IsIllegalTag(true))
-                {
-                    this.IsOnList = true;
-                    this.checEnc = true;
-                    return;
-                }
 
-                crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.GMS;
-                if (IsIllegalTag(false))
-                {
-                    this.IsOnList = false;
-                    this.checEnc = true;
-                    return;
-                }
-                else if (IsIllegalTag(true))
-                {
-                    this.IsOnList = true;
-                    this.checEnc = true;
-                    return;
-                }
-
-                crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.Unknown;
+            crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.GMS;
+            if (IsIllegalTag())
+            {
+                this.checEnc = true;
+                return;
             }
+
+            crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.BMS;
+            if (IsIllegalTag())
+            {
+                this.checEnc = true;
+                return;
+            }
+
+            crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.Unknown;
         }
 
-        private bool IsIllegalTag(bool useEnc)
+        private bool IsIllegalTag()
         {
-            this.WzFile.FileStream.Position = this.offset;
-            switch (this.WzFile.ReadString(offset, useEnc))
+            this.WzFile.FileStream.Position = this.Offset;
+            this.WzFile.stringTable.Remove(Offset);
+            switch (this.WzFile.ReadString(Offset))
             {
                 case "Property":
                 case "Shape2D#Vector2D":
@@ -265,7 +242,7 @@ namespace WzComparerR2.WzLib
                     return false;
             }
         }
-        */
+        
 
         private void ExtractValue(int offset, Wz_Node parent)
         {

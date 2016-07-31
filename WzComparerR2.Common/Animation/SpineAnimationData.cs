@@ -22,6 +22,12 @@ namespace WzComparerR2.Animation
 
         public static SpineAnimationData CreateFromNode(Wz_Node atlasNode, bool? useJson, GraphicsDevice graphicsDevice, GlobalFindNodeFunction findNode)
         {
+            var textureLoader = new WzSpineTextureLoader(atlasNode.ParentNode, graphicsDevice, findNode);
+            return CreateFromNode(atlasNode, useJson, textureLoader);
+        }
+
+        public static SpineAnimationData CreateFromNode(Wz_Node atlasNode, bool? useJson, TextureLoader textureLoader)
+        {
             var parentNode = atlasNode.ParentNode;
 
             var loadType = SkeletonLoadType.Auto;
@@ -30,7 +36,6 @@ namespace WzComparerR2.Animation
                 loadType = useJson.Value ? SkeletonLoadType.Json : SkeletonLoadType.Binary;
             }
 
-            var textureLoader = new WzSpineTextureLoader(parentNode, graphicsDevice, findNode);
             var skeletonData = SpineLoader.LoadSkeleton(atlasNode, loadType, textureLoader);
 
             if (skeletonData == null)

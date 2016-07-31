@@ -147,7 +147,7 @@ namespace WzComparerR2.WzLib
             return string.Empty;
         }
 
-        public string ReadStringAt(int offset, bool useEnc = false)
+        public string ReadStringAt(int offset)
         {
             long oldoffset = this.FileStream.Position;
             string str;
@@ -252,20 +252,19 @@ namespace WzComparerR2.WzLib
             return (int)offset;
         }
 
-        public void GetDirTree(Wz_Node parent, bool allChildOnList)
+        public void GetDirTree(Wz_Node parent)
         {
-            GetDirTree(parent, allChildOnList, true);
+            GetDirTree(parent, true);
         }
 
-        public void GetDirTree(Wz_Node parent, bool allChildOnList, bool useBaseWz)
+        public void GetDirTree(Wz_Node parent, bool useBaseWz)
         {
             List<string> dirs = new List<string>();
             string name = null;
             int size = 0;
             int cs32 = 0;
             //int offs = 0;
-            bool on_list = false;
-            bool all_lst = allChildOnList || this.WzStructure.encryption.List.Contains(parent.Text.ToLower() + '/');
+
             bool parentBase = parent.Text.Equals("base.wz", StringComparison.CurrentCultureIgnoreCase);
 
             int count = ReadInt32();
@@ -287,11 +286,7 @@ namespace WzComparerR2.WzLib
                         uint pos = (uint)this.bReader.BaseStream.Position;
                         uint hashOffset = this.bReader.ReadUInt32();
 
-                        on_list = all_lst
-                             || (parentBase ? this.WzStructure.encryption.list_contains(name.ToLower()) :
-                            this.WzStructure.encryption.list_contains(getFullPath(parent, name)));
-
-                        Wz_Image img = new Wz_Image(name, size, cs32, hashOffset, pos, on_list, this);
+                        Wz_Image img = new Wz_Image(name, size, cs32, hashOffset, pos, this);
                         Wz_Node childNode = parent.Nodes.Add(name);
                         childNode.Value = img;
                         img.OwnerNode = childNode;
@@ -328,7 +323,7 @@ namespace WzComparerR2.WzLib
                 }
                 else
                 {
-                    GetDirTree(t, all_lst);
+                    GetDirTree(t);
                 }
             }
         }
