@@ -38,6 +38,11 @@ namespace WzComparerR2.WzLib
 
         public Wz_Node OwnerNode { get; set; }
 
+        public bool IsLuaImage
+        {
+            get { return this.Name.EndsWith(".lua"); }
+        }
+
         public bool TryExtract()
         {
             Exception ex;
@@ -59,7 +64,10 @@ namespace WzComparerR2.WzLib
                 }
                 if (!this.checEnc)
                 {
-                    TryDetectEnc();
+                    if (!this.IsLuaImage)
+                    {
+                        TryDetectEnc();
+                    }
                 }
 
                 try
@@ -67,8 +75,15 @@ namespace WzComparerR2.WzLib
                     lock (this.WzFile.ReadLock)
                     {
                         this.WzFile.FileStream.Position = this.Offset;
-                        ExtractImg(this.Offset, this.Node, 0);
-                        this.WzFile.stringTable.Clear();
+                        if (!this.IsLuaImage)
+                        {
+                            ExtractImg(this.Offset, this.Node, 0);
+                            this.WzFile.stringTable.Clear();
+                        }
+                        else
+                        {
+                            ExtractLua();
+                        }
                         this.extr = true;
                     }
                 }
@@ -290,5 +305,34 @@ namespace WzComparerR2.WzLib
             }
         }
 
+        private void ExtractLua()
+        {
+            while(this.WzFile.FileStream.Position < this.Offset + this.Size)
+            {
+                var flag = this.WzFile.BReader.ReadByte();
+
+                switch (flag)
+                {
+                    case 0x01:
+                       
+                        var node = this.Node.Nodes.Add("lua");
+                        ExtractLuaValue(node);
+                        
+                        break;
+
+                    default:
+                        throw new Exception("读取Lua错误." + flag + " at Offset: " + this.WzFile.FileStream.Position);
+                }
+            }
+        }
+
+        private void ExtractLuaValue(Wz_Node parent)
+        {
+            int len = this.WzFile.ReadInt32();
+            byte[] data = this.WzFile.BReader.ReadBytes(len);
+            this.WzFile.WzStructure.encryption.keys.Decrypt(data, 0, data.Length);
+            string luaCode = Encoding.UTF8.GetString(data);
+            parent.Value = luaCode;
+        }
     }
 }
