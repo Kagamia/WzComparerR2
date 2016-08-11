@@ -14,7 +14,7 @@ namespace WzComparerR2.WzLib
             this.Checksum = cs32;
             this.HashedOffset = hashOff;
             this.HashedOffsetPosition = hashPos;
-            this.Node = new Wz_Node(name) { Value = this };
+            this.Node = new Wz_ImageNode(name, this);
 
             this.extr = false;
             this.chec = false;
@@ -202,7 +202,6 @@ namespace WzComparerR2.WzLib
             }
         }
 
-
         private void TryDetectEnc()
         {
             Wz_Crypto crypto = this.WzFile.WzStructure.encryption;
@@ -314,10 +313,7 @@ namespace WzComparerR2.WzLib
                 switch (flag)
                 {
                     case 0x01:
-                       
-                        var node = this.Node.Nodes.Add("lua");
-                        ExtractLuaValue(node);
-                        
+                        ExtractLuaValue(this.Node);
                         break;
 
                     default:
@@ -333,6 +329,16 @@ namespace WzComparerR2.WzLib
             this.WzFile.WzStructure.encryption.keys.Decrypt(data, 0, data.Length);
             string luaCode = Encoding.UTF8.GetString(data);
             parent.Value = luaCode;
+        }
+
+        internal class Wz_ImageNode : Wz_Node
+        {
+            public Wz_ImageNode(string nodeText, Wz_Image image) : base(nodeText)
+            {
+                this.Image = image;
+            }
+
+            public Wz_Image Image { get; private set; }
         }
     }
 }

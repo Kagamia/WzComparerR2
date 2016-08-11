@@ -331,7 +331,8 @@ namespace WzComparerR2.WzLib
                 {
                     break;
                 }
-                if ((wzImg = node.Value as Wz_Image) != null)
+                if ((wzImg = node.Value as Wz_Image) != null
+                    || (wzImg = (node as Wz_Image.Wz_ImageNode)?.Image) != null)
                 {
                     wzfile = wzImg.WzFile;
                     break;
@@ -346,7 +347,8 @@ namespace WzComparerR2.WzLib
             Wz_Image wzImg = null;
             while (node != null)
             {
-                if ((wzImg = node.Value as Wz_Image) != null)
+                if ((wzImg = node.Value as Wz_Image) != null
+                    || (wzImg = (node as Wz_Image.Wz_ImageNode)?.Image) != null)
                 {
                     break;
                 }

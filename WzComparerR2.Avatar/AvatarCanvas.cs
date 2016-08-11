@@ -587,7 +587,7 @@ namespace WzComparerR2.Avatar
                         //读取纹理
                         Skin skin = new Skin();
                         skin.Name = childNode.Text;
-                        skin.Image = BitmapOrigin.CreateFromNode(linkNode, null);
+                        skin.Image = BitmapOrigin.CreateFromNode(linkNode, PluginBase.PluginManager.FindWz);
                         skin.Z = linkNode.FindNodeByPath("z").GetValueEx<string>(null);
 
                         //读取骨骼

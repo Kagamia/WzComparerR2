@@ -45,7 +45,7 @@ namespace WzComparerR2.Avatar
                         break;
 
                     case "icon":
-                        this.Icon = BitmapOrigin.CreateFromNode(node, null);
+                        this.Icon = BitmapOrigin.CreateFromNode(node, PluginBase.PluginManager.FindWz);
                         break;
                 }
             }
