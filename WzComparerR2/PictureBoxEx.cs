@@ -297,6 +297,11 @@ namespace WzComparerR2
             {
                 writeFrame(100);
             }
+            //保存动画长度
+            if (config.SavePngFramesEnabled)
+            {
+                File.WriteAllText(Path.Combine(dirName, "delay.txt"), length.ToString());
+            }
             rec.End();
             enc.Dispose();
         }

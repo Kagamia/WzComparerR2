@@ -531,6 +531,16 @@ namespace WzComparerR2.CharaSim
                 }
             }
 
+            //修复恶魔盾牌特殊属性
+            if (gear.type == GearType.demonShield)
+            {
+                if (gear.Props.TryGetValue(GearPropType.incMMP, out value))
+                {
+                    gear.Props.Remove(GearPropType.incMMP);
+                    gear.Props.Add(GearPropType.incMDF, value);
+                }
+            }
+
             return gear;
         }
     }

@@ -12,6 +12,8 @@ using System.Threading;
 using DevComponents.DotNetBar;
 using System.Reflection;
 using ICSharpCode.TextEditor.Document;
+using WzComparerR2.PluginBase;
+using System.Text.RegularExpressions;
 
 namespace WzComparerR2.LuaConsole
 {
@@ -72,15 +74,6 @@ end
             lua.DoString(string.Format("package.path = [[{0}]]..';'..package.path", packageDir));
         }
 
-        void proc_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-        }
-
-        private void buttonItem1_Click(object sender, EventArgs e)
-        {
-
-        }
-
         public class LuaEnvironment
         {
             internal LuaEnvironment(FrmConsole form)
@@ -90,6 +83,13 @@ end
 
             private FrmConsole form;
 
+            public PluginContext Context
+            {
+                get
+                {
+                    return Entry.Instance?.Context;
+                }
+            }
 
             public void Write(object value)
             {
@@ -163,11 +163,12 @@ env:Write(string format, object[] args)
 env:WriteLine(object)
 env:WriteLine(string format, object[] args)");
             }
-        }
 
-        private void buttonItem2_Click(object sender, EventArgs e)
-        {
-
+            private void AppendText(string text)
+            {
+                text = Regex.Replace(text, @"(?<!\r)\n", "\r\n", RegexOptions.Multiline);
+                this.form.textBoxX2.AppendText(text);
+            }
         }
 
         private void FrmConsole_FormClosing(object sender, FormClosingEventArgs e)
@@ -216,6 +217,15 @@ env:WriteLine(string format, object[] args)");
 
         }
 
+        private void menuReset_Click(object sender, EventArgs e)
+        {
+            if (!isRunning)
+            {
+                InitLuaEnv();
+                textBoxX2.AppendText("===虚拟机已重置===\r\n");
+            }
+        }
+
         private void menuNew_Click(object sender, EventArgs e)
         {
             FrmLuaEditor frm = new FrmLuaEditor();
@@ -242,5 +252,6 @@ env:WriteLine(string format, object[] args)");
                 env.WriteLine(ex.Message);
             }
         }
+
     }
 }

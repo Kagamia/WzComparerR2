@@ -22,6 +22,7 @@ namespace WzComparerR2.CharaSim
         incMHPr,
         incMMP,
         incMMPr,
+        incMDF,
         incARC,
         incPAD_incMAD,
         incPAD,

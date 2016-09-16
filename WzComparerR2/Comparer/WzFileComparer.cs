@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using WzComparerR2.WzLib;
 
 namespace WzComparerR2.Comparer
@@ -74,11 +75,23 @@ namespace WzComparerR2.Comparer
                 arrayOld.Sort();
             }
 
+            foreach (var diff in CompareSortedNodes(arrayNew, arrayOld))
+            {
+                yield return diff;
+            }
+
+            //移除引用
+            arrayNew = null;
+            arrayOld = null;
+        }
+
+        private IEnumerable<CompareDifference> CompareSortedNodes(IList<ComparableNode> arrayNew, IList<ComparableNode> arrayOld, Comparison<ComparableNode> compFunc = null)
+        {
             //逐层对比
             int l = 0, r = 0;
             while (l < arrayNew.Count || r < arrayOld.Count)
             {
-                int comp = -2;
+                int? comp = null;
                 if (r == arrayOld.Count) //输出左边
                 {
                     comp = -1;
@@ -89,7 +102,7 @@ namespace WzComparerR2.Comparer
                 }
                 else
                 {
-                    comp = string.Compare(arrayNew[l].Name, arrayOld[r].Name);
+                    comp = compFunc != null ? compFunc(arrayNew[l], arrayOld[r]) : arrayNew[l].CompareTo(arrayOld[r]);
                 }
 
                 switch (comp)
@@ -107,17 +120,41 @@ namespace WzComparerR2.Comparer
                         break;
                     case 0:
                         //TODO: 试着比较多linkNode的场合。。
-                        if (!CompareData(arrayNew[l].Value, arrayOld[r].Value))
+                        if ((arrayNew[l].HasMultiValues || arrayOld[r].HasMultiValues)
+                            && !(arrayNew[l].Value?.GetType() == typeof(Wz_File) || arrayOld[r].Value?.GetType() == typeof(Wz_File)) //file跳过
+                            )
                         {
-                            yield return new CompareDifference(arrayNew[l].LinkNode, arrayOld[r].LinkNode, DifferenceType.Changed);
-                        }
-                        if (CompareChild(arrayNew[l], arrayOld[r]))
-                        {
-                            foreach (CompareDifference diff in Compare(arrayNew[l], arrayOld[r]))
+                            //对比node的绝对路径
+                            var left = (arrayNew[l] as WzVirtualNodeAgent).Target.LinkNodes;
+                            var right = (arrayOld[r] as WzVirtualNodeAgent).Target.LinkNodes;
+                            var compFunc2 = new Comparison<Wz_Node>((a, b) => string.Compare(a.FullPathToFile, b.FullPathToFile));
+                            left.Sort(compFunc2);
+                            right.Sort(compFunc2);
+
+                            foreach (var diff in CompareSortedNodes(
+                                left.Select(n => (ComparableNode)new WzNodeAgent(n)).ToList(),
+                                right.Select(n => (ComparableNode)new WzNodeAgent(n)).ToList(),
+                                (a, b) => Math.Sign(string.CompareOrdinal(a.LinkNode.FullPath, b.LinkNode.FullPath)))
+                                )
                             {
                                 yield return diff;
                             }
                         }
+                        else
+                        {
+                            if (!CompareData(arrayNew[l].Value, arrayOld[r].Value))
+                            {
+                                yield return new CompareDifference(arrayNew[l].LinkNode, arrayOld[r].LinkNode, DifferenceType.Changed);
+                            }
+                            if (CompareChild(arrayNew[l], arrayOld[r]))
+                            {
+                                foreach (CompareDifference diff in Compare(arrayNew[l], arrayOld[r]))
+                                {
+                                    yield return diff;
+                                }
+                            }
+                        }
+
                         l++; r++;
                         break;
                     case 1:
@@ -135,10 +172,6 @@ namespace WzComparerR2.Comparer
                         throw new Exception("什么鬼");
                 }
             }
-
-            //移除引用
-            arrayNew = null;
-            arrayOld = null;
         }
 
         private bool CompareChild(ComparableNode node1, ComparableNode node2)
@@ -256,15 +289,24 @@ namespace WzComparerR2.Comparer
         {
             public abstract string Name { get; }
             public abstract object Value { get; }
+            public abstract bool HasMultiValues { get; }
+            public virtual IEnumerable<object> Values
+            {
+                get
+                {
+                    if (this.Value == null) return Enumerable.Empty<object>();
+                    return new[] { this.Value };
+                }
+            }
             public abstract IEnumerable<ComparableNode> Children { get; }
             public virtual Wz_Node LinkNode
             {
                 get { return null; }
             }
 
-            int IComparable<ComparableNode>.CompareTo(ComparableNode other)
+            public int CompareTo(ComparableNode other)
             {
-                return string.CompareOrdinal(this.Name, other.Name);
+                return Math.Sign(string.CompareOrdinal(this.Name, other.Name));
             }
         }
 
@@ -285,6 +327,11 @@ namespace WzComparerR2.Comparer
             public override object Value
             {
                 get { return this.Target.Value; }
+            }
+
+            public override bool HasMultiValues
+            {
+                get { return false; }
             }
 
             public override IEnumerable<ComparableNode> Children
@@ -325,28 +372,29 @@ namespace WzComparerR2.Comparer
             {
                 get
                 {
-                    if (this.Target.LinkNodes.Count <= 0)
-                    {
-                        return null;
-                    }
-                    else if (this.Target.LinkNodes.Count == 1)
-                    {
-                        return this.Target.LinkNodes[0].Value;
-                    }
-                    else
-                    {
-                        foreach (var node in this.Target.LinkNodes)
-                        {
-                            if (node.Value != null)
-                            {
-                                return node.Value;
-                            }
-                        }
-                        return null;
-                    }
+                    return this.Target.LinkNodes.Select(n => n.Value)
+                        .Where(v => v != null)
+                        .FirstOrDefault();
                 }
             }
-        
+
+            public override bool HasMultiValues
+            {
+                get
+                {
+                    return this.Values.Count() > 1;
+                }
+            }
+
+            public override IEnumerable<object> Values
+            {
+                get
+                {
+                    return this.Target.LinkNodes.Select(n => n.Value)
+                      .Where(v => v != null);
+                }
+            }
+
             public override IEnumerable<ComparableNode> Children
             {
                 get

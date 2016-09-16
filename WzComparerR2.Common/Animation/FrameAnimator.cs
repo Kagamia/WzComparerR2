@@ -69,12 +69,8 @@ namespace WzComparerR2.Animation
 
         protected virtual void Load()
         {
-            _timeline = new int[this.Data.Frames.Count + 1];
-            for (int i = 0; i < this.Data.Frames.Count; i++)
-            {
-                _timeline[i + 1] = _timeline[i] + this.Data.Frames[i].Delay;
-            }
-            _length = _timeline[_timeline.Length - 1];
+            _timeline = CreateTimeline(this.Data.Frames.Select(f => f.Delay));
+            _length = _timeline.Last();
             _timeOffset = 0;
             this.UpdateFrame();
         }
@@ -91,6 +87,16 @@ namespace WzComparerR2.Animation
                 Origin = frame.Origin,
                 A0 = (int)MathHelper.Lerp(frame.A0, frame.A1, progress),
             };
+        }
+
+        public static int[] CreateTimeline(IEnumerable<int> delays)
+        {
+            var timeLine = new List<int>() { 0 };
+            foreach (var ms in delays)
+            {
+                timeLine.Add(timeLine[timeLine.Count - 1] + ms);
+            }
+            return timeLine.ToArray();
         }
 
         public static int GetProcessFromTimeline(int[] timeline, int timeOffset, out float progress)

@@ -73,6 +73,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incMHPr: return "MaxHP : " + sign + value + "%";
                 case GearPropType.incMMP: return "MaxMP : " + sign + value;
                 case GearPropType.incMMPr: return "MaxMP : " + sign + value + "%";
+                case GearPropType.incMDF: return "MaxDF : " + sign + value;
                 case GearPropType.incPAD: return "攻击力 : " + sign + value;
                 case GearPropType.incPADr: return "攻击力 : " + sign + value + "%";
                 case GearPropType.incMAD: return "魔法力 : " + sign + value;

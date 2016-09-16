@@ -11,8 +11,10 @@ namespace WzComparerR2.LuaConsole
         public Entry(PluginContext context)
             : base(context)
         {
-            
+            Instance = this;
         }
+
+        internal static Entry Instance { get; private set; }
 
         protected override void OnLoad()
         {
@@ -31,7 +33,7 @@ namespace WzComparerR2.LuaConsole
             {
                 frm = new FrmConsole();
                 frm.Owner = Context.MainForm;
-               
+                
             }
             frm.Show();
             frm.Focus();

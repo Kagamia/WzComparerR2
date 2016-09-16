@@ -21,7 +21,7 @@ namespace WzComparerR2.Comparer
         public bool OutputPng { get; set; }
         public bool OutputAddedImg { get; set; }
         public bool OutputRemovedImg { get; set; }
-
+        
         public string StateInfo
         {
             get { return stateInfo; }

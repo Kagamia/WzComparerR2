@@ -624,7 +624,7 @@ namespace WzComparerR2
 
             Wz_Image image = null;
             if (advTree2.Nodes.Count > 0
-                && (image = advTree2.Nodes[0].AsWzNode()?.Value as Wz_Image) != null
+                && (image = advTree2.Nodes[0].AsWzNode()?.GetValue<Wz_Image>()) != null
                 && image.WzFile.WzStructure == wz)
             {
                 advTree2.Nodes.Clear();
@@ -1435,7 +1435,7 @@ namespace WzComparerR2
 
         private void tsmi1Export_Click(object sender, EventArgs e)
         {
-            Wz_Image img = advTree1.SelectedNode?.AsWzNode()?.Value as Wz_Image;
+            Wz_Image img = advTree1.SelectedNode?.AsWzNode()?.GetValue<Wz_Image>();
             if (img == null)
             {
                 MessageBoxEx.Show("没有选中一个用于导出的wz_img。");
@@ -2190,7 +2190,7 @@ namespace WzComparerR2
             switch (wzf.Type)
             {
                 case Wz_Type.Character:
-                    if ((image = selectedNode.Value as Wz_Image) == null || !image.TryExtract())
+                    if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
                         return;
                     if (CharaSimLoader.LoadedSetItems.Count == 0)
                     {
@@ -2220,7 +2220,9 @@ namespace WzComparerR2
                         {
                             CharaSimLoader.LoadSetItems();
                         }
-                        var item = Item.CreateFromNode(itemNode);
+                        if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
+                            return;
+                        var item = Item.CreateFromNode(image.Node);
                         obj = item;
                         if (item != null)
                         {
@@ -2260,7 +2262,7 @@ namespace WzComparerR2
                     break;
 
                 case Wz_Type.Mob:
-                    if ((image = selectedNode.Value as Wz_Image) == null || !image.TryExtract())
+                    if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
                         return;
                     if (CharaSimLoader.LoadedSetItems.Count == 0)
                     {
@@ -2275,7 +2277,7 @@ namespace WzComparerR2
                     break;
 
                 case Wz_Type.Npc:
-                    if ((image = selectedNode.Value as Wz_Image) == null || !image.TryExtract())
+                    if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
                         return;
                     if (CharaSimLoader.LoadedSetItems.Count == 0)
                     {

@@ -76,9 +76,9 @@ namespace WzComparerR2.WzLib
 
                     path.Push(node.text);
 
-                    if (node.value is Wz_Image)
+                    var img = node.GetValue<Wz_Image>();
+                    if (img != null)
                     {
-                        Wz_Image img = (Wz_Image)node.value;
                         node = img.OwnerNode;
                     }
 
@@ -128,10 +128,11 @@ namespace WzComparerR2.WzLib
         {
             Wz_Node node = this;
 
+            Wz_Image img;
+
             //首次解压
-            if (extractImage && this.value is Wz_Image)
+            if (extractImage && (img = this.GetValue<Wz_Image>()) != null)
             {
-                Wz_Image img = (Wz_Image)node.value;
                 if (img.TryExtract())
                 {
                     node = img.Node;
@@ -165,7 +166,7 @@ namespace WzComparerR2.WzLib
 
                 if (extractImage)
                 {
-                    Wz_Image img = node.value as Wz_Image;
+                    img = node.GetValue<Wz_Image>();
                     if (img != null && img.TryExtract()) //判断是否是img
                     {
                         node = img.Node;
@@ -177,6 +178,8 @@ namespace WzComparerR2.WzLib
 
         public T GetValue<T>(T defaultValue)
         {
+            if (typeof(Wz_Image) == typeof(T) && this is Wz_Image.Wz_ImageNode)
+                return (T)(object)(((Wz_Image.Wz_ImageNode)this).Image);
             if (this.value == null)
                 return defaultValue;
             if (this.value.GetType() == typeof(T))

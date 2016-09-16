@@ -54,6 +54,7 @@
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.dockContainerItem3 = new DevComponents.DotNetBar.DockContainerItem();
             this.tabStrip1 = new DevComponents.DotNetBar.TabStrip();
+            this.menuReset = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bar2)).BeginInit();
             this.bar2.SuspendLayout();
@@ -110,6 +111,7 @@
             this.bar2.Controls.Add(this.panelDockContainer1);
             this.bar2.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.bar2.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Caption;
+            this.bar2.IsMaximized = false;
             this.bar2.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.dockContainerItem1});
             this.bar2.LayoutType = DevComponents.DotNetBar.eLayoutType.DockContainer;
@@ -151,7 +153,7 @@
             this.textBoxX2.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxX2.Size = new System.Drawing.Size(482, 69);
             this.textBoxX2.TabIndex = 1;
-            this.textBoxX2.Text = "--调用env:Help() 获取帮助";
+            this.textBoxX2.Text = "--调用env:Help() 获取帮助\r\n";
             // 
             // dockContainerItem1
             // 
@@ -239,6 +241,7 @@
             this.bar1.AccessibleRole = System.Windows.Forms.AccessibleRole.MenuBar;
             this.bar1.DockSide = DevComponents.DotNetBar.eDockSide.Top;
             this.bar1.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            this.bar1.IsMaximized = false;
             this.bar1.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.menuFile,
             this.menuDebug});
@@ -293,12 +296,14 @@
             // 
             this.menuDebug.Name = "menuDebug";
             this.menuDebug.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.menuReset,
             this.menuRun,
             this.menuStopRun});
             this.menuDebug.Text = "调试(&D)";
             // 
             // menuRun
             // 
+            this.menuRun.BeginGroup = true;
             this.menuRun.Name = "menuRun";
             this.menuRun.Shortcuts.Add(DevComponents.DotNetBar.eShortcut.F5);
             this.menuRun.Text = "运行";
@@ -346,6 +351,12 @@
             this.tabStrip1.TabIndex = 14;
             this.tabStrip1.TabLayoutType = DevComponents.DotNetBar.eTabLayoutType.FixedWithNavigationBox;
             this.tabStrip1.Text = "tabStrip1";
+            // 
+            // menuReset
+            // 
+            this.menuReset.Name = "menuReset";
+            this.menuReset.Text = "重置";
+            this.menuReset.Click += new System.EventHandler(this.menuReset_Click);
             // 
             // FrmConsole
             // 
@@ -406,6 +417,6 @@
         private DevComponents.DotNetBar.ButtonItem menuSave;
         private DevComponents.DotNetBar.ButtonItem menuExit;
         private DevComponents.DotNetBar.ButtonItem menuDebug;
-
+        private DevComponents.DotNetBar.ButtonItem menuReset;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using WzComparerR2.WzLib;
 
 namespace WzComparerR2.Comparer
@@ -65,13 +66,17 @@ namespace WzComparerR2.Comparer
                 {
                     this.AddChild(fromChild, true);
                 }
-                else if (fromChild.Value == null && toChild.HasNoValue() ) //同为目录
+                else if (fromChild.Value == null && toChild.HasNoValue()) //同为目录
+                {
+                    toChild.Combine(fromChild);
+                }
+                else if (fromChild.Nodes.Count <= 0 && !toChild.HasDirectory()) //没有子集 合并测试
                 {
                     toChild.Combine(fromChild);
                 }
                 else
                 {
-                    throw new Exception(string.Format("WZ合并失败，{0}已存在。", fromChild));
+                    throw new Exception(string.Format("WZ合并失败，{0}已存在并且存在子级。", fromChild.FullPathToFile));
                 }
             }
         }
@@ -98,6 +103,18 @@ namespace WzComparerR2.Comparer
                 }
             }
             return true;
+        }
+
+        private bool HasDirectory()
+        {
+            foreach(var linkNode in this.LinkNodes)
+            {
+                if (linkNode.Nodes.Count > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public override string ToString()
