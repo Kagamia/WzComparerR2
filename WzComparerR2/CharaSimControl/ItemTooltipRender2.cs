@@ -116,7 +116,7 @@ namespace WzComparerR2.CharaSimControl
                                     Wz_Node imgNode = node0.FindNodeByPath(imgClass, true);
                                     if (imgNode != null)
                                     {
-                                        Item item = Item.CreateFromNode(imgNode);
+                                        Item item = Item.CreateFromNode(imgNode, PluginManager.FindWz);
                                         if (item != null)
                                         {
                                             recipeItemBmp = RenderLinkRecipeItem(item);

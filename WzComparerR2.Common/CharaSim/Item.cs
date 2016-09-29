@@ -33,7 +33,7 @@ namespace WzComparerR2.CharaSim
             return this.Props.TryGetValue(type, out value) && value != 0;
         }
 
-        public static Item CreateFromNode(Wz_Node node)
+        public static Item CreateFromNode(Wz_Node node, GlobalFindNodeFunction findNode)
         {
             Item item = new Item();
             int value;
@@ -66,7 +66,7 @@ namespace WzComparerR2.CharaSim
                             }
                             if (pngNode.Value is Wz_Png)
                             {
-                                item.Icon = BitmapOrigin.CreateFromNode(pngNode, null);
+                                item.Icon = BitmapOrigin.CreateFromNode(pngNode, findNode);
                             }
                             break;
 
@@ -83,14 +83,14 @@ namespace WzComparerR2.CharaSim
                             }
                             if (pngNode.Value is Wz_Png)
                             {
-                                item.IconRaw = BitmapOrigin.CreateFromNode(pngNode, null);
+                                item.IconRaw = BitmapOrigin.CreateFromNode(pngNode, findNode);
                             }
                             break;
 
                         case "sample":
                             if (subNode.Value is Wz_Png)
                             {
-                                item.Sample = BitmapOrigin.CreateFromNode(subNode, null);
+                                item.Sample = BitmapOrigin.CreateFromNode(subNode, findNode);
                             }
                             break;
 

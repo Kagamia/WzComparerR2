@@ -1,4 +1,10 @@
-﻿##2016.09.16
+﻿##2016.09.26
+
+###CharaSim
+- 修复Item无法识别link没有图标的bug
+
+
+##2016.09.16
 
 ###共通
 - wzlib读取结构变更 Wz_Image.Node.Value不再指向Wz_Image自身的引用

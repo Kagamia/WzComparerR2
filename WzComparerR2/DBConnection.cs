@@ -297,7 +297,7 @@ namespace WzComparerR2
                             sw.WriteLine(@"<tr style=""background-color:#ffcccc; ""><td>道具名称</td><td>{0} (id:{1})</td></tr>", sr == null ? "null" : sr.Name, itemID);
                         }
 
-                        Item item = Item.CreateFromNode(node);
+                        Item item = Item.CreateFromNode(node, PluginManager.FindWz);
                         if (item != null)
                         {
                             itemRender.Item = item;
