@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Linq;
 using System.IO;
+using System.Xml;
 using Timer = System.Timers.Timer;
 using System.Threading;
 using System.Threading.Tasks;
@@ -122,7 +123,7 @@ namespace WzComparerR2
             labelItemAutoSaveFolder.Text = ImageHandlerConfig.Default.AutoSavePictureFolder;
             buttonItemAutoSave.Checked = ImageHandlerConfig.Default.AutoSaveEnabled;
             comboBoxItemLanguage.SelectedIndex = Clamp(CharaSimConfig.Default.SelectedFontIndex, 0, comboBoxItemLanguage.Items.Count);
-            
+
 
             //更新界面颜色
             styleManager1.ManagerStyle = WcR2Config.Default.MainStyle;
@@ -370,7 +371,7 @@ namespace WzComparerR2
             else
             {
                 var dlg = new SaveFileDialog();
-                
+
                 dlg.Filter = "Gif图片(*.gif)|*.gif|全部文件(*.*)|*.*";
                 dlg.FileName = gifFileName;
                 if (dlg.ShowDialog() != DialogResult.OK)
@@ -571,7 +572,7 @@ namespace WzComparerR2
                 OnWzOpened(new WzStructureEventArgs(wz)); //触发事件
                 QueryPerformance.End();
                 labelItemStatus.Text = "读取成功,用时" + (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000) + "ms,共读取" + wz.img_number + "img.";
-                
+
                 ConfigManager.Reload();
                 WcR2Config.Default.RecentDocuments.Remove(wzFilePath);
                 WcR2Config.Default.RecentDocuments.Insert(0, wzFilePath);
@@ -1461,6 +1462,7 @@ namespace WzComparerR2
                         fs.Write(buffer, 0, count);
                         size -= count;
                     }
+                    labelItemStatus.Text = img.Name + "导出完毕。";
                 }
                 catch (Exception ex)
                 {
@@ -1474,6 +1476,120 @@ namespace WzComparerR2
                     }
                 }
             }
+        }
+
+        private void tsmi1DumpAsXml_Click(object sender, EventArgs e)
+        {
+            Wz_Image img = advTree1.SelectedNode?.AsWzNode()?.GetValue<Wz_Image>();
+            if (img == null)
+            {
+                MessageBoxEx.Show("没有选中一个用于导出的wz_img。");
+                return;
+            }
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.DefaultExt = ".xml";
+            dlg.Filter = "*.xml|*.xml";
+            dlg.FileName = img.Node.FullPathToFile.Replace('\\', '.') + ".xml";
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                FileStream fs = null;
+                try
+                {
+                    fs = new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write);
+                    var xsetting = new XmlWriterSettings()
+                    {
+                        CloseOutput = false,
+                        Indent = true,
+                        Encoding = Encoding.UTF8,
+                        CheckCharacters = true,
+                        NewLineChars = Environment.NewLine,
+                        NewLineOnAttributes = false,
+                    };
+                    var writer = XmlWriter.Create(fs, xsetting);
+                    writer.WriteStartDocument(true);
+                    DumpNodeXml(writer, img.Node);
+                    writer.WriteEndDocument();
+                    writer.Close();
+
+                    labelItemStatus.Text = img.Name + "导出完毕。";
+                }
+                catch (Exception ex)
+                {
+                    MessageBoxEx.Show(ex.ToString(), "错了");
+                }
+                finally
+                {
+                    if (fs != null)
+                    {
+                        fs.Close();
+                    }
+                }
+            }
+        }
+
+        private void DumpNodeXml(XmlWriter writer, Wz_Node node)
+        {
+            object value = node.Value;
+
+            if (value == null || value is Wz_Image)
+            {
+                writer.WriteStartElement("dir");
+                writer.WriteAttributeString("name", node.Text);
+            }
+            else if (value is Wz_Png)
+            {
+                var png = (Wz_Png)value;
+                writer.WriteStartElement("png");
+                writer.WriteAttributeString("name", node.Text);
+                using (var bmp = png.ExtractPng())
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                        byte[] data = ms.ToArray();
+                        writer.WriteAttributeString("value", Convert.ToBase64String(data));
+                    } 
+                }
+            }
+            else if (value is Wz_Uol)
+            {
+                var uol = (Wz_Uol)value;
+                writer.WriteStartElement("uol");
+                writer.WriteAttributeString("name", node.Text);
+                writer.WriteAttributeString("value", uol.Uol);
+            }
+            else if (value is Wz_Vector)
+            {
+                var vector = (Wz_Vector)value;
+                writer.WriteStartElement("vector");
+                writer.WriteAttributeString("name", node.Text);
+                writer.WriteAttributeString("value", $"{vector.X}, {vector.Y}");
+            }
+            else if (value is Wz_Sound)
+            {
+                var sound = (Wz_Sound)value;
+                writer.WriteStartElement("sound");
+                writer.WriteAttributeString("name", node.Text);
+                byte[] data = sound.ExtractSound();
+                writer.WriteAttributeString("value", Convert.ToBase64String(data));
+            }
+            else
+            {
+                var tag = value.GetType().Name.ToLower();
+                writer.WriteStartElement(tag);
+                writer.WriteAttributeString("name", node.Text);
+                writer.WriteAttributeString("value", value.ToString());
+            }
+
+            //输出子节点
+            foreach(var child in node.Nodes)
+            {
+                DumpNodeXml(writer, child);1
+            }
+
+
+            //结束标识
+            writer.WriteEndElement();
         }
         #endregion
 
@@ -2820,6 +2936,7 @@ namespace WzComparerR2
         {
             System.Diagnostics.Process.Start("https://github.com/Kagamia/WzComparerR2/releases");
         }
+
     }
 
     #region 内部用扩展方法
