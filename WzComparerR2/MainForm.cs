@@ -1584,7 +1584,7 @@ namespace WzComparerR2
             //输出子节点
             foreach(var child in node.Nodes)
             {
-                DumpNodeXml(writer, child);1
+                DumpNodeXml(writer, child);
             }
 
 
