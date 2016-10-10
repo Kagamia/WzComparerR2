@@ -17,9 +17,13 @@ namespace WzComparerR2.MapRender
         {
             IntPtr hWnd = game.Window.Handle;
             Device.RegisterDevice(UsagePage.Generic, UsageId.GenericKeyboard, DeviceFlags.None, hWnd, RegisterDeviceOptions.Default);
-            var filter = new RawInputMessageFilter();
-            filterCache[hWnd] = filter;
-            MessageFilterHook.AddMessageFilter(hWnd, filter);
+            
+            if(!filterCache.ContainsKey(hWnd))
+            {
+                var filter = new RawInputMessageFilter();
+                filterCache[hWnd] = filter;
+                MessageFilterHook.AddMessageFilter(hWnd, filter);
+            }
         }
 
 
@@ -27,6 +31,7 @@ namespace WzComparerR2.MapRender
         {
             RawInputMessageFilter filter;
             IntPtr hWnd = game.Window.Handle;
+
             if (filterCache.TryGetValue(hWnd, out filter))
             {
                 MessageFilterHook.RemoveMessageFilter(hWnd, filter);

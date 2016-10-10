@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Reflection;
 
 namespace WzComparerR2.MapRender
 {
@@ -10,7 +11,15 @@ namespace WzComparerR2.MapRender
     {
         public InputState()
         {
+
         }
+
+        public InputState(Game game)
+        {
+            _gameWindow = game.Window;
+        }
+
+        private GameWindow _gameWindow;
 
         private KeyboardState CurrentKeyboardState;
         private KeyboardState LastKeyboardState;
@@ -27,7 +36,7 @@ namespace WzComparerR2.MapRender
             CurrentKeyboardState = Keyboard.GetState();
 
             LastMouseState = CurrentMouseState;
-            CurrentMouseState = Mouse.GetState();
+            CurrentMouseState = _gameWindow != null ? Mouse.GetState(_gameWindow) : Mouse.GetState();
         }
 
         /// <summary>

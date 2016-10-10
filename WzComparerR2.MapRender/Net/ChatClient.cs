@@ -1,4 +1,5 @@
-﻿using System;
+﻿/*
+using System;
 using System.Collections.Generic;
 using System.Text;
 using SignalR.Client._20.Hubs;
@@ -71,3 +72,4 @@ namespace WzComparerR2.MapRender.Net
         public string ClientID { get; set; }
     }
 }
+*/

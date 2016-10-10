@@ -15,7 +15,7 @@ using Form = System.Windows.Forms.Form;
 using Un4seen.Bass;
 using WzComparerR2.MapRender.UI;
 
-using JLChnToZ.IMEHelper;
+//using JLChnToZ.IMEHelper;
 using WzComparerR2.MapRender.Patches;
 using WzComparerR2.Common;
 using WzComparerR2.Rendering;
@@ -60,6 +60,17 @@ namespace WzComparerR2.MapRender
                 this.txtChat.AppendLine();
             }
             this.txtChat.Append("已经连接服务器");
+        }
+
+        protected override void OnActivated(object sender, EventArgs args)
+        {
+            base.OnActivated(sender, args);
+            GameExt.FixKeyboard(this);
+        }
+
+        protected override void OnDeactivated(object sender, EventArgs args)
+        {
+            base.OnDeactivated(sender, args);
         }
         /*
         void chat_Error(object sender, ChatErrorEventArgs e)
@@ -134,7 +145,7 @@ namespace WzComparerR2.MapRender
         UIMiniMap uiMinimap;
 
         //输入
-        IMEHandler ime;
+        //IMEHandler ime;
         StringBuilder txtInput = new StringBuilder();
         bool isOnCommand;
 
@@ -157,6 +168,7 @@ namespace WzComparerR2.MapRender
         }
 
 
+        /*
         void ime_onResultReceived(object sender, IMEResultEventArgs e)
         {
             if (isOnCommand)
@@ -186,7 +198,7 @@ namespace WzComparerR2.MapRender
                         }
                         break;
                     case '\r': //回车
-                        /*
+                        
                         if (this.chat.IsConnected)
                         {
                             string content = this.txtInput.ToString();
@@ -199,7 +211,7 @@ namespace WzComparerR2.MapRender
                                 ThreadPool.QueueUserWorkItem(o => this.chat.Talk(content));
                             }
                             this.txtInput.Remove(0, this.txtInput.Length);
-                        }*/
+                        }
                         this.ime.Enabled = false;
                         break;
                     default:
@@ -207,12 +219,12 @@ namespace WzComparerR2.MapRender
                         break;
                 }
             }
-        }
+        }*/
 
         protected override void LoadContent()
         {
             base.LoadContent();
-            this.renderEnv = new RenderEnv(this.graphics);
+            this.renderEnv = new RenderEnv(this, this.graphics);
             this.tooltip = new Tooltip(this.GraphicsDevice);
             this.texLoader = new TextureLoader(this.GraphicsDevice);
             
@@ -404,10 +416,11 @@ namespace WzComparerR2.MapRender
             }
             else
             {
-                OnInputMethod(gameTime);
+                //OnInputMethod(gameTime);
             }
         }
 
+        /*
         private void OnInputMethod(GameTime gameTime)
         {
             InputState input = renderEnv.Input;
@@ -415,7 +428,7 @@ namespace WzComparerR2.MapRender
             {
                 this.isOnCommand = false;
             }
-        }
+        }*/
 
         private void OnGlobalHotKey(GameTime gameTime)
         {
@@ -425,7 +438,7 @@ namespace WzComparerR2.MapRender
             if (input.IsAltPressing && input.IsCtrlPressing && input.IsShiftPressing && input.IsKeyDown(Keys.Insert))
             {
                 this.isOnCommand = !this.isOnCommand;
-                this.ime.Enabled = this.isOnCommand; //开关输入法支持
+                //this.ime.Enabled = this.isOnCommand; //开关输入法支持
             }
 
             if (input.IsAltPressing && input.IsKeyDown(Keys.Enter))
@@ -945,7 +958,7 @@ namespace WzComparerR2.MapRender
                     for (int i = 0; i < picBlocks.GetLength(0); i++)
                     {
                         Color[] data = picBlocks[i, j];
-                        IntPtr pData = System.Runtime.InteropServices.Marshal.UnsafeAddrOfPinnedArrayElement(data, 0);
+                        IntPtr pData = Marshal.UnsafeAddrOfPinnedArrayElement(data, 0);
 
                         Rectangle blockRect = new Rectangle();
                         blockRect.X = i * blockWidth;
@@ -957,20 +970,22 @@ namespace WzComparerR2.MapRender
                         if (blockRect.X == 0 && blockRect.Width == mapWidth) //整块复制
                         {
                             int startIndex = mapWidth * 4 * blockRect.Y;
-                            System.Runtime.InteropServices.Marshal.Copy(pData, mapData, startIndex, blockRect.Width * blockRect.Height * 4);
+                            Marshal.Copy(pData, mapData, startIndex, blockRect.Width * blockRect.Height * 4);
                         }
                         else //逐行扫描
                         {
                             for (int y = blockRect.Top, y0 = blockRect.Bottom; y < y0; y++)
                             {
-                                
                                 int startIndex = (y * mapWidth + blockRect.X) * 4;
-                                System.Runtime.InteropServices.Marshal.Copy(pData, mapData, startIndex, length);
+                                Marshal.Copy(pData, mapData, startIndex, length);
                                 pData = new IntPtr(pData.ToInt32() + blockWidth * 4);
                             }
                         }
                     }
                 }
+
+                //反色
+                MonogameUtils.BgraToColor(mapData);
 
                 try
                 {
@@ -1006,7 +1021,9 @@ namespace WzComparerR2.MapRender
                 {
                     var texture = patch.Frames[0].Texture;
                     using (var file = File.OpenWrite(path))
-                        texture.SaveAsPng(file, texture.Width, texture.Height);
+                    {
+                        texture.SaveAsPng(file);
+                    }
                 }
             }
         }

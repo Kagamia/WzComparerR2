@@ -90,10 +90,13 @@ namespace WzComparerR2.MapRender.Patches
             }
             else
             {
-                origin2.Y = env.Camera.Center.Y * (100 + this.ry) / 100;
+                //origin2.Y = env.Camera.Center.Y * (100 + this.ry) / 100;
+                origin2.Y = (env.Camera.Center.Y) * (100 + this.ry) / 100; //屏幕大小适配补丁
             }
 
+            origin2.Y += (env.Camera.Height - 600);
             this.origin2 = origin2;
+            
 
             //计算平铺绘制参数
             if (this.TileMode != TileMode.None)
@@ -169,7 +172,6 @@ namespace WzComparerR2.MapRender.Patches
                        0f);
                 }
             }
-
         }
     }
 }

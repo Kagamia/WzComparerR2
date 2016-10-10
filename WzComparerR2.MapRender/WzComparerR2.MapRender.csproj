@@ -42,13 +42,10 @@
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="IMEHelper, Version=1.3.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\IMEHelper.dll</HintPath>
-    </Reference>
     <Reference Include="MonoGame.Framework, Version=3.4.0.456, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\MonoGame.Framework.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="SharpDX, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -60,24 +57,33 @@
       <HintPath>..\References\SharpDX.RawInput.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="SignalR.Client.20, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\SignalR.Client.20.dll</HintPath>
+    <Reference Include="spine-monogame">
+      <HintPath>..\References\spine-monogame.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="TSF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\TSF.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animation\IStateMachineAnimationData.cs" />
+    <Compile Include="Animation\RepeatableFrameAnimationData.cs" />
+    <Compile Include="Animation\RepeatableFrameAnimator.cs" />
+    <Compile Include="Animation\StateMachineAnimator.cs" />
     <Compile Include="FrmMapRender2.cs" />
     <Compile Include="GameExt.cs" />
+    <Compile Include="MapData.cs" />
     <Compile Include="MapScene.cs" />
+    <Compile Include="MeshBatcher.cs" />
+    <Compile Include="MeshItem.cs" />
     <Compile Include="Net\ChatClient.cs" />
+    <Compile Include="Patches2\BackItem.cs" />
+    <Compile Include="Patches2\FootholdItem.cs" />
+    <Compile Include="Patches2\LifeItem.cs" />
+    <Compile Include="Patches2\ObjItem.cs" />
+    <Compile Include="Patches2\SceneItem.cs" />
+    <Compile Include="Patches2\TileItem.cs" />
     <Compile Include="Patches\BackPatch.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Chat.cs" />
@@ -92,7 +98,6 @@
     <Compile Include="Patches\LifePatch.cs" />
     <Compile Include="MapRenderFonts.cs" />
     <Compile Include="MathHelper2.cs" />
-    <Compile Include="Methods.cs" />
     <Compile Include="MiniMap.cs" />
     <Compile Include="MouseButton.cs" />
     <Compile Include="Patches\ObjTilePatch.cs" />
@@ -106,6 +111,9 @@
     <Compile Include="RenderFrame.cs" />
     <Compile Include="Patches\RenderObjectType.cs" />
     <Compile Include="Patches\RenderPatch.cs" />
+    <Compile Include="ResourceLoader.cs" />
+    <Compile Include="SceneNode.cs" />
+    <Compile Include="TextureAtlas.cs" />
     <Compile Include="TextureLoader.cs" />
     <Compile Include="TileMode.cs" />
     <Compile Include="UI\Tooltip.cs" />

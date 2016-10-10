@@ -55,6 +55,7 @@ namespace WzComparerR2.MapRender
                         sl.Load(PluginManager.FindWz(Wz_Type.String).GetValueEx<Wz_File>(null));
                     }
 
+
                     //开始绘制
                     Thread thread = new Thread(() =>
                     {
@@ -62,10 +63,11 @@ namespace WzComparerR2.MapRender
                         try
                         {
 #endif
-                        FrmMapRender frm = new MapRender.FrmMapRender(img);
-                        frm.StringLinker = sl;
-                        frm.Run();
-
+                            using (var frm = new MapRender.FrmMapRender2(img))
+                            {
+                                //frm.StringLinker = sl;
+                                frm.Run();
+                            }
 #if !DEBUG
                         }
                         catch (Exception ex)

@@ -9,12 +9,12 @@ namespace WzComparerR2.MapRender
 {
     public class RenderEnv : IDisposable
     {
-        public RenderEnv(GraphicsDeviceManager graphics)
+        public RenderEnv(Game game, GraphicsDeviceManager graphics)
         {
             this.device = graphics.GraphicsDevice;
             this.camera = new Camera(graphics);
             this.sprite = new SpriteBatchEx(this.device);
-            this.input = new InputState();
+            this.input = new InputState(game);
             this.fonts = new MapRenderFonts(this.device);
         }
 

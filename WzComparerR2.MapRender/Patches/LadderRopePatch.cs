@@ -30,7 +30,7 @@ namespace WzComparerR2.MapRender.Patches
             Vector2 origin = env.Camera.Origin;
             Point p1 = new Point(this.X - (int)origin.X, this.Y1 - (int)origin.Y);
             Point p2 = new Point(this.X - (int)origin.X, this.Y2 - (int)origin.Y);
-            Color color = Methods.LerpColor(colorTable, (float)gameTime.TotalGameTime.TotalMilliseconds % 10000 / 2000);
+            Color color = MathHelper2.Lerp(colorTable, (float)gameTime.TotalGameTime.TotalMilliseconds % 10000 / 2000);
 
             env.Sprite.DrawLine(p1, p2, 5, color);
         }
