@@ -1507,7 +1507,7 @@ namespace WzComparerR2
                     };
                     var writer = XmlWriter.Create(fs, xsetting);
                     writer.WriteStartDocument(true);
-                    DumpNodeXml(writer, img.Node);
+                    img.Node.DumpAsXml(writer);
                     writer.WriteEndDocument();
                     writer.Close();
 
@@ -1525,71 +1525,6 @@ namespace WzComparerR2
                     }
                 }
             }
-        }
-
-        private void DumpNodeXml(XmlWriter writer, Wz_Node node)
-        {
-            object value = node.Value;
-
-            if (value == null || value is Wz_Image)
-            {
-                writer.WriteStartElement("dir");
-                writer.WriteAttributeString("name", node.Text);
-            }
-            else if (value is Wz_Png)
-            {
-                var png = (Wz_Png)value;
-                writer.WriteStartElement("png");
-                writer.WriteAttributeString("name", node.Text);
-                using (var bmp = png.ExtractPng())
-                {
-                    using (var ms = new MemoryStream())
-                    {
-                        bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                        byte[] data = ms.ToArray();
-                        writer.WriteAttributeString("value", Convert.ToBase64String(data));
-                    } 
-                }
-            }
-            else if (value is Wz_Uol)
-            {
-                var uol = (Wz_Uol)value;
-                writer.WriteStartElement("uol");
-                writer.WriteAttributeString("name", node.Text);
-                writer.WriteAttributeString("value", uol.Uol);
-            }
-            else if (value is Wz_Vector)
-            {
-                var vector = (Wz_Vector)value;
-                writer.WriteStartElement("vector");
-                writer.WriteAttributeString("name", node.Text);
-                writer.WriteAttributeString("value", $"{vector.X}, {vector.Y}");
-            }
-            else if (value is Wz_Sound)
-            {
-                var sound = (Wz_Sound)value;
-                writer.WriteStartElement("sound");
-                writer.WriteAttributeString("name", node.Text);
-                byte[] data = sound.ExtractSound();
-                writer.WriteAttributeString("value", Convert.ToBase64String(data));
-            }
-            else
-            {
-                var tag = value.GetType().Name.ToLower();
-                writer.WriteStartElement(tag);
-                writer.WriteAttributeString("name", node.Text);
-                writer.WriteAttributeString("value", value.ToString());
-            }
-
-            //输出子节点
-            foreach(var child in node.Nodes)
-            {
-                DumpNodeXml(writer, child);
-            }
-
-
-            //结束标识
-            writer.WriteEndElement();
         }
         #endregion
 

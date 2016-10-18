@@ -253,5 +253,43 @@ env:WriteLine(string format, object[] args)");
             }
         }
 
+        private void menuOpen_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "*.lua|*.lua|*.*|*.*";
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                FrmLuaEditor frm = new FrmLuaEditor();
+                frm.MdiParent = this;
+                frm.WindowState = FormWindowState.Maximized;
+                frm.LoadFile(dlg.FileName);
+                frm.Show();
+            }
+        }
+
+        private void menuSave_Click(object sender, EventArgs e)
+        {
+            FrmLuaEditor editor;
+            if (tabStrip1.SelectedTab == null
+               || (editor = tabStrip1.SelectedTab.AttachedControl as FrmLuaEditor) == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(editor.FileName))
+            {
+                SaveFileDialog dlg = new SaveFileDialog();
+                dlg.Filter = "*.lua|*.lua|*.*|*.*";
+                dlg.FileName = editor.Text + ".lua";
+                if (dlg.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+                editor.FileName = dlg.FileName;
+            }
+
+            editor.SaveFile(editor.FileName);
+            textBoxX2.AppendText($"====已经保存{editor.FileName}====");
+        }
     }
 }

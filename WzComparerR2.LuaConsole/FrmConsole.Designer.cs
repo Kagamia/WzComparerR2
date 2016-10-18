@@ -49,12 +49,12 @@
             this.menuSave = new DevComponents.DotNetBar.ButtonItem();
             this.menuExit = new DevComponents.DotNetBar.ButtonItem();
             this.menuDebug = new DevComponents.DotNetBar.ButtonItem();
+            this.menuReset = new DevComponents.DotNetBar.ButtonItem();
             this.menuRun = new DevComponents.DotNetBar.ButtonItem();
             this.menuStopRun = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.dockContainerItem3 = new DevComponents.DotNetBar.DockContainerItem();
             this.tabStrip1 = new DevComponents.DotNetBar.TabStrip();
-            this.menuReset = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bar2)).BeginInit();
             this.bar2.SuspendLayout();
@@ -277,6 +277,7 @@
             this.menuOpen.Name = "menuOpen";
             this.menuOpen.Shortcuts.Add(DevComponents.DotNetBar.eShortcut.CtrlO);
             this.menuOpen.Text = "打开";
+            this.menuOpen.Click += new System.EventHandler(this.menuOpen_Click);
             // 
             // menuSave
             // 
@@ -284,6 +285,7 @@
             this.menuSave.Name = "menuSave";
             this.menuSave.Shortcuts.Add(DevComponents.DotNetBar.eShortcut.CtrlS);
             this.menuSave.Text = "保存";
+            this.menuSave.Click += new System.EventHandler(this.menuSave_Click);
             // 
             // menuExit
             // 
@@ -300,6 +302,12 @@
             this.menuRun,
             this.menuStopRun});
             this.menuDebug.Text = "调试(&D)";
+            // 
+            // menuReset
+            // 
+            this.menuReset.Name = "menuReset";
+            this.menuReset.Text = "重置";
+            this.menuReset.Click += new System.EventHandler(this.menuReset_Click);
             // 
             // menuRun
             // 
@@ -351,12 +359,6 @@
             this.tabStrip1.TabIndex = 14;
             this.tabStrip1.TabLayoutType = DevComponents.DotNetBar.eTabLayoutType.FixedWithNavigationBox;
             this.tabStrip1.Text = "tabStrip1";
-            // 
-            // menuReset
-            // 
-            this.menuReset.Name = "menuReset";
-            this.menuReset.Text = "重置";
-            this.menuReset.Click += new System.EventHandler(this.menuReset_Click);
             // 
             // FrmConsole
             // 

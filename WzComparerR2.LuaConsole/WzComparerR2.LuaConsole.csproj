@@ -101,6 +101,7 @@
     <EmbeddedResource Include="Resources\SharpLua.xshd" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Examples\DumpXml.lua" />
     <None Include="Lua\CLRPackage.lua">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

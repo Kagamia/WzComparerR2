@@ -19,14 +19,24 @@ namespace WzComparerR2.LuaConsole
 
         public void LoadFile(string fileName)
         {
-
+            this.textEditorControl1.LoadFile(fileName, false, true);
         }
 
-        public string FileName { get; private set; }
+        public void SaveFile(string fileName)
+        {
+            this.textEditorControl1.SaveFile(fileName);
+        }
+
+        public string FileName
+        {
+            get { return this.textEditorControl1.FileName; }
+            set { this.textEditorControl1.FileName = value; }
+        }
 
         public string CodeContent
         {
             get { return this.textEditorControl1.Text; }
         }
+
     }
 }
