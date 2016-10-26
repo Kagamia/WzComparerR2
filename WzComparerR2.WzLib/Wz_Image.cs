@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace WzComparerR2.WzLib
 {
@@ -326,11 +327,48 @@ namespace WzComparerR2.WzLib
         {
             int len = this.WzFile.ReadInt32();
             byte[] data = this.WzFile.BReader.ReadBytes(len);
+            if (!this.checEnc)
+            {
+                TryDetectLuaEnc(data);
+            }
             this.WzFile.WzStructure.encryption.keys.Decrypt(data, 0, data.Length);
             string luaCode = Encoding.UTF8.GetString(data);
             parent.Value = luaCode;
         }
 
+        private void TryDetectLuaEnc(byte[] luaBinary)
+        {
+            Wz_Crypto crypto = this.WzFile.WzStructure.encryption;
+            byte[] tempBuffer = new byte[Math.Min(luaBinary.Length, 64)];
+            char[] tempStr = new char[tempBuffer.Length];
+
+            //测试各种加密方式 判断符合度最高的
+            int maxCharCount = 0;
+            var maxCharEnc = Wz_Crypto.Wz_CryptoKeyType.Unknown;
+
+            foreach (var enc in new[] {
+                Wz_Crypto.Wz_CryptoKeyType.GMS,
+                Wz_Crypto.Wz_CryptoKeyType.KMS,
+                Wz_Crypto.Wz_CryptoKeyType.BMS
+            })
+            {
+                Buffer.BlockCopy(luaBinary, 0, tempBuffer, 0, tempBuffer.Length);
+                crypto.EncType = enc;
+                crypto.keys.Decrypt(tempBuffer, 0, tempBuffer.Length);
+                int count = Encoding.UTF8.GetChars(tempBuffer, 0, tempBuffer.Length, tempStr, 0);
+                int asciiCount = tempStr.Take(count).Count(chr => 32 <= chr && chr <= 127);
+
+                if (maxCharCount < asciiCount)
+                {
+                    maxCharEnc = enc;
+                    maxCharCount = asciiCount;
+                }
+            }
+
+            crypto.EncType = maxCharEnc;
+            this.checEnc = true;
+        }
+        
         internal class Wz_ImageNode : Wz_Node
         {
             public Wz_ImageNode(string nodeText, Wz_Image image) : base(nodeText)
