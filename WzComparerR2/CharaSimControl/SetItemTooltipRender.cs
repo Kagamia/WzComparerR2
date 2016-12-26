@@ -128,7 +128,7 @@ namespace WzComparerR2.CharaSimControl
                 Brush brush = effect.Value.Enabled ? Brushes.White : GearGraphics.GrayBrush2;
 
                 //T116 合并套装
-                var props = IsCombineProperties ? CombineProperties(effect.Value.Props) : effect.Value.Props;
+                var props = IsCombineProperties ? CombineProperties(effect.Value.PropsV5) : effect.Value.PropsV5;
                 foreach (KeyValuePair<GearPropType, object> prop in props)
                 {
                     if (prop.Key == GearPropType.Option)
@@ -179,11 +179,17 @@ namespace WzComparerR2.CharaSimControl
             return setBitmap;
         }
 
-        private SortedDictionary<GearPropType, object> CombineProperties(SortedDictionary<GearPropType, object> props)
+        private IEnumerable<KeyValuePair<GearPropType, object>> CombineProperties(IEnumerable<KeyValuePair<GearPropType, object>> props)
         {
             var combinedProps = new SortedDictionary<GearPropType, object>();
+            var propCache = new SortedDictionary<GearPropType, object>();
+            foreach(var kv in props)
+            {
+                propCache.Add(kv.Key, kv.Value);
+            }
+
             object obj;
-            foreach (var prop in props)
+            foreach (var prop in propCache)
             {
                 switch (prop.Key)
                 {
@@ -193,7 +199,7 @@ namespace WzComparerR2.CharaSimControl
                         {
                             break;
                         }
-                        else if (props.TryGetValue(prop.Key == GearPropType.incMHP? GearPropType.incMMP : GearPropType.incMHP, out obj)
+                        else if (propCache.TryGetValue(prop.Key == GearPropType.incMHP? GearPropType.incMMP : GearPropType.incMHP, out obj)
                             && object.Equals(prop.Value, obj))
                         {
                             combinedProps.Add(GearPropType.incMHP_incMMP, prop.Value);
@@ -207,7 +213,7 @@ namespace WzComparerR2.CharaSimControl
                         {
                             break;
                         }
-                        else if (props.TryGetValue(prop.Key == GearPropType.incMHPr ? GearPropType.incMMPr : GearPropType.incMHPr, out obj)
+                        else if (propCache.TryGetValue(prop.Key == GearPropType.incMHPr ? GearPropType.incMMPr : GearPropType.incMHPr, out obj)
                             && object.Equals(prop.Value, obj))
                         {
                             combinedProps.Add(GearPropType.incMHPr_incMMPr, prop.Value);
@@ -221,7 +227,7 @@ namespace WzComparerR2.CharaSimControl
                         {
                             break;
                         }
-                        else if (props.TryGetValue(prop.Key == GearPropType.incPAD ? GearPropType.incMAD : GearPropType.incPAD, out obj)
+                        else if (propCache.TryGetValue(prop.Key == GearPropType.incPAD ? GearPropType.incMAD : GearPropType.incPAD, out obj)
                             && object.Equals(prop.Value, obj))
                         {
                             combinedProps.Add(GearPropType.incPAD_incMAD, prop.Value);
@@ -235,7 +241,7 @@ namespace WzComparerR2.CharaSimControl
                         {
                             break;
                         }
-                        else if (props.TryGetValue(prop.Key == GearPropType.incPDD ? GearPropType.incMDD : GearPropType.incPDD, out obj)
+                        else if (propCache.TryGetValue(prop.Key == GearPropType.incPDD ? GearPropType.incMDD : GearPropType.incPDD, out obj)
                             && object.Equals(prop.Value, obj))
                         {
                             combinedProps.Add(GearPropType.incPDD_incMDD, prop.Value);
@@ -249,7 +255,7 @@ namespace WzComparerR2.CharaSimControl
                         {
                             break;
                         }
-                        else if (props.TryGetValue(prop.Key == GearPropType.incACC ? GearPropType.incEVA : GearPropType.incACC, out obj)
+                        else if (propCache.TryGetValue(prop.Key == GearPropType.incACC ? GearPropType.incEVA : GearPropType.incACC, out obj)
                             && object.Equals(prop.Value, obj))
                         {
                             combinedProps.Add(GearPropType.incACC_incEVA, prop.Value);

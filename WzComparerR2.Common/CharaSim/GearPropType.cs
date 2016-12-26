@@ -87,7 +87,7 @@ namespace WzComparerR2.CharaSim
         incMaxDamage,
         incPADlv,
         incMADlv,
-        
+        incCriticaldamage,
 
         Option,
         OptionToMob,

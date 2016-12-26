@@ -39,11 +39,11 @@ namespace WzComparerR2.CharaSim
                         string val;
                         if (this.Props.TryGetValue("prob", out val))
                         {
-                            sb.AppendFormat("爆击概率提高{0}%\r\n", val);
+                            sb.AppendFormat("爆击率{0}%\r\n", val);
                         }
                         if (this.Props.TryGetValue("damage", out val))
                         {
-                            sb.AppendFormat("爆击最小伤害增加{0}%\r\n", val);
+                            sb.AppendFormat("爆击伤害增加{0}%\r\n", val);
                         }
                         if (sb.Length > 2)
                         {

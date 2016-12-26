@@ -396,7 +396,7 @@ namespace WzComparerR2.CharaSimControl
 
             //一般属性
             List<GearPropType> props = new List<GearPropType>();
-            foreach (KeyValuePair<GearPropType, int> p in Gear.Props)
+            foreach (KeyValuePair<GearPropType, int> p in Gear.PropsV5) //5转过滤
             {
                 if ((int)p.Key < 100 && p.Value != 0)
                     props.Add(p.Key);
@@ -1025,28 +1025,28 @@ namespace WzComparerR2.CharaSimControl
             int value;
             string numValue;
             //防御
-            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_pdd, x, y);
             x += 62;
+            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_pdd, x, y);
             DrawReqNum(g, "0", NumberType.LookAhead, x - 5, y + 6, StringAlignment.Far);
 
-            //魔防
-            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_mdd, x, y);
-            x += 62;
-            DrawReqNum(g, "0", NumberType.LookAhead, x - 5, y + 6, StringAlignment.Far);
+            ////魔防
+            //g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_mdd, x, y);
+            //x += 62;
+            //DrawReqNum(g, "0", NumberType.LookAhead, x - 5, y + 6, StringAlignment.Far);
 
             //boss伤
-            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_bdr, x, y);
             x += 62;
+            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_bdr, x, y);
             this.Gear.Props.TryGetValue(GearPropType.bdR, out value);
             numValue = (value > 0 ? "+ " : null) + value + " % ";
-            DrawReqNum(g, numValue, NumberType.LookAhead, x - 5, y + 6, StringAlignment.Far);
+            DrawReqNum(g, numValue, NumberType.LookAhead, x - 5 + 3, y + 6, StringAlignment.Far);
 
             //无视防御
-            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_igpddr, x, y);
             x += 62;
+            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_igpddr, x, y);
             this.Gear.Props.TryGetValue(GearPropType.imdR, out value);
             numValue = (value > 0 ? "+ " : null) + value + " % ";
-            DrawReqNum(g, numValue, NumberType.LookAhead, x - 5 - 4, y + 6, StringAlignment.Far);
+            DrawReqNum(g, numValue, NumberType.LookAhead, x - 5 - 1, y + 6, StringAlignment.Far);
         }
 
         private void DrawJobReq(Graphics g, ref int picH)
