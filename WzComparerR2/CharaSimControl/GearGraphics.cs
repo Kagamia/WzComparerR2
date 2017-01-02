@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -7,6 +8,7 @@ using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using CharaSimResource;
 using WzComparerR2.CharaSim;
+using TR = System.Windows.Forms.TextRenderer;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -72,10 +74,11 @@ namespace WzComparerR2.CharaSimControl
         public static readonly Brush EpicGearIconBackBrush = new SolidBrush(EpicGearIconBackColor);
         public static readonly Brush StatDetailGrayBrush = new SolidBrush(Color.FromArgb(85, 85, 85));
 
+        public static readonly Color OrangeBrushColor = Color.FromArgb(255, 153, 0);
         /// <summary>
         /// 表示物品说明中带有#c标识的橙色字体画刷。
         /// </summary>
-        public static readonly Brush OrangeBrush = new SolidBrush(Color.FromArgb(255, 153, 0));
+        public static readonly Brush OrangeBrush = new SolidBrush(OrangeBrushColor);
         /// <summary>
         /// 表示物品附加属性中橙色字体画刷。
         /// </summary>
@@ -210,93 +213,12 @@ namespace WzComparerR2.CharaSimControl
         {
             if (s == null)
                 return;
-            StringFormat fmt = StringFormat.GenericTypographic;
-            Stack<Brush> brushStack = new Stack<Brush>();
-            brushStack.Push(Brushes.White);
-            Brush brush = brushStack.Peek();
-            StringBuilder sb = new StringBuilder();
-            int curX = x;
-            int tempX = 0;
-            int strPos = 0;
-            char curChar;
 
-            while (strPos < s.Length)
+            using (var r = new FormattedTextRenderer())
             {
-                curChar = s[strPos++];
-                if (curChar == '\\')
-                {
-                    if (strPos < s.Length)
-                    {
-                        curChar = s[strPos++];
-                        switch (curChar)
-                        {
-                            case 'r': curChar = '\r'; break;
-                            case 'n':
-                                if (strPos <= 2)
-                                    curChar = ' ';//替换文本第一个\n
-                                else
-                                    curChar = '\n';
-                                break;
-                        }
-                    }
-                    else //结束符处理
-                    {
-                        curChar = '#';
-                    }
-                }
-                if (curChar == '#')
-                {
-                    if (strPos < s.Length && s[strPos] == 'c')//遇到#c 换橙刷子并flush
-                    {
-                        g.DrawString(sb.ToString(), font, brush, curX, y, fmt);
-                        brushStack.Push(GearGraphics.OrangeBrush);
-                        brush = brushStack.Peek();
-                        strPos++;
-                    }
-                    else if (strPos < s.Length && s[strPos] == 'g')//遇到#c 换绿刷子并flush
-                    {
-                        g.DrawString(sb.ToString(), font, brush, curX, y, fmt);
-                        brushStack.Push(GearGraphics.GearNameBrushG);
-                        brush = brushStack.Peek();
-                        strPos++;
-                    }
-                    else if (brushStack.Count == 1) //同#c
-                    {
-                        g.DrawString(sb.ToString(), font, brush, curX, y, fmt);
-                        brushStack.Push(GearGraphics.OrangeBrush);
-                        brush = brushStack.Peek();
-                    }
-                    else//遇到# 换白刷子并flush
-                    {
-                        g.DrawString(sb.ToString(), font, brush, curX, y, fmt);
-                        brushStack.Pop();
-                        brush = brushStack.Peek();
-                    }
-                    sb.Remove(0, sb.Length);
-                    curX += tempX;
-                    tempX = 0;
-                }
-                else if (curChar < 0x0100 && curChar != '\r' && curChar != '\n')
-                {
-                    sb.Append(curChar);
-                    tempX += (int)font.Size / 2;
-                }
-                else if (curChar > 0xff)
-                {
-                    sb.Append(curChar);
-                    tempX += (int)font.Size;
-                }
-                if (curX + tempX >= x1 || curChar == '\n' || strPos == s.Length)
-                {
-                    g.DrawString(sb.ToString(), font, brush, curX, y, fmt);
-                    sb.Remove(0, sb.Length);
-                    curX = x;
-                    tempX = 0;
-                    y += height;
-                }
+                r.WordWrapEnabled = false;
+                r.DrawString(g, s, font, x, x1, ref y, height);
             }
-
-            fmt.Dispose();
         }
 
         public static Bitmap EnlargeBitmap(Bitmap bitmap)
@@ -486,6 +408,425 @@ namespace WzComparerR2.CharaSimControl
             {
                 SendMessage(control.Handle, WM_SETREDRAW, new IntPtr(enable ? 1 : 0), IntPtr.Zero);
             }
+        }
+
+        private class FormattedTextRenderer : IDisposable
+        {
+            public FormattedTextRenderer()
+            {
+                fmt = (StringFormat)StringFormat.GenericTypographic.Clone();
+                sb = new StringBuilder();
+            }
+
+            public bool WordWrapEnabled { get; set; }
+
+            const int MAX_RANGES = 32;
+            StringFormat fmt;
+
+            Graphics g;
+            StringBuilder sb;
+            Font font;
+            RectangleF infinityRect;
+
+            public void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height)
+            {
+                //初始化环境
+                this.g = g;
+                this.font = font;
+                this.sb.Clear();
+                this.sb.EnsureCapacity(s.Length);
+
+                float fontLineHeight = GetFontLineHeight(font);
+                this.infinityRect = new RectangleF(0, 0, ushort.MaxValue, fontLineHeight);
+
+                //读取格式
+                var runs = ParseFormat(s);
+
+                //拆分成词
+                
+                runs = runs.SelectMany(run => SplitWords(run)).ToList();
+
+                //对词进行measure
+                MeasureRuns(runs);
+
+                //runs.Dump();
+
+                //直接绘制
+                DrawRuns(runs, x, x1, ref y, height);
+            }
+
+            private List<Run> ParseFormat(string format)
+            {
+                List<Run> runs = new List<Run>();
+
+                Stack<Color> colorStack = new Stack<Color>();
+                colorStack.Push(Color.White);
+
+                int strPos = 0;
+                char curChar;
+
+                int offset = 0;
+
+                Action flushRun = () =>
+                {
+                    if (sb.Length > offset)
+                    {
+                        runs.Add(new Run(offset, sb.Length - offset) { ForeColor = colorStack.Peek() });
+                        offset = sb.Length;
+                    }
+                };
+
+                while (strPos < format.Length)
+                {
+                    curChar = format[strPos++];
+                    if (curChar == '\\')
+                    {
+                        if (strPos < format.Length)
+                        {
+                            curChar = format[strPos++];
+                            switch (curChar)
+                            {
+                                case 'r': curChar = '\r'; break;
+                                case 'n':
+                                    if (strPos <= 2)
+                                        curChar = ' ';//替换文本第一个\n
+                                    else
+                                        curChar = '\n';
+                                    break;
+                            }
+                        }
+                        else //结束符处理
+                        {
+                            curChar = '#';
+                        }
+                    }
+
+                    switch (curChar)
+                    {
+                        case '#':
+                            if (strPos < format.Length && format[strPos] == 'c')//遇到#c 换橙刷子并flush
+                            {
+                                flushRun();
+                                colorStack.Push(OrangeBrushColor);
+                                strPos++;
+                            }
+                            else if (strPos < format.Length && format[strPos] == 'g')//遇到#c 换绿刷子并flush
+                            {
+                                flushRun();
+                                colorStack.Push(GearGraphics.gearGreenColor);
+                                strPos++;
+                            }
+                            else if (colorStack.Count == 1) //同#c
+                            {
+                                flushRun();
+                                colorStack.Push(OrangeBrushColor);
+                                strPos++;
+                            }
+                            else//遇到# 换白刷子并flush
+                            {
+                                flushRun();
+                                colorStack.Pop();
+                            }
+                            break;
+
+                        case '\r': //忽略
+                            break;
+
+                        case '\n': //插入换行
+                            flushRun();
+                            runs.Add(new Run(offset, 0) { IsBreakLine = true });
+                            break;
+
+                        default:
+                            sb.Append(curChar);
+                            break;
+                    }
+                }
+
+                flushRun();
+                return runs;
+            }
+
+            private List<Run> SplitWords(Run run)
+            {
+                List<Run> runs = new List<Run>();
+
+                if (run.IsBreakLine)
+                {
+                    runs.Add(run);
+                }
+                else
+                {
+                    for (int i = run.StartIndex, i0 = run.StartIndex + run.Length; i < i0; i++)
+                    {
+                        int start = i, len;
+                        switch (sb[i])
+                        {
+                            case ' ':
+                            case '\t':
+                                while (++i < i0)
+                                {
+                                    if (!(sb[i] == ' ' || sb[i] == '\t'))
+                                    {
+                                        break;
+                                    }
+                                }
+                                len = (i--) - start;
+                                runs.Add(new Run(start, len) { IsWhiteSpace = true });
+                                break;
+
+                            case '\r':
+                                if (i + 1 < i0 && sb[i + 1] == '\n')
+                                {
+                                    i++;
+                                    goto case '\n';
+                                }
+                                else
+                                {
+                                    runs.Add(new Run(start, 1) { IsWhiteSpace = true });
+                                }
+                                break;
+
+                            case '\n':
+                                len = i - start + 1;
+                                runs.Add(new Run(start, len) { IsBreakLine = true });
+                                break;
+
+                            default:
+                                if (this.WordWrapEnabled)
+                                {
+                                    while (++i < i0)
+                                    {
+                                        if (sb[i] == ' ' || sb[i] == '\t' || sb[i] == '\r' || sb[i] == '\n')
+                                        {
+                                            break;
+                                        }
+                                    }
+
+                                    len = (i--) - start;
+                                    runs.Add(new Run(start, len) { ForeColor = run.ForeColor });
+                                }
+                                else
+                                {
+                                    runs.Add(new Run(start, 1) { ForeColor = run.ForeColor });
+                                }
+                                break;
+                        }
+                    }
+                }
+                return runs;
+            }
+
+            private float GetFontLineHeight(Font font)
+            {
+                var ff = font.FontFamily;
+                return (float)Math.Ceiling(1.0 * font.Height * ff.GetLineSpacing(font.Style) / ff.GetEmHeight(font.Style));
+            }
+
+            private void MeasureRuns(List<Run> runs)
+            {
+                List<Run> tempRuns = new List<Run>(MAX_RANGES);
+
+                foreach (var run in runs)
+                {
+                    tempRuns.Add(run);
+                    if (tempRuns.Count >= MAX_RANGES)
+                    {
+                        MeasureBatch(tempRuns);
+                        tempRuns.Clear();
+                    }
+                }
+
+                MeasureBatch(tempRuns);
+            }
+
+            private void MeasureBatch(List<Run> runs)
+            {
+                string text = sb.ToString();
+                if (runs.Count > 0)
+                {
+                    fmt.SetMeasurableCharacterRanges(runs.Select(r => new CharacterRange(r.StartIndex, r.Length)).ToArray());
+                    var regions = g.MeasureCharacterRanges(text, font, infinityRect, fmt);
+                    for (int i = 0; i < runs.Count; i++)
+                    {
+                        var layout = regions[i].GetBounds(g);
+                        runs[i].X = (int)Math.Round(layout.Left);
+                        runs[i].Width = (int)Math.Round(layout.Width);
+                        regions[i].Dispose();
+                    }
+                }
+            }
+
+            private Rectangle[] MeasureChars(int startIndex, int length)
+            {
+                string word = sb.ToString(startIndex, length);
+                Rectangle[] rects = new Rectangle[length];
+
+                for (int i = 0; i < length; i += MAX_RANGES)
+                { //批次
+                    int chrCount = Math.Min(length - i, MAX_RANGES);
+                    fmt.SetMeasurableCharacterRanges(
+                        Enumerable.Range(i, chrCount)
+                        .Select(start => new CharacterRange(start, 1))
+                        .ToArray());
+                    var regions = g.MeasureCharacterRanges(word, font, infinityRect, fmt);
+                    for (int i1 = 0; i1 < regions.Length; i1++)
+                    {
+                        var rect = regions[i1].GetBounds(g);
+                        rects[i + i1] = new Rectangle(
+                            (int)Math.Round(rect.Left),
+                            (int)Math.Round(rect.Top),
+                            (int)Math.Round(rect.Width),
+                            (int)Math.Round(rect.Height)
+                            );
+                    }
+                }
+
+                return rects;
+            }
+
+            private void DrawRuns(List<Run> runs, int x, int x1, ref int y, int lineHeight)
+            {
+                int drawX = x;
+                int drawY = y;
+                int width = x1 - x;
+                int start = -1, end = -1;
+                int xOffset = 0;
+
+                int curX = drawX;
+
+                Func<bool> hasContent = () => start > -1 && end > start;
+                Color color = Color.Transparent;
+
+                Action<bool> flush = (isNewLine) =>
+                {
+                    if (hasContent())
+                    {
+                        string content = sb.ToString(start, end - start);
+                        TR.DrawText(g, content, font, new Point(drawX, drawY), color);
+                    }
+                    if (isNewLine)
+                    {
+                        drawX = curX = x;
+                        drawY += lineHeight;
+                    }
+                    else
+                    {
+                        drawX = curX;
+                    }
+                    start = end = -1;
+                };
+
+                for (int r = 0; r < runs.Count; r++)
+                {
+                    var run = runs[r];
+                    if (run.IsBreakLine)
+                    { //强行换行 并且flush
+                        flush(true);
+                        if( r < runs.Count - 1)
+                        {
+                            xOffset = runs[r + 1].X;
+                        }
+                    }
+                    else
+                    {
+                        if (run.ForeColor != color)
+                        {
+                            end = run.StartIndex;
+                            curX = x + run.X - xOffset;
+                            flush(false);
+                            color = run.ForeColor;
+                        }
+
+                        if (start < 0)
+                        {
+                            start = run.StartIndex;
+                        }
+
+                        if (!run.IsWhiteSpace)
+                        { //非空 计算宽度
+                            curX = x + run.X - xOffset;
+                            if (this.WordWrapEnabled ? (x1 - curX < run.Width) : (curX >= x1))  //奇怪的算法 暂定
+                            { //宽度不够
+                                if (hasContent())
+                                { //有内容
+                                    flush(true);
+                                    start = run.StartIndex;
+                                    xOffset = run.X;
+                                }
+                                if (x1 - curX < run.Width)
+                                { //宽度还是不够 按字符拆分
+                                    var rects = MeasureChars(run.StartIndex, run.Length);
+
+                                    for (int i = 0, ir = run.StartIndex; i < rects.Length; i++, ir++)
+                                    {
+                                        rects[i].X += run.X;
+
+                                        if (start < 0)
+                                        {
+                                            start = ir;
+                                            xOffset = run.X;
+                                        }
+
+                                        if (rects[i].Right - xOffset > width)
+                                        { //超宽 flush之前内容
+                                            if (ir - start <= 0)
+                                            { //限定至少输出一个字符
+                                                end = start + 1;
+                                                flush(true);
+                                                continue;
+                                            }
+                                            else
+                                            {
+                                                end = ir;
+                                                flush(true);
+                                                start = ir;
+                                                xOffset = rects[i].X;
+                                            }
+                                        }
+                                    }
+                                    end = run.StartIndex + run.Length;
+                                    curX = x + rects[rects.Length - 1].Right - xOffset;
+                                    flush(false);
+
+                                    continue;
+                                }
+                            }
+                        }
+
+                        //正常绘制
+                        end = run.StartIndex + run.Length;
+
+                    }
+                }
+
+                //输出结尾
+                flush(true);
+                y = drawY;
+            }
+
+            public void Dispose()
+            {
+                if (fmt != null)
+                    fmt.Dispose();
+            }
+        }
+
+        private class Run
+        {
+            public Run(int startIndex, int length)
+            {
+                this.StartIndex = startIndex;
+                this.Length = length;
+            }
+
+            public int StartIndex;
+            public int Length;
+            public bool IsWhiteSpace;
+            public bool IsBreakLine;
+            public int X;
+            public int Width;
+            public Color ForeColor;
         }
     }
 }
