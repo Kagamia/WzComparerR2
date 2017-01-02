@@ -302,9 +302,19 @@ namespace WzComparerR2.CharaSimControl
 
             int right = tooltip.Width - 18;
 
-            if (!string.IsNullOrEmpty(sr.Desc))
+            string desc = null;
+            if (item.Level > 0)
             {
-                GearGraphics.DrawString(g, sr.Desc + sr.AutoDesc, GearGraphics.ItemDetailFont2, 98, right, ref picH, 16);
+                desc += $"[LV.{item.Level}] ";
+            }
+            desc += sr.Desc;
+            if (!string.IsNullOrEmpty(desc))
+            {
+                GearGraphics.DrawString(g, desc, GearGraphics.ItemDetailFont2, 98, right, ref picH, 16);
+            }
+            if (!string.IsNullOrEmpty(sr.AutoDesc))
+            {
+                GearGraphics.DrawString(g, sr.AutoDesc, GearGraphics.ItemDetailFont2, 98, right, ref picH, 16);
             }
             if (item.Props.TryGetValue(ItemPropType.tradeAvailable, out value) && value > 0)
             {

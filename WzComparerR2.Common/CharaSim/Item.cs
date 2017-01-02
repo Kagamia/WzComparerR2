@@ -14,6 +14,8 @@ namespace WzComparerR2.CharaSim
             this.Specs = new Dictionary<ItemSpecType, int>();
         }
 
+        public int Level { get; set; }
+
         public Dictionary<ItemPropType, int> Props { get; private set; }
         public Dictionary<ItemSpecType, int> Specs { get; private set; }
 
@@ -92,6 +94,10 @@ namespace WzComparerR2.CharaSim
                             {
                                 item.Sample = BitmapOrigin.CreateFromNode(subNode, findNode);
                             }
+                            break;
+
+                        case "lv":
+                            item.Level = Convert.ToInt32(subNode.Value);
                             break;
 
                         default:
