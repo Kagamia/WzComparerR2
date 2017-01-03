@@ -216,7 +216,8 @@ namespace WzComparerR2.CharaSimControl
 
             using (var r = new FormattedTextRenderer())
             {
-                r.WordWrapEnabled = false;
+                r.WordWrapEnabled = true;
+                r.UseGDIRenderer = false;
                 r.DrawString(g, s, font, x, x1, ref y, height);
             }
         }
@@ -419,6 +420,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             public bool WordWrapEnabled { get; set; }
+            public bool UseGDIRenderer { get; set; }
 
             const int MAX_RANGES = 32;
             StringFormat fmt;
@@ -638,6 +640,25 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 MeasureBatch(tempRuns);
+
+                //failed
+                if (runs.Where(run => !run.IsBreakLine && run.Length > 0)
+                    .All(run => run.Width == 0))
+                {
+                    float x = 0;
+                    foreach (var run in runs.Where(r => !r.IsBreakLine))
+                    {
+                        run.X = (int)Math.Round(x);
+                        float width = 0;
+                        for (int i = 0; i < run.Length; i++)
+                        {
+                            var chr = this.sb[run.StartIndex + i];
+                            width += chr > 0xff ? this.font.Size : (this.font.Size / 2);
+                        }
+                        run.Width = (int)Math.Round(x);
+                        x += width;
+                    }
+                }
             }
 
             private void MeasureBatch(List<Run> runs)
@@ -682,6 +703,23 @@ namespace WzComparerR2.CharaSimControl
                     }
                 }
 
+                //failed
+                if (rects.All(rect => rect.Width == 0))
+                {
+                    float x = 0;
+                    for (int i = 0; i < rects.Length; i++)
+                    {
+                        var chr = this.sb[startIndex + i];
+                        var width = chr > 0xff ? this.font.Size : (this.font.Size / 2);
+                        rects[i] = new Rectangle(
+                            (int)Math.Round(x),
+                            0,
+                            (int)Math.Round(width),
+                            font.Height
+                            );
+                    }
+                }
+
                 return rects;
             }
 
@@ -703,7 +741,18 @@ namespace WzComparerR2.CharaSimControl
                     if (hasContent())
                     {
                         string content = sb.ToString(start, end - start);
-                        TR.DrawText(g, content, font, new Point(drawX, drawY), color);
+
+                         if (this.UseGDIRenderer)
+                        {
+                            TR.DrawText(g, content, font, new Point(drawX, drawY), color);
+                        }
+                        else
+                        {
+                            using (var brush = new SolidBrush(color))
+                            {
+                                g.DrawString(content, font, brush, drawX, drawY, fmt);
+                            }
+                        }
                     }
                     if (isNewLine)
                     {
@@ -730,7 +779,7 @@ namespace WzComparerR2.CharaSimControl
                     }
                     else
                     {
-                        if (run.ForeColor != color)
+                        if (!run.IsWhiteSpace && run.ForeColor != color)
                         {
                             end = run.StartIndex;
                             curX = x + run.X - xOffset;
@@ -748,7 +797,7 @@ namespace WzComparerR2.CharaSimControl
                             curX = x + run.X - xOffset;
                             if (this.WordWrapEnabled ? (x1 - curX < run.Width) : (curX >= x1))  //奇怪的算法 暂定
                             { //宽度不够
-                                if (hasContent())
+                                if (curX > x) //(hasContent())
                                 { //有内容
                                     flush(true);
                                     start = run.StartIndex;
@@ -774,6 +823,7 @@ namespace WzComparerR2.CharaSimControl
                                             { //限定至少输出一个字符
                                                 end = start + 1;
                                                 flush(true);
+                                                xOffset = rects[i].Right;
                                                 continue;
                                             }
                                             else

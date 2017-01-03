@@ -156,7 +156,8 @@ namespace WzComparerR2.CharaSimControl
         {
             Bitmap bitmap = new Bitmap(261, DefaultPicHeight);
             Graphics g = Graphics.FromImage(bitmap);
-            StringFormat format = (StringFormat)StringFormat.GenericDefault.Clone();
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+            StringFormat format = (StringFormat)StringFormat.GenericTypographic.Clone();
             int value;
 
             picH = 13;
@@ -185,9 +186,6 @@ namespace WzComparerR2.CharaSimControl
             g.DrawString(gearName, GearGraphics.ItemNameFont2,
                 GearGraphics.GetGearNameBrush(Gear.diff, Gear.ScrollUp > 0), 130, picH, format);
             picH += 23;
-            format.Dispose();
-            format = (StringFormat)StringFormat.GenericTypographic.Clone();
-            format.Alignment = StringAlignment.Center;
 
             //装备rank
             string rankStr = null;
