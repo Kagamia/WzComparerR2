@@ -410,6 +410,20 @@ namespace WzComparerR2.CharaSimControl
                 hasPart2 = true;
             }
 
+            //戒指特殊潜能
+            int ringOpt, ringOptLv;
+            if (Gear.Props.TryGetValue(GearPropType.ringOptionSkill, out ringOpt)
+                && Gear.Props.TryGetValue(GearPropType.ringOptionSkillLv, out ringOptLv))
+            {
+                var opt = Potential.LoadFromWz(ringOpt, ringOptLv, PluginBase.PluginManager.FindWz);
+                if (opt != null)
+                {
+                    g.DrawString(opt.ConvertSummary(), GearGraphics.ItemDetailFont2, Brushes.White, 11, picH);
+                    picH += 16;
+                    hasPart2 = true;
+                }
+            }
+
             bool hasReduce = Gear.Props.TryGetValue(GearPropType.reduceReq, out value);
             if (hasReduce && value > 0)
             {
