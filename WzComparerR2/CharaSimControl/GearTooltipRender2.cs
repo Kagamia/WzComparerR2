@@ -509,7 +509,7 @@ namespace WzComparerR2.CharaSimControl
                         int dLevel = curLevel - reqLvl + reduceLvl;
                         //int addVal = (int)Math.Floor(kv.Value * dLevel);
                         //这里有一个计算上的错误 换方式执行
-                        int addVal = (int)Math.Floor(double.Parse(kv.Value.ToString()) * dLevel);
+                        int addVal = (int)Math.Floor(new decimal(kv.Value) * dLevel);
                         string text = ItemStringHelper.GetGearPropString(kv.Key, addVal, 1);
                         text += string.Format(" ({0:f1} x {1})", kv.Value, dLevel);
                         g.DrawString(text, GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 10, picH, StringFormat.GenericTypographic);

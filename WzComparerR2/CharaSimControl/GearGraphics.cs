@@ -216,7 +216,7 @@ namespace WzComparerR2.CharaSimControl
 
             using (var r = new FormattedTextRenderer())
             {
-                r.WordWrapEnabled = true;
+                r.WordWrapEnabled = false;
                 r.UseGDIRenderer = false;
                 r.DrawString(g, s, font, x, x1, ref y, height);
             }
@@ -445,13 +445,10 @@ namespace WzComparerR2.CharaSimControl
                 var runs = ParseFormat(s);
 
                 //拆分成词
-                
                 runs = runs.SelectMany(run => SplitWords(run)).ToList();
 
                 //对词进行measure
                 MeasureRuns(runs);
-
-                //runs.Dump();
 
                 //直接绘制
                 DrawRuns(runs, x, x1, ref y, height);
