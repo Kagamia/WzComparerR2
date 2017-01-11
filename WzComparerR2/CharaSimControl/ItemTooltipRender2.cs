@@ -259,15 +259,26 @@ namespace WzComparerR2.CharaSimControl
                 picH = 10;
             }
 
+            //绘制标题
             format.Alignment = StringAlignment.Center;
             g.DrawString(sr.Name, GearGraphics.ItemNameFont2, Brushes.White, tooltip.Width / 2, picH, format);
             picH += 22;
 
+            //额外特性
             string attr = GetItemAttributeString();
             if (!string.IsNullOrEmpty(attr))
             {
                 g.DrawString(attr, GearGraphics.ItemDetailFont, GearGraphics.GearNameBrushC, tooltip.Width / 2, picH, format);
                 picH += 19;
+            }
+
+            //装备限时
+            if (item.TimeLimited)
+            {
+                DateTime time = DateTime.Now.AddDays(7d);
+                string expireStr = time.ToString("到yyyy年 M月 d日 H时 m分可以用");
+                g.DrawString(expireStr, GearGraphics.ItemDetailFont, Brushes.White, tooltip.Width / 2, picH, format);
+                picH += 21;
             }
 
             //绘制图标
@@ -310,25 +321,25 @@ namespace WzComparerR2.CharaSimControl
             desc += sr.Desc;
             if (!string.IsNullOrEmpty(desc))
             {
-                GearGraphics.DrawString(g, desc, GearGraphics.ItemDetailFont2, 98, right, ref picH, 16);
+                GearGraphics.DrawString(g, desc, GearGraphics.ItemDetailFont2, 100, right, ref picH, 16);
             }
             if (!string.IsNullOrEmpty(sr.AutoDesc))
             {
-                GearGraphics.DrawString(g, sr.AutoDesc, GearGraphics.ItemDetailFont2, 98, right, ref picH, 16);
+                GearGraphics.DrawString(g, sr.AutoDesc, GearGraphics.ItemDetailFont2, 100, right, ref picH, 16);
             }
             if (item.Props.TryGetValue(ItemPropType.tradeAvailable, out value) && value > 0)
             {
                 attr = ItemStringHelper.GetItemPropString(ItemPropType.tradeAvailable, value);
                 if (!string.IsNullOrEmpty(attr))
-                    GearGraphics.DrawString(g, "#c" + attr + "#", GearGraphics.ItemDetailFont2, 98, right, ref picH, 16);
+                    GearGraphics.DrawString(g, "#c" + attr + "#", GearGraphics.ItemDetailFont2, 100, right, ref picH, 16);
             }
             if (item.Specs.TryGetValue(ItemSpecType.recipeValidDay, out value) && value > 0)
             {
-                GearGraphics.DrawString(g, "(可制作时间：" + value + "天)", GearGraphics.ItemDetailFont, 98, right, ref picH, 16);
+                GearGraphics.DrawString(g, "(可制作时间：" + value + "天)", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
             }
             if (item.Specs.TryGetValue(ItemSpecType.recipeUseCount, out value) && value > 0)
             {
-                GearGraphics.DrawString(g, "(可制作次数：" + value + "次)", GearGraphics.ItemDetailFont, 98, right, ref picH, 16);
+                GearGraphics.DrawString(g, "(可制作次数：" + value + "次)", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
             }
 
             picH += 3;
