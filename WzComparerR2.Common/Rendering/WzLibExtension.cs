@@ -37,8 +37,7 @@ namespace WzComparerR2.Rendering
                     break;
 
                 case 2:
-                    t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, SurfaceFormat.Color);
-                    MonogameUtils.BgraToColor(plainData);
+                    t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, SurfaceFormat.Bgra32);
                     t2d.SetData(plainData);
                     break;
 

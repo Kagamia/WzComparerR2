@@ -23,7 +23,7 @@ float4 RGBAtoNonPremultiplied(float4 input)
 	if (input.a <= 1) {
 		input.rgb /= input.a;
 	}
-	return input.bgra;
+	return input;
 }
 
 float4 Blend(float4 background, float4 premultipliedColor)
@@ -41,7 +41,7 @@ float4 PS_AlphaTest(VSOutput input) : SV_Target0
 {
 	float4 color = SAMPLE_TEXTURE(Texture, input.texCoord) * input.color;
 	clip(color.a <= clipAlpha ? -1 : 1);
-	return Blend(mixedColor, color).bgra;
+	return Blend(mixedColor, color);
 }
 
 TECHNIQUE_SB(tech0, PS);

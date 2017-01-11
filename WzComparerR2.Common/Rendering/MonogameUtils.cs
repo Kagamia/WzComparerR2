@@ -83,10 +83,7 @@ namespace WzComparerR2.Rendering
             Marshal.Copy(bmpData.Scan0, buffer, 0, buffer.Length);
             bitmap.UnlockBits(bmpData);
 
-            //bgra->rgba
-            MonogameUtils.BgraToColor(buffer);
-
-            var t2d = new Texture2D(device, rect.Width, rect.Height, false, SurfaceFormat.Color);
+            var t2d = new Texture2D(device, rect.Width, rect.Height, false, SurfaceFormat.Bgra32);
             t2d.SetData(buffer);
             return t2d;
         }
