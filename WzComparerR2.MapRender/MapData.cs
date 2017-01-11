@@ -305,7 +305,21 @@ namespace WzComparerR2.MapRender
                 switch (life.Type)
                 {
                     case "m":
-                        path = $@"Mob\{life.ID:D7}.img\stand";
+                        path = $@"Mob\{life.ID:D7}.img";
+                        var mobNode = PluginManager.FindWz(path);
+                        //TODO: 加载mob数据
+
+                        int? mobLink = mobNode.FindNodeByPath(@"info\link")?.GetValueEx<int>();
+                        if (mobLink != null)
+                        {
+                            path = $@"Mob\{mobLink.Value:D7}.img\stand";
+                        }
+                        else
+                        {
+                            path = $@"Mob\{life.ID:D7}.img\stand";
+                        }
+                       
+                        //加载动画
                         {
                             var aniItem = resLoader.LoadAnimationData(path);
                             if (aniItem != null)
@@ -319,7 +333,20 @@ namespace WzComparerR2.MapRender
                         break;
 
                     case "n":
-                        path = $@"Npc\{life.ID:D7}.img\stand";
+                        path = $@"Npc\{life.ID:D7}.img";
+                        var npcNode = PluginManager.FindWz(path);
+                        //TODO: 加载npc数据
+                        int? npcLink = npcNode.FindNodeByPath(@"info\link")?.GetValueEx<int>();
+                        if (npcLink != null)
+                        {
+                            path = $@"Npc\{npcLink.Value:D7}.img\stand";
+                        }
+                        else
+                        {
+                            path = $@"Npc\{life.ID:D7}.img\stand";
+                        }
+
+                        //加载动画
                         {
                             var aniItem = resLoader.LoadAnimationData(path);
                             if (aniItem != null)

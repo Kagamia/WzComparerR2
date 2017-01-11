@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Threading.Tasks;
 using WzComparerR2.WzLib;
 using WzComparerR2.PluginBase;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using WzComparerR2.Rendering;
 using WzComparerR2.MapRender.Patches2;
 using WzComparerR2.Animation;
-
+using System.Runtime.InteropServices;
 
 namespace WzComparerR2.MapRender
 {
@@ -25,6 +28,8 @@ namespace WzComparerR2.MapRender
             graphics.PreferredBackBufferWidth = 1024;
             graphics.PreferredBackBufferHeight = 768;
             this.IsMouseVisible = true;
+
+            GameExt.FixKeyboard(this);
         }
 
         GraphicsDeviceManager graphics;
@@ -35,12 +40,17 @@ namespace WzComparerR2.MapRender
         ResourceLoader resLoader;
         MeshBatcher batcher;
 
+        bool prepareCapture;
+        Task captureTask;
+
+
         protected override void Initialize()
         {
             base.Initialize();
             this.renderEnv = new RenderEnv(this, this.graphics);
-
             this.batcher = new MeshBatcher(this.GraphicsDevice);
+
+            this.renderEnv.Camera.WorldRect = mapData.VRect;
         }
 
         protected override void OnActivated(object sender, EventArgs args)
@@ -77,20 +87,173 @@ namespace WzComparerR2.MapRender
                 this.renderEnv.Camera.Center += new Vector2(mousePos.X - 640, mousePos.Y - 360) / 10;
             }
 
+            //临时方向键移动视角
+            {
+                var input = this.renderEnv.Input;
+                int boost = 1;
+                Vector2 offs = new Vector2();
+
+                if (input.IsKeyPressing(Keys.Left))
+                    offs.X -= 5;
+                if (input.IsKeyPressing(Keys.Right))
+                    offs.X += 5;
+                if (input.IsKeyPressing(Keys.Up))
+                    offs.Y -= 5;
+                if (input.IsKeyPressing(Keys.Down))
+                    offs.Y += 5;
+
+                if (input.IsCtrlPressing)
+                    boost = 2;
+                this.renderEnv.Camera.Center += offs * boost;
+            }
+
+            //临时截图键
+            if (renderEnv.Input.IsKeyDown(Keys.Scroll) 
+                && (captureTask == null || captureTask.IsCompleted)
+                && !prepareCapture)
+            {
+                prepareCapture = true;
+            }
+
             UpdateAllItems(mapData.Scene, gameTime.ElapsedGameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
+            if (prepareCapture)
+            {
+
+                var oldTarget = GraphicsDevice.GetRenderTargets();
+
+                //检查显卡支持纹理大小
+                var maxTextureWidth = 4096;
+                var maxTextureHeight = 4096;
+
+                Rectangle oldRect = this.renderEnv.Camera.WorldRect;
+                int width = Math.Min(oldRect.Width, maxTextureWidth);
+                int height = Math.Min(oldRect.Height, maxTextureHeight);
+                this.renderEnv.Camera.UseWorldRect = true;
+
+                var target2d = new RenderTarget2D(this.GraphicsDevice, width, height, false, SurfaceFormat.Bgra32, DepthFormat.None);
+
+                //计算一组截图区
+                int horizonBlock = (int)Math.Ceiling(1.0 * oldRect.Width / width);
+                int verticalBlock = (int)Math.Ceiling(1.0 * oldRect.Height / height);
+                byte[,][] picBlocks = new byte[horizonBlock, verticalBlock][];
+                for (int j = 0; j < verticalBlock; j++)
+                {
+                    for (int i = 0; i < horizonBlock; i++)
+                    {
+                        //计算镜头区域
+                        this.renderEnv.Camera.WorldRect = new Rectangle(
+                            oldRect.X + i * width,
+                            oldRect.Y + j * height,
+                            width,
+                            height);
+
+                        //绘制
+                        GraphicsDevice.SetRenderTarget(target2d);
+                        GraphicsDevice.Clear(Color.Black);
+                        DrawScene();
+                        GraphicsDevice.SetRenderTarget(null);
+                        //保存
+                        Texture2D t2d = target2d;
+                        byte[] data = new byte[target2d.Width * target2d.Height * 4];
+                        t2d.GetData(data);
+                        picBlocks[i, j] = data;
+                    }
+                }
+                target2d.Dispose();
+
+                this.renderEnv.Camera.WorldRect = oldRect;
+                this.renderEnv.Camera.UseWorldRect = false;
+
+                GraphicsDevice.SetRenderTargets(oldTarget);
+                prepareCapture = false;
+
+                captureTask = Task.Factory.StartNew(() =>
+                    SaveTexture(picBlocks, oldRect.Width, oldRect.Height, target2d.Width, target2d.Height)
+                );
+            }
+
             this.GraphicsDevice.Clear(Color.Black);
+            DrawScene();
+            base.Draw(gameTime);
+        }
+
+        private void DrawScene()
+        {
             this.batcher.Begin(Matrix.CreateTranslation(new Vector3(-this.renderEnv.Camera.Origin, 0)));
             foreach (var mesh in GetDrawableItems(this.mapData.Scene))
             {
                 this.batcher.Draw(mesh);
             }
             this.batcher.End();
-            base.Draw(gameTime);
         }
+
+        private void SaveTexture(byte[,][] picBlocks, int mapWidth, int mapHeight, int blockWidth, int blockHeight)
+        {
+            //透明处理
+            foreach (byte[] data in picBlocks)
+            {
+                for (int i = 0, j = data.Length; i < j; i += 4)
+                {
+                    data[i + 3] = 255;
+                }
+            }
+
+            //组装
+            byte[] mapData = new byte[mapWidth * mapHeight * 4];
+            for (int j = 0; j < picBlocks.GetLength(1); j++)
+            {
+                for (int i = 0; i < picBlocks.GetLength(0); i++)
+                {
+                    byte[] data = picBlocks[i, j];
+                    IntPtr pData = Marshal.UnsafeAddrOfPinnedArrayElement(data, 0);
+
+                    Rectangle blockRect = new Rectangle();
+                    blockRect.X = i * blockWidth;
+                    blockRect.Y = j * blockHeight;
+                    blockRect.Width = Math.Min(mapWidth - blockRect.X, blockWidth);
+                    blockRect.Height = Math.Min(mapHeight - blockRect.Y, blockHeight);
+
+                    int length = blockRect.Width * 4;
+                    if (blockRect.X == 0 && blockRect.Width == mapWidth) //整块复制
+                    {
+                        int startIndex = mapWidth * 4 * blockRect.Y;
+                        Marshal.Copy(pData, mapData, startIndex, blockRect.Width * blockRect.Height * 4);
+                    }
+                    else //逐行扫描
+                    {
+                        for (int y = blockRect.Top, y0 = blockRect.Bottom; y < y0; y++)
+                        {
+                            int startIndex = (y * mapWidth + blockRect.X) * 4;
+                            Marshal.Copy(pData, mapData, startIndex, length);
+                            pData = new IntPtr(pData.ToInt32() + blockWidth * 4);
+                        }
+                    }
+                }
+            }
+
+            try
+            {
+                System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(
+                    mapWidth,
+                    mapHeight,
+                    mapWidth * 4,
+                    System.Drawing.Imaging.PixelFormat.Format32bppArgb,
+                    Marshal.UnsafeAddrOfPinnedArrayElement(mapData, 0));
+
+                bitmap.Save(DateTime.Now.ToString("yyyyMMddHHmmssfff") + "_" + (this.mapData?.ID ?? 0).ToString("D9") + ".png",
+                    System.Drawing.Imaging.ImageFormat.Png);
+
+                bitmap.Dispose();
+            }
+            catch
+            {
+            }
+        }
+
 
         private IEnumerable<MeshItem> GetDrawableItems(SceneNode node)
         {
@@ -208,7 +371,8 @@ namespace WzComparerR2.MapRender
             }
 
             //y轴镜头调整
-            position.Y += (renderEnv.Camera.Height - 600)/2;
+            if (back.TileMode == TileMode.None)
+                position.Y += (renderEnv.Camera.Height - 600) / 2;
 
             //计算tile
             Rectangle? tileRect = null;

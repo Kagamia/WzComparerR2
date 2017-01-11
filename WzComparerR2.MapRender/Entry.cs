@@ -21,12 +21,20 @@ namespace WzComparerR2.MapRender
         private RibbonBar bar;
         private ButtonItem btnItemMapRender;
 
+        private RibbonBar bar2;
+        private ButtonItem btnItemMapRenderV2;
+
         protected override void OnLoad()
         {
             this.bar = Context.AddRibbonBar("Modules", "MapRender");
             btnItemMapRender = new ButtonItem("", "MapRender");
             btnItemMapRender.Click += btnItem_Click;
             bar.Items.Add(btnItemMapRender);
+
+            this.bar2 = Context.AddRibbonBar("Modules", "MapRender2");
+            btnItemMapRenderV2 = new ButtonItem("", "MapRenderV2");
+            btnItemMapRenderV2.Click += btnItem_Click;
+            bar2.Items.Add(btnItemMapRenderV2);
         }
 
         void btnItem_Click(object sender, EventArgs e)
@@ -63,11 +71,19 @@ namespace WzComparerR2.MapRender
                         try
                         {
 #endif
-                            using (var frm = new MapRender.FrmMapRender2(img))
-                            {
-                                //frm.StringLinker = sl;
-                                frm.Run();
-                            }
+                        Microsoft.Xna.Framework.Game game;
+                        if (sender == btnItemMapRender)
+                        {
+                            game = new FrmMapRender(img) { StringLinker = sl };
+                        }
+                        else
+                        {
+                            game = new FrmMapRender2(img);
+                        }
+                        using (game)
+                        {
+                            game.Run();
+                        }
 #if !DEBUG
                         }
                         catch (Exception ex)
