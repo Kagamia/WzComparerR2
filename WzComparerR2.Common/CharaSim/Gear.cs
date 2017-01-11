@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Drawing;
+using System.Linq;
 using WzComparerR2.WzLib;
 
 namespace WzComparerR2.CharaSim
@@ -62,6 +63,14 @@ namespace WzComparerR2.CharaSim
         {
             int value;
             return this.Props.TryGetValue(type, out value) && value != 0;
+        }
+
+        public IEnumerable<KeyValuePair<GearPropType, int>> PropsV5
+        {
+            get
+            {
+                return this.Props.Where(kv => IsV5SupportPropType(kv.Key));
+            }
         }
 
         public int GetMaxStar()
@@ -223,6 +232,22 @@ namespace WzComparerR2.CharaSim
                     return true;
                 default:
                     return false;
+            }
+        }
+
+        public static bool IsV5SupportPropType(GearPropType type)
+        {
+            switch (type)
+            {
+                case GearPropType.incMDD:
+                case GearPropType.incMDDr:
+                case GearPropType.incACC:
+                case GearPropType.incACCr:
+                case GearPropType.incEVA:
+                case GearPropType.incEVAr:
+                    return false;
+                default:
+                    return true;
             }
         }
 

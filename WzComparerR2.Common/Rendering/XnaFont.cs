@@ -32,7 +32,7 @@ namespace WzComparerR2.Rendering
                 throw new ArgumentNullException();
             }
             this.baseFont = baseFont;
-            this.textureBuffer = new Texture2D(graphicsDevice, 2048, 2048, false, SurfaceFormat.Color);
+            this.textureBuffer = new Texture2D(graphicsDevice, 2048, 2048, false, SurfaceFormat.Bgra32);
             RebuildGdiBuffer(this.baseFont.Height);
             this.charLocation = new Dictionary<char, Rectangle>();
         }
@@ -182,7 +182,6 @@ namespace WzComparerR2.Rendering
 
             Rectangle rect = new Rectangle(textureSpaceX, textureSpaceY, originRect.Width, originRect.Height);
 
-            MonogameUtils.BgraToColor(b);
             textureBuffer.SetData(0, rect, b, 0, b.Length);
             textureSpaceX += rect.Width;
             return rect;

@@ -87,7 +87,7 @@ namespace WzComparerR2.CharaSim
         incMaxDamage,
         incPADlv,
         incMADlv,
-        
+        incCriticaldamage,
 
         Option,
         OptionToMob,
@@ -157,5 +157,7 @@ namespace WzComparerR2.CharaSim
         nActivatedSocket,
         jokerToSetItem,
         medalTag,
+        ringOptionSkill,
+        ringOptionSkillLv
     }
 }

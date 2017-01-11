@@ -48,7 +48,7 @@ namespace WzComparerR2.Controls
 
         public void Begin(Rectangle viewport)
         {
-            _rt2d = new RenderTarget2D(_device, viewport.Width, viewport.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+            _rt2d = new RenderTarget2D(_device, viewport.Width, viewport.Height, false, SurfaceFormat.Bgra32, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             var binding = _device.GetRenderTargets();
             _device.SetRenderTarget(_rt2d);
 
@@ -106,7 +106,7 @@ namespace WzComparerR2.Controls
 
         public Texture2D GetPngTexture()
         {
-            var texture = new RenderTarget2D(_device, _rt2d.Width, _rt2d.Height, false, SurfaceFormat.Color, DepthFormat.None);
+            var texture = new RenderTarget2D(_device, _rt2d.Width, _rt2d.Height, false, SurfaceFormat.Bgra32, DepthFormat.None);
             _device.SetRenderTarget(texture);
             _eff.AlphaMixEnabled = false;
 
@@ -121,7 +121,7 @@ namespace WzComparerR2.Controls
 
         public Texture2D GetGifTexture(Color mixColor, int minMixedAlpha)
         {
-            var texture = new RenderTarget2D(_device, _rt2d.Width, _rt2d.Height, false, SurfaceFormat.Color, DepthFormat.None);
+            var texture = new RenderTarget2D(_device, _rt2d.Width, _rt2d.Height, false, SurfaceFormat.Bgra32, DepthFormat.None);
             _device.SetRenderTarget(texture);
 
             _eff.AlphaMixEnabled = true;

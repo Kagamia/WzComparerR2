@@ -156,7 +156,8 @@ namespace WzComparerR2.CharaSimControl
         {
             Bitmap bitmap = new Bitmap(261, DefaultPicHeight);
             Graphics g = Graphics.FromImage(bitmap);
-            StringFormat format = (StringFormat)StringFormat.GenericDefault.Clone();
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+            StringFormat format = (StringFormat)StringFormat.GenericTypographic.Clone();
             int value;
 
             picH = 13;
@@ -185,9 +186,6 @@ namespace WzComparerR2.CharaSimControl
             g.DrawString(gearName, GearGraphics.ItemNameFont2,
                 GearGraphics.GetGearNameBrush(Gear.diff, Gear.ScrollUp > 0), 130, picH, format);
             picH += 23;
-            format.Dispose();
-            format = (StringFormat)StringFormat.GenericTypographic.Clone();
-            format.Alignment = StringAlignment.Center;
 
             //装备rank
             string rankStr = null;
@@ -396,7 +394,7 @@ namespace WzComparerR2.CharaSimControl
 
             //一般属性
             List<GearPropType> props = new List<GearPropType>();
-            foreach (KeyValuePair<GearPropType, int> p in Gear.Props)
+            foreach (KeyValuePair<GearPropType, int> p in Gear.PropsV5) //5转过滤
             {
                 if ((int)p.Key < 100 && p.Value != 0)
                     props.Add(p.Key);
@@ -410,6 +408,20 @@ namespace WzComparerR2.CharaSimControl
                     Brushes.White, 11, picH);
                 picH += 16;
                 hasPart2 = true;
+            }
+
+            //戒指特殊潜能
+            int ringOpt, ringOptLv;
+            if (Gear.Props.TryGetValue(GearPropType.ringOptionSkill, out ringOpt)
+                && Gear.Props.TryGetValue(GearPropType.ringOptionSkillLv, out ringOptLv))
+            {
+                var opt = Potential.LoadFromWz(ringOpt, ringOptLv, PluginBase.PluginManager.FindWz);
+                if (opt != null)
+                {
+                    g.DrawString(opt.ConvertSummary(), GearGraphics.ItemDetailFont2, Brushes.White, 11, picH);
+                    picH += 16;
+                    hasPart2 = true;
+                }
             }
 
             bool hasReduce = Gear.Props.TryGetValue(GearPropType.reduceReq, out value);
@@ -497,7 +509,7 @@ namespace WzComparerR2.CharaSimControl
                         int dLevel = curLevel - reqLvl + reduceLvl;
                         //int addVal = (int)Math.Floor(kv.Value * dLevel);
                         //这里有一个计算上的错误 换方式执行
-                        int addVal = (int)Math.Floor(double.Parse(kv.Value.ToString()) * dLevel);
+                        int addVal = (int)Math.Floor(new decimal(kv.Value) * dLevel);
                         string text = ItemStringHelper.GetGearPropString(kv.Key, addVal, 1);
                         text += string.Format(" ({0:f1} x {1})", kv.Value, dLevel);
                         g.DrawString(text, GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 10, picH, StringFormat.GenericTypographic);
@@ -654,11 +666,11 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (!string.IsNullOrEmpty(sr.Desc))
                 {
-                    GearGraphics.DrawString(g, sr.Desc, GearGraphics.ItemDetailFont2, 11, 247, ref picH, 16);
+                    GearGraphics.DrawString(g, sr.Desc, GearGraphics.ItemDetailFont2, 11, 245, ref picH, 16);
                 }
                 foreach (string str in desc)
                 {
-                    GearGraphics.DrawString(g, str, GearGraphics.ItemDetailFont, 11, 247, ref picH, 16);
+                    GearGraphics.DrawString(g, str, GearGraphics.ItemDetailFont, 11, 245, ref picH, 16);
                 }
                 picH += 5;
             }
@@ -1025,28 +1037,28 @@ namespace WzComparerR2.CharaSimControl
             int value;
             string numValue;
             //防御
-            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_pdd, x, y);
             x += 62;
+            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_pdd, x, y);
             DrawReqNum(g, "0", NumberType.LookAhead, x - 5, y + 6, StringAlignment.Far);
 
-            //魔防
-            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_mdd, x, y);
-            x += 62;
-            DrawReqNum(g, "0", NumberType.LookAhead, x - 5, y + 6, StringAlignment.Far);
+            ////魔防
+            //g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_mdd, x, y);
+            //x += 62;
+            //DrawReqNum(g, "0", NumberType.LookAhead, x - 5, y + 6, StringAlignment.Far);
 
             //boss伤
-            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_bdr, x, y);
             x += 62;
+            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_bdr, x, y);
             this.Gear.Props.TryGetValue(GearPropType.bdR, out value);
             numValue = (value > 0 ? "+ " : null) + value + " % ";
-            DrawReqNum(g, numValue, NumberType.LookAhead, x - 5, y + 6, StringAlignment.Far);
+            DrawReqNum(g, numValue, NumberType.LookAhead, x - 5 + 3, y + 6, StringAlignment.Far);
 
             //无视防御
-            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_igpddr, x, y);
             x += 62;
+            g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_igpddr, x, y);
             this.Gear.Props.TryGetValue(GearPropType.imdR, out value);
             numValue = (value > 0 ? "+ " : null) + value + " % ";
-            DrawReqNum(g, numValue, NumberType.LookAhead, x - 5 - 4, y + 6, StringAlignment.Far);
+            DrawReqNum(g, numValue, NumberType.LookAhead, x - 5 - 1, y + 6, StringAlignment.Far);
         }
 
         private void DrawJobReq(Graphics g, ref int picH)
