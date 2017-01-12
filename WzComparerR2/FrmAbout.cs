@@ -18,7 +18,7 @@ namespace WzComparerR2
         {
             InitializeComponent();
 
-            this.lblClrVer.Text = Environment.Version.ToString();
+            this.lblClrVer.Text = string.Format("{0} ({1})", Environment.Version, Environment.Is64BitProcess ? "x64": "x86");
             this.lblAsmVer.Text = GetAsmVersion().ToString();
             this.lblFileVer.Text = GetFileVersion().ToString();
             this.lblCopyright.Text = GetAsmCopyright().ToString();
@@ -50,7 +50,10 @@ namespace WzComparerR2
             {
                 foreach (var plugin in PluginBase.PluginManager.LoadedPlugins)
                 {
-                    string nodeTxt = string.Format("{0} <font color=\"#808080\">{1}</font>", plugin.Instance.Name, plugin.Instance.Version);
+                    string nodeTxt = string.Format("{0} <font color=\"#808080\">{1} ({2})</font>",
+                        plugin.Instance.Name, 
+                        plugin.Instance.Version,
+                        plugin.Instance.FileVersion);
                     Node node = new Node(nodeTxt);
                     this.advTree1.Nodes.Add(node);
                 }

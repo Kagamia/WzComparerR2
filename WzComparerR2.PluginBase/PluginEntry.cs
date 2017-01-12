@@ -44,6 +44,15 @@ namespace WzComparerR2.PluginBase
             }
         }
 
+        public virtual string FileVersion
+        {
+            get
+            {
+                var attr = GetAsmAttr<AssemblyFileVersionAttribute>();
+                return attr?.Version;
+            }
+        }
+
         private T GetAsmAttr<T>()
         {
             object[] attr = this.GetType().Assembly.GetCustomAttributes(typeof(T), true);
