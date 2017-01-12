@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using CharaSimResource;
 using WzComparerR2.CharaSim;
 using TR = System.Windows.Forms.TextRenderer;
+using TextFormatFlags = System.Windows.Forms.TextFormatFlags;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -741,7 +742,7 @@ namespace WzComparerR2.CharaSimControl
 
                          if (this.UseGDIRenderer)
                         {
-                            TR.DrawText(g, content, font, new Point(drawX, drawY), color);
+                            TR.DrawText(g, content, font, new Point(drawX, drawY), color, TextFormatFlags.NoPrefix);
                         }
                         else
                         {
