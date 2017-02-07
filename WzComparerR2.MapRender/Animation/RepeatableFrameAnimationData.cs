@@ -18,6 +18,6 @@ namespace WzComparerR2.Animation
 
         }
 
-        public int Repeat { get; set; }
+        public bool? Repeat { get; set; }
     }
 }

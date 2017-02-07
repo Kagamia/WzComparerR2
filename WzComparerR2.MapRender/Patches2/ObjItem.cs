@@ -22,7 +22,7 @@ namespace WzComparerR2.MapRender.Patches2
 
         public static ObjItem LoadFromNode(Wz_Node node)
         {
-            var patch = new ObjItem()
+            var item = new ObjItem()
             {
                 OS = node.Nodes["oS"].GetValueEx<string>(null),
                 L0 = node.Nodes["l0"].GetValueEx<string>(null),
@@ -36,7 +36,7 @@ namespace WzComparerR2.MapRender.Patches2
                 Flip = node.Nodes["f"].GetValueEx(false),
                 Tags = node.Nodes["tags"].GetValueEx<string>(null),
             };
-            return patch;
+            return item;
         }
 
         public class ItemView

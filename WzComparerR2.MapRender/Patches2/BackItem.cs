@@ -29,7 +29,7 @@ namespace WzComparerR2.MapRender.Patches2
 
         public static BackItem LoadFromNode(Wz_Node node)
         {
-            var patch = new BackItem()
+            var item = new BackItem()
             {
                 BS = node.Nodes["bS"].GetValueEx<string>(null),
                 Ani = node.Nodes["ani"].GetValueEx<int>(0),
@@ -49,7 +49,7 @@ namespace WzComparerR2.MapRender.Patches2
                 Flip = node.Nodes["f"].GetValueEx(false),
                 IsFront = node.Nodes["front"].GetValueEx(false),
             };
-            return patch;
+            return item;
         }
 
         private static TileMode GetBackTileMode(int type)

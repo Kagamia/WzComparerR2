@@ -19,7 +19,7 @@ namespace WzComparerR2.MapRender.Patches2
 
         public static FootholdItem LoadFromNode(Wz_Node node)
         {
-            var patch = new FootholdItem()
+            var item = new FootholdItem()
             {
                 X1 = node.Nodes["x1"].GetValueEx(0),
                 Y1 = node.Nodes["y1"].GetValueEx(0),
@@ -29,7 +29,7 @@ namespace WzComparerR2.MapRender.Patches2
                 Next = node.Nodes["next"].GetValueEx(0),
                 Piece = node.Nodes["piece"].GetValueEx(0),
             };
-            return patch;
+            return item;
         }
     }
 }

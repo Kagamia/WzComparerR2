@@ -9,7 +9,7 @@ namespace WzComparerR2.Animation
 {
     public class StateMachineAnimator
     {
-        public StateMachineAnimator(IDictionary<string, FrameAnimationData> data)
+        public StateMachineAnimator(IDictionary<string, RepeatableFrameAnimationData> data)
             : this(new FrameStateMachineData(data))
         {
         }
@@ -24,28 +24,76 @@ namespace WzComparerR2.Animation
             this.Data.AnimationEnd += Data_AnimationEnd;
         }
 
-        private void Data_AnimationEnd(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
 
         public IStateMachineAnimationData Data { get; private set; }
+
+        public event EventHandler<AnimationEndEventArgs> AnimationEnd;
+
+
+        public void SetAnimation(string aniName)
+        {
+            int idx = this.Data.States.IndexOf(aniName);
+            this.Data.SelectedStateIndex = idx;
+        }
+
+        public string GetCurrent()
+        {
+            return this.Data.SelectedState;
+        }
+
+        public void Update(TimeSpan elapsedTime)
+        {
+            this.Data.Update(elapsedTime);
+        }
+
+        protected virtual void OnAnimationEnd(AnimationEndEventArgs e)
+        {
+            this.AnimationEnd?.Invoke(this, e);
+
+            if (!e.IsHandled)
+            {
+                if (e.CurrentState != e.NextState)
+                {
+                    this.SetAnimation(e.NextState);
+                }
+            }
+        }
+
+        private void Data_AnimationEnd(object sender, EventArgs e)
+        {
+            string state = GetCurrent();
+            var ev = new AnimationEndEventArgs(state);
+            ev.NextState = state;
+            this.OnAnimationEnd(ev);
+        }
+
+        public class AnimationEndEventArgs : EventArgs
+        {
+            public AnimationEndEventArgs(string currentState)
+            {
+                this.CurrentState = currentState;
+            }
+
+            public bool IsHandled { get; set; }
+            public string CurrentState { get; }
+            public string NextState { get; set; }
+        }
 
         /// <summary>
         /// 用于帧动画的状态机数据。
         /// </summary>
         private class FrameStateMachineData : IStateMachineAnimationData
         {
-            public FrameStateMachineData(IDictionary<string, FrameAnimationData> data)
+            public FrameStateMachineData(IDictionary<string, RepeatableFrameAnimationData> data)
             {
-                this.data = new Dictionary<string, FrameAnimationData>(data);
+                this.data = new Dictionary<string, RepeatableFrameAnimationData>(data);
                 this.States = new ReadOnlyCollection<string>(new List<string>(this.data.Keys));
                 this.SelectedStateIndex = -1;
             }
 
-            private IDictionary<string, FrameAnimationData> data;
+            private IDictionary<string, RepeatableFrameAnimationData> data;
             private int selectedIndex;
-            private FrameAnimator selectedData;
+            private RepeatableFrameAnimator selectedData;
 
             public ReadOnlyCollection<string> States { get; private set; }
 
@@ -62,7 +110,7 @@ namespace WzComparerR2.Animation
                     else
                     {
                         this.selectedIndex = value;
-                        this.selectedData = new FrameAnimator(this.data[SelectedState]);
+                        this.selectedData = new RepeatableFrameAnimator(this.data[SelectedState]);
                     }
                 }
             }
@@ -85,7 +133,8 @@ namespace WzComparerR2.Animation
                     return;
                 if (this.selectedData.CurrentTime + elapsedTime.TotalMilliseconds >= selectedData.Length)
                 {
-                    this.Update(TimeSpan.FromMilliseconds(selectedData.Length - selectedData.CurrentTime));
+                    this.selectedData.Update(elapsedTime);
+                    //this.Update(TimeSpan.FromMilliseconds(selectedData.Length - selectedData.CurrentTime));
                     OnAnimationEnd(EventArgs.Empty);
                 }
                 else

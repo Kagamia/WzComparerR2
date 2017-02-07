@@ -43,6 +43,7 @@ namespace WzComparerR2.MapRender
         bool prepareCapture;
         Task captureTask;
 
+        List<Tuple<string, Rectangle>> allItems = new List<Tuple<string, Rectangle>>();
 
         protected override void Initialize()
         {
@@ -67,7 +68,7 @@ namespace WzComparerR2.MapRender
         {
             base.LoadContent();
             this.resLoader = new ResourceLoader(this.Services);
-            this.font = new XnaFont(this.GraphicsDevice, "微软雅黑", 24);
+            this.font = new XnaFont(this.GraphicsDevice, "宋体", 12);
             this.mapData = new MapData();
             
             if (this.mapImg != null)
@@ -122,7 +123,6 @@ namespace WzComparerR2.MapRender
         {
             if (prepareCapture)
             {
-
                 var oldTarget = GraphicsDevice.GetRenderTargets();
 
                 //检查显卡支持纹理大小
@@ -178,15 +178,49 @@ namespace WzComparerR2.MapRender
 
             this.GraphicsDevice.Clear(Color.Black);
             DrawScene();
+
+            var sb = this.renderEnv.Sprite;
+            {
+                
+                var mp = this.renderEnv.Input.MousePosition;
+                var text = new StringBuilder();
+                foreach (var kv in this.allItems)
+                {
+                    if (kv.Item2.Contains(mp))
+                        text.AppendLine(kv.Item1);
+                }
+                sb.Begin();
+                sb.DrawStringEx(this.font, text.ToString(), Vector2.Zero, Color.Red);
+                sb.End();
+            }
             base.Draw(gameTime);
         }
 
         private void DrawScene()
         {
+            allItems.Clear();
             this.batcher.Begin(Matrix.CreateTranslation(new Vector3(-this.renderEnv.Camera.Origin, 0)));
-            foreach (var mesh in GetDrawableItems(this.mapData.Scene))
+            foreach (var kv in GetDrawableItems(this.mapData.Scene))
             {
-                this.batcher.Draw(mesh);
+                this.batcher.Draw(kv.Value);
+
+                //缓存绘图区域
+                {
+                    Rectangle[] rects = this.batcher.Measure(kv.Value);
+                    if (kv.Value.RenderObject is Frame)
+                    {
+                        var frame = (Frame)kv.Value.RenderObject;
+                    }
+                    if (rects != null && rects.Length > 0)
+                    {
+                        for (int i = 0; i < rects.Length; i++)
+                        {
+                            rects[i].X -= (int)this.renderEnv.Camera.Origin.X;
+                            rects[i].Y -= (int)this.renderEnv.Camera.Origin.Y;
+                            allItems.Add(new Tuple<string, Rectangle>(kv.Key.Name, rects[i]));
+                        }
+                    }
+                }
             }
             this.batcher.End();
         }
@@ -254,17 +288,16 @@ namespace WzComparerR2.MapRender
             }
         }
 
-
-        private IEnumerable<MeshItem> GetDrawableItems(SceneNode node)
+        private IEnumerable<KeyValuePair<SceneItem, MeshItem>> GetDrawableItems(SceneNode node)
         {
             var container = node as ContainerNode;
             if (container != null)  //暂时不考虑缩进z层递归合并  container下没有子节点
             {
-                foreach (var mesh in container.Slots.Select(item => GetMesh(item))
-                    .Where(mesh => mesh != null)
-                    .OrderBy(mesh => mesh))
+                foreach (var kv in container.Slots.Select(item => new KeyValuePair<SceneItem, MeshItem>(item, GetMesh(item)))
+                    .Where(kv => kv.Value != null)
+                    .OrderBy(kv => kv.Value))
                 {
-                    yield return mesh;
+                    yield return kv;
                 }
             }
             else 
@@ -297,9 +330,68 @@ namespace WzComparerR2.MapRender
                     }
                     else if (item is TileItem)
                     {
-                        var tile = ((TileItem)item);
+                        var tile = (TileItem)item;
                         (tile.View.Animator as WzComparerR2.Controls.AnimationItem)?.Update(elapsed);
                         tile.View.Time += (int)elapsed.TotalMilliseconds;
+                    }
+                    else if (item is LifeItem)
+                    {
+                        var life = (LifeItem)item;
+                        var smAni = (life.View.Animator as StateMachineAnimator);
+                        if (smAni != null)
+                        {
+                            if (smAni.GetCurrent() == null) //当前无动作
+                            {
+                                smAni.SetAnimation(smAni.Data.States[0]); //动作0
+                            }
+                            smAni.Update(elapsed);
+                        }
+
+                        life.View.Time += (int)elapsed.TotalMilliseconds;
+                    }
+                    else if (item is PortalItem)
+                    {
+                        var portal = (PortalItem)item;
+
+                        //更新状态
+                        var cursorPos = renderEnv.Camera.CameraToWorld(renderEnv.Input.MousePosition);
+                        var sensorRect = new Rectangle(portal.X - 250, portal.Y - 150, 500, 300);
+                        portal.View.IsFocusing = sensorRect.Contains(cursorPos);
+
+                        //更新动画
+                        var ani = portal.View.IsEditorMode ? portal.View.EditorAnimator : portal.View.Animator;
+                        if (ani is StateMachineAnimator)
+                        {
+                            if (portal.View.Controller != null)
+                            {
+                                portal.View.Controller.Update(elapsed);
+                            }
+                            else
+                            {
+                                ((StateMachineAnimator)ani).Update(elapsed);
+                            }
+                        }
+                        else if (ani is FrameAnimator)
+                        {
+                            var frameAni = (FrameAnimator)ani;
+                            frameAni.Update(elapsed);
+                        }
+                    }
+                    else if (item is ReactorItem)
+                    {
+                        var reactor = (ReactorItem)item;
+                        var ani = reactor.View.Animator;
+                        if (ani is StateMachineAnimator)
+                        {
+                            if (reactor.View.Controller != null)
+                            {
+                                reactor.View.Controller.Update(elapsed);
+                            }
+                            else
+                            {
+                                ((StateMachineAnimator)ani).Update(elapsed);
+                            }
+                        }
                     }
                 }
             }
@@ -329,6 +421,14 @@ namespace WzComparerR2.MapRender
             else if (item is LifeItem)
             {
                 return GetMeshLife((LifeItem)item);
+            }
+            else if (item is PortalItem)
+            {
+                return GetMeshPortal((PortalItem)item);
+            }
+            else if (item is ReactorItem)
+            {
+                return GetMeshReactor((ReactorItem)item);
             }
 
             return null;
@@ -371,8 +471,12 @@ namespace WzComparerR2.MapRender
             }
 
             //y轴镜头调整
-            if (back.TileMode == TileMode.None)
+            if (back.TileMode == TileMode.None && renderEnv.Camera.WorldRect.Height > 600)
                 position.Y += (renderEnv.Camera.Height - 600) / 2;
+
+            //取整
+            position.X = (float)Math.Floor(position.X);
+            position.Y = (float)Math.Floor(position.Y);
 
             //计算tile
             Rectangle? tileRect = null;
@@ -458,6 +562,31 @@ namespace WzComparerR2.MapRender
             };
         }
 
+        private MeshItem GetMeshPortal(PortalItem portal)
+        {
+            var renderObj = GetRenderObject(portal.View.IsEditorMode ? portal.View.EditorAnimator : portal.View.Animator);
+            return renderObj == null ? null : new MeshItem()
+            {
+                RenderObject = renderObj,
+                Position = new Vector2(portal.X, portal.Y),
+                Z0 = ((renderObj as Frame)?.Z ?? 0),
+                Z1 = portal.Index,
+            };
+        }
+
+        private MeshItem GetMeshReactor(ReactorItem reactor)
+        {
+            var renderObj = GetRenderObject(reactor.View.Animator);
+            return renderObj == null ? null : new MeshItem()
+            {
+                RenderObject = renderObj,
+                Position = new Vector2(reactor.X, reactor.Y),
+                FlipX = reactor.Flip,
+                Z0 = ((renderObj as Frame)?.Z ?? 0),
+                Z1 = reactor.Index,
+            };
+        }
+
         private object GetRenderObject(object animator, bool flip = false, int alpha = 255)
         {
             if (animator is FrameAnimator)
@@ -465,7 +594,7 @@ namespace WzComparerR2.MapRender
                 var frame = ((FrameAnimator)animator).CurrentFrame;
                 if (frame != null)
                 {
-                    if (alpha < 255)
+                    if (alpha < 255) //理论上应该返回一个新的实例
                     {
                         frame.A0 = frame.A0 * alpha / 255;
                     }
@@ -483,6 +612,11 @@ namespace WzComparerR2.MapRender
                     }
                     return skeleton;
                 }
+            }
+            else if (animator is StateMachineAnimator)
+            {
+                var smAni = (StateMachineAnimator)animator;
+                return smAni.Data.GetMesh();
             }
 
             //各种意外

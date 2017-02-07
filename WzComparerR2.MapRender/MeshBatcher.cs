@@ -121,6 +121,53 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        public Rectangle[] Measure(MeshItem mesh)
+        {
+            Rectangle rect = Rectangle.Empty;
+
+            if (mesh.RenderObject is Frame)
+            {
+                var frame = (Frame)mesh.RenderObject;
+                rect = frame.Rectangle;
+                if (mesh.FlipX)
+                {
+                    rect.X = -rect.Right;
+                }
+            }
+            else
+            {
+                return new Rectangle[0];
+            }
+
+            rect.X += (int)mesh.Position.X;
+            rect.Y += (int)mesh.Position.Y;
+
+            if (mesh.TileRegion != null)
+            {
+                var region = mesh.TileRegion.Value;
+                Rectangle[] rects = new Rectangle[region.Width * region.Height];
+                Point offset = mesh.TileOffset.ToPoint();
+                int i = 0;
+
+                for (int y = region.Top; y < region.Bottom; y++)
+                {
+                    for (int x = region.Left; x < region.Right; x++)
+                    {
+                        rects[i++] = new Rectangle(rect.X + x * offset.X,
+                            rect.Y + y * offset.Y,
+                            rect.Width,
+                            rect.Height);
+                    }
+                }
+
+                return rects;
+            }
+            else
+            {
+                return new[] { rect };
+            }
+        }
+
         public void End()
         {
             InnerFlush();

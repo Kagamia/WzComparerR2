@@ -12,75 +12,70 @@ namespace WzComparerR2.Animation
             : base(data)
         {
             this.Data = data;
+            this.IsLoop = this.Data.Repeat ?? true;
         }
 
         public new RepeatableFrameAnimationData Data { get; private set; }
 
-        public bool IsRepeating { get; private set; }
-
-        public int RepeatLength { get; private set; }
-
-        private int[] repeatTimeLine;
+        public bool IsStopped { get; private set; }
+        public bool IsLoop { get; set; }
 
         public override void Update(TimeSpan elapsedTime)
         {
-            int _timeOffset = base.CurrentTime;
-            if (this.Length <= 0)
+            if (!IsLoop)
             {
-                _timeOffset = 0;
-            }
-            else
-            {
-                _timeOffset += (int)elapsedTime.TotalMilliseconds;
-                if (!this.IsRepeating)
+                int _timeOffset = base.CurrentTime;
+                if (this.Length <= 0)
                 {
-                    if (_timeOffset >= this.Length)
-                    {
-                        _timeOffset -= this.Length;
-                        this.IsRepeating = true;
-                        _timeOffset %= this.RepeatLength;
-                    }
+                    _timeOffset = 0;
                 }
                 else
                 {
-                    _timeOffset %= this.RepeatLength;
+                    _timeOffset += (int)elapsedTime.TotalMilliseconds;
+                    if (!this.IsStopped)
+                    {
+                        if (_timeOffset >= this.Length)
+                        {
+                            _timeOffset = this.Length;
+                            this.IsStopped = true;
+                        }
+                    }
+                    else
+                    {
+                        _timeOffset = this.Length;
+                    }
                 }
-            }
 
-            base.CurrentTime = _timeOffset;
-            this.UpdateFrame();
+                base.CurrentTime = _timeOffset;
+                this.UpdateFrame();
+            }
+            else
+            {
+                base.Update(elapsedTime);
+            }
         }
 
         public override void Reset()
         {
             base.Reset();
-            IsRepeating = false;
+            IsStopped = false;
         }
 
         protected override void Load()
         {
-            if (this.Data.Repeat > 0)
-            {
-                this.repeatTimeLine = CreateTimeline(this.Data.Frames.Skip(Data.Repeat).Select(f => f.Delay));
-                this.RepeatLength = repeatTimeLine.Last();
-            }
-
             base.Load();
         }
 
         protected override void UpdateFrame()
         {
-            if (IsRepeating && this.Data.Repeat > 0)
+            if (!IsLoop && this.IsStopped)
             {
-                float progress;
-                int index = GetProcessFromTimeline(repeatTimeLine, this.CurrentTime, out progress);
-
-                var frame = this.Data.Frames[index + this.Data.Repeat];
+                var frame = this.Data.Frames.Last();
                 this.CurrentFrame = new Frame(frame.Texture, frame.AtlasRect)
                 {
                     Z = frame.Z,
                     Origin = frame.Origin,
-                    A0 = (int)MathHelper.Lerp(frame.A0, frame.A1, progress),
+                    A0 = frame.A1
                 };
             }
             else

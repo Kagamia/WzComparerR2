@@ -82,6 +82,8 @@
     <Compile Include="Patches2\FootholdItem.cs" />
     <Compile Include="Patches2\LifeItem.cs" />
     <Compile Include="Patches2\ObjItem.cs" />
+    <Compile Include="Patches2\PortalItem.cs" />
+    <Compile Include="Patches2\ReactorItem.cs" />
     <Compile Include="Patches2\SceneItem.cs" />
     <Compile Include="Patches2\TileItem.cs" />
     <Compile Include="Patches\BackPatch.cs" />

@@ -18,7 +18,7 @@ namespace WzComparerR2.MapRender.Patches2
 
         public static TileItem LoadFromNode(Wz_Node node)
         {
-            var patch = new TileItem()
+            var item = new TileItem()
             {
                 U = node.Nodes["u"].GetValueEx<string>(null),
                 No = node.Nodes["no"].GetValueEx<string>(null),
@@ -26,7 +26,7 @@ namespace WzComparerR2.MapRender.Patches2
                 X = node.Nodes["x"].GetValueEx(0),
                 Y = node.Nodes["y"].GetValueEx(0),
             };
-            return patch;
+            return item;
         }
 
         public class ItemView

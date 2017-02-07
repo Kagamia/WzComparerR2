@@ -73,12 +73,13 @@ namespace WzComparerR2.MapRender
             return (T)holder.Resource;
         }
 
-        public object LoadAnimationData(string assetName)
+        public object LoadAnimationData(Wz_Node node)
         {
             object aniData;
+            string assetName = node.FullPathToFile;
             if (!loadedAnimationData.TryGetValue(assetName, out aniData))
             {
-                aniData = InnerLoadAnimationData(assetName);
+                aniData = InnerLoadAnimationData(node);
                 if (aniData == null)
                 {
                     return null;
@@ -86,6 +87,12 @@ namespace WzComparerR2.MapRender
                 loadedAnimationData[assetName] = aniData;
             }
             return aniData;
+        }
+
+        public object LoadAnimationData(string assetName)
+        {
+            var node = PluginManager.FindWz(assetName);
+            return node != null ? LoadAnimationData(node) : null;
         }
 
         public void BeginCounting()
@@ -140,9 +147,8 @@ namespace WzComparerR2.MapRender
             return null;
         }
 
-        private object InnerLoadAnimationData(string assetName)
+        private object InnerLoadAnimationData(Wz_Node node)
         {
-            var node = PluginManager.FindWz(assetName);
             if (node != null)
             {
                 if (node.Value is Wz_Uol)
@@ -176,15 +182,8 @@ namespace WzComparerR2.MapRender
                             var frame = LoadFrame(frameNode);
                             frames.Add(frame);
                         }
-                        var repeat = node.Nodes["repeat"].GetValueEx<int>(0);
-                        if (repeat <= 0)
-                        {
-                            return new FrameAnimationData(frames);
-                        }
-                        else
-                        {
-                            return new RepeatableFrameAnimationData(frames) { Repeat = repeat };
-                        }
+                        var repeat = node.Nodes["repeat"].GetValueEx<bool>();
+                        return new RepeatableFrameAnimationData(frames) { Repeat = repeat };
                     }
                 }
             }
@@ -207,12 +206,13 @@ namespace WzComparerR2.MapRender
             {
                 Texture = atlas.Texture,
                 AtlasRect = atlas.SrcRect,
-                A0 = linkNode.Nodes["a0"].GetValueEx(255),
-                A1 = linkNode.Nodes["a1"].GetValueEx(255),
-                Z = linkNode.Nodes["z"].GetValueEx(0),
-                Delay = linkNode.Nodes["delay"].GetValueEx(100),
-                Origin = (linkNode.Nodes["origin"]?.Value as Wz_Vector)?.ToPoint() ?? Point.Zero
+                A0 = node.Nodes["a0"].GetValueEx(255),
+                A1 = node.Nodes["a1"].GetValueEx(255),
+                Z = node.Nodes["z"].GetValueEx(0),
+                Delay = node.Nodes["delay"].GetValueEx(100),
+                Origin = (node.Nodes["origin"]?.Value as Wz_Vector)?.ToPoint() ?? Point.Zero
             };
+
             return frame;
         }
 

@@ -24,7 +24,7 @@ namespace WzComparerR2.MapRender.Patches2
 
         public static LifeItem LoadFromNode(Wz_Node node)
         {
-            var patch = new LifeItem()
+            var item = new LifeItem()
             {
                 ID = node.Nodes["id"].GetValueEx(0),
                 Type = node.Nodes["type"].GetValueEx<string>(null),
@@ -38,7 +38,7 @@ namespace WzComparerR2.MapRender.Patches2
                 Rx0 = node.Nodes["rx0"].GetValueEx(0),
                 Rx1 = node.Nodes["rx1"].GetValueEx(0)
             };
-            return patch;
+            return item;
         }
 
         public class ItemView

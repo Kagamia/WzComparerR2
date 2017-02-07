@@ -93,11 +93,11 @@ namespace WzComparerR2.MapRender
             }
             if ((node = mapImgNode.Nodes["reactor"]) != null)
             {
-
+                LoadReactor(node);
             }
             if ((node = mapImgNode.Nodes["portal"]) != null)
             {
-
+                LoadPortal(node);
             }
             if ((node = mapImgNode.Nodes["ladderRope"]) != null)
             {
@@ -223,6 +223,35 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        private void LoadPortal(Wz_Node portalNode)
+        {
+            foreach(var node in portalNode.Nodes)
+            {
+                var item = PortalItem.LoadFromNode(node);
+                item.Name = $"portal_{node.Text}";
+                item.Index = int.Parse(node.Text);
+
+                Scene.Fly.Portal.Slots.Add(item);
+            }
+        }
+
+        private void LoadReactor(Wz_Node reactorNode)
+        {
+            //计算reactor所在层
+            var layer = Scene.Layers.Nodes.OfType<LayerNode>()
+                .FirstOrDefault(l => l.Foothold.Nodes.Count > 0) 
+                ?? (Scene.Layers.Nodes[0] as LayerNode);
+
+            foreach(var node in reactorNode.Nodes)
+            {
+                var item = ReactorItem.LoadFromNode(node);
+                item.Name = $"reactor_{node.Text}";
+                item.Index = int.Parse(node.Text);
+
+                layer.Reactor.Slots.Add(item);
+            }
+        }
+
         private ContainerNode<FootholdItem> FindFootholdByID(int fhID)
         {
             return this.Scene.Layers.Nodes.OfType<LayerNode>()
@@ -244,7 +273,30 @@ namespace WzComparerR2.MapRender
                 {
                     foreach (var item in container.Slots)
                     {
-                        PreloadItemResource(resLoader, item);
+                        if (item is BackItem)
+                        {
+                            PreloadResource(resLoader, (BackItem)item);
+                        }
+                        else if (item is ObjItem)
+                        {
+                            PreloadResource(resLoader, (ObjItem)item);
+                        }
+                        else if (item is TileItem)
+                        {
+                            PreloadResource(resLoader, (TileItem)item);
+                        }
+                        else if (item is LifeItem)
+                        {
+                            PreloadResource(resLoader, (LifeItem)item);
+                        }
+                        else if (item is PortalItem)
+                        {
+                            PreloadResource(resLoader, (PortalItem)item);
+                        }
+                        else if (item is ReactorItem)
+                        {
+                            PreloadResource(resLoader, (ReactorItem)item);
+                        }
                     }
                 }
 
@@ -257,116 +309,248 @@ namespace WzComparerR2.MapRender
             loadFunc(this.Scene);
         }
 
-        private void PreloadItemResource(ResourceLoader resLoader, SceneItem item)
+
+        private void PreloadResource(ResourceLoader resLoader, BackItem back)
         {
-            if (item is BackItem)
+            string aniDir;
+            switch (back.Ani)
             {
-                var back = (BackItem)item;
-                string aniDir;
-                switch (back.Ani)
-                {
-                    case 0: aniDir = "back"; break;
-                    case 1: aniDir = "ani"; break;
-                    case 2: aniDir = "spine"; break;
-                    default: throw new Exception($"Unknown back ani value: {back.Ani}.");
-                }
-                string path = $@"Map\Back\{back.BS}.img\{aniDir}\{back.No}";
-                var aniItem = resLoader.LoadAnimationData(path);
+                case 0: aniDir = "back"; break;
+                case 1: aniDir = "ani"; break;
+                case 2: aniDir = "spine"; break;
+                default: throw new Exception($"Unknown back ani value: {back.Ani}.");
+            }
+            string path = $@"Map\Back\{back.BS}.img\{aniDir}\{back.No}";
+            var aniItem = resLoader.LoadAnimationData(path);
 
-                back.View = new BackItem.ItemView()
-                {
-                    Animator = CreateAnimator(aniItem, back.SpineAni)
-                };
-            }
-            else if (item is ObjItem)
+            back.View = new BackItem.ItemView()
             {
-                var obj = (ObjItem)item;
-                string path = $@"Map\Obj\{obj.OS}.img\{obj.L0}\{obj.L1}\{obj.L2}";
-                var aniItem = resLoader.LoadAnimationData(path);
-                obj.View = new ObjItem.ItemView()
-                {
-                    Animator = CreateAnimator(aniItem)
-                };
-            }
-            else if (item is TileItem)
-            {
-                var tile = (TileItem)item;
-                string path = $@"Map\Tile\{tile.TS}.img\{tile.U}\{tile.No}";
-                var aniItem = resLoader.LoadAnimationData(path);
-                tile.View = new TileItem.ItemView()
-                {
-                    Animator = CreateAnimator(aniItem)
-                };
-            }
-            else if (item is LifeItem)
-            {
-                var life = (LifeItem)item;
-                string path;
-                switch (life.Type)
-                {
-                    case "m":
-                        path = $@"Mob\{life.ID:D7}.img";
-                        var mobNode = PluginManager.FindWz(path);
-                        //TODO: 加载mob数据
+                Animator = CreateAnimator(aniItem, back.SpineAni)
+            };
+        }
 
-                        int? mobLink = mobNode.FindNodeByPath(@"info\link")?.GetValueEx<int>();
-                        if (mobLink != null)
+        private void PreloadResource(ResourceLoader resLoader, ObjItem obj)
+        {
+            string path = $@"Map\Obj\{obj.OS}.img\{obj.L0}\{obj.L1}\{obj.L2}";
+            var aniItem = resLoader.LoadAnimationData(path);
+            obj.View = new ObjItem.ItemView()
+            {
+                Animator = CreateAnimator(aniItem)
+            };
+        }
+
+        private void PreloadResource(ResourceLoader resLoader, TileItem tile)
+        {
+            string path = $@"Map\Tile\{tile.TS}.img\{tile.U}\{tile.No}";
+            var aniItem = resLoader.LoadAnimationData(path);
+            tile.View = new TileItem.ItemView()
+            {
+                Animator = CreateAnimator(aniItem)
+            };
+        }
+
+        private void PreloadResource(ResourceLoader resLoader, LifeItem life)
+        {
+            string path;
+            switch (life.Type)
+            {
+                case "m":
+                    path = $@"Mob\{life.ID:D7}.img";
+                    var mobNode = PluginManager.FindWz(path);
+
+                    //TODO: 加载mob数据
+
+                    int? mobLink = mobNode?.FindNodeByPath(@"info\link").GetValueEx<int>();
+                    if (mobLink != null)
+                    {
+                        path = $@"Mob\{mobLink.Value:D7}.img";
+                        mobNode = PluginManager.FindWz(path);
+                    }
+
+                    if (mobNode == null)
+                    {
+                        return;
+                    }
+
+                    //加载动画
+                    {
+                        var aniItem = this.CreateSMAnimator(mobNode, resLoader);
+                        if (aniItem != null)
                         {
-                            path = $@"Mob\{mobLink.Value:D7}.img\stand";
-                        }
-                        else
-                        {
-                            path = $@"Mob\{life.ID:D7}.img\stand";
-                        }
-                       
-                        //加载动画
-                        {
-                            var aniItem = resLoader.LoadAnimationData(path);
-                            if (aniItem != null)
+                            life.View = new LifeItem.ItemView()
                             {
-                                life.View = new LifeItem.ItemView()
-                                {
-                                    Animator = CreateAnimator(aniItem)
-                                };
-                            }
+                                Animator = aniItem
+                            };
                         }
-                        break;
+                    }
+                    break;
 
-                    case "n":
-                        path = $@"Npc\{life.ID:D7}.img";
-                        var npcNode = PluginManager.FindWz(path);
-                        //TODO: 加载npc数据
-                        int? npcLink = npcNode.FindNodeByPath(@"info\link")?.GetValueEx<int>();
-                        if (npcLink != null)
-                        {
-                            path = $@"Npc\{npcLink.Value:D7}.img\stand";
-                        }
-                        else
-                        {
-                            path = $@"Npc\{life.ID:D7}.img\stand";
-                        }
+                case "n":
+                    path = $@"Npc\{life.ID:D7}.img";
+                    var npcNode = PluginManager.FindWz(path);
 
-                        //加载动画
+                    //TODO: 加载npc数据
+                    int? npcLink = npcNode?.FindNodeByPath(@"info\link").GetValueEx<int>();
+                    if (npcLink != null)
+                    {
+                        path = $@"Npc\{npcLink.Value:D7}.img";
+                        npcNode = PluginManager.FindWz(path);
+                    }
+
+                    if (npcNode == null)
+                    {
+                        return;
+                    }
+
+                    //加载动画
+                    {
+                        var aniItem = this.CreateSMAnimator(npcNode, resLoader);
+                        if (aniItem != null)
                         {
-                            var aniItem = resLoader.LoadAnimationData(path);
-                            if (aniItem != null)
+                            life.View = new LifeItem.ItemView()
                             {
-                                life.View = new LifeItem.ItemView()
-                                {
-                                    Animator = CreateAnimator(aniItem)
-                                };
-                            }
+                                Animator = aniItem
+                            };
                         }
-                        break;
-                }
+                    }
+                    break;
             }
         }
 
-        private object CreateFSMAnimator(Wz_Node node)
+        private void PreloadResource(ResourceLoader resLoader, PortalItem portal)
         {
-            return null;
+            string path;
+
+            var view = new PortalItem.ItemView();
+            //加载editor
+            {
+                var typeName = PortalItem.PortalTypes[portal.Type];
+                path = $@"Map\MapHelper.img\portal\editor\{typeName}";
+                var aniData = resLoader.LoadAnimationData(path);
+                if (aniData != null)
+                {
+                    view.EditorAnimator = CreateAnimator(aniData);
+                }
+
+            }
+            //加载动画
+            {
+                string typeName, imgName;
+                switch (portal.Type)
+                {
+                    case 7:
+                        typeName = PortalItem.PortalTypes[2]; break;
+                    default:
+                        typeName = PortalItem.PortalTypes[portal.Type]; break;
+                }
+
+                switch (portal.Image)
+                {
+                    case 0:
+                        imgName = "default"; break;
+                    default:
+                        imgName = portal.Image.ToString(); break;
+                }
+                path = $@"Map\MapHelper.img\portal\game\{typeName}\{imgName}";
+
+                var aniNode = PluginManager.FindWz(path);
+                if (aniNode != null)
+                {
+                    bool useParts = new[] { "portalStart", "portalContinue", "portalExit" }
+                        .Any(aniName => aniNode.Nodes[aniName] != null);
+
+                    if (useParts) //加载动作动画
+                    {
+                        var animator = CreateSMAnimator(aniNode, resLoader);
+                        view.Animator = animator;
+                        view.Controller = new PortalItem.Controller(view);
+                    }
+                    else //加载普通动画
+                    {
+                        var aniData = resLoader.LoadAnimationData(aniNode);
+                        if (aniData != null)
+                        {
+                            view.Animator = CreateAnimator(aniData);
+                        }
+                    }
+                }
+            }
+
+            portal.View = view;
+        }
+        private void PreloadResource(ResourceLoader resLoader, ReactorItem reactor)
+        {
+            string path = $@"Reactor\{reactor.ID:D7}.img";
+            var reactorNode = PluginManager.FindWz(path);
+
+            int? reactorLink = reactorNode?.FindNodeByPath(@"info\link").GetValueEx<int>();
+            if (reactorLink != null)
+            {
+                path = $@"Reactor\{reactorLink.Value:D7}.img";
+                reactorNode = PluginManager.FindWz(path);
+            }
+
+            //加载动画
+            var aniData = new Dictionary<string, RepeatableFrameAnimationData>();
+
+            Wz_Node frameNode;
+            for (int i = 0; (frameNode = reactorNode.Nodes[i.ToString()]) != null; i++)
+            {
+                //加载循环动画
+                var ani = resLoader.LoadAnimationData(frameNode) as RepeatableFrameAnimationData;
+                if (ani != null)
+                {
+                    var ani2 = new RepeatableFrameAnimationData(ani.Frames);
+                    ani2.Repeat = ani.Repeat ?? false; //默认不循环
+                    aniData.Add(i.ToString(), ani2);
+                }
+
+                //加载跳转动画
+                var hitNode = frameNode.Nodes["hit"];
+                var uol = hitNode?.GetValue<Wz_Uol>();
+                if (uol != null)
+                {
+                    hitNode = uol.HandleUol(hitNode);
+                }
+                if (hitNode != null)
+                {
+                    var aniHit = resLoader.LoadAnimationData(hitNode) as RepeatableFrameAnimationData;
+                    aniData.Add($@"{i}/hit", aniHit);
+                }
+            }
+
+            var view = new ReactorItem.ItemView();
+            view.Animator = new StateMachineAnimator(aniData);
+            view.Controller = new ReactorItem.Controller(view);
+
+            reactor.View = view;
         }
 
+        private StateMachineAnimator CreateSMAnimator(Wz_Node node, ResourceLoader resLoader)
+        {
+            var aniData = new Dictionary<string, RepeatableFrameAnimationData>();
+            foreach (var actionNode in node.Nodes)
+            {
+                var actName = actionNode.Text;
+                if (actName != "info" && !actName.StartsWith("condition"))
+                {
+                    var ani = resLoader.LoadAnimationData(actionNode) as RepeatableFrameAnimationData;
+                    if (ani != null)
+                    {
+                        aniData.Add(actName, ani);
+                    }
+                }
+            }
+            if (aniData.Count > 0)
+            {
+                return new StateMachineAnimator(aniData);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        
         private object CreateAnimator(object animationData, string aniName = null)
         {
             if (animationData is RepeatableFrameAnimationData)
