@@ -26,6 +26,8 @@ namespace WzComparerR2.WzLib
         private bool loaded;
         private Wz_Type type;
 
+        public Encoding TextEncoding { get; set; }
+
         public readonly object ReadLock = new object();
 
         internal Dictionary<int, string> stringTable;
@@ -182,7 +184,8 @@ namespace WzComparerR2.WzLib
                         unchecked { mask++; }
                     }
 
-                    return new string((sbyte*)pData, 0, size);
+                    var enc = this.TextEncoding ?? Encoding.Default;
+                    return enc.GetString(buffer, 0, size);
                 }
             }
             else if (size > 0)

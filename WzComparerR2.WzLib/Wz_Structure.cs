@@ -13,6 +13,7 @@ namespace WzComparerR2.WzLib
             this.encryption = new Wz_Crypto();
             this.img_number = 0;
             this.has_basewz = false;
+            this.TextEncoding = DefaultEncoding;
         }
 
         public List<Wz_File> wz_files;
@@ -21,6 +22,8 @@ namespace WzComparerR2.WzLib
         public int img_number;
         public bool has_basewz;
         public bool sorted;
+
+        public Encoding TextEncoding { get; set; }
 
         public void Clear()
         {
@@ -80,6 +83,7 @@ namespace WzComparerR2.WzLib
             try
             {
                 file = new Wz_File(fileName, this);
+                file.TextEncoding = this.TextEncoding;
                 if (!this.encryption.encryption_detected)
                 {
                     this.encryption.DetectEncryption(file);
@@ -97,5 +101,15 @@ namespace WzComparerR2.WzLib
                 throw;
             }
         }
+
+        #region Global Settings
+        public static Encoding DefaultEncoding
+        {
+            get { return _defaultEncoding ?? Encoding.Default; }
+            set { _defaultEncoding = null; }
+        }
+
+        private static Encoding _defaultEncoding;
+        #endregion
     }
 }
