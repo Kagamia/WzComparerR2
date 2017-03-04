@@ -1650,10 +1650,11 @@
             // 
             this.buttonItem12.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText;
             this.buttonItem12.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.buttonItem12.Enabled = false;
+            this.buttonItem12.Enabled = true;
             this.buttonItem12.Name = "buttonItem12";
             this.buttonItem12.SubItemsExpandWidth = 24;
             this.buttonItem12.Text = "Opt&ions";
+            this.buttonItem12.Click += ButtonItem12_Click;
             // 
             // buttonItem13
             // 

@@ -1564,34 +1564,62 @@ namespace WzComparerR2
 
         private Node searchAdvTree(AdvTree advTree, int cellIndex, string[] patten, bool exact, bool ignoreCase)
         {
-            Node currentNode;
             if (advTree.Nodes.Count == 0)
                 return null;
-            currentNode = advTree.SelectedNode == null ? advTree.Nodes[0] : findNextNode(advTree.SelectedNode);
 
-            while (currentNode != null)
+            foreach (var node in findNextNode(advTree))
             {
-                bool check = checkSearchNodeText(currentNode, cellIndex, patten, exact, ignoreCase);
-                if (check)
-                    break;
-                currentNode = findNextNode(currentNode);
-            }
-            return currentNode;
-        }
-
-        private Node findNextNode(Node node)
-        {
-            if (node.Nodes.Count > 0)
-                return node.Nodes[0];
-            while (node.NextNode == null)
-            {
-                node = node.Parent;
-                if (node == null)
+                if (checkSearchNodeText(node, cellIndex, patten, exact, ignoreCase))
                 {
-                    return null;
+                    return node;
                 }
             }
-            return node.NextNode;
+            return null;
+        }
+
+        private IEnumerable<Node> findNextNode(AdvTree advTree)
+        {
+            var node = advTree.SelectedNode;
+            if (node == null)
+            {
+                node = advTree.Nodes[0];
+                yield return node;
+            }
+
+            var levelStack = new Stack<int>();
+            int index = node.Index + 1;
+
+            while (true)
+            {
+                if (node.Nodes.Count > 0)
+                {
+                    levelStack.Push(index);
+                    index = 0;
+                    yield return node = node.Nodes[index++];
+                    continue;
+                }
+
+                NodeCollection owner;
+
+                while (index >= (owner = (node.Parent?.Nodes ?? advTree.Nodes)).Count)
+                {
+                    node = node.Parent;
+                    if (node == null)
+                    {
+                        yield break;
+                    }
+                    if (levelStack.Count > 0)
+                    {
+                        index = levelStack.Pop();
+                    }
+                    else
+                    {
+                        index = node.Index + 1;
+                    }
+                }
+
+                yield return node = owner[index++];
+            }
         }
 
         private bool checkSearchNodeText(Node node, int cellIndex, string[] searchTextArray, bool exact, bool ignoreCase)
@@ -2872,6 +2900,10 @@ namespace WzComparerR2
             System.Diagnostics.Process.Start("https://github.com/Kagamia/WzComparerR2/releases");
         }
 
+        private void ButtonItem12_Click(object sender, System.EventArgs e)
+        {
+            
+        }
     }
 
     #region 内部用扩展方法
