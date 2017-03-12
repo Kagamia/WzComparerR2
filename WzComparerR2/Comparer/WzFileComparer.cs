@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using WzComparerR2.WzLib;
+using WzComparerR2.Common;
 
 namespace WzComparerR2.Comparer
 {
@@ -11,10 +12,12 @@ namespace WzComparerR2.Comparer
         public WzFileComparer()
         {
             this.PngComparison = WzPngComparison.SizeAndDataLength;
+            ResolvePngLink = true;
         }
 
         public WzPngComparison PngComparison { get; set; }
         public bool IgnoreWzFile { get; set; }
+        public bool ResolvePngLink { get; set; }
 
         public IEnumerable<CompareDifference> Compare(Wz_Node nodeNew, Wz_Node nodeOld)
         {
@@ -142,14 +145,82 @@ namespace WzComparerR2.Comparer
                         }
                         else
                         {
-                            if (!CompareData(arrayNew[l].Value, arrayOld[r].Value))
+                            bool compared = false;
+                            bool linkFilter = false;
+
+                            //同是png 检测link
+                            if (ResolvePngLink)
+                            {
+                                ComparableNode nodeNew = arrayNew[l],
+                                    nodeOld = arrayOld[r];
+                                bool linkNew = IsLinkedPng(nodeNew),
+                                    linkOld = IsLinkedPng(nodeOld);
+
+                                if (linkNew && !linkOld && nodeOld.Value is Wz_Png) //图片转化为link
+                                {
+                                    var newPng = GetLinkedPng(nodeNew.LinkNode);
+                                    if (newPng != null)
+                                    {
+                                        if (!CompareData(newPng, nodeOld.Value))
+                                        {
+                                            yield return new CompareDifference(nodeNew.LinkNode, nodeOld.LinkNode, DifferenceType.Changed);
+                                        }
+                                        compared = true;
+                                        linkFilter = true;
+                                    }
+                                }
+                                else if (!linkNew && linkOld && nodeNew.Value is Wz_Png) //link恢复为图片
+                                {
+                                    var oldPng = GetLinkedPng(nodeOld.LinkNode);
+                                    if (oldPng != null)
+                                    {
+                                        if (!CompareData(nodeNew.Value, oldPng))
+                                        {
+                                            yield return new CompareDifference(nodeNew.LinkNode, nodeOld.LinkNode, DifferenceType.Changed);
+                                        }
+                                        compared = true;
+                                        linkFilter = true;
+                                    }
+                                }
+                                else if (linkNew && linkOld) //两边都是link
+                                {
+                                    var newPng = GetLinkedPng(nodeNew.LinkNode);
+                                    var oldPng = GetLinkedPng(nodeOld.LinkNode);
+                                    if (newPng != null && oldPng != null)
+                                    {
+                                        if (newPng != oldPng && !CompareData(newPng, oldPng))
+                                        {
+                                            yield return new CompareDifference(nodeNew.LinkNode, nodeOld.LinkNode, DifferenceType.Changed);
+                                        }
+                                        compared = true;
+                                        linkFilter = true;
+                                    }
+                                }
+                            }
+
+                            //正常对比
+                            if (!compared && !CompareData(arrayNew[l].Value, arrayOld[r].Value))
                             {
                                 yield return new CompareDifference(arrayNew[l].LinkNode, arrayOld[r].LinkNode, DifferenceType.Changed);
                             }
+                            
+                            //对比子集
                             if (CompareChild(arrayNew[l], arrayOld[r]))
                             {
                                 foreach (CompareDifference diff in Compare(arrayNew[l], arrayOld[r]))
                                 {
+                                    if (linkFilter && diff.DifferenceType != DifferenceType.Changed) //过滤新增或删除
+                                    {
+                                        if ((diff.NodeNew?.ParentNode == arrayNew[l].LinkNode
+                                            || diff.NodeOld?.ParentNode == arrayOld[r].LinkNode)) //差异节点为当前的子级
+                                        {
+                                            var nodeText = diff.NodeNew?.Text ?? diff.NodeOld?.Text;
+                                            if (nodeText == "_inlink" || nodeText == "_outlink")
+                                            {
+                                                continue;
+                                            }
+                                        }
+                                    }
                                     yield return diff;
                                 }
                             }
@@ -182,6 +253,28 @@ namespace WzComparerR2.Comparer
                 return !IgnoreWzFile;
             }
             return true;
+        }
+
+        private bool IsLinkedPng(ComparableNode node)
+        {
+            var png = node.Value as Wz_Png;
+            if (png != null && png.Width == 1 && png.Height == 1)
+            {
+                return node.Children.Any(child => child.Name == "_inlink" || child.Name == "_outlink");
+            }
+            return false;
+        }
+
+        private Wz_Png GetLinkedPng(Wz_Node node)
+        {
+            var wzFile = node.GetNodeWzFile();
+            if (wzFile != null)
+            {
+                var linkNode = node.GetLinkedSourceNode(path =>
+                    PluginBase.PluginManager.FindWz(path, wzFile));
+                return linkNode.GetValueEx<Wz_Png>(null);
+            }
+            return null;
         }
 
         /// <summary>

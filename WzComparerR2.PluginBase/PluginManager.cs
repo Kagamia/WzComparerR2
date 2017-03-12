@@ -54,7 +54,12 @@ namespace WzComparerR2.PluginBase
         /// <returns></returns>
         public static Wz_Node FindWz(string fullPath)
         {
-            FindWzEventArgs e = new FindWzEventArgs() { FullPath = fullPath };
+            return FindWz(fullPath, null);
+        }
+
+        public static Wz_Node FindWz(string fullPath, Wz_File sourceWzFile)
+        {
+            FindWzEventArgs e = new FindWzEventArgs() { FullPath = fullPath, WzFile = sourceWzFile };
             if (WzFileFinding != null)
             {
                 WzFileFinding(null, e);

@@ -7,54 +7,42 @@ namespace WzComparerR2.Comparer
 {
     public class CompareDifference
     {
-        public CompareDifference(Wz_Node nodeNew, Wz_Node nodeOld,DifferenceType type)
+        public CompareDifference(Wz_Node nodeNew, Wz_Node nodeOld, DifferenceType type)
         {
-            this.nodeNew = nodeNew;
-            this.nodeOld = nodeOld;
-            this.type = type;
+            this.NodeNew = nodeNew;
+            this.NodeOld = nodeOld;
+            this.DifferenceType = type;
         }
 
-        Wz_Node nodeNew;
-        Wz_Node nodeOld;
-        DifferenceType type;
+        public Wz_Node NodeNew { get; protected set; }
 
-        public Wz_Node NodeNew
+        public Wz_Node NodeOld { get; protected set; }
+
+        public virtual object ValueNew
         {
-            get { return nodeNew; }
-        }
-       
-        public Wz_Node NodeOld
-        {
-            get { return nodeOld; }
+            get { return NodeNew?.Value; }
         }
 
-        public object ValueNew
+        public virtual object ValueOld
         {
-            get { return nodeNew == null ? null : nodeNew.Value; }
+            get { return NodeOld?.Value; }
         }
 
-        public object ValueOld
-        {
-            get { return nodeOld == null ? null : nodeOld.Value; }
-        }
-
-        public DifferenceType DifferenceType
-        {
-            get { return type; }
-        }
+        public DifferenceType DifferenceType { get; protected set; }
 
         public override string ToString()
         {
-            switch (this.type)
+            switch (this.DifferenceType)
             {
                 case DifferenceType.Append:
-                    return string.Format("{0} {1}({2})", this.type, this.nodeNew.Text, this.ValueNew);
+                    return string.Format("{0} {1}({2})", this.DifferenceType, this.NodeNew.Text, this.ValueNew);
                 case DifferenceType.Changed:
-                    return string.Format("{0} {1}({2}<-{3})", this.type, this.nodeNew.Text, this.ValueNew, this.ValueOld);
+                    return string.Format("{0} {1}({2}<-{3})", this.DifferenceType, this.NodeNew.Text, this.ValueNew, this.ValueOld);
                 case DifferenceType.Remove:
-                    return string.Format("{0} {1}({2})", this.type, this.nodeOld.Text, this.ValueOld);
+                    return string.Format("{0} {1}({2})", this.DifferenceType, this.NodeOld.Text, this.ValueOld);
             }
             return base.ToString();
         }
     }
+
 }
