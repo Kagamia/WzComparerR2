@@ -145,6 +145,12 @@ namespace WzComparerR2.CharaSimControl
         /// </summary>
         public static readonly Brush GearNameBrushH = new SolidBrush(Color.FromArgb(255, 0, 119));
 
+        public static readonly Color gearCyanColor = Color.FromArgb(102, 255, 255);
+        /// <summary>
+        /// 表示装备属性变化的青色画刷。
+        /// </summary>
+        public static readonly Brush GearPropChangeBrush = new SolidBrush(gearCyanColor);
+
         public static Brush GetGearNameBrush(int diff, bool up)
         {
             if (diff < 0)
@@ -510,10 +516,16 @@ namespace WzComparerR2.CharaSimControl
                                 colorStack.Push(OrangeBrushColor);
                                 strPos++;
                             }
-                            else if (strPos < format.Length && format[strPos] == 'g')//遇到#c 换绿刷子并flush
+                            else if (strPos < format.Length && format[strPos] == 'g')//遇到#g(自定义) 换绿刷子并flush
                             {
                                 flushRun();
                                 colorStack.Push(GearGraphics.gearGreenColor);
+                                strPos++;
+                            }
+                            else if (strPos < format.Length && format[strPos] == '$')//遇到#$(自定义) 换青色刷子并flush
+                            {
+                                flushRun();
+                                colorStack.Push(GearGraphics.gearCyanColor);
                                 strPos++;
                             }
                             else if (colorStack.Count == 1) //同#c
@@ -740,7 +752,7 @@ namespace WzComparerR2.CharaSimControl
                     {
                         string content = sb.ToString(start, end - start);
 
-                         if (this.UseGDIRenderer)
+                        if (this.UseGDIRenderer)
                         {
                             TR.DrawText(g, content, font, new Point(drawX, drawY), color, TextFormatFlags.NoPrefix);
                         }
@@ -770,7 +782,7 @@ namespace WzComparerR2.CharaSimControl
                     if (run.IsBreakLine)
                     { //强行换行 并且flush
                         flush(true);
-                        if( r < runs.Count - 1)
+                        if (r < runs.Count - 1)
                         {
                             xOffset = runs[r + 1].X;
                         }

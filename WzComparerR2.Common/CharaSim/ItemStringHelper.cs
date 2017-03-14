@@ -69,10 +69,10 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incLUK: return "运气 : " + sign + value;
                 case GearPropType.incLUKr: return "运气 : " + sign + value + "%";
                 case GearPropType.incAllStat: return "所有属性 : " + sign + value;
-                case GearPropType.incMHP: return "MaxHP : " + sign + value;
-                case GearPropType.incMHPr: return "MaxHP : " + sign + value + "%";
-                case GearPropType.incMMP: return "MaxMP : " + sign + value;
-                case GearPropType.incMMPr: return "MaxMP : " + sign + value + "%";
+                case GearPropType.incMHP: return "最大HP : " + sign + value;
+                case GearPropType.incMHPr: return "最大HP : " + sign + value + "%";
+                case GearPropType.incMMP: return "最大MP : " + sign + value;
+                case GearPropType.incMMPr: return "最大MP : " + sign + value + "%";
                 case GearPropType.incMDF: return "MaxDF : " + sign + value;
                 case GearPropType.incPAD: return "攻击力 : " + sign + value;
                 case GearPropType.incPADr: return "攻击力 : " + sign + value + "%";
@@ -105,7 +105,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.only: return value == 0 ? null : "固有道具";
                 case GearPropType.tradeBlock: return value == 0 ? null : "不可交换";
                 case GearPropType.equipTradeBlock: return value == 0 ? null : "装备后无法交换";
-                case GearPropType.accountSharable: return value == 0 ? null : "只能在同一账号内移动";
+                case GearPropType.accountSharable: return value == 0 ? null : "世界内只有我的角色之间可以移动";
                 case GearPropType.onlyEquip: return value == 0 ? null : "固有装备物品";
                 case GearPropType.notExtend: return value == 0 ? null : "无法延长有效时间。";
                 case GearPropType.tradeAvailable:
@@ -126,9 +126,10 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.superiorEqp: return value == 0 ? null : "道具强化成功时，可以获得更高的效果。";
                 case GearPropType.nActivatedSocket: return value == 0 ? null : "#c可以镶嵌星岩#";
                 case GearPropType.jokerToSetItem: return value == 0 ? null : " #c可以当作任何套装组件的幸运道具!#";
+                case GearPropType.abilityTimeLimited: return value == 0 ? null : "限期能力值";
 
-                case GearPropType.incMHP_incMMP: return "MaxHP / MaxMP : " + sign + value;
-                case GearPropType.incMHPr_incMMPr: return "MaxHP / MaxMP : " + sign + value + "%";
+                case GearPropType.incMHP_incMMP: return "最大HP / 最大MP : " + sign + value;
+                case GearPropType.incMHPr_incMMPr: return "最大HP / 最大MP : " + sign + value + "%";
                 case GearPropType.incPAD_incMAD: return "攻击力/魔力：" + sign + value;
                 case GearPropType.incPDD_incMDD: return "物理/魔法防御力：" + sign + value;
                 case GearPropType.incACC_incEVA: return "命中值/回避值：" + sign + value;
@@ -136,6 +137,40 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incARC: return "ARC : " + sign + value;
                 default: return null;
             }
+        }
+
+
+        public static string GetGearPropDiffString(GearPropType propType, int value, int standardValue)
+        {
+            var propStr = GetGearPropString(propType, value);
+            if (value > standardValue)
+            {
+                string subfix = null;
+                switch (propType)
+                {
+                    case GearPropType.incSTR:
+                    case GearPropType.incDEX:
+                    case GearPropType.incINT:
+                    case GearPropType.incLUK:
+                    case GearPropType.incMHP:
+                    case GearPropType.incMMP:
+                    case GearPropType.incMDF:
+                    case GearPropType.incARC:
+                    case GearPropType.incPAD:
+                    case GearPropType.incMAD:
+                    case GearPropType.incPDD:
+                    case GearPropType.incMDD:
+                        subfix = $"({standardValue} #$+{value - standardValue}#)"; break;
+
+                    case GearPropType.bdR:
+                    case GearPropType.incBDR:
+                    case GearPropType.imdR:
+                    case GearPropType.incIMDR:
+                        subfix = $"({standardValue}% #$+{value - standardValue}%#)"; break;
+                }
+                propStr = "#$" + propStr + "# " + subfix;
+            }
+            return propStr;
         }
 
         /// <summary>
@@ -266,7 +301,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.battlemageBall: return "魔法球";
                 case GearType.wildHunterArrowHead: return "箭轴";
                 case GearType.cygnusGem: return "珠宝";
-                case GearType.powerSource: return "能量源";
+                case GearType.controller: return "控制器";
                 case GearType.foxPearl: return "狐狸珠";
                 case GearType.chess: return "棋子";
 
@@ -360,7 +395,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.battlemageBall: return "唤灵斗师职业群可以装备";
                 case GearType.wildHunterArrowHead: return "豹弩游侠职业群可以装备";
                 case GearType.cygnusGem: return "冒险骑士团可以装备";
-                case GearType.powerSource:
+                case GearType.controller:
                 case GearType.energySword: return "尖兵可以装备";
                 case GearType.desperado: return "恶魔复仇者可以装备";
                 case GearType.swordZB:

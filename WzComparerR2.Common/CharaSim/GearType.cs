@@ -301,9 +301,9 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         connonGunPowder2 = 135298,
         /// <summary>
-        /// 能量源 135300
+        /// 控制器 135300
         /// </summary>
-        powerSource = 135300,
+        controller = 135300,
         /// <summary>
         /// 狐狸珠 135310
         /// </summary>

@@ -219,6 +219,13 @@ namespace WzComparerR2.CharaSimControl
                 g.DrawString(expireStr, GearGraphics.ItemDetailFont, Brushes.White, 130, picH, format);
                 picH += 15;
             }
+            else if (Gear.GetBooleanValue(GearPropType.abilityTimeLimited))
+            {
+                DateTime time = DateTime.Now.AddDays(7d);
+                string expireStr = time.ToString("效果持续到yyyy年M月d日H点m分");
+                g.DrawString(expireStr, GearGraphics.ItemDetailFont, Brushes.White, 130, picH, format);
+                picH += 15;
+            }
 
             //分割线1号
             picH += 7;
@@ -403,10 +410,14 @@ namespace WzComparerR2.CharaSimControl
             bool epic = Gear.Props.TryGetValue(GearPropType.epicItem, out value) && value > 0;
             foreach (GearPropType type in props)
             {
-                g.DrawString(ItemStringHelper.GetGearPropString(type, Gear.Props[type]),
-                    (epic && Gear.IsEpicPropType(type)) ? GearGraphics.EpicGearDetailFont : GearGraphics.ItemDetailFont,
-                    Brushes.White, 11, picH);
-                picH += 16;
+                var font = (epic && Gear.IsEpicPropType(type)) ? GearGraphics.EpicGearDetailFont : GearGraphics.ItemDetailFont;
+                //g.DrawString(ItemStringHelper.GetGearPropString(type, Gear.Props[type]), font, Brushes.White, 11, picH);
+                //picH += 16;
+
+                //绘制属性变化
+                Gear.StandardProps.TryGetValue(type, out value); //standard value
+                var propStr = ItemStringHelper.GetGearPropDiffString(type, Gear.Props[type], value);
+                GearGraphics.DrawString(g, propStr, font, 13, 256, ref picH, 16);
                 hasPart2 = true;
             }
 
@@ -904,6 +915,10 @@ namespace WzComparerR2.CharaSimControl
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.tradeBlock, value));
             }
+            if (Gear.Props.TryGetValue(GearPropType.abilityTimeLimited, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.abilityTimeLimited, value));
+            }
             if (Gear.Props.TryGetValue(GearPropType.equipTradeBlock, out value) && value != 0)
             {
                 if (Gear.State == GearState.itemList)
@@ -1037,8 +1052,8 @@ namespace WzComparerR2.CharaSimControl
             int value;
             string numValue;
             //防御
-            x += 62;
             g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_pdd, x, y);
+            x += 62;
             DrawReqNum(g, "0", NumberType.LookAhead, x - 5, y + 6, StringAlignment.Far);
 
             ////魔防
@@ -1047,15 +1062,16 @@ namespace WzComparerR2.CharaSimControl
             //DrawReqNum(g, "0", NumberType.LookAhead, x - 5, y + 6, StringAlignment.Far);
 
             //boss伤
-            x += 62;
+            
             g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_bdr, x, y);
+            x += 62;
             this.Gear.Props.TryGetValue(GearPropType.bdR, out value);
             numValue = (value > 0 ? "+ " : null) + value + " % ";
             DrawReqNum(g, numValue, NumberType.LookAhead, x - 5 + 3, y + 6, StringAlignment.Far);
 
             //无视防御
-            x += 62;
             g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_igpddr, x, y);
+            x += 62;
             this.Gear.Props.TryGetValue(GearPropType.imdR, out value);
             numValue = (value > 0 ? "+ " : null) + value + " % ";
             DrawReqNum(g, numValue, NumberType.LookAhead, x - 5 - 1, y + 6, StringAlignment.Far);
