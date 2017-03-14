@@ -312,6 +312,7 @@ namespace WzComparerR2
                             comparer.OutputAddedImg = chkOutputAddedImg.Checked;
                             comparer.OutputRemovedImg = chkOutputRemovedImg.Checked;
                             comparer.Comparer.PngComparison = (WzPngComparison)cmbComparePng.SelectedItem;
+                            comparer.Comparer.ResolvePngLink = chkResolvePngLink.Checked;
                             wznew.Load(e.Part.TempFilePath, false);
                             wzold.Load(e.Part.OldFilePath, false);
                             comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], this.compareFolder);

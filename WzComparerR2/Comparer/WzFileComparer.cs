@@ -165,8 +165,11 @@ namespace WzComparerR2.Comparer
                                         {
                                             yield return new CompareDifference(nodeNew.LinkNode, nodeOld.LinkNode, DifferenceType.Changed);
                                         }
+                                        else //链接后图片一致 过滤link标记
+                                        {
+                                            linkFilter = true;
+                                        }
                                         compared = true;
-                                        linkFilter = true;
                                     }
                                 }
                                 else if (!linkNew && linkOld && nodeNew.Value is Wz_Png) //link恢复为图片
@@ -178,8 +181,11 @@ namespace WzComparerR2.Comparer
                                         {
                                             yield return new CompareDifference(nodeNew.LinkNode, nodeOld.LinkNode, DifferenceType.Changed);
                                         }
+                                        else //链接后图片一致 过滤link标记
+                                        {
+                                            linkFilter = true;
+                                        }
                                         compared = true;
-                                        linkFilter = true;
                                     }
                                 }
                                 else if (linkNew && linkOld) //两边都是link
@@ -188,12 +194,15 @@ namespace WzComparerR2.Comparer
                                     var oldPng = GetLinkedPng(nodeOld.LinkNode);
                                     if (newPng != null && oldPng != null)
                                     {
-                                        if (newPng != oldPng && !CompareData(newPng, oldPng))
+                                        if (newPng != oldPng && !CompareData(newPng, oldPng)) //对比有差异 不输出dummy
                                         {
-                                            yield return new CompareDifference(nodeNew.LinkNode, nodeOld.LinkNode, DifferenceType.Changed);
+                                            //yield return new CompareDifference(nodeNew.LinkNode, nodeOld.LinkNode, DifferenceType.Changed);
+                                        }
+                                        else
+                                        {
+                                            linkFilter = true;
                                         }
                                         compared = true;
-                                        linkFilter = true;
                                     }
                                 }
                             }
@@ -209,7 +218,7 @@ namespace WzComparerR2.Comparer
                             {
                                 foreach (CompareDifference diff in Compare(arrayNew[l], arrayOld[r]))
                                 {
-                                    if (linkFilter && diff.DifferenceType != DifferenceType.Changed) //过滤新增或删除
+                                    if (linkFilter) // && diff.DifferenceType != DifferenceType.Changed) [s]过滤新增或删除[/s] 全部过滤
                                     {
                                         if ((diff.NodeNew?.ParentNode == arrayNew[l].LinkNode
                                             || diff.NodeOld?.ParentNode == arrayOld[r].LinkNode)) //差异节点为当前的子级

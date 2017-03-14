@@ -203,6 +203,13 @@ namespace WzComparerR2.Comparer
                     string.Join("<br/>", fileOld.Select(wzf => wzf.Header.WzVersion.ToString()).ToArray())
                     );
                 sw.WriteLine("<tr><td>对比时间</td><td colspan='3'>{0:yyyy-MM-dd HH:mm:ss.fff}</td></tr>", DateTime.Now);
+                sw.WriteLine("<tr><td>参数</td><td colspan='3'>{0}</td></tr>", string.Join("<br/>", new[] {
+                    this.OutputPng ? "-OutputPng" : null,
+                    this.OutputAddedImg ? "-OutputAddedImg" : null,
+                    this.OutputRemovedImg ? "-OutputRemovedImg" : null,
+                    "-PngComparison " + this.Comparer.PngComparison,
+                    this.Comparer.ResolvePngLink ? "-ResolvePngLink" : null,
+                }.Where(p => p != null)));
                 sw.WriteLine("</table>");
                 sw.WriteLine("</p>");
 

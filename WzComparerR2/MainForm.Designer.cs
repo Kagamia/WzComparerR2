@@ -31,6 +31,63 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.ribbonControl1 = new DevComponents.DotNetBar.RibbonControl();
+            this.ribbonPanel2 = new DevComponents.DotNetBar.RibbonPanel();
+            this.ribbonBar8 = new DevComponents.DotNetBar.RibbonBar();
+            this.itemContainer37 = new DevComponents.DotNetBar.ItemContainer();
+            this.itemContainer38 = new DevComponents.DotNetBar.ItemContainer();
+            this.comboBoxItemCharacter = new DevComponents.DotNetBar.ComboBoxItem();
+            this.itemContainer39 = new DevComponents.DotNetBar.ItemContainer();
+            this.itemContainer40 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemCreateChara = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonItemEdit = new DevComponents.DotNetBar.ButtonItem();
+            this.itemContainer41 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemLoadChara = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonItemSaveChara = new DevComponents.DotNetBar.ButtonItem();
+            this.itemContainer23 = new DevComponents.DotNetBar.ItemContainer();
+            this.itemContainer24 = new DevComponents.DotNetBar.ItemContainer();
+            this.comboBoxItemLanguage = new DevComponents.DotNetBar.ComboBoxItem();
+            this.comboItem13 = new DevComponents.Editors.ComboItem();
+            this.comboItem14 = new DevComponents.Editors.ComboItem();
+            this.comboItem15 = new DevComponents.Editors.ComboItem();
+            this.comboItem16 = new DevComponents.Editors.ComboItem();
+            this.comboItem17 = new DevComponents.Editors.ComboItem();
+            this.comboItem18 = new DevComponents.Editors.ComboItem();
+            this.itemContainer25 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemQuickView = new DevComponents.DotNetBar.ButtonItem();
+            this.itemContainer42 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemAutoQuickView = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonItemQuickViewSetting = new DevComponents.DotNetBar.ButtonItem();
+            this.itemContainer26 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemSetItems = new DevComponents.DotNetBar.ButtonItem();
+            this.itemContainer43 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemClearSetItems = new DevComponents.DotNetBar.ButtonItem();
+            this.itemContainer28 = new DevComponents.DotNetBar.ItemContainer();
+            this.itemContainer29 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemCharItem = new DevComponents.DotNetBar.ButtonItem();
+            this.itemContainer30 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemCharaStat = new DevComponents.DotNetBar.ButtonItem();
+            this.itemContainer31 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemCharaEquip = new DevComponents.DotNetBar.ButtonItem();
+            this.itemContainer32 = new DevComponents.DotNetBar.ItemContainer();
+            this.itemContainer33 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemAddItem = new DevComponents.DotNetBar.ButtonItem();
+            this.itemContainer34 = new DevComponents.DotNetBar.ItemContainer();
+            this.itemContainer35 = new DevComponents.DotNetBar.ItemContainer();
+            this.ribbonBar3 = new DevComponents.DotNetBar.RibbonBar();
+            this.itemContainer6 = new DevComponents.DotNetBar.ItemContainer();
+            this.itemContainer7 = new DevComponents.DotNetBar.ItemContainer();
+            this.labelItemSoundTitle = new DevComponents.DotNetBar.LabelItem();
+            this.itemContainer9 = new DevComponents.DotNetBar.ItemContainer();
+            this.sliderItemSoundTime = new DevComponents.DotNetBar.SliderItem();
+            this.checkBoxItemSoundLoop = new DevComponents.DotNetBar.CheckBoxItem();
+            this.itemContainer18 = new DevComponents.DotNetBar.ItemContainer();
+            this.labelItemSoundTime = new DevComponents.DotNetBar.LabelItem();
+            this.itemContainer13 = new DevComponents.DotNetBar.ItemContainer();
+            this.buttonItemLoadSound = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonItemSoundPlay = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonItemSoundStop = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonItemSoundSave = new DevComponents.DotNetBar.ButtonItem();
+            this.sliderItemSoundVol = new DevComponents.DotNetBar.SliderItem();
             this.ribbonPanel1 = new DevComponents.DotNetBar.RibbonPanel();
             this.ribbonBar9 = new DevComponents.DotNetBar.RibbonBar();
             this.buttonItemPatcher = new DevComponents.DotNetBar.ButtonItem();
@@ -73,62 +130,6 @@
             this.buttonItemUpdate = new DevComponents.DotNetBar.ButtonItem();
             this.ribbonBar6 = new DevComponents.DotNetBar.RibbonBar();
             this.buttonItemAbout = new DevComponents.DotNetBar.ButtonItem();
-            this.ribbonPanel2 = new DevComponents.DotNetBar.RibbonPanel();
-            this.ribbonBar8 = new DevComponents.DotNetBar.RibbonBar();
-            this.itemContainer37 = new DevComponents.DotNetBar.ItemContainer();
-            this.itemContainer38 = new DevComponents.DotNetBar.ItemContainer();
-            this.comboBoxItemCharacter = new DevComponents.DotNetBar.ComboBoxItem();
-            this.itemContainer39 = new DevComponents.DotNetBar.ItemContainer();
-            this.itemContainer40 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItemCreateChara = new DevComponents.DotNetBar.ButtonItem();
-            this.buttonItemEdit = new DevComponents.DotNetBar.ButtonItem();
-            this.itemContainer41 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItemLoadChara = new DevComponents.DotNetBar.ButtonItem();
-            this.buttonItemSaveChara = new DevComponents.DotNetBar.ButtonItem();
-            this.itemContainer23 = new DevComponents.DotNetBar.ItemContainer();
-            this.itemContainer24 = new DevComponents.DotNetBar.ItemContainer();
-            this.comboBoxItemLanguage = new DevComponents.DotNetBar.ComboBoxItem();
-            this.comboItem13 = new DevComponents.Editors.ComboItem();
-            this.comboItem14 = new DevComponents.Editors.ComboItem();
-            this.comboItem15 = new DevComponents.Editors.ComboItem();
-            this.comboItem16 = new DevComponents.Editors.ComboItem();
-            this.comboItem17 = new DevComponents.Editors.ComboItem();
-            this.itemContainer25 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItemQuickView = new DevComponents.DotNetBar.ButtonItem();
-            this.itemContainer42 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItemAutoQuickView = new DevComponents.DotNetBar.ButtonItem();
-            this.buttonItemQuickViewSetting = new DevComponents.DotNetBar.ButtonItem();
-            this.itemContainer26 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItemSetItems = new DevComponents.DotNetBar.ButtonItem();
-            this.itemContainer43 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItemClearSetItems = new DevComponents.DotNetBar.ButtonItem();
-            this.itemContainer28 = new DevComponents.DotNetBar.ItemContainer();
-            this.itemContainer29 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItemCharItem = new DevComponents.DotNetBar.ButtonItem();
-            this.itemContainer30 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItemCharaStat = new DevComponents.DotNetBar.ButtonItem();
-            this.itemContainer31 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItemCharaEquip = new DevComponents.DotNetBar.ButtonItem();
-            this.itemContainer32 = new DevComponents.DotNetBar.ItemContainer();
-            this.itemContainer33 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItemAddItem = new DevComponents.DotNetBar.ButtonItem();
-            this.itemContainer34 = new DevComponents.DotNetBar.ItemContainer();
-            this.itemContainer35 = new DevComponents.DotNetBar.ItemContainer();
-            this.ribbonBar3 = new DevComponents.DotNetBar.RibbonBar();
-            this.itemContainer6 = new DevComponents.DotNetBar.ItemContainer();
-            this.itemContainer7 = new DevComponents.DotNetBar.ItemContainer();
-            this.labelItemSoundTitle = new DevComponents.DotNetBar.LabelItem();
-            this.itemContainer9 = new DevComponents.DotNetBar.ItemContainer();
-            this.sliderItemSoundTime = new DevComponents.DotNetBar.SliderItem();
-            this.checkBoxItemSoundLoop = new DevComponents.DotNetBar.CheckBoxItem();
-            this.itemContainer18 = new DevComponents.DotNetBar.ItemContainer();
-            this.labelItemSoundTime = new DevComponents.DotNetBar.LabelItem();
-            this.itemContainer13 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItemLoadSound = new DevComponents.DotNetBar.ButtonItem();
-            this.buttonItemSoundPlay = new DevComponents.DotNetBar.ButtonItem();
-            this.buttonItemSoundStop = new DevComponents.DotNetBar.ButtonItem();
-            this.buttonItemSoundSave = new DevComponents.DotNetBar.ButtonItem();
-            this.sliderItemSoundVol = new DevComponents.DotNetBar.SliderItem();
             this.ribbonTabItem1 = new DevComponents.DotNetBar.RibbonTabItem();
             this.ribbonTabItem2 = new DevComponents.DotNetBar.RibbonTabItem();
             this.ribbonTabItem3 = new DevComponents.DotNetBar.RibbonTabItem();
@@ -242,11 +243,11 @@
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.dockContainerItem2 = new DevComponents.DotNetBar.DockContainerItem();
             this.panelDockContainer2 = new DevComponents.DotNetBar.PanelDockContainer();
-            this.comboItem18 = new DevComponents.Editors.ComboItem();
+            this.chkResolvePngLink = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.ribbonControl1.SuspendLayout();
+            this.ribbonPanel2.SuspendLayout();
             this.ribbonPanel1.SuspendLayout();
             this.ribbonPanel3.SuspendLayout();
-            this.ribbonPanel2.SuspendLayout();
             this.panelExMain.SuspendLayout();
             this.panelExRight.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
@@ -313,6 +314,655 @@
             this.ribbonControl1.TabIndex = 0;
             this.ribbonControl1.Text = "ribbonControl1";
             this.ribbonControl1.UseCustomizeDialog = false;
+            // 
+            // ribbonPanel2
+            // 
+            this.ribbonPanel2.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.ribbonPanel2.Controls.Add(this.ribbonBar8);
+            this.ribbonPanel2.Controls.Add(this.ribbonBar3);
+            this.ribbonPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ribbonPanel2.Location = new System.Drawing.Point(0, 56);
+            this.ribbonPanel2.Name = "ribbonPanel2";
+            this.ribbonPanel2.Padding = new System.Windows.Forms.Padding(3, 0, 3, 3);
+            this.ribbonPanel2.Size = new System.Drawing.Size(740, 94);
+            // 
+            // 
+            // 
+            this.ribbonPanel2.Style.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // 
+            // 
+            this.ribbonPanel2.StyleMouseDown.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // 
+            // 
+            this.ribbonPanel2.StyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.ribbonPanel2.TabIndex = 2;
+            // 
+            // ribbonBar8
+            // 
+            this.ribbonBar8.AutoOverflowEnabled = true;
+            // 
+            // 
+            // 
+            this.ribbonBar8.BackgroundMouseOverStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // 
+            // 
+            this.ribbonBar8.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.ribbonBar8.ContainerControlProcessDialogKey = true;
+            this.ribbonBar8.Dock = System.Windows.Forms.DockStyle.Left;
+            this.ribbonBar8.DragDropSupport = true;
+            this.ribbonBar8.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer37,
+            this.itemContainer23,
+            this.itemContainer28,
+            this.itemContainer32});
+            this.ribbonBar8.Location = new System.Drawing.Point(265, 0);
+            this.ribbonBar8.Name = "ribbonBar8";
+            this.ribbonBar8.Size = new System.Drawing.Size(270, 91);
+            this.ribbonBar8.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.ribbonBar8.TabIndex = 1;
+            this.ribbonBar8.Text = "CharaSim";
+            // 
+            // 
+            // 
+            this.ribbonBar8.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // 
+            // 
+            this.ribbonBar8.TitleStyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // itemContainer37
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer37.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer37.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
+            this.itemContainer37.Name = "itemContainer37";
+            this.itemContainer37.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer38,
+            this.itemContainer39});
+            // 
+            // 
+            // 
+            this.itemContainer37.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer37.Visible = false;
+            // 
+            // itemContainer38
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer38.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer38.Name = "itemContainer38";
+            this.itemContainer38.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.comboBoxItemCharacter});
+            // 
+            // 
+            // 
+            this.itemContainer38.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // comboBoxItemCharacter
+            // 
+            this.comboBoxItemCharacter.ComboWidth = 80;
+            this.comboBoxItemCharacter.DropDownHeight = 106;
+            this.comboBoxItemCharacter.ItemHeight = 16;
+            this.comboBoxItemCharacter.Name = "comboBoxItemCharacter";
+            this.comboBoxItemCharacter.Text = "comboBoxItem3";
+            // 
+            // itemContainer39
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer39.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer39.Name = "itemContainer39";
+            this.itemContainer39.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer40,
+            this.itemContainer41});
+            // 
+            // 
+            // 
+            this.itemContainer39.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer39.Visible = false;
+            // 
+            // itemContainer40
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer40.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer40.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
+            this.itemContainer40.Name = "itemContainer40";
+            this.itemContainer40.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemCreateChara,
+            this.buttonItemEdit});
+            // 
+            // 
+            // 
+            this.itemContainer40.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // buttonItemCreateChara
+            // 
+            this.buttonItemCreateChara.Name = "buttonItemCreateChara";
+            this.buttonItemCreateChara.Text = "Create";
+            // 
+            // buttonItemEdit
+            // 
+            this.buttonItemEdit.Name = "buttonItemEdit";
+            this.buttonItemEdit.Text = "Edit";
+            // 
+            // itemContainer41
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer41.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer41.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
+            this.itemContainer41.Name = "itemContainer41";
+            this.itemContainer41.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemLoadChara,
+            this.buttonItemSaveChara});
+            // 
+            // 
+            // 
+            this.itemContainer41.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // buttonItemLoadChara
+            // 
+            this.buttonItemLoadChara.Name = "buttonItemLoadChara";
+            this.buttonItemLoadChara.Text = "Load";
+            // 
+            // buttonItemSaveChara
+            // 
+            this.buttonItemSaveChara.Name = "buttonItemSaveChara";
+            this.buttonItemSaveChara.Text = "Save";
+            // 
+            // itemContainer23
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer23.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer23.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
+            this.itemContainer23.Name = "itemContainer23";
+            this.itemContainer23.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer24,
+            this.itemContainer25,
+            this.itemContainer26});
+            // 
+            // 
+            // 
+            this.itemContainer23.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // itemContainer24
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer24.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer24.Name = "itemContainer24";
+            this.itemContainer24.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.comboBoxItemLanguage});
+            // 
+            // 
+            // 
+            this.itemContainer24.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // comboBoxItemLanguage
+            // 
+            this.comboBoxItemLanguage.ComboWidth = 75;
+            this.comboBoxItemLanguage.DropDownHeight = 106;
+            this.comboBoxItemLanguage.ItemHeight = 16;
+            this.comboBoxItemLanguage.Items.AddRange(new object[] {
+            this.comboItem13,
+            this.comboItem14,
+            this.comboItem15,
+            this.comboItem16,
+            this.comboItem17,
+            this.comboItem18});
+            this.comboBoxItemLanguage.Name = "comboBoxItemLanguage";
+            this.comboBoxItemLanguage.Text = "comboBoxItem3";
+            this.comboBoxItemLanguage.SelectedIndexChanged += new System.EventHandler(this.comboBoxItemLanguage_SelectedIndexChanged);
+            // 
+            // comboItem14
+            // 
+            this.comboItem14.Text = "宋体";
+            // 
+            // comboItem15
+            // 
+            this.comboItem15.Text = "微软雅黑";
+            // 
+            // comboItem16
+            // 
+            this.comboItem16.Text = "MS Gothic";
+            // 
+            // comboItem17
+            // 
+            this.comboItem17.Text = "굴림체";
+            // 
+            // comboItem18
+            // 
+            this.comboItem18.Text = "돋움";
+            // 
+            // itemContainer25
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer25.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer25.Name = "itemContainer25";
+            this.itemContainer25.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemQuickView});
+            // 
+            // 
+            // 
+            this.itemContainer25.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // buttonItemQuickView
+            // 
+            this.buttonItemQuickView.Name = "buttonItemQuickView";
+            this.buttonItemQuickView.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer42});
+            this.buttonItemQuickView.Text = "QuickView";
+            this.buttonItemQuickView.Click += new System.EventHandler(this.buttonItemQuickView_Click);
+            // 
+            // itemContainer42
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer42.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer42.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
+            this.itemContainer42.Name = "itemContainer42";
+            this.itemContainer42.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemAutoQuickView,
+            this.buttonItemQuickViewSetting});
+            // 
+            // 
+            // 
+            this.itemContainer42.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // buttonItemAutoQuickView
+            // 
+            this.buttonItemAutoQuickView.AutoCheckOnClick = true;
+            this.buttonItemAutoQuickView.Name = "buttonItemAutoQuickView";
+            this.buttonItemAutoQuickView.Text = "AutoQuickView";
+            this.buttonItemAutoQuickView.Tooltip = "开启/关闭自动预览机能";
+            this.buttonItemAutoQuickView.Click += new System.EventHandler(this.buttonItemAutoQuickView_Click);
+            // 
+            // buttonItemQuickViewSetting
+            // 
+            this.buttonItemQuickViewSetting.Name = "buttonItemQuickViewSetting";
+            this.buttonItemQuickViewSetting.Text = "Setting";
+            this.buttonItemQuickViewSetting.Click += new System.EventHandler(this.buttonItemQuickViewSetting_Click);
+            // 
+            // itemContainer26
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer26.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer26.Name = "itemContainer26";
+            this.itemContainer26.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemSetItems});
+            // 
+            // 
+            // 
+            this.itemContainer26.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // buttonItemSetItems
+            // 
+            this.buttonItemSetItems.Name = "buttonItemSetItems";
+            this.buttonItemSetItems.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer43});
+            this.buttonItemSetItems.Text = "SetItems";
+            // 
+            // itemContainer43
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer43.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer43.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
+            this.itemContainer43.Name = "itemContainer43";
+            this.itemContainer43.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemClearSetItems});
+            // 
+            // 
+            // 
+            this.itemContainer43.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // buttonItemClearSetItems
+            // 
+            this.buttonItemClearSetItems.Name = "buttonItemClearSetItems";
+            this.buttonItemClearSetItems.Text = "Clear SetItems";
+            this.buttonItemClearSetItems.Click += new System.EventHandler(this.buttonItemClearSetItems_Click);
+            // 
+            // itemContainer28
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer28.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer28.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
+            this.itemContainer28.Name = "itemContainer28";
+            this.itemContainer28.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer29,
+            this.itemContainer30,
+            this.itemContainer31});
+            // 
+            // 
+            // 
+            this.itemContainer28.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // itemContainer29
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer29.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer29.Name = "itemContainer29";
+            this.itemContainer29.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemCharItem});
+            // 
+            // 
+            // 
+            this.itemContainer29.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // buttonItemCharItem
+            // 
+            this.buttonItemCharItem.AutoCheckOnClick = true;
+            this.buttonItemCharItem.Name = "buttonItemCharItem";
+            this.buttonItemCharItem.Text = "Item";
+            this.buttonItemCharItem.Tooltip = "开启/关闭道具栏";
+            this.buttonItemCharItem.CheckedChanged += new System.EventHandler(this.buttonItemCharItem_CheckedChanged);
+            // 
+            // itemContainer30
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer30.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer30.Name = "itemContainer30";
+            this.itemContainer30.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemCharaStat});
+            // 
+            // 
+            // 
+            this.itemContainer30.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // buttonItemCharaStat
+            // 
+            this.buttonItemCharaStat.AutoCheckOnClick = true;
+            this.buttonItemCharaStat.Name = "buttonItemCharaStat";
+            this.buttonItemCharaStat.Text = "Stat";
+            this.buttonItemCharaStat.Tooltip = "开启/关闭状态栏";
+            this.buttonItemCharaStat.CheckedChanged += new System.EventHandler(this.buttonItemCharaStat_CheckedChanged);
+            // 
+            // itemContainer31
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer31.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer31.Name = "itemContainer31";
+            this.itemContainer31.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemCharaEquip});
+            // 
+            // 
+            // 
+            this.itemContainer31.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // buttonItemCharaEquip
+            // 
+            this.buttonItemCharaEquip.AutoCheckOnClick = true;
+            this.buttonItemCharaEquip.Name = "buttonItemCharaEquip";
+            this.buttonItemCharaEquip.Text = "Equip";
+            this.buttonItemCharaEquip.Tooltip = "开启/关闭装备栏";
+            this.buttonItemCharaEquip.CheckedChanged += new System.EventHandler(this.buttonItemCharaEquip_CheckedChanged);
+            // 
+            // itemContainer32
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer32.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer32.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
+            this.itemContainer32.Name = "itemContainer32";
+            this.itemContainer32.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer33,
+            this.itemContainer34,
+            this.itemContainer35});
+            // 
+            // 
+            // 
+            this.itemContainer32.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // itemContainer33
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer33.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer33.Name = "itemContainer33";
+            this.itemContainer33.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemAddItem});
+            // 
+            // 
+            // 
+            this.itemContainer33.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // buttonItemAddItem
+            // 
+            this.buttonItemAddItem.Name = "buttonItemAddItem";
+            this.buttonItemAddItem.Text = "AddItem";
+            this.buttonItemAddItem.Tooltip = "把最后预览的装备或道具添加至背包";
+            this.buttonItemAddItem.Click += new System.EventHandler(this.buttonItemAddItem_Click);
+            // 
+            // itemContainer34
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer34.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer34.Name = "itemContainer34";
+            // 
+            // 
+            // 
+            this.itemContainer34.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // itemContainer35
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer35.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer35.Name = "itemContainer35";
+            // 
+            // 
+            // 
+            this.itemContainer35.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // ribbonBar3
+            // 
+            this.ribbonBar3.AllowDrop = true;
+            this.ribbonBar3.AutoOverflowEnabled = false;
+            // 
+            // 
+            // 
+            this.ribbonBar3.BackgroundMouseOverStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // 
+            // 
+            this.ribbonBar3.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.ribbonBar3.ContainerControlProcessDialogKey = true;
+            this.ribbonBar3.Dock = System.Windows.Forms.DockStyle.Left;
+            this.ribbonBar3.DragDropSupport = true;
+            this.ribbonBar3.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer6});
+            this.ribbonBar3.Location = new System.Drawing.Point(3, 0);
+            this.ribbonBar3.Name = "ribbonBar3";
+            this.ribbonBar3.Size = new System.Drawing.Size(262, 91);
+            this.ribbonBar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.ribbonBar3.TabIndex = 0;
+            this.ribbonBar3.Text = "SoundPlayer";
+            // 
+            // 
+            // 
+            this.ribbonBar3.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // 
+            // 
+            this.ribbonBar3.TitleStyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.ribbonBar3.DragDrop += new System.Windows.Forms.DragEventHandler(this.ribbonBar3_DragDrop);
+            this.ribbonBar3.DragEnter += new System.Windows.Forms.DragEventHandler(this.ribbonBar3_DragEnter);
+            // 
+            // itemContainer6
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer6.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer6.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
+            this.itemContainer6.Name = "itemContainer6";
+            this.itemContainer6.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer7,
+            this.itemContainer9,
+            this.itemContainer18,
+            this.itemContainer13});
+            // 
+            // 
+            // 
+            this.itemContainer6.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // itemContainer7
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer7.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer7.Name = "itemContainer7";
+            this.itemContainer7.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.labelItemSoundTitle});
+            // 
+            // 
+            // 
+            this.itemContainer7.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // labelItemSoundTitle
+            // 
+            this.labelItemSoundTitle.Name = "labelItemSoundTitle";
+            this.labelItemSoundTitle.Text = "player";
+            this.labelItemSoundTitle.Width = 254;
+            // 
+            // itemContainer9
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer9.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer9.Name = "itemContainer9";
+            this.itemContainer9.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.sliderItemSoundTime,
+            this.checkBoxItemSoundLoop});
+            // 
+            // 
+            // 
+            this.itemContainer9.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // sliderItemSoundTime
+            // 
+            this.sliderItemSoundTime.LabelWidth = 6;
+            this.sliderItemSoundTime.Name = "sliderItemSoundTime";
+            this.sliderItemSoundTime.Step = 10;
+            this.sliderItemSoundTime.Value = 0;
+            this.sliderItemSoundTime.Width = 195;
+            this.sliderItemSoundTime.ValueChanged += new System.EventHandler(this.sliderItemSoundTime_ValueChanged);
+            // 
+            // checkBoxItemSoundLoop
+            // 
+            this.checkBoxItemSoundLoop.Name = "checkBoxItemSoundLoop";
+            this.checkBoxItemSoundLoop.Text = "loop";
+            this.checkBoxItemSoundLoop.CheckedChanged += new DevComponents.DotNetBar.CheckBoxChangeEventHandler(this.checkBoxItemSoundLoop_CheckedChanged);
+            // 
+            // itemContainer18
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer18.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer18.Name = "itemContainer18";
+            this.itemContainer18.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.labelItemSoundTime});
+            // 
+            // 
+            // 
+            this.itemContainer18.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // labelItemSoundTime
+            // 
+            this.labelItemSoundTime.Name = "labelItemSoundTime";
+            this.labelItemSoundTime.Text = "00:00 / 00:00";
+            this.labelItemSoundTime.TextAlignment = System.Drawing.StringAlignment.Center;
+            this.labelItemSoundTime.Width = 222;
+            // 
+            // itemContainer13
+            // 
+            // 
+            // 
+            // 
+            this.itemContainer13.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainer13.Name = "itemContainer13";
+            this.itemContainer13.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemLoadSound,
+            this.buttonItemSoundPlay,
+            this.buttonItemSoundStop,
+            this.buttonItemSoundSave,
+            this.sliderItemSoundVol});
+            // 
+            // 
+            // 
+            this.itemContainer13.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            // 
+            // buttonItemLoadSound
+            // 
+            this.buttonItemLoadSound.Image = global::WzComparerR2.Properties.Resources.Open;
+            this.buttonItemLoadSound.Name = "buttonItemLoadSound";
+            this.buttonItemLoadSound.Text = "Load";
+            this.buttonItemLoadSound.Click += new System.EventHandler(this.buttonItemLoadSound_Click);
+            // 
+            // buttonItemSoundPlay
+            // 
+            this.buttonItemSoundPlay.Image = global::WzComparerR2.Properties.Resources.Play;
+            this.buttonItemSoundPlay.Name = "buttonItemSoundPlay";
+            this.buttonItemSoundPlay.Text = " Play";
+            this.buttonItemSoundPlay.Click += new System.EventHandler(this.buttonItemSoundPlay_Click);
+            // 
+            // buttonItemSoundStop
+            // 
+            this.buttonItemSoundStop.Image = global::WzComparerR2.Properties.Resources.Stop;
+            this.buttonItemSoundStop.Name = "buttonItemSoundStop";
+            this.buttonItemSoundStop.Text = "Stop";
+            this.buttonItemSoundStop.Click += new System.EventHandler(this.buttonItemSoundStop_Click);
+            // 
+            // buttonItemSoundSave
+            // 
+            this.buttonItemSoundSave.Image = global::WzComparerR2.Properties.Resources.Save;
+            this.buttonItemSoundSave.Name = "buttonItemSoundSave";
+            this.buttonItemSoundSave.Text = "Save";
+            this.buttonItemSoundSave.Click += new System.EventHandler(this.buttonItemSoundSave_Click);
+            // 
+            // sliderItemSoundVol
+            // 
+            this.sliderItemSoundVol.LabelWidth = 25;
+            this.sliderItemSoundVol.Name = "sliderItemSoundVol";
+            this.sliderItemSoundVol.Text = "vol";
+            this.sliderItemSoundVol.Value = 100;
+            this.sliderItemSoundVol.Width = 110;
+            this.sliderItemSoundVol.ValueChanged += new System.EventHandler(this.sliderItemSoundVol_ValueChanged);
             // 
             // ribbonPanel1
             // 
@@ -834,651 +1484,6 @@
             this.buttonItemAbout.Text = "About";
             this.buttonItemAbout.Click += new System.EventHandler(this.buttonItemAbout_Click);
             // 
-            // ribbonPanel2
-            // 
-            this.ribbonPanel2.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.ribbonPanel2.Controls.Add(this.ribbonBar8);
-            this.ribbonPanel2.Controls.Add(this.ribbonBar3);
-            this.ribbonPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ribbonPanel2.Location = new System.Drawing.Point(0, 56);
-            this.ribbonPanel2.Name = "ribbonPanel2";
-            this.ribbonPanel2.Padding = new System.Windows.Forms.Padding(3, 0, 3, 3);
-            this.ribbonPanel2.Size = new System.Drawing.Size(740, 94);
-            // 
-            // 
-            // 
-            this.ribbonPanel2.Style.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // 
-            // 
-            this.ribbonPanel2.StyleMouseDown.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // 
-            // 
-            this.ribbonPanel2.StyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.ribbonPanel2.TabIndex = 2;
-            // 
-            // ribbonBar8
-            // 
-            this.ribbonBar8.AutoOverflowEnabled = true;
-            // 
-            // 
-            // 
-            this.ribbonBar8.BackgroundMouseOverStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // 
-            // 
-            this.ribbonBar8.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.ribbonBar8.ContainerControlProcessDialogKey = true;
-            this.ribbonBar8.Dock = System.Windows.Forms.DockStyle.Left;
-            this.ribbonBar8.DragDropSupport = true;
-            this.ribbonBar8.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.itemContainer37,
-            this.itemContainer23,
-            this.itemContainer28,
-            this.itemContainer32});
-            this.ribbonBar8.Location = new System.Drawing.Point(265, 0);
-            this.ribbonBar8.Name = "ribbonBar8";
-            this.ribbonBar8.Size = new System.Drawing.Size(270, 91);
-            this.ribbonBar8.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.ribbonBar8.TabIndex = 1;
-            this.ribbonBar8.Text = "CharaSim";
-            // 
-            // 
-            // 
-            this.ribbonBar8.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // 
-            // 
-            this.ribbonBar8.TitleStyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // itemContainer37
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer37.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer37.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
-            this.itemContainer37.Name = "itemContainer37";
-            this.itemContainer37.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.itemContainer38,
-            this.itemContainer39});
-            // 
-            // 
-            // 
-            this.itemContainer37.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer37.Visible = false;
-            // 
-            // itemContainer38
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer38.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer38.Name = "itemContainer38";
-            this.itemContainer38.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.comboBoxItemCharacter});
-            // 
-            // 
-            // 
-            this.itemContainer38.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // comboBoxItemCharacter
-            // 
-            this.comboBoxItemCharacter.ComboWidth = 80;
-            this.comboBoxItemCharacter.DropDownHeight = 106;
-            this.comboBoxItemCharacter.ItemHeight = 16;
-            this.comboBoxItemCharacter.Name = "comboBoxItemCharacter";
-            this.comboBoxItemCharacter.Text = "comboBoxItem3";
-            // 
-            // itemContainer39
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer39.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer39.Name = "itemContainer39";
-            this.itemContainer39.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.itemContainer40,
-            this.itemContainer41});
-            // 
-            // 
-            // 
-            this.itemContainer39.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer39.Visible = false;
-            // 
-            // itemContainer40
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer40.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer40.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
-            this.itemContainer40.Name = "itemContainer40";
-            this.itemContainer40.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItemCreateChara,
-            this.buttonItemEdit});
-            // 
-            // 
-            // 
-            this.itemContainer40.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // buttonItemCreateChara
-            // 
-            this.buttonItemCreateChara.Name = "buttonItemCreateChara";
-            this.buttonItemCreateChara.Text = "Create";
-            // 
-            // buttonItemEdit
-            // 
-            this.buttonItemEdit.Name = "buttonItemEdit";
-            this.buttonItemEdit.Text = "Edit";
-            // 
-            // itemContainer41
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer41.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer41.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
-            this.itemContainer41.Name = "itemContainer41";
-            this.itemContainer41.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItemLoadChara,
-            this.buttonItemSaveChara});
-            // 
-            // 
-            // 
-            this.itemContainer41.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // buttonItemLoadChara
-            // 
-            this.buttonItemLoadChara.Name = "buttonItemLoadChara";
-            this.buttonItemLoadChara.Text = "Load";
-            // 
-            // buttonItemSaveChara
-            // 
-            this.buttonItemSaveChara.Name = "buttonItemSaveChara";
-            this.buttonItemSaveChara.Text = "Save";
-            // 
-            // itemContainer23
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer23.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer23.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
-            this.itemContainer23.Name = "itemContainer23";
-            this.itemContainer23.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.itemContainer24,
-            this.itemContainer25,
-            this.itemContainer26});
-            // 
-            // 
-            // 
-            this.itemContainer23.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // itemContainer24
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer24.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer24.Name = "itemContainer24";
-            this.itemContainer24.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.comboBoxItemLanguage});
-            // 
-            // 
-            // 
-            this.itemContainer24.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // comboBoxItemLanguage
-            // 
-            this.comboBoxItemLanguage.ComboWidth = 75;
-            this.comboBoxItemLanguage.DropDownHeight = 106;
-            this.comboBoxItemLanguage.ItemHeight = 16;
-            this.comboBoxItemLanguage.Items.AddRange(new object[] {
-            this.comboItem13,
-            this.comboItem14,
-            this.comboItem15,
-            this.comboItem16,
-            this.comboItem17,
-            this.comboItem18});
-            this.comboBoxItemLanguage.Name = "comboBoxItemLanguage";
-            this.comboBoxItemLanguage.Text = "comboBoxItem3";
-            this.comboBoxItemLanguage.SelectedIndexChanged += new System.EventHandler(this.comboBoxItemLanguage_SelectedIndexChanged);
-            // 
-            // comboItem14
-            // 
-            this.comboItem14.Text = "新宋体";
-            // 
-            // comboItem15
-            // 
-            this.comboItem15.Text = "微软雅黑";
-            // 
-            // comboItem16
-            // 
-            this.comboItem16.Text = "MS Gothic";
-            // 
-            // comboItem17
-            // 
-            this.comboItem17.Text = "굴림체";
-            // 
-            // itemContainer25
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer25.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer25.Name = "itemContainer25";
-            this.itemContainer25.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItemQuickView});
-            // 
-            // 
-            // 
-            this.itemContainer25.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // buttonItemQuickView
-            // 
-            this.buttonItemQuickView.Name = "buttonItemQuickView";
-            this.buttonItemQuickView.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.itemContainer42});
-            this.buttonItemQuickView.Text = "QuickView";
-            this.buttonItemQuickView.Click += new System.EventHandler(this.buttonItemQuickView_Click);
-            // 
-            // itemContainer42
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer42.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer42.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
-            this.itemContainer42.Name = "itemContainer42";
-            this.itemContainer42.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItemAutoQuickView,
-            this.buttonItemQuickViewSetting});
-            // 
-            // 
-            // 
-            this.itemContainer42.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // buttonItemAutoQuickView
-            // 
-            this.buttonItemAutoQuickView.AutoCheckOnClick = true;
-            this.buttonItemAutoQuickView.Name = "buttonItemAutoQuickView";
-            this.buttonItemAutoQuickView.Text = "AutoQuickView";
-            this.buttonItemAutoQuickView.Tooltip = "开启/关闭自动预览机能";
-            this.buttonItemAutoQuickView.Click += new System.EventHandler(this.buttonItemAutoQuickView_Click);
-            // 
-            // buttonItemQuickViewSetting
-            // 
-            this.buttonItemQuickViewSetting.Name = "buttonItemQuickViewSetting";
-            this.buttonItemQuickViewSetting.Text = "Setting";
-            this.buttonItemQuickViewSetting.Click += new System.EventHandler(this.buttonItemQuickViewSetting_Click);
-            // 
-            // itemContainer26
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer26.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer26.Name = "itemContainer26";
-            this.itemContainer26.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItemSetItems});
-            // 
-            // 
-            // 
-            this.itemContainer26.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // buttonItemSetItems
-            // 
-            this.buttonItemSetItems.Name = "buttonItemSetItems";
-            this.buttonItemSetItems.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.itemContainer43});
-            this.buttonItemSetItems.Text = "SetItems";
-            // 
-            // itemContainer43
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer43.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer43.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
-            this.itemContainer43.Name = "itemContainer43";
-            this.itemContainer43.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItemClearSetItems});
-            // 
-            // 
-            // 
-            this.itemContainer43.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // buttonItemClearSetItems
-            // 
-            this.buttonItemClearSetItems.Name = "buttonItemClearSetItems";
-            this.buttonItemClearSetItems.Text = "Clear SetItems";
-            this.buttonItemClearSetItems.Click += new System.EventHandler(this.buttonItemClearSetItems_Click);
-            // 
-            // itemContainer28
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer28.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer28.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
-            this.itemContainer28.Name = "itemContainer28";
-            this.itemContainer28.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.itemContainer29,
-            this.itemContainer30,
-            this.itemContainer31});
-            // 
-            // 
-            // 
-            this.itemContainer28.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // itemContainer29
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer29.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer29.Name = "itemContainer29";
-            this.itemContainer29.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItemCharItem});
-            // 
-            // 
-            // 
-            this.itemContainer29.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // buttonItemCharItem
-            // 
-            this.buttonItemCharItem.AutoCheckOnClick = true;
-            this.buttonItemCharItem.Name = "buttonItemCharItem";
-            this.buttonItemCharItem.Text = "Item";
-            this.buttonItemCharItem.Tooltip = "开启/关闭道具栏";
-            this.buttonItemCharItem.CheckedChanged += new System.EventHandler(this.buttonItemCharItem_CheckedChanged);
-            // 
-            // itemContainer30
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer30.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer30.Name = "itemContainer30";
-            this.itemContainer30.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItemCharaStat});
-            // 
-            // 
-            // 
-            this.itemContainer30.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // buttonItemCharaStat
-            // 
-            this.buttonItemCharaStat.AutoCheckOnClick = true;
-            this.buttonItemCharaStat.Name = "buttonItemCharaStat";
-            this.buttonItemCharaStat.Text = "Stat";
-            this.buttonItemCharaStat.Tooltip = "开启/关闭状态栏";
-            this.buttonItemCharaStat.CheckedChanged += new System.EventHandler(this.buttonItemCharaStat_CheckedChanged);
-            // 
-            // itemContainer31
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer31.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer31.Name = "itemContainer31";
-            this.itemContainer31.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItemCharaEquip});
-            // 
-            // 
-            // 
-            this.itemContainer31.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // buttonItemCharaEquip
-            // 
-            this.buttonItemCharaEquip.AutoCheckOnClick = true;
-            this.buttonItemCharaEquip.Name = "buttonItemCharaEquip";
-            this.buttonItemCharaEquip.Text = "Equip";
-            this.buttonItemCharaEquip.Tooltip = "开启/关闭装备栏";
-            this.buttonItemCharaEquip.CheckedChanged += new System.EventHandler(this.buttonItemCharaEquip_CheckedChanged);
-            // 
-            // itemContainer32
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer32.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer32.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
-            this.itemContainer32.Name = "itemContainer32";
-            this.itemContainer32.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.itemContainer33,
-            this.itemContainer34,
-            this.itemContainer35});
-            // 
-            // 
-            // 
-            this.itemContainer32.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // itemContainer33
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer33.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer33.Name = "itemContainer33";
-            this.itemContainer33.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItemAddItem});
-            // 
-            // 
-            // 
-            this.itemContainer33.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // buttonItemAddItem
-            // 
-            this.buttonItemAddItem.Name = "buttonItemAddItem";
-            this.buttonItemAddItem.Text = "AddItem";
-            this.buttonItemAddItem.Tooltip = "把最后预览的装备或道具添加至背包";
-            this.buttonItemAddItem.Click += new System.EventHandler(this.buttonItemAddItem_Click);
-            // 
-            // itemContainer34
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer34.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer34.Name = "itemContainer34";
-            // 
-            // 
-            // 
-            this.itemContainer34.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // itemContainer35
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer35.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer35.Name = "itemContainer35";
-            // 
-            // 
-            // 
-            this.itemContainer35.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // ribbonBar3
-            // 
-            this.ribbonBar3.AllowDrop = true;
-            this.ribbonBar3.AutoOverflowEnabled = false;
-            // 
-            // 
-            // 
-            this.ribbonBar3.BackgroundMouseOverStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // 
-            // 
-            this.ribbonBar3.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.ribbonBar3.ContainerControlProcessDialogKey = true;
-            this.ribbonBar3.Dock = System.Windows.Forms.DockStyle.Left;
-            this.ribbonBar3.DragDropSupport = true;
-            this.ribbonBar3.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.itemContainer6});
-            this.ribbonBar3.Location = new System.Drawing.Point(3, 0);
-            this.ribbonBar3.Name = "ribbonBar3";
-            this.ribbonBar3.Size = new System.Drawing.Size(262, 91);
-            this.ribbonBar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.ribbonBar3.TabIndex = 0;
-            this.ribbonBar3.Text = "SoundPlayer";
-            // 
-            // 
-            // 
-            this.ribbonBar3.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // 
-            // 
-            this.ribbonBar3.TitleStyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.ribbonBar3.DragDrop += new System.Windows.Forms.DragEventHandler(this.ribbonBar3_DragDrop);
-            this.ribbonBar3.DragEnter += new System.Windows.Forms.DragEventHandler(this.ribbonBar3_DragEnter);
-            // 
-            // itemContainer6
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer6.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer6.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
-            this.itemContainer6.Name = "itemContainer6";
-            this.itemContainer6.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.itemContainer7,
-            this.itemContainer9,
-            this.itemContainer18,
-            this.itemContainer13});
-            // 
-            // 
-            // 
-            this.itemContainer6.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // itemContainer7
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer7.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer7.Name = "itemContainer7";
-            this.itemContainer7.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.labelItemSoundTitle});
-            // 
-            // 
-            // 
-            this.itemContainer7.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // labelItemSoundTitle
-            // 
-            this.labelItemSoundTitle.Name = "labelItemSoundTitle";
-            this.labelItemSoundTitle.Text = "player";
-            this.labelItemSoundTitle.Width = 254;
-            // 
-            // itemContainer9
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer9.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer9.Name = "itemContainer9";
-            this.itemContainer9.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.sliderItemSoundTime,
-            this.checkBoxItemSoundLoop});
-            // 
-            // 
-            // 
-            this.itemContainer9.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // sliderItemSoundTime
-            // 
-            this.sliderItemSoundTime.LabelWidth = 6;
-            this.sliderItemSoundTime.Name = "sliderItemSoundTime";
-            this.sliderItemSoundTime.Step = 10;
-            this.sliderItemSoundTime.Value = 0;
-            this.sliderItemSoundTime.Width = 195;
-            this.sliderItemSoundTime.ValueChanged += new System.EventHandler(this.sliderItemSoundTime_ValueChanged);
-            // 
-            // checkBoxItemSoundLoop
-            // 
-            this.checkBoxItemSoundLoop.Name = "checkBoxItemSoundLoop";
-            this.checkBoxItemSoundLoop.Text = "loop";
-            this.checkBoxItemSoundLoop.CheckedChanged += new DevComponents.DotNetBar.CheckBoxChangeEventHandler(this.checkBoxItemSoundLoop_CheckedChanged);
-            // 
-            // itemContainer18
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer18.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer18.Name = "itemContainer18";
-            this.itemContainer18.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.labelItemSoundTime});
-            // 
-            // 
-            // 
-            this.itemContainer18.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // labelItemSoundTime
-            // 
-            this.labelItemSoundTime.Name = "labelItemSoundTime";
-            this.labelItemSoundTime.Text = "00:00 / 00:00";
-            this.labelItemSoundTime.TextAlignment = System.Drawing.StringAlignment.Center;
-            this.labelItemSoundTime.Width = 222;
-            // 
-            // itemContainer13
-            // 
-            // 
-            // 
-            // 
-            this.itemContainer13.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.itemContainer13.Name = "itemContainer13";
-            this.itemContainer13.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItemLoadSound,
-            this.buttonItemSoundPlay,
-            this.buttonItemSoundStop,
-            this.buttonItemSoundSave,
-            this.sliderItemSoundVol});
-            // 
-            // 
-            // 
-            this.itemContainer13.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            // 
-            // buttonItemLoadSound
-            // 
-            this.buttonItemLoadSound.Image = global::WzComparerR2.Properties.Resources.Open;
-            this.buttonItemLoadSound.Name = "buttonItemLoadSound";
-            this.buttonItemLoadSound.Text = "Load";
-            this.buttonItemLoadSound.Click += new System.EventHandler(this.buttonItemLoadSound_Click);
-            // 
-            // buttonItemSoundPlay
-            // 
-            this.buttonItemSoundPlay.Image = global::WzComparerR2.Properties.Resources.Play;
-            this.buttonItemSoundPlay.Name = "buttonItemSoundPlay";
-            this.buttonItemSoundPlay.Text = " Play";
-            this.buttonItemSoundPlay.Click += new System.EventHandler(this.buttonItemSoundPlay_Click);
-            // 
-            // buttonItemSoundStop
-            // 
-            this.buttonItemSoundStop.Image = global::WzComparerR2.Properties.Resources.Stop;
-            this.buttonItemSoundStop.Name = "buttonItemSoundStop";
-            this.buttonItemSoundStop.Text = "Stop";
-            this.buttonItemSoundStop.Click += new System.EventHandler(this.buttonItemSoundStop_Click);
-            // 
-            // buttonItemSoundSave
-            // 
-            this.buttonItemSoundSave.Image = global::WzComparerR2.Properties.Resources.Save;
-            this.buttonItemSoundSave.Name = "buttonItemSoundSave";
-            this.buttonItemSoundSave.Text = "Save";
-            this.buttonItemSoundSave.Click += new System.EventHandler(this.buttonItemSoundSave_Click);
-            // 
-            // sliderItemSoundVol
-            // 
-            this.sliderItemSoundVol.LabelWidth = 25;
-            this.sliderItemSoundVol.Name = "sliderItemSoundVol";
-            this.sliderItemSoundVol.Text = "vol";
-            this.sliderItemSoundVol.Value = 100;
-            this.sliderItemSoundVol.Width = 110;
-            this.sliderItemSoundVol.ValueChanged += new System.EventHandler(this.sliderItemSoundVol_ValueChanged);
-            // 
             // ribbonTabItem1
             // 
             this.ribbonTabItem1.Name = "ribbonTabItem1";
@@ -1650,11 +1655,9 @@
             // 
             this.buttonItem12.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText;
             this.buttonItem12.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.buttonItem12.Enabled = true;
             this.buttonItem12.Name = "buttonItem12";
             this.buttonItem12.SubItemsExpandWidth = 24;
             this.buttonItem12.Text = "Opt&ions";
-            this.buttonItem12.Click += ButtonItem12_Click;
             // 
             // buttonItem13
             // 
@@ -1790,8 +1793,8 @@
             this.superTabControl1.ControlBox.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.superTabControl1.ControlBox.MenuBox,
             this.superTabControl1.ControlBox.CloseBox});
-            this.superTabControl1.Controls.Add(this.superTabControlPanel1);
             this.superTabControl1.Controls.Add(this.superTabControlPanel2);
+            this.superTabControl1.Controls.Add(this.superTabControlPanel1);
             this.superTabControl1.Controls.Add(this.superTabControlPanel3);
             this.superTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControl1.Location = new System.Drawing.Point(0, 0);
@@ -2256,6 +2259,7 @@
             // 
             // superTabControlPanel2
             // 
+            this.superTabControlPanel2.Controls.Add(this.chkResolvePngLink);
             this.superTabControlPanel2.Controls.Add(this.chkOutputRemovedImg);
             this.superTabControlPanel2.Controls.Add(this.chkOutputAddedImg);
             this.superTabControlPanel2.Controls.Add(this.labelX1);
@@ -2265,9 +2269,9 @@
             this.superTabControlPanel2.Controls.Add(this.labelXComp1);
             this.superTabControlPanel2.Controls.Add(this.btnEasyCompare);
             this.superTabControlPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.superTabControlPanel2.Location = new System.Drawing.Point(0, 0);
+            this.superTabControlPanel2.Location = new System.Drawing.Point(0, 26);
             this.superTabControlPanel2.Name = "superTabControlPanel2";
-            this.superTabControlPanel2.Size = new System.Drawing.Size(530, 228);
+            this.superTabControlPanel2.Size = new System.Drawing.Size(530, 202);
             this.superTabControlPanel2.TabIndex = 0;
             this.superTabControlPanel2.TabItem = this.superTabItem2;
             // 
@@ -2845,9 +2849,18 @@
             this.panelDockContainer2.Style.GradientAngle = 90;
             this.panelDockContainer2.TabIndex = 2;
             // 
-            // comboItem18
+            // chkResolvePngLink
             // 
-            this.comboItem18.Text = "돋움";
+            // 
+            // 
+            // 
+            this.chkResolvePngLink.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkResolvePngLink.Location = new System.Drawing.Point(318, 34);
+            this.chkResolvePngLink.Name = "chkResolvePngLink";
+            this.chkResolvePngLink.Size = new System.Drawing.Size(107, 23);
+            this.chkResolvePngLink.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkResolvePngLink.TabIndex = 9;
+            this.chkResolvePngLink.Text = "ResolvePngLink";
             // 
             // MainForm
             // 
@@ -2869,9 +2882,9 @@
             this.Text = "WzComparerR2";
             this.ribbonControl1.ResumeLayout(false);
             this.ribbonControl1.PerformLayout();
+            this.ribbonPanel2.ResumeLayout(false);
             this.ribbonPanel1.ResumeLayout(false);
             this.ribbonPanel3.ResumeLayout(false);
-            this.ribbonPanel2.ResumeLayout(false);
             this.panelExMain.ResumeLayout(false);
             this.panelExRight.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).EndInit();
@@ -3111,5 +3124,6 @@
         private DevComponents.DotNetBar.ButtonItem buttonItemUpdate;
         private System.Windows.Forms.ToolStripMenuItem tsmi1DumpAsXml;
         private DevComponents.Editors.ComboItem comboItem18;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkResolvePngLink;
     }
 }
