@@ -160,5 +160,7 @@ namespace WzComparerR2.CharaSim
         ringOptionSkill,
         ringOptionSkillLv,
         abilityTimeLimited,
+        blockGoldHammer,
+        exceptUpgrade,
     }
 }

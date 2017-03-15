@@ -127,6 +127,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.nActivatedSocket: return value == 0 ? null : "#c可以镶嵌星岩#";
                 case GearPropType.jokerToSetItem: return value == 0 ? null : " #c可以当作任何套装组件的幸运道具!#";
                 case GearPropType.abilityTimeLimited: return value == 0 ? null : "限期能力值";
+                case GearPropType.blockGoldHammer: return value == 0 ? null : "无法使用黄金锤";
 
                 case GearPropType.incMHP_incMMP: return "最大HP / 最大MP : " + sign + value;
                 case GearPropType.incMHPr_incMMPr: return "最大HP / 最大MP : " + sign + value + "%";

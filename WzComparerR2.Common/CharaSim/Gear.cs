@@ -139,8 +139,8 @@ namespace WzComparerR2.CharaSim
                 {
                     this.Props[kv.Key] = kv.Value;
                 }
+                this.Props[GearPropType.abilityTimeLimited] = 1;
             }
-            this.Props[GearPropType.abilityTimeLimited] = 1;
         }
 
         public void RestoreStandardProperties()

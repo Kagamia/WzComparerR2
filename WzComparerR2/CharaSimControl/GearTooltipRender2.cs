@@ -204,11 +204,30 @@ namespace WzComparerR2.CharaSimControl
             }
 
             //额外属性
-            string attrStr = GetGearAttributeString();
-            if (!string.IsNullOrEmpty(attrStr))
+            var attrList = GetGearAttributeString();
+            if (attrList.Count > 0)
             {
-                g.DrawString(attrStr, GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush2, 130, picH, format);
-                picH += 15;
+                var font = GearGraphics.ItemDetailFont;
+                string attrStr = null;
+                for (int i = 0; i < attrList.Count; i++)
+                {
+                    var newStr = (attrStr != null ? (attrStr + ", ") : null) + attrList[i];
+                    if (g.MeasureString(newStr, font, short.MaxValue, format).Width > 257)
+                    {
+                        g.DrawString(attrStr, GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush2, 130, picH, format);
+                        picH += 15;
+                        attrStr = attrList[i];
+                    }
+                    else
+                    {
+                        attrStr = newStr;
+                    }
+                }
+                if (!string.IsNullOrEmpty(attrStr))
+                {
+                    g.DrawString(attrStr, GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush2, 130, picH, format);
+                    picH += 15;
+                }
             }
 
             //装备限时
@@ -444,12 +463,18 @@ namespace WzComparerR2.CharaSimControl
             }
 
             bool hasTuc = Gear.HasTuc && Gear.Props.TryGetValue(GearPropType.tuc, out value);
-            if (hasTuc)
+            if (Gear.GetBooleanValue(GearPropType.exceptUpgrade))
+            {
+                g.DrawString("无法强化", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
+                picH += 16;
+            }
+            else if (hasTuc)
             {
                 g.DrawString("可升级次数 : " + value + "回", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
                 picH += 16;
                 hasPart2 = true;
             }
+            
             if (Gear.Props.TryGetValue(GearPropType.limitBreak, out value) && value > 0) //突破上限
             {
                 g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.limitBreak, value), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 11, picH);
@@ -471,17 +496,20 @@ namespace WzComparerR2.CharaSimControl
                     picH += 16;
                 }
 
-                int maxStar = Gear.GetMaxStar();
+                if (!Gear.GetBooleanValue(GearPropType.exceptUpgrade))
+                {
+                    int maxStar = Gear.GetMaxStar();
 
-                if (Gear.Star > 0) //星星
-                {
-                    g.DrawString("适用" + Gear.Star + "星强化(最高" + maxStar + "星)", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
-                    picH += 16;
-                }
-                else
-                {
-                    g.DrawString("最高可强化到" + maxStar + "星", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
-                    picH += 16;
+                    if (Gear.Star > 0) //星星
+                    {
+                        g.DrawString("适用" + Gear.Star + "星强化(最高" + maxStar + "星)", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
+                        picH += 16;
+                    }
+                    else
+                    {
+                        g.DrawString("最高可强化到" + maxStar + "星", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
+                        picH += 16;
+                    }
                 }
                 picH += 2;
                 g.DrawString("金锤子已提高的强化次数", GearGraphics.ItemDetailFont, GearGraphics.GoldHammerBrush, 11, picH);
@@ -902,7 +930,7 @@ namespace WzComparerR2.CharaSimControl
             g.FillRectangle(brush, x, y0, brush.Image.Width, y1 - y0);
         }
 
-        private string GetGearAttributeString()
+        private List<string> GetGearAttributeString()
         {
             int value;
             List<string> tags = new List<string>();
@@ -936,6 +964,10 @@ namespace WzComparerR2.CharaSimControl
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.accountSharable, value));
             }
+            if (Gear.Props.TryGetValue(GearPropType.blockGoldHammer, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.blockGoldHammer, value));
+            }
             if (Gear.Props.TryGetValue(GearPropType.noPotential, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.noPotential, value));
@@ -944,7 +976,6 @@ namespace WzComparerR2.CharaSimControl
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.fixedPotential, value));
             }
-
             if (Gear.Props.TryGetValue(GearPropType.onlyEquip, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.onlyEquip, value));
@@ -954,7 +985,7 @@ namespace WzComparerR2.CharaSimControl
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.notExtend, value));
             }
 
-            return tags.Count > 0 ? string.Join(", ", tags.ToArray()) : null;
+            return tags;
         }
 
         private Bitmap GetAlienStoneIcon()
