@@ -62,7 +62,7 @@ namespace WzComparerR2.WzLib
                 {
                     if (node.value is Wz_File)
                     {
-                        if (node.text.EndsWith(".wz", StringComparison.CurrentCultureIgnoreCase))
+                        if (node.text.EndsWith(".wz", StringComparison.OrdinalIgnoreCase))
                         {
                             path.Push(node.text.Substring(0, node.text.Length - 3));
                         }
@@ -146,7 +146,7 @@ namespace WzComparerR2.WzLib
 
                     foreach (Wz_Node subNode in node.nodes)
                     {
-                        if (string.Equals(subNode.text, txt, StringComparison.CurrentCultureIgnoreCase))
+                        if (string.Equals(subNode.text, txt, StringComparison.OrdinalIgnoreCase))
                         {
                             find = true;
                             node = subNode;

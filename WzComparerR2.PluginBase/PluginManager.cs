@@ -83,7 +83,7 @@ namespace WzComparerR2.PluginBase
                 foreach (var asm in asmArray)
                 {
                     string asmName = asm.GetName().Name;
-                    if (string.Equals(asmName, "WzComparerR2", StringComparison.CurrentCultureIgnoreCase))
+                    if (string.Equals(asmName, "WzComparerR2", StringComparison.OrdinalIgnoreCase))
                     {
                         return asm.Location;
                     }

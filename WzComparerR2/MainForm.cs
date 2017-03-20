@@ -437,7 +437,7 @@ namespace WzComparerR2
             string aniName = GetSelectedNodeImageName();
 
             //添加到动画控件
-            if (node.Text.EndsWith(".atlas", StringComparison.InvariantCultureIgnoreCase))
+            if (node.Text.EndsWith(".atlas", StringComparison.OrdinalIgnoreCase))
             {
                 var spineData = this.pictureBoxEx1.LoadSpineAnimation(node);
 

@@ -19,8 +19,15 @@ namespace WzComparerR2.Comparer
         public bool IgnoreWzFile { get; set; }
         public bool ResolvePngLink { get; set; }
 
+        private DisposeQueue _disposeQueue;
+        private List<Wz_Image> _currentWzImg = new List<Wz_Image>();
+
         public IEnumerable<CompareDifference> Compare(Wz_Node nodeNew, Wz_Node nodeOld)
         {
+            _currentWzImg.Clear();
+            AppendContext(nodeNew);
+            AppendContext(nodeOld);
+
             var cmp = Compare(
                 nodeNew == null ? null : new WzNodeAgent(nodeNew).Children,
                 nodeOld == null ? null : new WzNodeAgent(nodeOld).Children);
@@ -29,10 +36,18 @@ namespace WzComparerR2.Comparer
             {
                 yield return diff;
             }
+
+
         }
 
         public IEnumerable<CompareDifference> Compare(WzVirtualNode nodeNew, WzVirtualNode nodeOld)
         {
+            _currentWzImg.Clear();
+            foreach (var node in nodeNew.LinkNodes)
+                AppendContext(node);
+            foreach (var node in nodeOld.LinkNodes)
+                AppendContext(node);
+
             var cmp = Compare(
                nodeNew == null ? null : new WzVirtualNodeAgent(nodeNew).Children,
                nodeOld == null ? null : new WzVirtualNodeAgent(nodeOld).Children);
@@ -40,6 +55,15 @@ namespace WzComparerR2.Comparer
             foreach (var diff in cmp)
             {
                 yield return diff;
+            }
+        }
+
+        private void AppendContext(Wz_Node node)
+        {
+            Wz_Image wzImg = node.GetNodeWzImage();
+            if (wzImg != null)
+            {
+                _currentWzImg.Add(wzImg);
             }
         }
 
@@ -212,7 +236,7 @@ namespace WzComparerR2.Comparer
                             {
                                 yield return new CompareDifference(arrayNew[l].LinkNode, arrayOld[r].LinkNode, DifferenceType.Changed);
                             }
-                            
+
                             //对比子集
                             if (CompareChild(arrayNew[l], arrayOld[r]))
                             {
@@ -281,6 +305,21 @@ namespace WzComparerR2.Comparer
             {
                 var linkNode = node.GetLinkedSourceNode(path =>
                     PluginBase.PluginManager.FindWz(path, wzFile));
+
+                //添加回收池机制...
+                if (linkNode != null)
+                {
+                    var linkImg = linkNode.GetNodeWzImage();
+                    if (linkImg != null && !_currentWzImg.Contains(linkImg))
+                    {
+                        if (_disposeQueue == null)
+                        {
+                            _disposeQueue = new DisposeQueue(32);
+                        }
+                        _disposeQueue.Add(linkImg);
+                    }
+                }
+
                 return linkNode.GetValueEx<Wz_Png>(null);
             }
             return null;
@@ -534,5 +573,62 @@ namespace WzComparerR2.Comparer
                 }
             }
         }
+
+        private class DisposeQueue
+        {
+            public DisposeQueue(int maxCount)
+            {
+                this.MaxCount = maxCount;
+                _list = new LinkedList<Wz_Image>();
+                _dict = new Dictionary<Wz_Image, LinkedListNode<Wz_Image>>();
+            }
+
+            public int MaxCount { get; set; }
+
+            private LinkedList<Wz_Image> _list;
+            private Dictionary<Wz_Image, LinkedListNode<Wz_Image>> _dict;
+
+            public void Add(Wz_Image wzImage)
+            {
+                LinkedListNode<Wz_Image> node;
+                if (_dict.TryGetValue(wzImage, out node))
+                {
+                    //提升位置
+                    if (node.Previous != null)
+                    {
+                        _list.Remove(node);
+                        _list.AddFirst(node);
+                    }
+                }
+                else
+                {
+                    //添加item
+                    while (_list.Count >= MaxCount && _list.Count > 0)
+                    {
+                        DisposeLast();
+                    }
+
+                    node = _list.AddFirst(wzImage);
+                    _dict.Add(wzImage, node);
+                }
+            }
+
+            public void DisposeAll()
+            {
+                while(_list.Count > 0)
+                {
+                    DisposeLast();
+                }
+            }
+
+            private void DisposeLast()
+            {
+                var last = _list.Last;
+                last.Value.Unextract();
+                _dict.Remove(last.Value);
+                _list.Remove(last);
+            }
+        }
+
     }
 }

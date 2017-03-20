@@ -268,7 +268,7 @@ namespace WzComparerR2.WzLib
             int cs32 = 0;
             //int offs = 0;
 
-            bool parentBase = parent.Text.Equals("base.wz", StringComparison.CurrentCultureIgnoreCase);
+            bool parentBase = parent.Text.Equals("base.wz", StringComparison.OrdinalIgnoreCase);
 
             int count = ReadInt32();
 
@@ -426,7 +426,7 @@ namespace WzComparerR2.WzLib
             if (this.type == Wz_Type.Unknown) //用文件名来判断
             {
                 string wzName = this.node.Text;
-                int idx = wzName.IndexOf(".wz", StringComparison.CurrentCultureIgnoreCase);
+                int idx = wzName.IndexOf(".wz", StringComparison.OrdinalIgnoreCase);
                 if (idx >= 0)
                 {
                     wzName = wzName.Substring(0, idx);

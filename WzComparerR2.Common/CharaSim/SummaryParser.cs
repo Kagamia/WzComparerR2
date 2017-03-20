@@ -152,7 +152,7 @@ namespace WzComparerR2.CharaSim
             //bool find = false;
             foreach (var kv in dict)
             {
-                if (kv.Key.Equals(key, StringComparison.CurrentCultureIgnoreCase))
+                if (kv.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
                 {
                     value = kv.Value;
                     return true;
