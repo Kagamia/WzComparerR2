@@ -1,4 +1,17 @@
-﻿## 2017.3.15
+﻿
+## 2017.3.20
+
+### Comparer
+- 修复了开启ResolvePngLink会出现OutOfMemoryException的bug，现在在对比中打开的image会自动回收了。
+
+### WzLib
+- 优化了忽略大小写的wz节点搜索方法。
+
+### CharaSim
+- 装备模拟：能量源重新正确的识别了。
+
+
+## 2017.3.15
 
 ### CharaSim
 - 装备模拟：支持识别更多特性，支持多行装备特性的排版。
