@@ -309,6 +309,14 @@ namespace WzComparerR2.CharaSim
                         return (GearType)(code / 100 * 10);
                 }
             }
+            if (code / 10000 == 119)
+            {
+                switch(code / 100)
+                {
+                    case 11902:
+                        return (GearType)(code / 10);
+                }
+            }
             return (GearType)(code / 10000);
         }
 

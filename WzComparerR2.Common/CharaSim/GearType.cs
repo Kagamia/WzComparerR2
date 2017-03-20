@@ -116,6 +116,7 @@ namespace WzComparerR2.CharaSim
         /// 纹章 119
         /// </summary>
         emblem = 119,
+        powerSource = 119020,
         /// <summary>
         /// 裤/裙 106
         /// </summary>

@@ -305,6 +305,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.controller: return "控制器";
                 case GearType.foxPearl: return "狐狸珠";
                 case GearType.chess: return "棋子";
+                case GearType.powerSource: return "能源";
 
                 case GearType.energySword: return "能量剑";
                 case GearType.desperado: return "亡命剑";
@@ -316,6 +317,7 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.GauntletBuster: return "机甲手枪";
                 case GearType.ExplosivePill: return "装弹";
+
                 default: return null;
             }
         }
