@@ -92,10 +92,11 @@ namespace WzComparerR2.CharaSimControl
         /// 表示装备属性额外说明中使用的绿色画刷。
         /// </summary>
         public static readonly Brush GreenBrush2 = new SolidBrush(Color.FromArgb(204, 255, 0));
+        public static readonly Color GrayColor2 = Color.FromArgb(153, 153, 153);
         /// <summary>
         /// 表示用于绘制“攻击力提升”文字的灰色画刷。
         /// </summary>
-        public static readonly Brush GrayBrush2 = new SolidBrush(Color.FromArgb(153, 153, 153));
+        public static readonly Brush GrayBrush2 = new SolidBrush(GrayColor2);
         /// <summary>
         /// 表示套装名字的绿色画刷。
         /// </summary>
@@ -226,6 +227,19 @@ namespace WzComparerR2.CharaSimControl
                 r.WordWrapEnabled = false;
                 r.UseGDIRenderer = false;
                 r.DrawString(g, s, font, x, x1, ref y, height);
+            }
+        }
+
+        public static void DrawPlainText(Graphics g, string s, Font font, Color color, int x, int x1, ref int y, int height)
+        {
+            if (s == null)
+                return;
+
+            using (var r = new FormattedTextRenderer())
+            {
+                r.WordWrapEnabled = false;
+                r.UseGDIRenderer = false;
+                r.DrawPlainText(g, s, font, color, x, x1, ref y, height);
             }
         }
 
@@ -461,6 +475,22 @@ namespace WzComparerR2.CharaSimControl
                 DrawRuns(runs, x, x1, ref y, height);
             }
 
+            public void DrawPlainText(Graphics g, string s, Font font, Color color, int x, int x1, ref int y, int height)
+            {
+                this.g = g;
+                this.font = font;
+                this.sb.Clear();
+                this.sb.EnsureCapacity(s.Length);
+
+                float fontLineHeight = GetFontLineHeight(font);
+                this.infinityRect = new RectangleF(0, 0, ushort.MaxValue, fontLineHeight);
+
+                var runs = ParsePlainText(s, color);
+                runs = runs.SelectMany(run => SplitWords(run)).ToList();
+                MeasureRuns(runs);
+                DrawRuns(runs, x, x1, ref y, height);
+            }
+
             private List<Run> ParseFormat(string format)
             {
                 List<Run> runs = new List<Run>();
@@ -556,6 +586,26 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 flushRun();
+                return runs;
+            }
+
+            private List<Run> ParsePlainText(string text, Color color)
+            {
+                List<Run> runs = new List<Run>();
+                var sr = new System.IO.StringReader(text);
+                for (int row = 0; sr.Peek() > -1; row++)
+                {
+                    if (row > 0)
+                    {
+                        runs.Add(new Run(sb.Length, 0) { IsBreakLine = true });
+                    }
+                    var line = sr.ReadLine();
+                    if (!string.IsNullOrEmpty(line))
+                    {
+                        sb.Append(line);
+                        runs.Add(new Run(sb.Length - line.Length, line.Length) { ForeColor = color });
+                    }
+                }
                 return runs;
             }
 
