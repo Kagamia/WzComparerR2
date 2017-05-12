@@ -1,4 +1,10 @@
 ﻿
+## 2017.5.12
+
+### Comparer
+- 修复了在补丁对比过程中ResolvePngLink无法正常工作的bug。
+
+
 ## 2017.4.25
 
 ### CharaSim

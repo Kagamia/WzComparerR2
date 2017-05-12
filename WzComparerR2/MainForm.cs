@@ -169,36 +169,36 @@ namespace WzComparerR2
             List<Wz_Node> preSearch = new List<Wz_Node>();
             if (e.WzType != Wz_Type.Unknown) //用wztype作为输入参数
             {
-                foreach (Wz_Structure wzs in openedWz)
+                IEnumerable<Wz_Structure> preSearchWz = e.WzFile?.WzStructure != null ?
+                    Enumerable.Repeat(e.WzFile.WzStructure, 1) :
+                    this.openedWz;
+                foreach (var wzs in preSearchWz)
                 {
-                    if (e.WzFile == null || e.WzFile.WzStructure == wzs)
+                    Wz_File baseWz = null;
+                    bool find = false;
+                    foreach (Wz_File wz_f in wzs.wz_files)
                     {
-                        Wz_File baseWz = null;
-                        bool find = false;
-                        foreach (Wz_File wz_f in wzs.wz_files)
+                        if (wz_f.Type == e.WzType)
                         {
-                            if (wz_f.Type == e.WzType)
-                            {
-                                preSearch.Add(wz_f.Node);
-                                find = true;
-                                //e.WzFile = wz_f;
-                            }
-                            if (wz_f.Type == Wz_Type.Base)
-                            {
-                                baseWz = wz_f;
-                            }
+                            preSearch.Add(wz_f.Node);
+                            find = true;
+                            //e.WzFile = wz_f;
                         }
-
-                        // detect data.wz
-                        if (baseWz != null && !find)
+                        if (wz_f.Type == Wz_Type.Base)
                         {
-                            string key = e.WzType.ToString();
-                            foreach (Wz_Node node in baseWz.Node.Nodes)
+                            baseWz = wz_f;
+                        }
+                    }
+
+                    // detect data.wz
+                    if (baseWz != null && !find)
+                    {
+                        string key = e.WzType.ToString();
+                        foreach (Wz_Node node in baseWz.Node.Nodes)
+                        {
+                            if (node.Text == key && node.Nodes.Count > 0)
                             {
-                                if (node.Text == key && node.Nodes.Count > 0)
-                                {
-                                    preSearch.Add(node);
-                                }
+                                preSearch.Add(node);
                             }
                         }
                     }
@@ -214,14 +214,16 @@ namespace WzComparerR2
                 }
                 return;
             }
-            //拼接剩余路径
-            string[] fullPath2 = new string[fullPath.Length - 1];
-            Array.Copy(fullPath, 1, fullPath2, 0, fullPath2.Length);
-
+      
             if (preSearch.Count <= 0)
             {
                 return;
             }
+
+            //拼接剩余路径
+            string[] fullPath2 = new string[fullPath.Length - 1];
+            Array.Copy(fullPath, 1, fullPath2, 0, fullPath2.Length);
+
             foreach (var wzFileNode in preSearch)
             {
                 e.WzNode = wzFileNode.FindNodeByPath(true, true, fullPath2);

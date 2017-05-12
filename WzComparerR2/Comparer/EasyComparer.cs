@@ -382,7 +382,8 @@ namespace WzComparerR2.Comparer
             }
             StateDetail = "正在输出对比报告";
             sw.WriteLine("<table class=\"img\">");
-            sw.WriteLine("<tr><th colspan=\"3\"><a name=\"{1}\">{0}</a> 修改:{2} 新增:{3} 移除:{4}</th></tr>", imgName, anchorName, count[0], count[1], count[2]);
+            sw.WriteLine("<tr><th class=\"{5}\" colspan=\"3\"><a name=\"{1}\">{0}</a> 修改:{2} 新增:{3} 移除:{4}</th></tr>",
+                imgName, anchorName, count[0], count[1], count[2], count.Any(c => c > 0) ? "" : "noChange");
             sw.WriteLine(sb.ToString());
             sw.WriteLine("<tr><td colspan=\"3\"><a href=\"#{1}\">{0}</a></td></tr>", "回到目录", menuAnchorName);
             sw.WriteLine("</table>");
@@ -511,6 +512,7 @@ namespace WzComparerR2.Comparer
             sw.WriteLine("p.wzf { }");
             sw.WriteLine("table, tr, th, td { border:1px solid #ff8000; border-collapse:collapse; }");
             sw.WriteLine("th { text-align:left; }");
+            sw.WriteLine("th.noChange { color:#aaa; }");
             sw.WriteLine("table.lst0 { }");
             sw.WriteLine("table.lst1 { }");
             sw.WriteLine("table.lst2 { }");
