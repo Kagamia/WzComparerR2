@@ -265,7 +265,6 @@ namespace WzComparerR2.Comparer
                     sw.WriteLine("<tr><th>{0}共{1}项</th></tr>", diffStr[i], count[i]);
                     sw.Write(sb[i].ToString());
                     sw.WriteLine("</table>");
-                    sw.WriteLine("<br />");
                     sb[i] = null;
                     count[i] = 0;
                 }
@@ -381,13 +380,13 @@ namespace WzComparerR2.Comparer
                 count[idx]++;
             }
             StateDetail = "正在输出对比报告";
-            sw.WriteLine("<table class=\"img\">");
-            sw.WriteLine("<tr><th class=\"{5}\" colspan=\"3\"><a name=\"{1}\">{0}</a> 修改:{2} 新增:{3} 移除:{4}</th></tr>",
-                imgName, anchorName, count[0], count[1], count[2], count.Any(c => c > 0) ? "" : "noChange");
+            bool noChange = diffList.Count <= 0;
+            sw.WriteLine("<table class=\"img{0}\">", noChange ? " noChange" : "");
+            sw.WriteLine("<tr><th colspan=\"3\"><a name=\"{1}\">{0}</a> 修改:{2} 新增:{3} 移除:{4}</th></tr>",
+                imgName, anchorName, count[0], count[1], count[2]);
             sw.WriteLine(sb.ToString());
             sw.WriteLine("<tr><td colspan=\"3\"><a href=\"#{1}\">{0}</a></td></tr>", "回到目录", menuAnchorName);
             sw.WriteLine("</table>");
-            sw.WriteLine("<br />");
             imgNew.Unextract();
             imgOld.Unextract();
             sb = null;
@@ -439,7 +438,6 @@ namespace WzComparerR2.Comparer
             fnOutput(img.Node);
             sw.WriteLine("<tr><td colspan=\"2\"><a href=\"#{1}\">{0}</a></td></tr>", "回到目录", menuAnchorName);
             sw.WriteLine("</table>");
-            sw.WriteLine("<br />");
             img.Unextract();
         }
 
@@ -511,8 +509,8 @@ namespace WzComparerR2.Comparer
             sw.WriteLine("body { font-size:12px; }");
             sw.WriteLine("p.wzf { }");
             sw.WriteLine("table, tr, th, td { border:1px solid #ff8000; border-collapse:collapse; }");
+            sw.WriteLine("table { margin-bottom:16px; }");
             sw.WriteLine("th { text-align:left; }");
-            sw.WriteLine("th.noChange { color:#aaa; }");
             sw.WriteLine("table.lst0 { }");
             sw.WriteLine("table.lst1 { }");
             sw.WriteLine("table.lst2 { }");
@@ -520,6 +518,7 @@ namespace WzComparerR2.Comparer
             sw.WriteLine("table.img tr.r0 { background-color:#fff4c4; }");
             sw.WriteLine("table.img tr.r1 { background-color:#ebf2f8; }");
             sw.WriteLine("table.img tr.r2 { background-color:#ffffff; }");
+            sw.WriteLine("table.img.noChange { display:none; }");
             sw.Flush();
             sw.Close();
         }

@@ -177,8 +177,9 @@ namespace WzComparerR2.Comparer
                             {
                                 ComparableNode nodeNew = arrayNew[l],
                                     nodeOld = arrayOld[r];
-                                bool linkNew = IsLinkedPng(nodeNew),
-                                    linkOld = IsLinkedPng(nodeOld);
+                                PngLinkInfo linkInfoNew, linkInfoOld;
+                                bool linkNew = TryGetLink(nodeNew, out linkInfoNew),
+                                    linkOld = TryGetLink(nodeOld, out linkInfoOld);
 
                                 if (linkNew && !linkOld && nodeOld.Value is Wz_Png) //图片转化为link
                                 {
@@ -214,19 +215,27 @@ namespace WzComparerR2.Comparer
                                 }
                                 else if (linkNew && linkOld) //两边都是link
                                 {
-                                    var newPng = GetLinkedPng(nodeNew.LinkNode);
-                                    var oldPng = GetLinkedPng(nodeOld.LinkNode);
-                                    if (newPng != null && oldPng != null)
+                                    if (linkInfoNew.LinkType == linkInfoOld.LinkType 
+                                        && linkInfoNew.LinkUrl == linkInfoOld.LinkUrl) //link没有变动
                                     {
-                                        if (newPng != oldPng && !CompareData(newPng, oldPng)) //对比有差异 不输出dummy
-                                        {
-                                            //yield return new CompareDifference(nodeNew.LinkNode, nodeOld.LinkNode, DifferenceType.Changed);
-                                        }
-                                        else
-                                        {
-                                            linkFilter = true;
-                                        }
                                         compared = true;
+                                    }
+                                    else
+                                    {
+                                        var newPng = GetLinkedPng(nodeNew.LinkNode);
+                                        var oldPng = GetLinkedPng(nodeOld.LinkNode);
+                                        if (newPng != null && oldPng != null)
+                                        {
+                                            if (newPng != oldPng && !CompareData(newPng, oldPng)) //对比有差异 不输出dummy
+                                            {
+                                                //yield return new CompareDifference(nodeNew.LinkNode, nodeOld.LinkNode, DifferenceType.Changed);
+                                            }
+                                            else
+                                            {
+                                                linkFilter = true;
+                                            }
+                                            compared = true;
+                                        }
                                     }
                                 }
                             }
@@ -288,12 +297,26 @@ namespace WzComparerR2.Comparer
             return true;
         }
 
-        private bool IsLinkedPng(ComparableNode node)
+        private bool TryGetLink(ComparableNode node, out PngLinkInfo linkInfo)
         {
+            linkInfo = new PngLinkInfo();
             var png = node.Value as Wz_Png;
             if (png != null && png.Width == 1 && png.Height == 1)
             {
-                return node.Children.Any(child => child.Name == "_inlink" || child.Name == "_outlink");
+                var node1 = node.LinkNode;
+                WzLib.Wz_Node linkNode;
+                if ((linkNode = node1.Nodes["_inlink"]) != null)
+                {
+                    linkInfo.LinkType = PngLinkType.Inlink;
+                    linkInfo.LinkUrl = linkNode.GetValue<string>();
+                    return true;
+                }
+                else if ((linkNode = node1.Nodes["_outlink"]) != null)
+                {
+                    linkInfo.LinkType = PngLinkType.Inlink;
+                    linkInfo.LinkUrl = linkNode.GetValue<string>();
+                    return true;
+                }
             }
             return false;
         }
@@ -316,7 +339,7 @@ namespace WzComparerR2.Comparer
                         {
                             _disposeQueue = new DisposeQueue(32);
                         }
-                        _disposeQueue.Add(linkImg);
+                        _disposeQueue.Add(linkImg, _currentWzImg);
                     }
                 }
 
@@ -590,6 +613,11 @@ namespace WzComparerR2.Comparer
 
             public void Add(Wz_Image wzImage)
             {
+                Add(wzImage, null);
+            }
+
+            public void Add(Wz_Image wzImage, List<Wz_Image> currentImages)
+            {
                 LinkedListNode<Wz_Image> node;
                 if (_dict.TryGetValue(wzImage, out node))
                 {
@@ -605,7 +633,7 @@ namespace WzComparerR2.Comparer
                     //添加item
                     while (_list.Count >= MaxCount && _list.Count > 0)
                     {
-                        DisposeLast();
+                        DisposeLast(currentImages);
                     }
 
                     node = _list.AddFirst(wzImage);
@@ -623,12 +651,32 @@ namespace WzComparerR2.Comparer
 
             private void DisposeLast()
             {
+                this.DisposeLast(null);
+            }
+
+            private void DisposeLast(List<Wz_Image> currentImages)
+            {
                 var last = _list.Last;
-                last.Value.Unextract();
+                if (currentImages == null || !currentImages.Contains(last.Value))
+                {
+                    last.Value.Unextract();
+                }
                 _dict.Remove(last.Value);
                 _list.Remove(last);
             }
         }
 
+        private struct PngLinkInfo
+        {
+            public PngLinkType LinkType { get; set; }
+            public string LinkUrl { get; set; }
+        }
+
+        private enum PngLinkType
+        {
+            None = 0,
+            Inlink = 1,
+            Outlink = 2
+        }
     }
 }

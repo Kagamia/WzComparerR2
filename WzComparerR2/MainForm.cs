@@ -220,19 +220,28 @@ namespace WzComparerR2
                 return;
             }
 
-            //拼接剩余路径
-            string[] fullPath2 = new string[fullPath.Length - 1];
-            Array.Copy(fullPath, 1, fullPath2, 0, fullPath2.Length);
-
             foreach (var wzFileNode in preSearch)
             {
-                e.WzNode = wzFileNode.FindNodeByPath(true, true, fullPath2);
-                if (e.WzNode != null)
+                var searchNode = wzFileNode;
+                for (int i = 1; i < fullPath.Length && searchNode != null; i++)
                 {
+                    searchNode = searchNode.Nodes[fullPath[i]];
+                    var img = searchNode.GetValueEx<Wz_Image>(null);
+                    if (img != null)
+                    {
+                        searchNode = img.TryExtract() ? img.Node : null;
+                    }
+                }
+
+                if (searchNode != null)
+                {
+                    e.WzNode = searchNode;
                     e.WzFile = wzFileNode.Value as Wz_File;
                     return;
                 }
             }
+            //寻找失败
+            e.WzNode = null;
         }
 
         #region 界面主题配置
