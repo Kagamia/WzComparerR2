@@ -106,7 +106,7 @@ namespace WzComparerR2.WzLib
         public static Encoding DefaultEncoding
         {
             get { return _defaultEncoding ?? Encoding.Default; }
-            set { _defaultEncoding = null; }
+            set { _defaultEncoding = value; }
         }
 
         private static Encoding _defaultEncoding;
