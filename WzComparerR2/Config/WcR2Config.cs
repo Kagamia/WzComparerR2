@@ -57,6 +57,9 @@ namespace WzComparerR2.Config
             set { this["comparerOutputFolder"] = value; }
         }
 
+        /// <summary>
+        /// 获取或设置一个值，指示Wz文件加载后是否自动排序。
+        /// </summary>
         [ConfigurationProperty("sortWzOnOpened")]
         public ConfigItem<bool> SortWzOnOpened
         {
@@ -64,8 +67,18 @@ namespace WzComparerR2.Config
             set { this["sortWzOnOpened"] = value; }
         }
 
+        /// <summary>
+        /// 获取或设置一个值，指示Wz文件加载后是否自动排序。
+        /// </summary>
+        [ConfigurationProperty("wzEncoding")]
+        public ConfigItem<int> WzEncoding
+        {
+            get { return (ConfigItem<int>)this["wzEncoding"]; }
+            set { this["wzEncoding"] = value; }
+        }
+
         [ConfigurationProperty("patcherSettings")]
-        [ConfigurationCollection(typeof(PatcherSetting),CollectionType = ConfigurationElementCollectionType.AddRemoveClearMap)]
+        [ConfigurationCollection(typeof(PatcherSetting), CollectionType = ConfigurationElementCollectionType.AddRemoveClearMap)]
         public PatcherSettingCollection PatcherSettings
         {
             get { return (PatcherSettingCollection)this["patcherSettings"]; }

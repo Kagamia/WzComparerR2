@@ -144,7 +144,7 @@
             this.galleryContainerRecent = new DevComponents.DotNetBar.GalleryContainer();
             this.labelItem8 = new DevComponents.DotNetBar.LabelItem();
             this.itemContainer4 = new DevComponents.DotNetBar.ItemContainer();
-            this.buttonItem12 = new DevComponents.DotNetBar.ButtonItem();
+            this.btnItemOptions = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItem13 = new DevComponents.DotNetBar.ButtonItem();
             this.styleManager1 = new DevComponents.DotNetBar.StyleManager(this.components);
             this.colorPickerDropDown1 = new DevComponents.DotNetBar.ColorPickerDropDown();
@@ -1644,20 +1644,21 @@
             this.itemContainer4.HorizontalItemAlignment = DevComponents.DotNetBar.eHorizontalItemsAlignment.Right;
             this.itemContainer4.Name = "itemContainer4";
             this.itemContainer4.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.buttonItem12,
+            this.btnItemOptions,
             this.buttonItem13});
             // 
             // 
             // 
             this.itemContainer4.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             // 
-            // buttonItem12
+            // btnItemOptions
             // 
-            this.buttonItem12.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText;
-            this.buttonItem12.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.buttonItem12.Name = "buttonItem12";
-            this.buttonItem12.SubItemsExpandWidth = 24;
-            this.buttonItem12.Text = "Opt&ions";
+            this.btnItemOptions.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText;
+            this.btnItemOptions.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnItemOptions.Name = "buttonItem12";
+            this.btnItemOptions.SubItemsExpandWidth = 24;
+            this.btnItemOptions.Text = "Opt&ions";
+            this.btnItemOptions.Click += new System.EventHandler(btnItemOptions_Click);
             // 
             // buttonItem13
             // 
@@ -2923,7 +2924,7 @@
         private DevComponents.DotNetBar.GalleryContainer galleryContainerRecent;
         private DevComponents.DotNetBar.LabelItem labelItem8;
         private DevComponents.DotNetBar.ItemContainer itemContainer4;
-        private DevComponents.DotNetBar.ButtonItem buttonItem12;
+        private DevComponents.DotNetBar.ButtonItem btnItemOptions;
         private DevComponents.DotNetBar.ButtonItem buttonItem13;
         private DevComponents.DotNetBar.RibbonTabItem ribbonTabItem1;
         private DevComponents.DotNetBar.RibbonTabItem ribbonTabItem2;

@@ -118,6 +118,8 @@ namespace WzComparerR2
             refreshRecentDocItems();
             //读取CharaSim配置
             UpdateCharaSimSettings();
+            //wz加载配置
+            UpdateWzLoadingSettings();
 
             //杂项配置
             labelItemAutoSaveFolder.Text = ImageHandlerConfig.Default.AutoSavePictureFolder;
@@ -148,6 +150,21 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
             tooltipQuickView.ItemRender.LinkRecipeItem = Setting.Item.LinkRecipeItem;
             tooltipQuickView.RecipeRender.ShowObjectID = Setting.Recipe.ShowID;
+        }
+
+        void UpdateWzLoadingSettings()
+        {
+            var config = WcR2Config.Default;
+            Encoding enc;
+            try
+            {
+                enc = Encoding.GetEncoding(config.WzEncoding);
+            }
+            catch
+            {
+                enc = null;
+            }
+            Wz_Structure.DefaultEncoding = enc;
         }
 
         void CharaSimLoader_WzFileFinding(object sender, FindWzEventArgs e)
@@ -2912,9 +2929,17 @@ namespace WzComparerR2
             System.Diagnostics.Process.Start("https://github.com/Kagamia/WzComparerR2/releases");
         }
 
-        private void ButtonItem12_Click(object sender, System.EventArgs e)
+        private void btnItemOptions_Click(object sender, System.EventArgs e)
         {
-            
+            var frm = new FrmOptions();
+            frm.Load(WcR2Config.Default);
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                ConfigManager.Reload();
+                frm.Save(WcR2Config.Default);
+                ConfigManager.Save();
+                UpdateWzLoadingSettings();
+            }
         }
     }
 

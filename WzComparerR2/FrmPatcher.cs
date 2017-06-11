@@ -115,6 +115,12 @@ namespace WzComparerR2
             {
                 patchThread.Abort();
             }
+            ConfigManager.Reload();
+            WcR2Config.Default.PatcherSettings.Clear();
+            foreach (PatcherSetting item in comboBoxEx1.Items)
+            {
+                WcR2Config.Default.PatcherSettings.Add(item);
+            }
             ConfigManager.Save();
         }
 
