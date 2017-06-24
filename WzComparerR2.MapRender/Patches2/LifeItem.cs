@@ -9,7 +9,7 @@ namespace WzComparerR2.MapRender.Patches2
     public class LifeItem : SceneItem
     {
         public int ID { get; set; }
-        public string Type { get; set; }
+        public LifeType Type { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
         public int MobTime { get; set; }
@@ -22,12 +22,14 @@ namespace WzComparerR2.MapRender.Patches2
 
         public ItemView View { get; set; }
 
+        public LifeInfo LifeInfo { get; set; }
+
         public static LifeItem LoadFromNode(Wz_Node node)
         {
             var item = new LifeItem()
             {
                 ID = node.Nodes["id"].GetValueEx(0),
-                Type = node.Nodes["type"].GetValueEx<string>(null),
+                Type = ParseLifeType(node.Nodes["type"].GetValueEx<string>(null)),
                 X = node.Nodes["x"].GetValueEx(0),
                 Y = node.Nodes["y"].GetValueEx(0),
                 MobTime = node.Nodes["mobTime"].GetValueEx(0),
@@ -39,6 +41,16 @@ namespace WzComparerR2.MapRender.Patches2
                 Rx1 = node.Nodes["rx1"].GetValueEx(0)
             };
             return item;
+        }
+
+        private static LifeType ParseLifeType(string text)
+        {
+            switch (text)
+            {
+                case "m": return LifeType.Mob;
+                case "n": return LifeType.Npc;
+                default: return LifeType.Unknown;
+            }
         }
 
         public class ItemView
@@ -53,5 +65,13 @@ namespace WzComparerR2.MapRender.Patches2
             /// </summary>
             public object Animator { get; set; }
         }
+
+        public enum LifeType
+        {
+            Unknown = 0,
+            Mob = 1,
+            Npc = 2
+        }
+
     }
 }

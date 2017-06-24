@@ -261,9 +261,10 @@ namespace WzComparerR2.MapRender
                 default:
                 case 0:
                 case 1:
+                case 2:
                     windowForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
                     break;
-                case 2:
+                case 3:
                     windowForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
                     break;
             }
@@ -443,7 +444,7 @@ namespace WzComparerR2.MapRender
 
             if (input.IsAltPressing && input.IsKeyDown(Keys.Enter))
             {
-                camera.DisplayMode = (camera.DisplayMode + 1) % 3;
+                camera.DisplayMode = (camera.DisplayMode + 1) % 4;
                 this.ChangeDisplayMode(camera.DisplayMode);
             }
 

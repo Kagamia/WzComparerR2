@@ -90,7 +90,7 @@ namespace WzComparerR2.Rendering
                 }
                 else if (c == '\n') //换行符
                 {
-                    dy += font.BaseFont.Height;
+                    dy += font.Height;
                     dx = location.X;
                     continue;
                 }
@@ -164,6 +164,20 @@ namespace WzComparerR2.Rendering
             base.Draw(singlePixel, rectangle, color);
         }
 
+        public void FillRoundCornerRectangle(Rectangle rectangle, Color color)
+        {
+            if (rectangle.Width > 2 && rectangle.Height > 2)
+            {
+                base.Draw(singlePixel, new Rectangle(rectangle.X + 1, rectangle.Y, rectangle.Width - 2, 1), color);
+                base.Draw(singlePixel, new Rectangle(rectangle.X, rectangle.Y + 1, rectangle.Width, rectangle.Height - 2), color);
+                base.Draw(singlePixel, new Rectangle(rectangle.X + 1, rectangle.Bottom - 1, rectangle.Width - 2, 1), color);
+            }
+            else
+            {
+                base.Draw(singlePixel, rectangle, color);
+            }
+        }
+
         public void DrawRectangle(Rectangle rectangle, Color color)
         {
             if (!rectangle.IsEmpty)
@@ -184,8 +198,9 @@ namespace WzComparerR2.Rendering
             {
                 float length = Vector2.Distance(new Vector2(point1.X, point1.Y), new Vector2(point2.X, point2.Y));
                 Rectangle dest = new Rectangle(point1.X, point1.Y, (int)length, width);
+                Vector2 origin = new Vector2(0, 0.5f);
                 float rot = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
-                this.Draw(this.singlePixel, dest, null, color, rot, Vector2.Zero, SpriteEffects.None, 0);
+                this.Draw(this.singlePixel, dest, null, color, rot, origin, SpriteEffects.None, 0);
             }
         }
         

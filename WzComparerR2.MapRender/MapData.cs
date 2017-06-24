@@ -18,6 +18,7 @@ namespace WzComparerR2.MapRender
         public MapData()
         {
             this.Scene = new MapScene();
+            this.MiniMap = new MiniMap();
         }
 
         #region 基本信息
@@ -35,15 +36,10 @@ namespace WzComparerR2.MapRender
         public bool HideMinimap { get; set; }
         public int FieldLimit { get; set; }
 
-        public MiniMap Minimap { get; set; }
+        public MiniMap MiniMap { get; private set; }
         #endregion
 
-        #region 绘图资源
-        public Texture2D MapMarkIcon { get; set; }
-        #endregion 
-
         public MapScene Scene { get; private set; }
-
 
         public void Load(Wz_Node mapImgNode, ResourceLoader resLoader)
         {
@@ -63,8 +59,22 @@ namespace WzComparerR2.MapRender
                 throw new Exception("Cannot find or extract map link node.");
             }
 
-            //加载地图元件
+            //加载小地图
             Wz_Node node;
+            if (!string.IsNullOrEmpty(this.MapMark))
+            {
+                node = PluginManager.FindWz("Map\\MapHelper.img\\mark\\" + this.MapMark);
+                if (node != null)
+                {
+                    this.MiniMap.MapMark = resLoader.Load<Texture2D>(node);
+                }
+            }
+            if ((node = mapImgNode.Nodes["miniMap"]) != null)
+            {
+                LoadMinimap(node, resLoader);
+            }
+
+            //加载地图元件
             if ((node = mapImgNode.Nodes["back"]) != null)
             {
                 LoadBack(node);
@@ -101,8 +111,15 @@ namespace WzComparerR2.MapRender
             }
             if ((node = mapImgNode.Nodes["ladderRope"]) != null)
             {
-
+                LoadLadderRope(node);
             }
+            if ((node = mapImgNode.Nodes["skyWhale"]) != null)
+            {
+                LoadSkyWhale(node);
+            }
+
+            //计算地图大小
+            CalcMapSize();
         }
 
         private void LoadIDOrName(Wz_Node mapImgNode)
@@ -135,6 +152,27 @@ namespace WzComparerR2.MapRender
             this.ReturnMap = infoNode.Nodes["returnMap"].GetValueEx<int>();
             this.HideMinimap = infoNode.Nodes["hideMinimap"].GetValueEx(false);
             this.FieldLimit = infoNode.Nodes["fieldLimit"].GetValueEx(0);
+        }
+
+        private void LoadMinimap(Wz_Node miniMapNode, ResourceLoader resLoader)
+        {
+            Wz_Node canvas = miniMapNode.FindNodeByPath("canvas"),
+                   width = miniMapNode.FindNodeByPath("width"),
+                   height = miniMapNode.FindNodeByPath("height"),
+                   centerX = miniMapNode.FindNodeByPath("centerX"),
+                   centerY = miniMapNode.FindNodeByPath("centerY"),
+                   mag = miniMapNode.FindNodeByPath("mag");
+
+            Wz_Png _canvas = canvas.GetValueEx<Wz_Png>(null);
+            if (canvas != null)
+            {
+                this.MiniMap.Canvas = resLoader.Load<Texture2D>(canvas);
+            }
+            this.MiniMap.Width = width.GetValueEx(0);
+            this.MiniMap.Height = height.GetValueEx(0);
+            this.MiniMap.CenterX = centerX.GetValueEx(0);
+            this.MiniMap.CenterY = centerY.GetValueEx(0);
+            this.MiniMap.Mag = mag.GetValueEx(0);
         }
 
         private void LoadBack(Wz_Node backNode)
@@ -252,6 +290,72 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        private void LoadLadderRope(Wz_Node ladderRopeNode)
+        {
+            foreach (var node in ladderRopeNode.Nodes)
+            {
+                var item = LadderRopeItem.LoadFromNode(node);
+                item.Name = $"ladderRope_{node.Text}";
+                item.Index = int.Parse(node.Text);
+
+                Scene.Fly.LadderRope.Slots.Add(item);
+            }
+        }
+
+        private void LoadSkyWhale(Wz_Node skyWhaleNode)
+        {
+            foreach (var node in skyWhaleNode.Nodes)
+            {
+                var item = SkyWhaleItem.LoadFromNode(node);
+                item.Name = node.Text;
+                Scene.Fly.SkyWhale.Slots.Add(item);
+            }
+        }
+
+        private void CalcMapSize()
+        {
+            if (!this.VRect.IsEmpty)
+            {
+                return;
+            }
+
+            var rect = Rectangle.Empty;
+            
+            foreach(LayerNode layer in this.Scene.Layers.Nodes)
+            {
+                foreach (ContainerNode<FootholdItem> item in layer.Foothold.Nodes)
+                {
+                    var fh = item.Item;
+                    var fhRect = new Rectangle(fh.X1, fh.Y1, fh.X2 - fh.X1, fh.Y2 - fh.Y1);
+                    if (rect.IsEmpty)
+                    {
+                        rect = fhRect;
+                    }
+                    else
+                    {
+                        Rectangle.Union(ref rect, ref fhRect, out rect);
+                    }
+                }
+            }
+
+            foreach (LadderRopeItem item in this.Scene.Fly.LadderRope.Slots)
+            {
+                var lrRect = new Rectangle(item.X, item.Y1, 1, item.Y2 - item.Y1);
+                if (rect.IsEmpty)
+                {
+                    rect = lrRect;
+                }
+                else
+                {
+                    Rectangle.Union(ref rect, ref lrRect, out rect);
+                }
+            }
+
+            rect.Y -= 300;
+            rect.Height += 600;
+            this.VRect = rect;
+        }
+
         private ContainerNode<FootholdItem> FindFootholdByID(int fhID)
         {
             return this.Scene.Layers.Nodes.OfType<LayerNode>()
@@ -309,7 +413,6 @@ namespace WzComparerR2.MapRender
             loadFunc(this.Scene);
         }
 
-
         private void PreloadResource(ResourceLoader resLoader, BackItem back)
         {
             string aniDir;
@@ -354,12 +457,17 @@ namespace WzComparerR2.MapRender
             string path;
             switch (life.Type)
             {
-                case "m":
+                case LifeItem.LifeType.Mob:
                     path = $@"Mob\{life.ID:D7}.img";
                     var mobNode = PluginManager.FindWz(path);
 
-                    //TODO: 加载mob数据
+                    //加载mob数据
+                    if (mobNode != null)
+                    {
+                        life.LifeInfo = LifeInfo.CreateFromNode(mobNode);
+                    }
 
+                    //获取link
                     int? mobLink = mobNode?.FindNodeByPath(@"info\link").GetValueEx<int>();
                     if (mobLink != null)
                     {
@@ -377,6 +485,7 @@ namespace WzComparerR2.MapRender
                         var aniItem = this.CreateSMAnimator(mobNode, resLoader);
                         if (aniItem != null)
                         {
+                            AddMobAI(aniItem);
                             life.View = new LifeItem.ItemView()
                             {
                                 Animator = aniItem
@@ -385,7 +494,7 @@ namespace WzComparerR2.MapRender
                     }
                     break;
 
-                case "n":
+                case LifeItem.LifeType.Npc:
                     path = $@"Npc\{life.ID:D7}.img";
                     var npcNode = PluginManager.FindWz(path);
 
@@ -407,6 +516,7 @@ namespace WzComparerR2.MapRender
                         var aniItem = this.CreateSMAnimator(npcNode, resLoader);
                         if (aniItem != null)
                         {
+                            AddNpcAI(aniItem);
                             life.View = new LifeItem.ItemView()
                             {
                                 Animator = aniItem
@@ -478,6 +588,7 @@ namespace WzComparerR2.MapRender
 
             portal.View = view;
         }
+
         private void PreloadResource(ResourceLoader resLoader, ReactorItem reactor)
         {
             string path = $@"Reactor\{reactor.ID:D7}.img";
@@ -501,7 +612,7 @@ namespace WzComparerR2.MapRender
                 if (ani != null)
                 {
                     var ani2 = new RepeatableFrameAnimationData(ani.Frames);
-                    ani2.Repeat = ani.Repeat ?? false; //默认不循环
+                    ani2.Repeat = ani.Repeat ?? true; //默认循环
                     aniData.Add(i.ToString(), ani2);
                 }
 
@@ -576,6 +687,31 @@ namespace WzComparerR2.MapRender
                 return animator;
             }
             return null;
+        }
+
+        private void AddMobAI(StateMachineAnimator ani)
+        {
+            ani.AnimationEnd += (o, e) =>
+            {
+                if (e.CurrentState == "regen" && ani.Data.States.Contains("stand"))
+                {
+                    e.NextState = "stand";
+                }
+            };
+        }
+
+        private void AddNpcAI(StateMachineAnimator ani)
+        {
+            Random r = new Random();
+            var actions = new[] { "stand", "say", "mouse", "move", "hand", "laugh", "eye" };
+            var availActions = ani.Data.States.Where(act => actions.Contains(act)).ToArray();
+            if (availActions.Length > 0)
+            {
+                ani.AnimationEnd += (o, e) =>
+                {
+                    e.NextState = availActions[r.Next(availActions.Length)];
+                };
+            }
         }
 
         public static bool FindMapByID(int mapID, out Wz_Node mapImgNode)

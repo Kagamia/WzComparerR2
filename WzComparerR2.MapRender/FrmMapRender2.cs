@@ -5,32 +5,76 @@ using System.Linq;
 using System.Threading.Tasks;
 using WzComparerR2.WzLib;
 using WzComparerR2.PluginBase;
+using WzComparerR2.Common;
+using WzComparerR2.Rendering;
+using WzComparerR2.MapRender.Patches2;
+using WzComparerR2.MapRender.UI;
+using WzComparerR2.Animation;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using WzComparerR2.Rendering;
-using WzComparerR2.MapRender.Patches2;
-using WzComparerR2.Animation;
+
 using System.Runtime.InteropServices;
+
+using Form = System.Windows.Forms.Form;
+#region USING_EK
+using KeyBinding = EmptyKeys.UserInterface.Input.KeyBinding;
+using RelayCommand = EmptyKeys.UserInterface.Input.RelayCommand;
+using KeyGesture = EmptyKeys.UserInterface.Input.KeyGesture;
+using KeyCode = EmptyKeys.UserInterface.Input.KeyCode;
+using ModifierKeys = EmptyKeys.UserInterface.Input.ModifierKeys;
+#endregion
 
 namespace WzComparerR2.MapRender
 {
-    public class FrmMapRender2 : Game
+    public partial class FrmMapRender2 : Game
     {
         public FrmMapRender2(Wz_Image img)
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.DeviceCreated += Graphics_DeviceCreated;
             this.mapImg = img;
             this.MaxElapsedTime = TimeSpan.MaxValue;
             this.IsFixedTimeStep = false;
             this.TargetElapsedTime = TimeSpan.FromSeconds(1.0 / 60);
             this.InactiveSleepTime = TimeSpan.FromSeconds(1.0 / 30);
-            graphics.PreferredBackBufferWidth = 1024;
-            graphics.PreferredBackBufferHeight = 768;
             this.IsMouseVisible = true;
 
+            this.Content = new WcR2ContentManager(this.Services);
+            this.patchVisibility = new PatchVisibility();
+            this.patchVisibility.FootHoldVisible = false;
+            this.patchVisibility.LadderRopeVisible = false;
+            this.patchVisibility.SkyWhaleVisible = false;
             GameExt.FixKeyboard(this);
+
+            var form = Form.FromHandle(this.Window.Handle) as Form;
+            form.Load += Form_Load;
+            form.FormClosed += Form_FormClosed;
         }
+
+        private void Form_Load(object sender, EventArgs e)
+        {
+            var form = (Form)sender;
+            form.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
+            form.SetDesktopLocation(0, 0);
+        }
+
+        private void Form_FormClosed(object sender, System.Windows.Forms.FormClosedEventArgs e)
+        {
+            GameExt.EnsureGameExit(this);
+        }
+
+        private void Graphics_DeviceCreated(object sender, EventArgs e)
+        {
+            this.engine = new WcR2Engine(this.GraphicsDevice,
+                graphics.PreferredBackBufferWidth,
+                graphics.PreferredBackBufferHeight);
+
+            WcR2Engine.FixEKBugs();
+        }
+
+        public StringLinker StringLinker { get; set; }
 
         GraphicsDeviceManager graphics;
         Wz_Image mapImg;
@@ -39,19 +83,29 @@ namespace WzComparerR2.MapRender
         MapData mapData;
         ResourceLoader resLoader;
         MeshBatcher batcher;
+        PatchVisibility patchVisibility;
 
         bool prepareCapture;
         Task captureTask;
+        Resolution resolution;
 
-        List<Tuple<string, Rectangle>> allItems = new List<Tuple<string, Rectangle>>();
+        List<ItemRect> allItems = new List<ItemRect>();
+        MapRenderUIRoot ui;
+        Tooltip2 tooltip;
+        WcR2Engine engine;
+        Music bgm;
 
         protected override void Initialize()
         {
-            base.Initialize();
             this.renderEnv = new RenderEnv(this, this.graphics);
             this.batcher = new MeshBatcher(this.GraphicsDevice);
-
-            this.renderEnv.Camera.WorldRect = mapData.VRect;
+            this.ui = new MapRenderUIRoot();
+            this.ui.LoadContents(this.Content);
+            this.BindingUIInput();
+            this.tooltip = new Tooltip2(this.GraphicsDevice);
+            this.tooltip.StringLinker = this.StringLinker;
+            SwitchResolution(Resolution.Window_800_600);
+            base.Initialize();
         }
 
         protected override void OnActivated(object sender, EventArgs args)
@@ -64,165 +118,389 @@ namespace WzComparerR2.MapRender
             base.OnDeactivated(sender, args);
         }
 
+        private void BindingUIInput()
+        {
+            //键盘事件
+            //切换分辨率
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => SwitchResolution()), KeyCode.Enter, ModifierKeys.Alt));
+
+            //开关小地图
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.ui.Minimap.Toggle()), KeyCode.M, ModifierKeys.None) { IsRepeatEnabled = true });
+
+            //截图
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => { if (CanCapture()) prepareCapture = true; }), KeyCode.Scroll, ModifierKeys.None));
+
+            //层隐藏
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.patchVisibility.BackVisible = !this.patchVisibility.BackVisible), KeyCode.D1, ModifierKeys.Control));
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.patchVisibility.ReactorVisible = !this.patchVisibility.ReactorVisible), KeyCode.D2, ModifierKeys.Control));
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.patchVisibility.ObjVisible = !this.patchVisibility.ObjVisible), KeyCode.D3, ModifierKeys.Control));
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.patchVisibility.TileVisible = !this.patchVisibility.TileVisible), KeyCode.D4, ModifierKeys.Control));
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.patchVisibility.NpcVisible = !this.patchVisibility.NpcVisible), KeyCode.D5, ModifierKeys.Control));
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.patchVisibility.MobVisible = !this.patchVisibility.MobVisible), KeyCode.D6, ModifierKeys.Control));
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ =>
+            {
+                var visible = this.patchVisibility.FootHoldVisible;
+                this.patchVisibility.FootHoldVisible = !visible;
+                this.patchVisibility.LadderRopeVisible = !visible;
+                this.patchVisibility.SkyWhaleVisible = !visible;
+            }), KeyCode.D7, ModifierKeys.Control));
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ =>
+            {
+                var portals = this.mapData.Scene.Descendants().OfType<ContainerNode>().SelectMany(container => container.Slots).OfType<PortalItem>();
+                if (!this.patchVisibility.PortalVisible)
+                {
+                    this.patchVisibility.PortalVisible = true;
+                    this.patchVisibility.PortalInEditMode = false;
+                    foreach (var item in portals)
+                    {
+                        item.View.IsEditorMode = false;
+                    }
+                }
+                else if (!this.patchVisibility.PortalInEditMode)
+                {
+                    this.patchVisibility.PortalInEditMode = true;
+                    foreach (var item in portals)
+                    {
+                        item.View.IsEditorMode = true;
+                    }
+                }
+                else
+                {
+                    this.patchVisibility.PortalVisible = false;
+                }
+            }), KeyCode.D8, ModifierKeys.Control));
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.patchVisibility.FrontVisible = !this.patchVisibility.FrontVisible), KeyCode.D9, ModifierKeys.Control));
+
+            //移动操作
+            #region 移动操作
+            {
+                //键盘移动
+                int boostMoveFlag = 0;
+                var direction1 = Vector2.Zero;
+
+                Action<Vector2> calcKeyboardMoveDir = dir =>
+                {
+                    if (dir.X != 0)
+                    {
+                        var preMove = dir.X * 10 * (boostMoveFlag != 0 ? 3 : 1);
+
+                        if (Math.Sign(preMove) * Math.Sign(direction1.X) == -1
+                            && Math.Abs(direction1.X) <= Math.Abs(preMove))
+                        {
+                            direction1.X = 0;
+                        }
+                        else
+                        {
+                            direction1.X += preMove;
+                        }
+                    }
+                    if (dir.Y != 0)
+                    {
+                        var preMove = dir.Y * 10 * (boostMoveFlag != 0 ? 3 : 1);
+
+                        if (Math.Sign(preMove) * Math.Sign(direction1.Y) == -1
+                            && Math.Abs(direction1.Y) <= Math.Abs(preMove))
+                        {
+                            direction1.Y = 0;
+                        }
+                        else
+                        {
+                            direction1.Y += preMove;
+                        }
+                    }
+                };
+
+                //键盘动量减速
+                Action keyboardMoveSlowDown = () =>
+                {
+                    if (direction1.X > 2 || direction1.X < -2) direction1.X *= 0.98f;
+                    else direction1.X = 0;
+                    if (direction1.Y > 2 || direction1.Y < 2) direction1.Y *= 0.98f;
+                    else direction1.Y = 0;
+                };
+
+                this.ui.PreviewKeyDown += (o, e) =>
+                {
+                    switch (e.Key)
+                    {
+                        case KeyCode.Up:
+                            calcKeyboardMoveDir(new Vector2(0, -1));
+                            break;
+                        case KeyCode.Down:
+                            calcKeyboardMoveDir(new Vector2(0, 1));
+                            break;
+                        case KeyCode.Left:
+                            calcKeyboardMoveDir(new Vector2(-1, 0));
+                            break;
+                        case KeyCode.Right:
+                            calcKeyboardMoveDir(new Vector2(1, 0));
+                            break;
+
+                        case KeyCode.LeftControl:
+                            boostMoveFlag |= 0x01;
+                            break;
+                        case KeyCode.RightControl:
+                            boostMoveFlag |= 0x02;
+                            break;
+                    }
+                };
+                this.ui.KeyUp += (o, e) =>
+                {
+                    switch (e.Key)
+                    {
+                        case KeyCode.LeftControl:
+                            boostMoveFlag &= ~0x01;
+                            break;
+                        case KeyCode.RightControl:
+                            boostMoveFlag &= ~0x02;
+                            break;
+                    }
+                };
+
+                //鼠标移动
+                bool isMouseDown = false;
+                var direction2 = Vector2.Zero;
+
+                Action<EmptyKeys.UserInterface.Input.MouseEventArgs> calcMouseMoveDir = e =>
+                {
+                    var mousePos = e.GetPosition();
+                    Vector2 vec = new Vector2(2 * mousePos.X / this.ui.Width - 1, 2 * mousePos.Y / this.ui.Height - 1);
+                    var distance = vec.Length();
+                    if (distance >= 0.4f)
+                    {
+                        vec *= (distance - 0.4f) / distance;
+                    }
+                    else
+                    {
+                        vec = Vector2.Zero;
+                    }
+                    direction2 = vec * 20;
+                };
+
+                this.ui.MouseDown += (o, e) =>
+                {
+                    if (e.ChangedButton == EmptyKeys.UserInterface.Input.MouseButton.Right)
+                    {
+                        isMouseDown = true;
+                        calcMouseMoveDir(e);
+                    }
+                };
+                this.ui.MouseMove += (o, e) =>
+                {
+                    if (isMouseDown)
+                    {
+                        calcMouseMoveDir(e);
+                    }
+                };
+                this.ui.MouseUp += (o, e) =>
+                {
+                    if (e.ChangedButton == EmptyKeys.UserInterface.Input.MouseButton.Right)
+                    {
+                        isMouseDown = false;
+                        direction2 = Vector2.Zero;
+                    }
+                };
+
+                //更新事件
+                this.ui.InputUpdated += (o, e) =>
+                {
+                    this.renderEnv.Camera.Center += direction1 + direction2 * ((boostMoveFlag != 0) ? 3 : 1);
+                    keyboardMoveSlowDown();
+                };
+            }
+            #endregion
+
+            //点击事件
+            UIHelper.RegisterClickEvent<SceneItem>(this.ui.ContentControl,
+                (sender, point) => {
+                    int x = (int)point.X;
+                    int y = (int)point.Y;
+                    var mouseTarget = this.allItems.Reverse<ItemRect>().FirstOrDefault(item =>
+                    {
+                        return item.rect.Contains(x, y) && (item.item is PortalItem || item.item is ReactorItem);
+                    });
+                    return mouseTarget.item;
+                },
+                (item) => {
+                    this.ui.IsEnabled = true;
+                });
+        }
+
         protected override void LoadContent()
         {
             base.LoadContent();
             this.resLoader = new ResourceLoader(this.Services);
             this.font = new XnaFont(this.GraphicsDevice, "宋体", 12);
             this.mapData = new MapData();
-            
+
             if (this.mapImg != null)
             {
-                this.mapData.Load(mapImg.Node, resLoader);
-                this.mapData.PreloadResource(resLoader);
+                LoadMap(this.mapImg);
             }
+        }
+
+        private void LoadMap(Wz_Image mapImg)
+        {
+            //加载地图数据
+            this.mapData.Load(mapImg.Node, resLoader);
+            this.mapData.PreloadResource(resLoader);
+
+            //同步UI
+            this.renderEnv.Camera.WorldRect = mapData.VRect;
+
+            //加载bgm
+            if (!string.IsNullOrEmpty(this.mapData.Bgm))
+            {
+                if (this.bgm != null)
+                {
+                    this.bgm.Stop();
+                    this.bgm.Dispose();
+                    this.bgm = null;
+                }
+
+                var path = new List<string>() { "Sound" };
+                path.AddRange(this.mapData.Bgm.Split('/'));
+                path[1] += ".img";
+                var bgmNode = PluginManager.FindWz(string.Join("\\", path));
+                if (bgmNode != null)
+                {
+                    this.bgm = resLoader.Load<Music>(bgmNode);
+                    if (this.bgm != null)
+                    {
+                        this.bgm.IsLoop = true;
+                        this.bgm.Play();
+                    }
+                }
+            }
+
+            StringResult sr;
+            if (this.mapData.ID != null && this.StringLinker != null
+                && StringLinker.StringMap.TryGetValue(this.mapData.ID.Value, out sr))
+            {
+                this.ui.Minimap.StreetName = sr["streetName"];
+                this.ui.Minimap.MapName = sr["mapName"];
+            }
+            else
+            {
+                this.ui.Minimap.StreetName = null;
+                this.ui.Minimap.MapName = null;
+            }
+
+            if (this.mapData.MiniMap.MapMark != null)
+            {
+                this.ui.Minimap.MapMark = engine.Renderer.CreateTexture(this.mapData.MiniMap.MapMark);
+            }
+            else
+            {
+                this.ui.Minimap.MapMark = null;
+            }
+
+            if (this.mapData.MiniMap.Canvas != null)
+            {
+                this.ui.Minimap.MinimapCanvas = engine.Renderer.CreateTexture(this.mapData.MiniMap.Canvas);
+            }
+            else
+            {
+                this.ui.Minimap.MinimapCanvas = null;
+            }
+
+            this.ui.Minimap.MapRegion = mapData.VRect.ToRect();
         }
 
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
             this.renderEnv.Input.Update(gameTime);
-            if (renderEnv.Input.IsMouseButtonPressing(MouseButton.RightButton))
+            this.ui.UpdateInput(gameTime.ElapsedGameTime.TotalMilliseconds);
+
+            //需要手动更新数据部分
+            this.renderEnv.Camera.AdjustToWorldRect();
             {
-                var mousePos = renderEnv.Input.MousePosition;
-                this.renderEnv.Camera.Center += new Vector2(mousePos.X - 640, mousePos.Y - 360) / 10;
+                var point = this.renderEnv.Camera.Center;
+                this.ui.Minimap.CameraCenter = new EmptyKeys.UserInterface.PointF(point.X, point.Y);
             }
-
-            //临时方向键移动视角
-            {
-                var input = this.renderEnv.Input;
-                int boost = 1;
-                Vector2 offs = new Vector2();
-
-                if (input.IsKeyPressing(Keys.Left))
-                    offs.X -= 5;
-                if (input.IsKeyPressing(Keys.Right))
-                    offs.X += 5;
-                if (input.IsKeyPressing(Keys.Up))
-                    offs.Y -= 5;
-                if (input.IsKeyPressing(Keys.Down))
-                    offs.Y += 5;
-
-                if (input.IsCtrlPressing)
-                    boost = 2;
-                this.renderEnv.Camera.Center += offs * boost;
-            }
-
-            //临时截图键
-            if (renderEnv.Input.IsKeyDown(Keys.Scroll) 
-                && (captureTask == null || captureTask.IsCompleted)
-                && !prepareCapture)
-            {
-                prepareCapture = true;
-            }
-
+            //更新ui
+            this.ui.UpdateLayout(gameTime.ElapsedGameTime.TotalMilliseconds);
+            //更新场景
             UpdateAllItems(mapData.Scene, gameTime.ElapsedGameTime);
+            //更新tooltip
+            UpdateTooltip();
         }
 
         protected override void Draw(GameTime gameTime)
         {
             if (prepareCapture)
             {
-                var oldTarget = GraphicsDevice.GetRenderTargets();
-
-                //检查显卡支持纹理大小
-                var maxTextureWidth = 4096;
-                var maxTextureHeight = 4096;
-
-                Rectangle oldRect = this.renderEnv.Camera.WorldRect;
-                int width = Math.Min(oldRect.Width, maxTextureWidth);
-                int height = Math.Min(oldRect.Height, maxTextureHeight);
-                this.renderEnv.Camera.UseWorldRect = true;
-
-                var target2d = new RenderTarget2D(this.GraphicsDevice, width, height, false, SurfaceFormat.Bgra32, DepthFormat.None);
-
-                //计算一组截图区
-                int horizonBlock = (int)Math.Ceiling(1.0 * oldRect.Width / width);
-                int verticalBlock = (int)Math.Ceiling(1.0 * oldRect.Height / height);
-                byte[,][] picBlocks = new byte[horizonBlock, verticalBlock][];
-                for (int j = 0; j < verticalBlock; j++)
-                {
-                    for (int i = 0; i < horizonBlock; i++)
-                    {
-                        //计算镜头区域
-                        this.renderEnv.Camera.WorldRect = new Rectangle(
-                            oldRect.X + i * width,
-                            oldRect.Y + j * height,
-                            width,
-                            height);
-
-                        //绘制
-                        GraphicsDevice.SetRenderTarget(target2d);
-                        GraphicsDevice.Clear(Color.Black);
-                        DrawScene();
-                        GraphicsDevice.SetRenderTarget(null);
-                        //保存
-                        Texture2D t2d = target2d;
-                        byte[] data = new byte[target2d.Width * target2d.Height * 4];
-                        t2d.GetData(data);
-                        picBlocks[i, j] = data;
-                    }
-                }
-                target2d.Dispose();
-
-                this.renderEnv.Camera.WorldRect = oldRect;
-                this.renderEnv.Camera.UseWorldRect = false;
-
-                GraphicsDevice.SetRenderTargets(oldTarget);
-                prepareCapture = false;
-
-                captureTask = Task.Factory.StartNew(() =>
-                    SaveTexture(picBlocks, oldRect.Width, oldRect.Height, target2d.Width, target2d.Height)
-                );
+                Capture(gameTime);
             }
 
             this.GraphicsDevice.Clear(Color.Black);
-            DrawScene();
-
-            var sb = this.renderEnv.Sprite;
-            {
-                
-                var mp = this.renderEnv.Input.MousePosition;
-                var text = new StringBuilder();
-                foreach (var kv in this.allItems)
-                {
-                    if (kv.Item2.Contains(mp))
-                        text.AppendLine(kv.Item1);
-                }
-                sb.Begin();
-                sb.DrawStringEx(this.font, text.ToString(), Vector2.Zero, Color.Red);
-                sb.End();
-            }
+            DrawScene(gameTime);
+            this.ui.Draw(gameTime.ElapsedGameTime.TotalMilliseconds);
+            this.tooltip.Draw(gameTime, renderEnv);
             base.Draw(gameTime);
         }
 
-        private void DrawScene()
-        {
-            allItems.Clear();
-            this.batcher.Begin(Matrix.CreateTranslation(new Vector3(-this.renderEnv.Camera.Origin, 0)));
-            foreach (var kv in GetDrawableItems(this.mapData.Scene))
-            {
-                this.batcher.Draw(kv.Value);
+        #region 截图相关
 
-                //缓存绘图区域
+        private bool CanCapture()
+        {
+            return (captureTask == null || captureTask.IsCompleted) && !prepareCapture;
+        }
+
+        private void Capture(GameTime gameTime)
+        {
+            var oldTarget = GraphicsDevice.GetRenderTargets();
+
+            //检查显卡支持纹理大小
+            var maxTextureWidth = 4096;
+            var maxTextureHeight = 4096;
+
+            Rectangle oldRect = this.renderEnv.Camera.WorldRect;
+            int width = Math.Min(oldRect.Width, maxTextureWidth);
+            int height = Math.Min(oldRect.Height, maxTextureHeight);
+            this.renderEnv.Camera.UseWorldRect = true;
+
+            var target2d = new RenderTarget2D(this.GraphicsDevice, width, height, false, SurfaceFormat.Bgra32, DepthFormat.None);
+
+            //计算一组截图区
+            int horizonBlock = (int)Math.Ceiling(1.0 * oldRect.Width / width);
+            int verticalBlock = (int)Math.Ceiling(1.0 * oldRect.Height / height);
+            byte[,][] picBlocks = new byte[horizonBlock, verticalBlock][];
+            for (int j = 0; j < verticalBlock; j++)
+            {
+                for (int i = 0; i < horizonBlock; i++)
                 {
-                    Rectangle[] rects = this.batcher.Measure(kv.Value);
-                    if (kv.Value.RenderObject is Frame)
-                    {
-                        var frame = (Frame)kv.Value.RenderObject;
-                    }
-                    if (rects != null && rects.Length > 0)
-                    {
-                        for (int i = 0; i < rects.Length; i++)
-                        {
-                            rects[i].X -= (int)this.renderEnv.Camera.Origin.X;
-                            rects[i].Y -= (int)this.renderEnv.Camera.Origin.Y;
-                            allItems.Add(new Tuple<string, Rectangle>(kv.Key.Name, rects[i]));
-                        }
-                    }
+                    //计算镜头区域
+                    this.renderEnv.Camera.WorldRect = new Rectangle(
+                        oldRect.X + i * width,
+                        oldRect.Y + j * height,
+                        width,
+                        height);
+
+                    //绘制
+                    GraphicsDevice.SetRenderTarget(target2d);
+                    GraphicsDevice.Clear(Color.Black);
+                    DrawScene(gameTime);
+                    GraphicsDevice.SetRenderTarget(null);
+                    //保存
+                    Texture2D t2d = target2d;
+                    byte[] data = new byte[target2d.Width * target2d.Height * 4];
+                    t2d.GetData(data);
+                    picBlocks[i, j] = data;
                 }
             }
-            this.batcher.End();
+            target2d.Dispose();
+
+            this.renderEnv.Camera.WorldRect = oldRect;
+            this.renderEnv.Camera.UseWorldRect = false;
+
+            GraphicsDevice.SetRenderTargets(oldTarget);
+            prepareCapture = false;
+
+            captureTask = Task.Factory.StartNew(() =>
+                SaveTexture(picBlocks, oldRect.Width, oldRect.Height, target2d.Width, target2d.Height)
+            );
         }
 
         private void SaveTexture(byte[,][] picBlocks, int mapWidth, int mapHeight, int blockWidth, int blockHeight)
@@ -243,7 +521,6 @@ namespace WzComparerR2.MapRender
                 for (int i = 0; i < picBlocks.GetLength(0); i++)
                 {
                     byte[] data = picBlocks[i, j];
-                    IntPtr pData = Marshal.UnsafeAddrOfPinnedArrayElement(data, 0);
 
                     Rectangle blockRect = new Rectangle();
                     blockRect.X = i * blockWidth;
@@ -255,15 +532,16 @@ namespace WzComparerR2.MapRender
                     if (blockRect.X == 0 && blockRect.Width == mapWidth) //整块复制
                     {
                         int startIndex = mapWidth * 4 * blockRect.Y;
-                        Marshal.Copy(pData, mapData, startIndex, blockRect.Width * blockRect.Height * 4);
+                        Buffer.BlockCopy(data, 0, mapData, startIndex, blockRect.Width * blockRect.Height * 4);
                     }
                     else //逐行扫描
                     {
+                        int offset = 0;
                         for (int y = blockRect.Top, y0 = blockRect.Bottom; y < y0; y++)
                         {
                             int startIndex = (y * mapWidth + blockRect.X) * 4;
-                            Marshal.Copy(pData, mapData, startIndex, length);
-                            pData = new IntPtr(pData.ToInt32() + blockWidth * 4);
+                            Buffer.BlockCopy(data, offset, mapData, startIndex, length);
+                            offset += blockWidth * 4;
                         }
                     }
                 }
@@ -287,346 +565,13 @@ namespace WzComparerR2.MapRender
             {
             }
         }
-
-        private IEnumerable<KeyValuePair<SceneItem, MeshItem>> GetDrawableItems(SceneNode node)
-        {
-            var container = node as ContainerNode;
-            if (container != null)  //暂时不考虑缩进z层递归合并  container下没有子节点
-            {
-                foreach (var kv in container.Slots.Select(item => new KeyValuePair<SceneItem, MeshItem>(item, GetMesh(item)))
-                    .Where(kv => kv.Value != null)
-                    .OrderBy(kv => kv.Value))
-                {
-                    yield return kv;
-                }
-            }
-            else 
-            {
-                foreach (var mesh in node.Nodes.SelectMany(child => GetDrawableItems(child)))
-                {
-                    yield return mesh;
-                }
-            }
-        }
-
-        private void UpdateAllItems(SceneNode node, TimeSpan elapsed)
-        {
-            var container = node as ContainerNode;
-            if (container != null)  //暂时不考虑缩进z层递归合并  container下没有子节点
-            {
-                foreach (var item in container.Slots)
-                {
-                    if (item is BackItem)
-                    {
-                        var back = (BackItem)item;
-                        (back.View.Animator as WzComparerR2.Controls.AnimationItem)?.Update(elapsed);
-                        back.View.Time += (int)elapsed.TotalMilliseconds;
-                    }
-                    else if (item is ObjItem)
-                    {
-                        var _item = (ObjItem)item;
-                        (_item.View.Animator as WzComparerR2.Controls.AnimationItem)?.Update(elapsed);
-                        _item.View.Time += (int)elapsed.TotalMilliseconds;
-                    }
-                    else if (item is TileItem)
-                    {
-                        var tile = (TileItem)item;
-                        (tile.View.Animator as WzComparerR2.Controls.AnimationItem)?.Update(elapsed);
-                        tile.View.Time += (int)elapsed.TotalMilliseconds;
-                    }
-                    else if (item is LifeItem)
-                    {
-                        var life = (LifeItem)item;
-                        var smAni = (life.View.Animator as StateMachineAnimator);
-                        if (smAni != null)
-                        {
-                            if (smAni.GetCurrent() == null) //当前无动作
-                            {
-                                smAni.SetAnimation(smAni.Data.States[0]); //动作0
-                            }
-                            smAni.Update(elapsed);
-                        }
-
-                        life.View.Time += (int)elapsed.TotalMilliseconds;
-                    }
-                    else if (item is PortalItem)
-                    {
-                        var portal = (PortalItem)item;
-
-                        //更新状态
-                        var cursorPos = renderEnv.Camera.CameraToWorld(renderEnv.Input.MousePosition);
-                        var sensorRect = new Rectangle(portal.X - 250, portal.Y - 150, 500, 300);
-                        portal.View.IsFocusing = sensorRect.Contains(cursorPos);
-
-                        //更新动画
-                        var ani = portal.View.IsEditorMode ? portal.View.EditorAnimator : portal.View.Animator;
-                        if (ani is StateMachineAnimator)
-                        {
-                            if (portal.View.Controller != null)
-                            {
-                                portal.View.Controller.Update(elapsed);
-                            }
-                            else
-                            {
-                                ((StateMachineAnimator)ani).Update(elapsed);
-                            }
-                        }
-                        else if (ani is FrameAnimator)
-                        {
-                            var frameAni = (FrameAnimator)ani;
-                            frameAni.Update(elapsed);
-                        }
-                    }
-                    else if (item is ReactorItem)
-                    {
-                        var reactor = (ReactorItem)item;
-                        var ani = reactor.View.Animator;
-                        if (ani is StateMachineAnimator)
-                        {
-                            if (reactor.View.Controller != null)
-                            {
-                                reactor.View.Controller.Update(elapsed);
-                            }
-                            else
-                            {
-                                ((StateMachineAnimator)ani).Update(elapsed);
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                foreach (var child in node.Nodes)
-                {
-                    UpdateAllItems(child, elapsed);
-                }
-            }
-        }
-
-        private MeshItem GetMesh(SceneItem item)
-        {
-            if (item is BackItem)
-            {
-                return GetMeshBack((BackItem)item);
-            }
-            else if (item is ObjItem)
-            {
-                return GetMeshObj((ObjItem)item);
-            }
-            else if (item is TileItem)
-            {
-                return GetMeshTile((TileItem)item);
-            }
-            else if (item is LifeItem)
-            {
-                return GetMeshLife((LifeItem)item);
-            }
-            else if (item is PortalItem)
-            {
-                return GetMeshPortal((PortalItem)item);
-            }
-            else if (item is ReactorItem)
-            {
-                return GetMeshReactor((ReactorItem)item);
-            }
-
-            return null;
-        }
-
-        private MeshItem GetMeshBack(BackItem back)
-        {
-            //计算计算culling
-            if (back.ScreenMode != 0 && back.ScreenMode != renderEnv.Camera.DisplayMode + 1)
-            {
-                return null;
-            }
-
-            //计算坐标
-            var renderObject = (back.View.Animator as FrameAnimator)?.CurrentFrame.Rectangle.Size ?? Point.Zero;
-            int cx = (back.Cx == 0 ? renderObject.X : back.Cx);
-            int cy = (back.Cy == 0 ? renderObject.Y : back.Cy);
-
-            Vector2 tileOff = new Vector2(cx, cy);
-            Vector2 position = new Vector2(back.X, back.Y);
-
-            //计算水平卷动
-            if (back.TileMode.HasFlag(TileMode.ScrollHorizontial))
-            {
-                position.X += ((float)back.Rx * 5 * back.View.Time / 1000) % cx;// +this.Camera.Center.X * (100 - Math.Abs(this.rx)) / 100;
-            }
-            else //镜头移动比率偏移
-            {
-                position.X += renderEnv.Camera.Center.X * (100 + back.Rx) / 100;
-            }
-
-            //计算垂直卷动
-            if (back.TileMode.HasFlag(TileMode.ScrollVertical))
-            {
-                position.Y += ((float)back.Ry * 5 * back.View.Time / 1000) % cy;// +this.Camera.Center.Y * (100 - Math.Abs(this.ry)) / 100;
-            }
-            else //镜头移动比率偏移
-            {
-                position.Y += (renderEnv.Camera.Center.Y) * (100 + back.Ry) / 100;
-            }
-
-            //y轴镜头调整
-            if (back.TileMode == TileMode.None && renderEnv.Camera.WorldRect.Height > 600)
-                position.Y += (renderEnv.Camera.Height - 600) / 2;
-
-            //取整
-            position.X = (float)Math.Floor(position.X);
-            position.Y = (float)Math.Floor(position.Y);
-
-            //计算tile
-            Rectangle? tileRect = null;
-            if (back.TileMode != TileMode.None)
-            {
-                var cameraRect = renderEnv.Camera.ClipRect;
-
-                int l, t, r, b;
-                if (back.TileMode.HasFlag(TileMode.Horizontal) && cx > 0)
-                {
-                    l = (int)Math.Floor((cameraRect.Left - position.X) / cx) - 1;
-                    r = (int)Math.Ceiling((cameraRect.Right - position.X) / cx) + 1;
-                }
-                else
-                {
-                    l = 0;
-                    r = 1;
-                }
-
-                if (back.TileMode.HasFlag(TileMode.Vertical) && cy > 0)
-                {
-                    t = (int)Math.Floor((cameraRect.Top - position.Y) / cy) - 1;
-                    b = (int)Math.Ceiling((cameraRect.Bottom - position.Y) / cy) + 1;
-                }
-                else
-                {
-                    t = 0;
-                    b = 1;
-                }
-
-                tileRect = new Rectangle(l, t, r - l, b - t);
-            }
-
-            //生成mesh
-            var renderObj = GetRenderObject(back.View.Animator, back.Flip, back.Alpha);
-            return renderObj == null ? null : new MeshItem()
-            {
-                RenderObject = renderObj,
-                Position = position,
-                Z0 = 0,
-                Z1 = back.Index,
-                FlipX = back.Flip,
-                TileRegion = tileRect,
-                TileOffset = tileOff,
-            };
-        }
-
-        private MeshItem GetMeshObj(ObjItem obj)
-        {
-            var renderObj = GetRenderObject(obj.View.Animator, obj.Flip);
-            return renderObj == null ? null : new MeshItem()
-            {
-                RenderObject = renderObj,
-                Position = new Vector2(obj.X, obj.Y),
-                FlipX = obj.Flip,
-                Z0 = obj.Z,
-                Z1 = obj.Index,
-            };
-        }
-
-        private MeshItem GetMeshTile(TileItem tile)
-        {
-            var renderObj = GetRenderObject(tile.View.Animator);
-            return renderObj == null ? null : new MeshItem()
-            {
-                RenderObject = renderObj,
-                Position = new Vector2(tile.X, tile.Y),
-                Z0 = ((renderObj as Frame)?.Z ?? 0),
-                Z1 = tile.Index,
-            };
-        }
-
-        private MeshItem GetMeshLife(LifeItem life)
-        {
-            var renderObj = GetRenderObject(life.View.Animator);
-            return renderObj == null ? null : new MeshItem()
-            {
-                RenderObject = renderObj,
-                Position = new Vector2(life.X, life.Cy),
-                FlipX = life.Flip,
-                Z0 = ((renderObj as Frame)?.Z ?? 0),
-                Z1 = life.Index,
-            };
-        }
-
-        private MeshItem GetMeshPortal(PortalItem portal)
-        {
-            var renderObj = GetRenderObject(portal.View.IsEditorMode ? portal.View.EditorAnimator : portal.View.Animator);
-            return renderObj == null ? null : new MeshItem()
-            {
-                RenderObject = renderObj,
-                Position = new Vector2(portal.X, portal.Y),
-                Z0 = ((renderObj as Frame)?.Z ?? 0),
-                Z1 = portal.Index,
-            };
-        }
-
-        private MeshItem GetMeshReactor(ReactorItem reactor)
-        {
-            var renderObj = GetRenderObject(reactor.View.Animator);
-            return renderObj == null ? null : new MeshItem()
-            {
-                RenderObject = renderObj,
-                Position = new Vector2(reactor.X, reactor.Y),
-                FlipX = reactor.Flip,
-                Z0 = ((renderObj as Frame)?.Z ?? 0),
-                Z1 = reactor.Index,
-            };
-        }
-
-        private object GetRenderObject(object animator, bool flip = false, int alpha = 255)
-        {
-            if (animator is FrameAnimator)
-            {
-                var frame = ((FrameAnimator)animator).CurrentFrame;
-                if (frame != null)
-                {
-                    if (alpha < 255) //理论上应该返回一个新的实例
-                    {
-                        frame.A0 = frame.A0 * alpha / 255;
-                    }
-                    return frame;
-                }
-            }
-            else if (animator is SpineAnimator)
-            {
-                var skeleton = ((SpineAnimator)animator).Skeleton;
-                if (skeleton != null)
-                {
-                    if (alpha < 255)
-                    {
-                        skeleton.A = alpha / 255.0f;
-                    }
-                    return skeleton;
-                }
-            }
-            else if (animator is StateMachineAnimator)
-            {
-                var smAni = (StateMachineAnimator)animator;
-                return smAni.Data.GetMesh();
-            }
-
-            //各种意外
-            return null;
-        }
+        #endregion
 
         protected override void UnloadContent()
         {
             base.UnloadContent();
             this.resLoader.Unload();
+            this.ui.UnloadContents();
             this.mapImg = null;
             this.mapData = null;
         }
@@ -638,6 +583,55 @@ namespace WzComparerR2.MapRender
             this.batcher = null;
             this.renderEnv.Dispose();
             this.renderEnv = null;
+            this.engine = null;
+
+            GameExt.RemoveKeyboardEvent(this);
+        }
+
+        private void SwitchResolution()
+        {
+            var r = (Resolution)(((int)this.resolution + 1) % 4);
+            SwitchResolution(r);
+        }
+
+        private void SwitchResolution(Resolution r)
+        {
+            Form gameWindow = (Form)Form.FromHandle(this.Window.Handle);
+            switch (r)
+            {
+                case Resolution.Window_800_600:
+                case Resolution.Window_1024_768:
+                case Resolution.Window_1366_768:
+                    gameWindow.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+                    break;
+                case Resolution.WindowFullScreen:
+                    gameWindow.SetDesktopLocation(0, 0);
+                    gameWindow.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+                    break;
+                default:
+                    r = Resolution.Window_800_600;
+                    goto case Resolution.Window_800_600;
+            }
+
+            this.resolution = r;
+            this.renderEnv.Camera.DisplayMode = (int)r;
+            this.ui.Width = this.renderEnv.Camera.Width;
+            this.ui.Height = this.renderEnv.Camera.Height;
+            engine.Renderer.ResetNativeSize();
+        }
+
+        enum Resolution
+        {
+            Window_800_600 = 0,
+            Window_1024_768 = 1,
+            Window_1366_768 = 2,
+            WindowFullScreen = 3,
+        }
+
+        struct ItemRect
+        {
+            public SceneItem item;
+            public Rectangle rect;
         }
     }
 }

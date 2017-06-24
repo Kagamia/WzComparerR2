@@ -39,7 +39,12 @@ namespace WzComparerR2.MapRender
 
         public virtual T Load<T>(string assetName)
         {
-            return Load<T>(assetName: assetName);
+            return Load<T>(null, assetName);
+        }
+
+        public virtual T Load<T>(Wz_Node node)
+        {
+            return Load<T>(node, null);
         }
 
         private T Load<T>(Wz_Node node = null, string assetName = null)
@@ -122,6 +127,10 @@ namespace WzComparerR2.MapRender
                 {
                     ((TextureAtlas)res).Texture.Dispose();
                 }
+                else if (res is Music)
+                {
+                    ((Music)res).Dispose();
+                }
             }
 
             this.loadedItems.Clear();
@@ -138,11 +147,27 @@ namespace WzComparerR2.MapRender
         {
             if (assetType == typeof(TextureAtlas)) //回头再说
             {
-                return new TextureAtlas(((Wz_Png)node.Value).ToTexture(this.GraphicsDevice));
+                var png = node.GetValue<Wz_Png>();
+                if (png != null)
+                {
+                    return new TextureAtlas(png.ToTexture(this.GraphicsDevice));
+                }
             }
             else if (assetType == typeof(Texture2D))
             {
-                return ((Wz_Png)node.Value).ToTexture(this.GraphicsDevice);
+                var png = node.GetValue<Wz_Png>();
+                if (png != null)
+                {
+                    return png.ToTexture(this.GraphicsDevice);
+                }
+            }
+            else if (assetType == typeof(Music))
+            {
+                var sound = node.GetValue<Wz_Sound>();
+                if (sound != null)
+                {
+                    return new Music(sound);
+                }
             }
             return null;
         }

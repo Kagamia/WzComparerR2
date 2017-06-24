@@ -59,5 +59,33 @@ namespace WzComparerR2.MapRender
                 (byte)MathHelper.Lerp(colors[index].A, colors[index + 1].A, amount)
                 );
         }
+
+        public static Color HSVtoColor(float hue, float saturation, float value)
+        {
+            Vector3 color = Vector3.Zero;
+            if (saturation == 0)
+            {
+                color = new Vector3(value);
+            }
+            else
+            {
+                hue /= 60;
+                var i = (int)hue;
+                var f = hue - i;
+                var a = value * (1 - saturation);
+                var b = value * (1 - saturation * f);
+                var c = value * (1 - saturation * (1 - f));
+                switch (i)
+                {
+                    case 0: color = new Vector3(value, c, a); break;
+                    case 1: color = new Vector3(b, value, a); break;
+                    case 2: color = new Vector3(a, value, c); break;
+                    case 3: color = new Vector3(a, b, value); break;
+                    case 4: color = new Vector3(c, a, value); break;
+                    case 5: color = new Vector3(value, a, b); break;
+                }
+            }
+            return new Color(color);
+        }
     }
 }

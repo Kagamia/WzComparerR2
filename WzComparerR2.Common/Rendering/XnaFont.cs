@@ -32,6 +32,7 @@ namespace WzComparerR2.Rendering
                 throw new ArgumentNullException();
             }
             this.baseFont = baseFont;
+            this.Height = baseFont.Height;
             this.textureBuffer = new Texture2D(graphicsDevice, 2048, 2048, false, SurfaceFormat.Bgra32);
             RebuildGdiBuffer(this.baseFont.Height);
             this.charLocation = new Dictionary<char, Rectangle>();
@@ -56,6 +57,8 @@ namespace WzComparerR2.Rendering
         {
             get { return baseFont; }
         }
+
+        public int Height { get; private set; }
 
         public Vector2 MeasureString(string text)
         {

@@ -15,7 +15,7 @@ namespace WzComparerR2.MapRender
         public MeshBatcher(GraphicsDevice graphicsDevice)
         {
             this.GraphicsDevice = graphicsDevice;
-            this.sprite = new SpriteBatch(graphicsDevice);
+            this.sprite = new SpriteBatchEx(graphicsDevice);
             this.spineRender = new SkeletonMeshRenderer(graphicsDevice);
             this.alphaBlendState = StateEx.NonPremultipled_Hidef();
         }
@@ -23,7 +23,7 @@ namespace WzComparerR2.MapRender
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         //内部batcher
-        SpriteBatch sprite;
+        SpriteBatchEx sprite;
         SkeletonMeshRenderer spineRender;
         BlendState alphaBlendState;
         ItemType lastItem;
@@ -43,80 +43,129 @@ namespace WzComparerR2.MapRender
         {
             if (mesh.RenderObject is Frame)
             {
-                var frame = (Frame)mesh.RenderObject;
-
-                var origin = mesh.FlipX ? new Vector2(frame.Rectangle.Width - frame.Origin.X, frame.Origin.Y) : frame.Origin.ToVector2();
-                var eff = mesh.FlipX ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-
-                if (lastItem != ItemType.Sprite)
-                {
-                    InnerFlush();
-                    lastItem = ItemType.Sprite;
-                    InnerBegin();
-                }
-
-                //兼容平铺
-                if (mesh.TileRegion != null)
-                {
-                    var region = mesh.TileRegion.Value;
-                    for (int y = region.Top; y < region.Bottom; y++)
-                    {
-                        for (int x = region.Left; x < region.Right; x++)
-                        {
-                            Vector2 pos = mesh.Position + mesh.TileOffset * new Vector2(x, y);
-                            sprite.Draw(frame.Texture, pos,
-                                sourceRectangle: frame.AtlasRect,
-                                color: new Color(Color.White, frame.A0),
-                                origin: origin,
-                                effects: eff
-                                );
-                        }
-                    }
-                }
-                else
-                {
-                    sprite.Draw(frame.Texture, mesh.Position,
-                        sourceRectangle: frame.AtlasRect,
-                        color: new Color(Color.White, frame.A0),
-                        origin: origin,
-                        effects: eff
-                        );
-                }
+                Prepare(ItemType.Sprite);
+                this.DrawItem(mesh, (Frame)mesh.RenderObject);
             }
             else if (mesh.RenderObject is Skeleton)
             {
-                var skeleton = (Skeleton)mesh.RenderObject;
-                skeleton.FlipX = mesh.FlipX;
+                Prepare(ItemType.Skeleton);
+                this.DrawItem(mesh, (Skeleton)mesh.RenderObject);
+            }
+            else if (mesh.RenderObject is TextMesh)
+            {
+                Prepare(ItemType.Sprite);
+                this.DrawItem(mesh, (TextMesh)mesh.RenderObject);
+            }
+            else if (mesh.RenderObject is LineListMesh)
+            {
+                Prepare(ItemType.Sprite);
+                this.DrawItem((LineListMesh)mesh.RenderObject);
+            }
+        }
 
-                if (lastItem != ItemType.Skeleton)
-                {
-                    InnerFlush();
-                    lastItem = ItemType.Skeleton;
-                    InnerBegin();
-                }
+        private void DrawItem(MeshItem mesh, Frame frame)
+        {
+            var origin = mesh.FlipX ? new Vector2(frame.Rectangle.Width - frame.Origin.X, frame.Origin.Y) : frame.Origin.ToVector2();
+            var eff = mesh.FlipX ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 
-                //兼容平铺
-                if (mesh.TileRegion != null)
+            //兼容平铺
+            if (mesh.TileRegion != null)
+            {
+                var region = mesh.TileRegion.Value;
+                for (int y = region.Top; y < region.Bottom; y++)
                 {
-                    var region = mesh.TileRegion.Value;
-                    for (int y = region.Top; y < region.Bottom; y++)
+                    for (int x = region.Left; x < region.Right; x++)
                     {
-                        for (int x = region.Left; x < region.Right; x++)
-                        {
-                            Vector2 pos = mesh.Position + mesh.TileOffset * new Vector2(x, y);
-                            skeleton.X = pos.X;
-                            skeleton.Y = pos.Y;
-                            skeleton.UpdateWorldTransform();
-                            this.spineRender.Draw(skeleton);
-                        }
+                        Vector2 pos = mesh.Position + mesh.TileOffset * new Vector2(x, y);
+                        sprite.Draw(frame.Texture, pos,
+                            sourceRectangle: frame.AtlasRect,
+                            color: new Color(Color.White, frame.A0),
+                            origin: origin,
+                            effects: eff
+                            );
                     }
                 }
-                else
+            }
+            else
+            {
+                sprite.Draw(frame.Texture, mesh.Position,
+                    sourceRectangle: frame.AtlasRect,
+                    color: new Color(Color.White, frame.A0),
+                    origin: origin,
+                    effects: eff
+                    );
+            }
+        }
+
+        private void DrawItem(MeshItem mesh, Skeleton skeleton)
+        {
+            skeleton.FlipX = mesh.FlipX;
+
+            //兼容平铺
+            if (mesh.TileRegion != null)
+            {
+                var region = mesh.TileRegion.Value;
+                for (int y = region.Top; y < region.Bottom; y++)
                 {
-                    skeleton.X = mesh.Position.X;
-                    skeleton.Y = mesh.Position.Y;
-                    skeleton.UpdateWorldTransform();
-                    this.spineRender.Draw(skeleton);
+                    for (int x = region.Left; x < region.Right; x++)
+                    {
+                        Vector2 pos = mesh.Position + mesh.TileOffset * new Vector2(x, y);
+                        skeleton.X = pos.X;
+                        skeleton.Y = pos.Y;
+                        skeleton.UpdateWorldTransform();
+                        this.spineRender.Draw(skeleton);
+                    }
+                }
+            }
+            else
+            {
+                skeleton.X = mesh.Position.X;
+                skeleton.Y = mesh.Position.Y;
+                skeleton.UpdateWorldTransform();
+                this.spineRender.Draw(skeleton);
+            }
+        }
+
+        private void DrawItem(MeshItem mesh, TextMesh text)
+        {
+            if (text.Text != null && text.Font != null)
+            {
+                var size = text.Font.MeasureString(text.Text);
+                var pos = mesh.Position;
+
+                switch (text.Align)
+                {
+                    case Alignment.Near: break;
+                    case Alignment.Center: pos.X -= size.X / 2; break;
+                    case Alignment.Far: pos.X -= size.X; break;
+                }
+
+                if (text.BackColor.A > 0) //绘制背景
+                {
+                    var padding = text.Padding;
+                    var rect = new Rectangle((int)(pos.X - padding.Left),
+                        (int)(pos.Y - padding.Top),
+                        (int)(size.X + padding.Left + padding.Right),
+                        (int)(size.Y + padding.Top + padding.Bottom)
+                        );
+                    sprite.FillRoundCornerRectangle(rect, text.BackColor);
+                }
+
+                if (text.ForeColor.A > 0) //绘制文字
+                {
+                    sprite.DrawStringEx(text.Font, text.Text, pos, text.ForeColor);
+                }
+            }
+        }
+
+        private void DrawItem(LineListMesh lineList)
+        {
+            if (lineList != null && lineList.Lines != null)
+            {
+                var vertices = lineList.Lines;
+                for (int i = 0, i1 = vertices.Length / 2 * 2; i < i1; i+=2)
+                {
+                    sprite.DrawLine(vertices[i], vertices[i + 1], lineList.Thickness, lineList.Color);
                 }
             }
         }
@@ -124,6 +173,29 @@ namespace WzComparerR2.MapRender
         public Rectangle[] Measure(MeshItem mesh)
         {
             Rectangle rect = Rectangle.Empty;
+
+            if (mesh.RenderObject is TextMesh)
+            {
+                var textItem = (TextMesh)mesh.RenderObject;
+                var size = textItem.Font.MeasureString(textItem.Text);
+                var pos = mesh.Position;
+
+                switch (textItem.Align)
+                {
+                    case Alignment.Near: break;
+                    case Alignment.Center: pos.X -= size.X / 2; break;
+                    case Alignment.Far: pos.X -= size.X; break;
+                }
+
+                var padding = textItem.Padding;
+                var rectBg = new Rectangle((int)(pos.X - padding.Left),
+                    (int)(pos.Y - padding.Top),
+                    (int)(size.X + padding.Left + padding.Right),
+                    (int)(size.Y + padding.Top + padding.Bottom)
+                    );
+                var rectText = new Rectangle((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y);
+                return new Rectangle[] { Rectangle.Union(rectBg, rectText) };
+            }
 
             if (mesh.RenderObject is Frame)
             {
@@ -173,6 +245,29 @@ namespace WzComparerR2.MapRender
             InnerFlush();
             this.lastItem = ItemType.Unknown;
             this.isInBeginEndPair = false;
+        }
+
+        private void Prepare(ItemType itemType)
+        {
+            if (lastItem == itemType)
+            {
+                return;
+            }
+
+            switch (itemType)
+            {
+                case ItemType.Sprite:
+                    InnerFlush();
+                    lastItem = ItemType.Sprite;
+                    InnerBegin();
+                    break;
+
+                case ItemType.Skeleton:
+                    InnerFlush();
+                    lastItem = ItemType.Skeleton;
+                    InnerBegin();
+                    break;
+            }
         }
 
         private void InnerBegin()

@@ -17,6 +17,18 @@ namespace WzComparerR2.MapRender
         public SceneNodeCollection Nodes { get; private set; }
 
 
+        public IEnumerable<SceneNode> Descendants()
+        {
+            foreach(var node in this.Nodes)
+            {
+                yield return node;
+                foreach(var subNode in node.Descendants())
+                {
+                    yield return subNode;
+                }
+            }
+        }
+
         public class SceneNodeCollection : Collection<SceneNode>
         {
             public SceneNodeCollection(SceneNode owner)

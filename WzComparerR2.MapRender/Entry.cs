@@ -7,6 +7,7 @@ using WzComparerR2.PluginBase;
 using DevComponents.DotNetBar;
 using System.Threading;
 using System.Windows.Forms;
+using Game = Microsoft.Xna.Framework.Game;
 
 namespace WzComparerR2.MapRender
 {
@@ -20,9 +21,12 @@ namespace WzComparerR2.MapRender
 
         private RibbonBar bar;
         private ButtonItem btnItemMapRender;
+        private FrmMapRender mapRenderGame1;
 
         private RibbonBar bar2;
         private ButtonItem btnItemMapRenderV2;
+        private FrmMapRender2 mapRenderGame2;
+
 
         protected override void OnLoad()
         {
@@ -50,7 +54,7 @@ namespace WzComparerR2.MapRender
                 {
                     if (wzFile == null || wzFile.Type != Wz_Type.Map)
                     {
-                        if (MessageBoxEx.Show("所选Img不属于Map.wz，是否继续？", "提示", MessageBoxButtons.OKCancel ) != DialogResult.OK)
+                        if (MessageBoxEx.Show("所选Img不属于Map.wz，是否继续？", "提示", MessageBoxButtons.OKCancel) != DialogResult.OK)
                         {
                             goto exit;
                         }
@@ -63,7 +67,6 @@ namespace WzComparerR2.MapRender
                         sl.Load(PluginManager.FindWz(Wz_Type.String).GetValueEx<Wz_File>(null));
                     }
 
-
                     //开始绘制
                     Thread thread = new Thread(() =>
                     {
@@ -71,18 +74,43 @@ namespace WzComparerR2.MapRender
                         try
                         {
 #endif
-                        Microsoft.Xna.Framework.Game game;
                         if (sender == btnItemMapRender)
                         {
-                            game = new FrmMapRender(img) { StringLinker = sl };
+                            if (this.mapRenderGame1 != null)
+                            {
+                                return;
+                            }
+                            this.mapRenderGame1 = new FrmMapRender(img) { StringLinker = sl };
+                            try
+                            {
+                                using (this.mapRenderGame1)
+                                {
+                                    this.mapRenderGame1.Run();
+                                }
+                            }
+                            finally
+                            {
+                                this.mapRenderGame1 = null;
+                            }
                         }
                         else
                         {
-                            game = new FrmMapRender2(img);
-                        }
-                        using (game)
-                        {
-                            game.Run();
+                            if (this.mapRenderGame2 != null)
+                            {
+                                return;
+                            }
+                            this.mapRenderGame2 = new FrmMapRender2(img) { StringLinker = sl };
+                            try
+                            {
+                                using (this.mapRenderGame2)
+                                {
+                                    this.mapRenderGame2.Run();
+                                }
+                            }
+                            finally
+                            {
+                                this.mapRenderGame2 = null;
+                            }
                         }
 #if !DEBUG
                         }
@@ -93,6 +121,7 @@ namespace WzComparerR2.MapRender
 #endif
                     });
                     thread.SetApartmentState(ApartmentState.STA);
+                    thread.IsBackground = true;
                     thread.Start();
                     goto exit;
                 }
@@ -100,7 +129,7 @@ namespace WzComparerR2.MapRender
 
             MessageBoxEx.Show("没有选择一个map的img", "MapRender");
 
-        exit:
+            exit:
             btnItemMapRender.Enabled = true;
         }
 

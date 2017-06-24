@@ -77,6 +77,12 @@ namespace WzComparerR2.Animation
 
         protected virtual void UpdateFrame()
         {
+            if (this.Data.Frames.Count <= 0)
+            {
+                this.CurrentFrame = null;
+                return;
+            }
+
             float progress;
             int index = GetProcessFromTimeline(_timeline, _timeOffset, out progress);
 

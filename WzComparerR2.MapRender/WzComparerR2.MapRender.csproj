@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WzComparerR2.MapRender</RootNamespace>
     <AssemblyName>WzComparerR2.MapRender</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +32,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bass.Net">
@@ -41,6 +43,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="EmptyKeys.UserInterface">
+      <HintPath>..\References\EmptyKeys.UserInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="EmptyKeys.UserInterface.Core">
+      <HintPath>..\References\EmptyKeys.UserInterface.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="EmptyKeys.UserInterface.MonoGame">
+      <HintPath>..\References\EmptyKeys.UserInterface.MonoGame.dll</HintPath>
     </Reference>
     <Reference Include="MonoGame.Framework, Version=3.4.0.456, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -64,7 +75,6 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animation\IStateMachineAnimationData.cs" />
@@ -72,19 +82,24 @@
     <Compile Include="Animation\RepeatableFrameAnimator.cs" />
     <Compile Include="Animation\StateMachineAnimator.cs" />
     <Compile Include="FrmMapRender2.cs" />
+    <Compile Include="FrmMapRender2.SceneRendering.cs" />
     <Compile Include="GameExt.cs" />
+    <Compile Include="LineListMesh.cs" />
     <Compile Include="MapData.cs" />
     <Compile Include="MapScene.cs" />
     <Compile Include="MeshBatcher.cs" />
     <Compile Include="MeshItem.cs" />
+    <Compile Include="Music.cs" />
     <Compile Include="Net\ChatClient.cs" />
     <Compile Include="Patches2\BackItem.cs" />
     <Compile Include="Patches2\FootholdItem.cs" />
+    <Compile Include="Patches2\LadderRopeItem.cs" />
     <Compile Include="Patches2\LifeItem.cs" />
     <Compile Include="Patches2\ObjItem.cs" />
     <Compile Include="Patches2\PortalItem.cs" />
     <Compile Include="Patches2\ReactorItem.cs" />
     <Compile Include="Patches2\SceneItem.cs" />
+    <Compile Include="Patches2\SkyWhaleItem.cs" />
     <Compile Include="Patches2\TileItem.cs" />
     <Compile Include="Patches\BackPatch.cs" />
     <Compile Include="Camera.cs" />
@@ -107,6 +122,11 @@
     <Compile Include="Patches\PortalPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Patches\ReactorPatch.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="RenderAnimate.cs" />
     <Compile Include="RenderArgs.cs" />
     <Compile Include="RenderEnv.cs" />
@@ -115,14 +135,25 @@
     <Compile Include="Patches\RenderPatch.cs" />
     <Compile Include="ResourceLoader.cs" />
     <Compile Include="SceneNode.cs" />
+    <Compile Include="TextMesh.cs" />
     <Compile Include="TextureAtlas.cs" />
     <Compile Include="TextureLoader.cs" />
     <Compile Include="TileMode.cs" />
+    <Compile Include="UI\ITooltipTarget.cs" />
+    <Compile Include="UI\LCRBrush.cs" />
+    <Compile Include="UI\MapRenderUIRoot.cs" />
+    <Compile Include="UI\NinePatchBrush.cs" />
     <Compile Include="UI\Tooltip.cs" />
     <Compile Include="Patches\TooltipPatch.cs" />
     <Compile Include="UI\NineFormResource.cs" />
+    <Compile Include="UI\Tooltip2.cs" />
+    <Compile Include="UI\TooltipHelper.cs" />
     <Compile Include="UI\UIGraphics.cs" />
+    <Compile Include="UI\UIHelper.cs" />
     <Compile Include="UI\UIMiniMap.cs" />
+    <Compile Include="UI\UIMinimap2.cs" />
+    <Compile Include="UI\WcR2Engine.cs" />
+    <Compile Include="UI\WindowEx.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CharaSimResource\CharaSimResource.csproj">
@@ -146,7 +177,21 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Basic.img.ComboBox.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Basic.img.ComboBox.normal.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Basic.img.ComboBox.normal.2.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(TargetDir)*.dll" "$(SolutionDir)WzComparerR2\bin\$(ConfigurationName)\Plugin\$(ProjectName)" /I /Y</PostBuildEvent>
