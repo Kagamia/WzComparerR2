@@ -283,20 +283,21 @@ namespace WzComparerR2.CharaSimControl
 
             //绘制图标
             int iconY = picH;
-            g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_base, 14, picH);
+            int iconX = 14;
+            g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_base, iconX, picH);
             if (item.Icon.Bitmap != null)
             {
                 g.DrawImage(GearGraphics.EnlargeBitmap(item.Icon.Bitmap),
-                20 + (1 - item.Icon.Origin.X) * 2,
+                iconX + 6 + (1 - item.Icon.Origin.X) * 2,
                 picH + 6 + (33 - item.Icon.Bitmap.Height) * 2);
             }
             if (item.Cash)
             {
                 g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_0),
-                    20 + 68 - 26,
+                    iconX + 6 + 68 - 26,
                     picH + 6 + 68 - 26);
             }
-            g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, 18, picH + 4); //绘制左上角cover
+            g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, iconX + 4, picH + 4); //绘制左上角cover
 
             if (item.Props.TryGetValue(ItemPropType.reqLevel, out value))
             {
