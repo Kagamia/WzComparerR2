@@ -39,7 +39,7 @@ namespace WzComparerR2.Avatar
 
         public bool LoadZ()
         {
-            return LoadZ(PluginBase.PluginManager.FindWz("Base\\Zmap.img"));
+            return LoadZ(PluginBase.PluginManager.FindWz("Base\\zmap.img"));
         }
 
         public bool LoadZ(Wz_Node zMapNode)

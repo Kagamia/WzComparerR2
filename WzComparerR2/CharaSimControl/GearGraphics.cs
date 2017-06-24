@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using CharaSimResource;
 using WzComparerR2.CharaSim;
 using TR = System.Windows.Forms.TextRenderer;
+using TextFormatFlags = System.Windows.Forms.TextFormatFlags;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -91,10 +92,11 @@ namespace WzComparerR2.CharaSimControl
         /// 表示装备属性额外说明中使用的绿色画刷。
         /// </summary>
         public static readonly Brush GreenBrush2 = new SolidBrush(Color.FromArgb(204, 255, 0));
+        public static readonly Color GrayColor2 = Color.FromArgb(153, 153, 153);
         /// <summary>
         /// 表示用于绘制“攻击力提升”文字的灰色画刷。
         /// </summary>
-        public static readonly Brush GrayBrush2 = new SolidBrush(Color.FromArgb(153, 153, 153));
+        public static readonly Brush GrayBrush2 = new SolidBrush(GrayColor2);
         /// <summary>
         /// 表示套装名字的绿色画刷。
         /// </summary>
@@ -143,6 +145,12 @@ namespace WzComparerR2.CharaSimControl
         /// 表示红色品质的装备名字画刷，额外属性为70以上。
         /// </summary>
         public static readonly Brush GearNameBrushH = new SolidBrush(Color.FromArgb(255, 0, 119));
+
+        public static readonly Color gearCyanColor = Color.FromArgb(102, 255, 255);
+        /// <summary>
+        /// 表示装备属性变化的青色画刷。
+        /// </summary>
+        public static readonly Brush GearPropChangeBrush = new SolidBrush(gearCyanColor);
 
         public static Brush GetGearNameBrush(int diff, bool up)
         {
@@ -219,6 +227,19 @@ namespace WzComparerR2.CharaSimControl
                 r.WordWrapEnabled = false;
                 r.UseGDIRenderer = false;
                 r.DrawString(g, s, font, x, x1, ref y, height);
+            }
+        }
+
+        public static void DrawPlainText(Graphics g, string s, Font font, Color color, int x, int x1, ref int y, int height)
+        {
+            if (s == null)
+                return;
+
+            using (var r = new FormattedTextRenderer())
+            {
+                r.WordWrapEnabled = false;
+                r.UseGDIRenderer = false;
+                r.DrawPlainText(g, s, font, color, x, x1, ref y, height);
             }
         }
 
@@ -454,6 +475,22 @@ namespace WzComparerR2.CharaSimControl
                 DrawRuns(runs, x, x1, ref y, height);
             }
 
+            public void DrawPlainText(Graphics g, string s, Font font, Color color, int x, int x1, ref int y, int height)
+            {
+                this.g = g;
+                this.font = font;
+                this.sb.Clear();
+                this.sb.EnsureCapacity(s.Length);
+
+                float fontLineHeight = GetFontLineHeight(font);
+                this.infinityRect = new RectangleF(0, 0, ushort.MaxValue, fontLineHeight);
+
+                var runs = ParsePlainText(s, color);
+                runs = runs.SelectMany(run => SplitWords(run)).ToList();
+                MeasureRuns(runs);
+                DrawRuns(runs, x, x1, ref y, height);
+            }
+
             private List<Run> ParseFormat(string format)
             {
                 List<Run> runs = new List<Run>();
@@ -509,10 +546,16 @@ namespace WzComparerR2.CharaSimControl
                                 colorStack.Push(OrangeBrushColor);
                                 strPos++;
                             }
-                            else if (strPos < format.Length && format[strPos] == 'g')//遇到#c 换绿刷子并flush
+                            else if (strPos < format.Length && format[strPos] == 'g')//遇到#g(自定义) 换绿刷子并flush
                             {
                                 flushRun();
                                 colorStack.Push(GearGraphics.gearGreenColor);
+                                strPos++;
+                            }
+                            else if (strPos < format.Length && format[strPos] == '$')//遇到#$(自定义) 换青色刷子并flush
+                            {
+                                flushRun();
+                                colorStack.Push(GearGraphics.gearCyanColor);
                                 strPos++;
                             }
                             else if (colorStack.Count == 1) //同#c
@@ -543,6 +586,26 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 flushRun();
+                return runs;
+            }
+
+            private List<Run> ParsePlainText(string text, Color color)
+            {
+                List<Run> runs = new List<Run>();
+                var sr = new System.IO.StringReader(text);
+                for (int row = 0; sr.Peek() > -1; row++)
+                {
+                    if (row > 0)
+                    {
+                        runs.Add(new Run(sb.Length, 0) { IsBreakLine = true });
+                    }
+                    var line = sr.ReadLine();
+                    if (!string.IsNullOrEmpty(line))
+                    {
+                        sb.Append(line);
+                        runs.Add(new Run(sb.Length - line.Length, line.Length) { ForeColor = color });
+                    }
+                }
                 return runs;
             }
 
@@ -739,9 +802,9 @@ namespace WzComparerR2.CharaSimControl
                     {
                         string content = sb.ToString(start, end - start);
 
-                         if (this.UseGDIRenderer)
+                        if (this.UseGDIRenderer)
                         {
-                            TR.DrawText(g, content, font, new Point(drawX, drawY), color);
+                            TR.DrawText(g, content, font, new Point(drawX, drawY), color, TextFormatFlags.NoPrefix);
                         }
                         else
                         {
@@ -769,7 +832,7 @@ namespace WzComparerR2.CharaSimControl
                     if (run.IsBreakLine)
                     { //强行换行 并且flush
                         flush(true);
-                        if( r < runs.Count - 1)
+                        if (r < runs.Count - 1)
                         {
                             xOffset = runs[r + 1].X;
                         }

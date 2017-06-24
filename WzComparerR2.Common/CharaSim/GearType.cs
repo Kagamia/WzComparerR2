@@ -116,6 +116,7 @@ namespace WzComparerR2.CharaSim
         /// 纹章 119
         /// </summary>
         emblem = 119,
+        powerSource = 119020,
         /// <summary>
         /// 裤/裙 106
         /// </summary>
@@ -301,9 +302,9 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         connonGunPowder2 = 135298,
         /// <summary>
-        /// 能量源 135300
+        /// 控制器 135300
         /// </summary>
-        powerSource = 135300,
+        controller = 135300,
         /// <summary>
         /// 狐狸珠 135310
         /// </summary>

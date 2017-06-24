@@ -115,6 +115,12 @@ namespace WzComparerR2
             {
                 patchThread.Abort();
             }
+            ConfigManager.Reload();
+            WcR2Config.Default.PatcherSettings.Clear();
+            foreach (PatcherSetting item in comboBoxEx1.Items)
+            {
+                WcR2Config.Default.PatcherSettings.Add(item);
+            }
             ConfigManager.Save();
         }
 
@@ -299,8 +305,8 @@ namespace WzComparerR2
 
                     if (!string.IsNullOrEmpty(this.compareFolder)
                         && e.Part.Type == 1
-                        && Path.GetExtension(e.Part.FileName).Equals(".wz", StringComparison.CurrentCultureIgnoreCase)
-                        && !Path.GetFileName(e.Part.FileName).Equals("list.wz", StringComparison.CurrentCultureIgnoreCase))
+                        && Path.GetExtension(e.Part.FileName).Equals(".wz", StringComparison.OrdinalIgnoreCase)
+                        && !Path.GetFileName(e.Part.FileName).Equals("list.wz", StringComparison.OrdinalIgnoreCase))
                     {
                         Wz_Structure wznew = new Wz_Structure();
                         Wz_Structure wzold = new Wz_Structure();
@@ -312,6 +318,7 @@ namespace WzComparerR2
                             comparer.OutputAddedImg = chkOutputAddedImg.Checked;
                             comparer.OutputRemovedImg = chkOutputRemovedImg.Checked;
                             comparer.Comparer.PngComparison = (WzPngComparison)cmbComparePng.SelectedItem;
+                            comparer.Comparer.ResolvePngLink = chkResolvePngLink.Checked;
                             wznew.Load(e.Part.TempFilePath, false);
                             wzold.Load(e.Part.OldFilePath, false);
                             comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], this.compareFolder);
@@ -370,7 +377,7 @@ namespace WzComparerR2
             System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
             foreach (PatchPartContext part in patcher.PatchParts)
             {
-                if (part.FileName.Equals("map.wz", StringComparison.CurrentCultureIgnoreCase))
+                if (part.FileName.Equals("map.wz", StringComparison.OrdinalIgnoreCase))
                 {
                     patcher.RebuildFile(part, @"E:\", @"E:\MapleT");
                     break;

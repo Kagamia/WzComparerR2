@@ -28,10 +28,10 @@ namespace WzComparerR2.CharaSim
                     int end = idx, len = 0;
                     while ((++end) < H.Length)
                     {
-                        if ((H[end] >= 'a' && H[end] <= 'z') ||
-                            (H[end] >= 'A' && H[end] <= 'Z') ||
-                            (H[end] >= '0' && H[end] <= '9') ||
-                            H[end] == '_')
+                        if (H[end] == '_' ||
+                            ('a' <= H[end] && H[end] <= 'z') ||
+                            ('A' <= H[end] && H[end] <= 'Z') ||
+                            (end - idx > 1 && '0' <= H[end] && H[end] <= '9')) //^[_A-Za-z][_A-Za-z0-9]*$
                         {
                             len++;
                         }
@@ -152,7 +152,7 @@ namespace WzComparerR2.CharaSim
             //bool find = false;
             foreach (var kv in dict)
             {
-                if (kv.Key.Equals(key, StringComparison.CurrentCultureIgnoreCase))
+                if (kv.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
                 {
                     value = kv.Value;
                     return true;

@@ -158,6 +158,9 @@ namespace WzComparerR2.CharaSim
         jokerToSetItem,
         medalTag,
         ringOptionSkill,
-        ringOptionSkillLv
+        ringOptionSkillLv,
+        abilityTimeLimited,
+        blockGoldHammer,
+        exceptUpgrade,
     }
 }

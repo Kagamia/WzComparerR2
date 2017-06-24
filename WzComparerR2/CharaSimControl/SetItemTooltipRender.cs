@@ -125,7 +125,8 @@ namespace WzComparerR2.CharaSimControl
             {
                 g.DrawString(effect.Key + "套装效果", GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 8, picHeight);
                 picHeight += 16;
-                Brush brush = effect.Value.Enabled ? Brushes.White : GearGraphics.GrayBrush2;
+                //Brush brush = effect.Value.Enabled ? Brushes.White : GearGraphics.GrayBrush2;
+                var color = effect.Value.Enabled ? Color.White : GearGraphics.GrayColor2;
 
                 //T116 合并套装
                 var props = IsCombineProperties ? CombineProperties(effect.Value.PropsV5) : effect.Value.PropsV5;
@@ -136,8 +137,7 @@ namespace WzComparerR2.CharaSimControl
                         List<Potential> ops = (List<Potential>)prop.Value;
                         foreach (Potential p in ops)
                         {
-                            g.DrawString(p.ConvertSummary(), GearGraphics.ItemDetailFont2, brush, 8, picHeight);
-                            picHeight += 16;
+                            GearGraphics.DrawPlainText(g, p.ConvertSummary(), GearGraphics.ItemDetailFont2, color, 10, 244, ref picHeight, 16);
                         }
                     }
                     else if (prop.Key == GearPropType.OptionToMob)
@@ -145,8 +145,7 @@ namespace WzComparerR2.CharaSimControl
                         List<SetItemOptionToMob> ops = (List<SetItemOptionToMob>)prop.Value;
                         foreach (SetItemOptionToMob p in ops)
                         {
-                            g.DrawString(p.ConvertSummary(), GearGraphics.ItemDetailFont2, brush, 8, picHeight);
-                            picHeight += 16;
+                            GearGraphics.DrawPlainText(g, p.ConvertSummary(), GearGraphics.ItemDetailFont2, color, 10, 244, ref picHeight, 16);
                         }
                     }
                     else if (prop.Key == GearPropType.activeSkill)
@@ -161,15 +160,13 @@ namespace WzComparerR2.CharaSimControl
                                 sr.Name = p.SkillID.ToString();
                             }
                             string summary = "激活技能<" + sr.Name + "> Lv." + p.Level;
-                            g.DrawString(summary, GearGraphics.ItemDetailFont2, brush, 8, picHeight);
-                            picHeight += 16;
+                            GearGraphics.DrawPlainText(g, summary, GearGraphics.ItemDetailFont2, color, 10, 244, ref picHeight, 16);
                         }
                     }
                     else
                     {
-                        g.DrawString(ItemStringHelper.GetGearPropString(prop.Key, Convert.ToInt32(prop.Value)),
-                            GearGraphics.SetItemPropFont, brush, 8, picHeight);
-                        picHeight += 16;
+                        var summary = ItemStringHelper.GetGearPropString(prop.Key, Convert.ToInt32(prop.Value));
+                        GearGraphics.DrawPlainText(g, summary, GearGraphics.ItemDetailFont2, color, 10, 244, ref picHeight, 16);
                     }
                 }
             }

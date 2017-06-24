@@ -107,7 +107,7 @@ namespace WzComparerR2.PluginBase
             foreach (BaseItem item in ribbonCtrl.Items)
             {
                 if ((tabItem = item as RibbonTabItem) != null
-                    && string.Equals(Convert.ToString(tabItem.Tag), tabName, StringComparison.CurrentCultureIgnoreCase))
+                    && string.Equals(Convert.ToString(tabItem.Tag), tabName, StringComparison.OrdinalIgnoreCase))
                 {
                     ribbonPanel = tabItem.Panel;
                     break;

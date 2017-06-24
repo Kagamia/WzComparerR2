@@ -118,6 +118,8 @@ namespace WzComparerR2
             refreshRecentDocItems();
             //读取CharaSim配置
             UpdateCharaSimSettings();
+            //wz加载配置
+            UpdateWzLoadingSettings();
 
             //杂项配置
             labelItemAutoSaveFolder.Text = ImageHandlerConfig.Default.AutoSavePictureFolder;
@@ -150,6 +152,21 @@ namespace WzComparerR2
             tooltipQuickView.RecipeRender.ShowObjectID = Setting.Recipe.ShowID;
         }
 
+        void UpdateWzLoadingSettings()
+        {
+            var config = WcR2Config.Default;
+            Encoding enc;
+            try
+            {
+                enc = Encoding.GetEncoding(config.WzEncoding);
+            }
+            catch
+            {
+                enc = null;
+            }
+            Wz_Structure.DefaultEncoding = enc;
+        }
+
         void CharaSimLoader_WzFileFinding(object sender, FindWzEventArgs e)
         {
             string[] fullPath = null;
@@ -169,36 +186,36 @@ namespace WzComparerR2
             List<Wz_Node> preSearch = new List<Wz_Node>();
             if (e.WzType != Wz_Type.Unknown) //用wztype作为输入参数
             {
-                foreach (Wz_Structure wzs in openedWz)
+                IEnumerable<Wz_Structure> preSearchWz = e.WzFile?.WzStructure != null ?
+                    Enumerable.Repeat(e.WzFile.WzStructure, 1) :
+                    this.openedWz;
+                foreach (var wzs in preSearchWz)
                 {
-                    if (e.WzFile == null || e.WzFile.WzStructure == wzs)
+                    Wz_File baseWz = null;
+                    bool find = false;
+                    foreach (Wz_File wz_f in wzs.wz_files)
                     {
-                        Wz_File baseWz = null;
-                        bool find = false;
-                        foreach (Wz_File wz_f in wzs.wz_files)
+                        if (wz_f.Type == e.WzType)
                         {
-                            if (wz_f.Type == e.WzType)
-                            {
-                                preSearch.Add(wz_f.Node);
-                                find = true;
-                                //e.WzFile = wz_f;
-                            }
-                            if (wz_f.Type == Wz_Type.Base)
-                            {
-                                baseWz = wz_f;
-                            }
+                            preSearch.Add(wz_f.Node);
+                            find = true;
+                            //e.WzFile = wz_f;
                         }
-
-                        // detect data.wz
-                        if (baseWz != null && !find)
+                        if (wz_f.Type == Wz_Type.Base)
                         {
-                            string key = e.WzType.ToString();
-                            foreach (Wz_Node node in baseWz.Node.Nodes)
+                            baseWz = wz_f;
+                        }
+                    }
+
+                    // detect data.wz
+                    if (baseWz != null && !find)
+                    {
+                        string key = e.WzType.ToString();
+                        foreach (Wz_Node node in baseWz.Node.Nodes)
+                        {
+                            if (node.Text == key && node.Nodes.Count > 0)
                             {
-                                if (node.Text == key && node.Nodes.Count > 0)
-                                {
-                                    preSearch.Add(node);
-                                }
+                                preSearch.Add(node);
                             }
                         }
                     }
@@ -214,23 +231,34 @@ namespace WzComparerR2
                 }
                 return;
             }
-            //拼接剩余路径
-            string[] fullPath2 = new string[fullPath.Length - 1];
-            Array.Copy(fullPath, 1, fullPath2, 0, fullPath2.Length);
-
+      
             if (preSearch.Count <= 0)
             {
                 return;
             }
+
             foreach (var wzFileNode in preSearch)
             {
-                e.WzNode = wzFileNode.FindNodeByPath(true, true, fullPath2);
-                if (e.WzNode != null)
+                var searchNode = wzFileNode;
+                for (int i = 1; i < fullPath.Length && searchNode != null; i++)
                 {
+                    searchNode = searchNode.Nodes[fullPath[i]];
+                    var img = searchNode.GetValueEx<Wz_Image>(null);
+                    if (img != null)
+                    {
+                        searchNode = img.TryExtract() ? img.Node : null;
+                    }
+                }
+
+                if (searchNode != null)
+                {
+                    e.WzNode = searchNode;
                     e.WzFile = wzFileNode.Value as Wz_File;
                     return;
                 }
             }
+            //寻找失败
+            e.WzNode = null;
         }
 
         #region 界面主题配置
@@ -437,7 +465,7 @@ namespace WzComparerR2
             string aniName = GetSelectedNodeImageName();
 
             //添加到动画控件
-            if (node.Text.EndsWith(".atlas", StringComparison.InvariantCultureIgnoreCase))
+            if (node.Text.EndsWith(".atlas", StringComparison.OrdinalIgnoreCase))
             {
                 var spineData = this.pictureBoxEx1.LoadSpineAnimation(node);
 
@@ -1564,34 +1592,62 @@ namespace WzComparerR2
 
         private Node searchAdvTree(AdvTree advTree, int cellIndex, string[] patten, bool exact, bool ignoreCase)
         {
-            Node currentNode;
             if (advTree.Nodes.Count == 0)
                 return null;
-            currentNode = advTree.SelectedNode == null ? advTree.Nodes[0] : findNextNode(advTree.SelectedNode);
 
-            while (currentNode != null)
+            foreach (var node in findNextNode(advTree))
             {
-                bool check = checkSearchNodeText(currentNode, cellIndex, patten, exact, ignoreCase);
-                if (check)
-                    break;
-                currentNode = findNextNode(currentNode);
-            }
-            return currentNode;
-        }
-
-        private Node findNextNode(Node node)
-        {
-            if (node.Nodes.Count > 0)
-                return node.Nodes[0];
-            while (node.NextNode == null)
-            {
-                node = node.Parent;
-                if (node == null)
+                if (checkSearchNodeText(node, cellIndex, patten, exact, ignoreCase))
                 {
-                    return null;
+                    return node;
                 }
             }
-            return node.NextNode;
+            return null;
+        }
+
+        private IEnumerable<Node> findNextNode(AdvTree advTree)
+        {
+            var node = advTree.SelectedNode;
+            if (node == null)
+            {
+                node = advTree.Nodes[0];
+                yield return node;
+            }
+
+            var levelStack = new Stack<int>();
+            int index = node.Index + 1;
+
+            while (true)
+            {
+                if (node.Nodes.Count > 0)
+                {
+                    levelStack.Push(index);
+                    index = 0;
+                    yield return node = node.Nodes[index++];
+                    continue;
+                }
+
+                NodeCollection owner;
+
+                while (index >= (owner = (node.Parent?.Nodes ?? advTree.Nodes)).Count)
+                {
+                    node = node.Parent;
+                    if (node == null)
+                    {
+                        yield break;
+                    }
+                    if (levelStack.Count > 0)
+                    {
+                        index = levelStack.Pop();
+                    }
+                    else
+                    {
+                        index = node.Index + 1;
+                    }
+                }
+
+                yield return node = owner[index++];
+            }
         }
 
         private bool checkSearchNodeText(Node node, int cellIndex, string[] searchTextArray, bool exact, bool ignoreCase)
@@ -2635,6 +2691,7 @@ namespace WzComparerR2
                     System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
                     EasyComparer comparer = new EasyComparer();
                     comparer.Comparer.PngComparison = (WzPngComparison)cmbComparePng.SelectedItem;
+                    comparer.Comparer.ResolvePngLink = chkResolvePngLink.Checked;
                     comparer.OutputPng = chkOutputPng.Checked;
                     comparer.OutputAddedImg = chkOutputAddedImg.Checked;
                     comparer.OutputRemovedImg = chkOutputRemovedImg.Checked;
@@ -2872,6 +2929,18 @@ namespace WzComparerR2
             System.Diagnostics.Process.Start("https://github.com/Kagamia/WzComparerR2/releases");
         }
 
+        private void btnItemOptions_Click(object sender, System.EventArgs e)
+        {
+            var frm = new FrmOptions();
+            frm.Load(WcR2Config.Default);
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                ConfigManager.Reload();
+                frm.Save(WcR2Config.Default);
+                ConfigManager.Save();
+                UpdateWzLoadingSettings();
+            }
+        }
     }
 
     #region 内部用扩展方法

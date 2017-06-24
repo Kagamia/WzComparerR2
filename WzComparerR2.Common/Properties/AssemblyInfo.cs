@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("WzComparerR2.Common")]
-[assembly: AssemblyCopyright("Copyright © Kagamia Studio 2015-2016")]
+[assembly: AssemblyCopyright("Copyright © Kagamia Studio 2015-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // 可以指定所有这些值，也可以使用“生成号”和“修订号”的默认值，
 // 方法是按如下所示使用“*”:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.6.0")]
-[assembly: AssemblyFileVersion("2.0.6.70111")]
+[assembly: AssemblyVersion("2.0.7.3")]
+[assembly: AssemblyFileVersion("2.0.7.70425")]
