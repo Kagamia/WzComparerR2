@@ -13,11 +13,8 @@ namespace WzComparerR2
         static BassSoundPlayer()
         {
             BassNet.Registration("amethyst50504724@msn.com", "2X3223324222822");
-            //dllPath = Path.Combine(System.Windows.Forms.Application.StartupPath, "Lib", Un4seen.Bass.Utils.Is64Bit ? "x64" : "x86");
             bool success = Bass.LoadMe();
         }
-
-        private static string dllPath;
 
         public BassSoundPlayer()
         {
@@ -63,7 +60,7 @@ namespace WzComparerR2
                 {
                     if (inited = Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero))
                     {
-                        loadedPlugin = Bass.BASS_PluginLoadDirectory(dllPath);
+                        loadedPlugin = Bass.BASS_PluginLoadDirectory(Program.LibPath);
                     }
                 }
                 catch

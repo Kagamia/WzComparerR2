@@ -21,6 +21,8 @@ namespace WzComparerR2
             Program.StartMainForm();
         }
 
+        public static string LibPath { get; private set; }
+
         /// <summary>
         /// 这是程序入口无雾。
         /// </summary>
@@ -76,10 +78,10 @@ namespace WzComparerR2
 
         static void SetDllDirectory()
         {
-            string libPath = Path.Combine(Application.StartupPath, "Lib", Environment.Is64BitProcess ? "x64" : "x86");
-            SetDllDirectory(libPath);
+            LibPath = Path.Combine(Application.StartupPath, "Lib", Environment.Is64BitProcess ? "x64" : "x86");
+            SetDllDirectory(LibPath);
 
-            foreach (var dllName in Directory.GetFiles(libPath, "*.dll"))
+            foreach (var dllName in Directory.GetFiles(LibPath, "*.dll"))
             {
                 var handle = LoadLibrary(dllName);
             }
