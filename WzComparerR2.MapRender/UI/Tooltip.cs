@@ -7,6 +7,7 @@ using Resource = CharaSimResource.Resource;
 using WzComparerR2.MapRender.Patches;
 using WzComparerR2.Common;
 using WzComparerR2.Rendering;
+using static WzComparerR2.MapRender.UI.TooltipHelper;
 
 namespace WzComparerR2.MapRender.UI
 {
@@ -52,26 +53,22 @@ namespace WzComparerR2.MapRender.UI
                         stringLinker.StringMob.TryGetValue(p.LifeID, out sr);
                         Vector2 current = Vector2.Zero;
 
-                        PrepareTextBlock(blocks, env.Fonts.TooltipTitleFont, sr == null ? "(null)" : sr.Name, ref current, Color.White);
+                        blocks.Add(PrepareTextBlock(env.Fonts.TooltipTitleFont, sr == null ? "(null)" : sr.Name, ref current, Color.White));
                         current += new Vector2(4, 4);
-                        PrepareTextBlock(blocks, env.Fonts.TooltipContentFont, "id:" + p.LifeID.ToString("d7"), ref current, Color.White);
+                        blocks.Add(PrepareTextBlock(env.Fonts.TooltipContentFont, "id:" + p.LifeID.ToString("d7"), ref current, Color.White));
                         size.X = Math.Max(size.X, current.X);
                         current = new Vector2(0, current.Y + 16);
 
                         LifeInfo info = p.LifeInfo;
-
-                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "Level: " + info.level + (info.boss ? " (Boss)" : null), ref current, Color.White, ref size.X);
-                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "HP/MP: " + info.maxHP + " / " + info.maxMP, ref current, Color.White, ref size.X);
-                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "PAD/MAD: " + info.PADamage + " / " + info.MADamage, ref current, Color.White, ref size.X);
-                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "PDr/MDr: " + info.PDRate + "% / " + info.MDRate + "%", ref current, Color.White, ref size.X);
-                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "Acc/Eva: " + info.acc + " / " + info.eva, ref current, Color.White, ref size.X);
-                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "KB: " + info.pushed, ref current, Color.White, ref size.X);
-                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "Exp: " + info.exp, ref current, Color.White, ref size.X);
-                        if (info.undead) PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "undead: 1", ref current, Color.White, ref size.X);
-                        StringBuilder sb;
-                        if ((sb = GetLifeElemAttrString(ref info.elemAttr)).Length > 0)
-                            PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "elem: " + sb.ToString(), ref current, Color.White, ref size.X);
-                        size.Y = current.Y;
+                        Vector2 size2;
+                        var blocks2 = TooltipHelper.Prepare(info, env.Fonts, out size2);
+                        for (int i = 0; i < blocks2.Length; i++)
+                        {
+                            blocks2[i].Position.Y += current.Y;
+                            blocks.Add(blocks2[i]);
+                        }
+                        size.X = Math.Max(size.X, size2.X);
+                        size.Y = current.Y + size2.Y;
                     }
                     break;
                 case RenderObjectType.Npc:
@@ -80,9 +77,9 @@ namespace WzComparerR2.MapRender.UI
                         stringLinker.StringNpc.TryGetValue(p.LifeID, out sr);
                         Vector2 current = Vector2.Zero;
 
-                        PrepareTextBlock(blocks, env.Fonts.TooltipTitleFont, sr == null ? "(null)" : sr.Name, ref current, Color.White);
+                        blocks.Add(PrepareTextBlock(env.Fonts.TooltipTitleFont, sr == null ? "(null)" : sr.Name, ref current, Color.White));
                         current += new Vector2(4, 4);
-                        PrepareTextBlock(blocks, env.Fonts.TooltipContentFont, "id:" + p.LifeID.ToString("d7"), ref current, Color.White);
+                        blocks.Add(PrepareTextBlock(env.Fonts.TooltipContentFont, "id:" + p.LifeID.ToString("d7"), ref current, Color.White));
                         size.X = Math.Max(size.X, current.X);
                         current = new Vector2(0, current.Y + 16);
 
@@ -90,7 +87,7 @@ namespace WzComparerR2.MapRender.UI
                         {
                             if (kv.Value == p.Frames)
                             {
-                                PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "action: " + kv.Key, ref current, Color.White, ref size.X);
+                                blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, "action: " + kv.Key, ref current, Color.White, ref size.X));
                             }
                         }
                         size.Y = current.Y;
@@ -101,14 +98,14 @@ namespace WzComparerR2.MapRender.UI
                     {
                         PortalPatch p = tooltipTarget as PortalPatch;
                         Vector2 current = Vector2.Zero;
-                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "pName: " + p.PortalName, ref current, Color.White, ref size.X);
+                        blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, "pName: " + p.PortalName, ref current, Color.White, ref size.X));
                         string pTypeName = GetPortalTypeString(p.PortalType);
-                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "pType: " + p.PortalType + (pTypeName == null ? null : (" (" + pTypeName + ")")), ref current, Color.White, ref size.X);
+                        blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, "pType: " + p.PortalType + (pTypeName == null ? null : (" (" + pTypeName + ")")), ref current, Color.White, ref size.X));
                         stringLinker.StringMap.TryGetValue(p.ToMap, out sr);
-                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "toMap: " + (sr == null ? "(null)" : sr.Name) + "(" + p.ToMap + ")", ref current, Color.White, ref size.X);
-                        PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "toName: " + p.ToName, ref current, Color.White, ref size.X);
+                        blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, "toMap: " + (sr == null ? "(null)" : sr.Name) + "(" + p.ToMap + ")", ref current, Color.White, ref size.X));
+                        blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, "toName: " + p.ToName, ref current, Color.White, ref size.X));
                         if (!string.IsNullOrEmpty(p.Script))
-                            PrepareTextLine(blocks, env.Fonts.TooltipContentFont, "script: " + p.Script, ref current, Color.White, ref size.X);
+                            blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, "script: " + p.Script, ref current, Color.White, ref size.X));
                         size.Y = current.Y;
                     }
                     break;
@@ -119,7 +116,7 @@ namespace WzComparerR2.MapRender.UI
                 size += new Vector2(26, 26);
                 Vector2 origin = new Vector2(env.Input.MousePosition.X, env.Input.MousePosition.Y);
                 origin.X = MathHelper.Clamp(origin.X, 0, Math.Max(0, env.Camera.Width - size.X));
-                origin.Y = MathHelper.Clamp(origin.Y, 0, Math.Max(0, env.Camera.Height- size.Y));
+                origin.Y = MathHelper.Clamp(origin.Y, 0, Math.Max(0, env.Camera.Height - size.Y));
                 this.DrawFrame(env, origin, size);
 
                 origin += new Vector2(13, 13);
@@ -128,80 +125,6 @@ namespace WzComparerR2.MapRender.UI
                     env.Sprite.DrawStringEx(block.Font, block.Text, block.Position, block.ForeColor, -origin);
                 }
             }
-        }
-
-        private StringBuilder GetLifeElemAttrString(ref LifeInfo.ElemAttr elemAttr)
-        {
-            StringBuilder sb = new StringBuilder(14);
-            sb.Append(GetElemResistanceString("冰", elemAttr.I));
-            sb.Append(GetElemResistanceString("雷", elemAttr.L));
-            sb.Append(GetElemResistanceString("火", elemAttr.F));
-            sb.Append(GetElemResistanceString("毒", elemAttr.S));
-            sb.Append(GetElemResistanceString("圣", elemAttr.H));
-            sb.Append(GetElemResistanceString("暗", elemAttr.D));
-            sb.Append(GetElemResistanceString("物", elemAttr.P));
-            return sb;
-        }
-
-        private string GetPortalTypeString(int pType)
-        {
-            switch (pType)
-            {
-                case 0: return "地图出生点";
-                case 1: return "一般传送门(隐藏)";
-                case 2: return "一般传送门";
-                case 3: return "一般传送门(接触)";
-                case 6: return "时空门入口点";
-                case 7: return "脚本传送门";
-                case 8: return "脚本传送门(隐藏)";
-                case 9: return "脚本传送门(接触)";
-                case 10: return "地图内传送门";
-                case 12: return "弹力装置";
-                default: return null;
-            }
-        }
-
-        private string GetElemResistanceString(string elemName, LifeInfo.ElemResistance resist)
-        {
-            string e = null;
-            switch (resist)
-            {
-                case LifeInfo.ElemResistance.Immune: e = "× "; break;
-                case LifeInfo.ElemResistance.Resist: e = "△ "; break;
-                case LifeInfo.ElemResistance.Normal: e = null; break;
-                case LifeInfo.ElemResistance.Weak: e = "◎ "; break;
-            }
-            return e != null ? (elemName + e) : null;
-        }
-
-        private void PrepareTextBlock(IList<TextBlock> list, XnaFont font, string text, ref Vector2 pos, Color color)
-        {
-            Vector2 size = font.MeasureString(text);
-
-            TextBlock block = new TextBlock();
-            block.Font = font;
-            block.Text = text;
-            block.Position = pos;
-            block.ForeColor = color;
-            list.Add(block);
-
-            pos.X += size.X;
-        }
-
-        private void PrepareTextLine(IList<TextBlock> list, XnaFont font, string text, ref Vector2 pos, Color color, ref float maxWidth)
-        {
-            Vector2 size = font.MeasureString(text);
-
-            TextBlock block = new TextBlock();
-            block.Font = font;
-            block.Text = text;
-            block.Position = pos;
-            block.ForeColor = color;
-            list.Add(block);
-
-            maxWidth = Math.Max(pos.X + size.X, maxWidth);
-            pos.X = 0;
-            pos.Y += size.Y;
         }
 
         private void DrawFrame(RenderEnv env, Vector2 position, Vector2 size)
@@ -272,12 +195,5 @@ namespace WzComparerR2.MapRender.UI
                 env.Camera.Origin);
         }
 
-        private struct TextBlock
-        {
-            public Vector2 Position;
-            public Color ForeColor;
-            public XnaFont Font;
-            public string Text;
-        }
     }
 }

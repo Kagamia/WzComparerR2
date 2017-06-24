@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace WzComparerR2.MapRender.UI
 {
-    public class NineFormResource
+    public class NineFormResource : INinePatchResource<Texture2D>
     {
         /// <summary>
         /// 左上
@@ -55,6 +56,11 @@ namespace WzComparerR2.MapRender.UI
                     && this.SE.Height == this.SW.Height
                     && this.SW.Width == this.NW.Width;
             }
+        }
+
+        public Point GetSize(Texture2D texture)
+        {
+            return texture == null ? Point.Zero : new Point(texture.Width, texture.Height);
         }
     }
 }

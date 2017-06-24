@@ -22,11 +22,13 @@ namespace WzComparerR2.MapRender
             get { return IsVisible(RenderObjectType.Back); }
             set { this.SetVisible(RenderObjectType.Back, value); }
         }
+
         public bool ReactorVisible
         {
             get { return IsVisible(RenderObjectType.Reactor); }
             set { this.SetVisible(RenderObjectType.Reactor, value); }
         }
+
         public bool ObjVisible
         {
             get { return IsVisible(RenderObjectType.Obj); }
@@ -63,6 +65,7 @@ namespace WzComparerR2.MapRender
             set { this.SetVisible(RenderObjectType.LadderRope, value); }
         }
 
+        public bool SkyWhaleVisible { get; set; }
 
         public bool PortalVisible
         {
@@ -91,6 +94,5 @@ namespace WzComparerR2.MapRender
         {
             this.dictVisible[type] = visible;
         }
-
     }
 }

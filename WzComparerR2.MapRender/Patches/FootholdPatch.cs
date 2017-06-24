@@ -71,7 +71,7 @@ namespace WzComparerR2.MapRender.Patches
             Vector2 origin = env.Camera.Origin;
             Point p1 = new Point(x1 - (int)origin.X, y1 - (int)origin.Y);
             Point p2 = new Point(x2 - (int)origin.X, y2 - (int)origin.Y);
-            Color color = Methods.LerpColor(colorTable, (float)gameTime.TotalGameTime.TotalMilliseconds % 10000 / 2000);
+            Color color = MathHelper2.Lerp(colorTable, (float)gameTime.TotalGameTime.TotalMilliseconds % 10000 / 2000);
             if (x1 != x2 && y1 != y2)
             {
             }
