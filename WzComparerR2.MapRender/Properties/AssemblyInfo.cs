@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
 [assembly: AssemblyTitle("WzComparerR2.MapRender")]
-[assembly: AssemblyDescription("用于WzComparerR2的地图渲染插件。")]
+[assembly: AssemblyDescription("Map Simulator Plugin for WzComparerR2.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kagamia Studio")]
 [assembly: AssemblyProduct("WzComparerR2.MapRender")]
-[assembly: AssemblyCopyright("Copyright © 癫ω倒④ゞ 2015")]
+[assembly: AssemblyCopyright("Copyright © Kagamia Studio 2015-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // 可以指定所有这些值，也可以使用“生成号”和“修订号”的默认值，
 // 方法是按如下所示使用“*”:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.0.70111-Alpha")]
+[assembly: AssemblyVersion("2.0.0.1")]
+[assembly: AssemblyFileVersion("2.0.0.70625-Alpha")]
