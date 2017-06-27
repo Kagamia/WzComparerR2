@@ -15,7 +15,6 @@ namespace WzComparerR2.MapRender
 {
     public partial class FrmMapRender2
     {
-
         private void UpdateAllItems(SceneNode node, TimeSpan elapsed)
         {
             var container = node as ContainerNode;
@@ -133,6 +132,11 @@ namespace WzComparerR2.MapRender
             tooltip.TooltipTarget = target;
         }
 
+        private void OnSceneItemClick(SceneItem item)
+        {
+
+        }
+
         private void DrawScene(GameTime gameTime)
         {
             allItems.Clear();
@@ -169,6 +173,20 @@ namespace WzComparerR2.MapRender
             DrawFootholds(gameTime);
 
             this.batcher.End();
+        }
+
+        private void DrawTooltipItems(GameTime gameTime)
+        {
+            var pos = renderEnv.Camera.CameraToWorld(renderEnv.Input.MousePosition);
+            var origin = renderEnv.Camera.Origin.ToPoint();
+            foreach (var item in mapData.Tooltips)
+            {
+                if (item.CharRect.Contains(pos) || item.Rect.Contains(pos))
+                {
+                    var center = new Vector2(item.Rect.Center.X - origin.X, item.Rect.Center.Y - origin.Y);
+                    tooltip.Draw(gameTime, renderEnv, item, center);
+                }
+            }
         }
 
         private void DrawFootholds(GameTime gameTime)
@@ -332,7 +350,7 @@ namespace WzComparerR2.MapRender
                             {
                                 mesh = new MeshItem()
                                 {
-                                    Position = new Vector2(life.X, life.Cy + 24),
+                                    Position = new Vector2(life.X, life.Cy + 20),
                                     RenderObject = new TextMesh()
                                     {
                                         Align = Alignment.Center,

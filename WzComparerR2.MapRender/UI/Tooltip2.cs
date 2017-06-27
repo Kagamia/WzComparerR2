@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Res = CharaSimResource.Resource;
@@ -40,6 +39,21 @@ namespace WzComparerR2.MapRender.UI
             }
         }
 
+        public void Draw(GameTime gameTime, RenderEnv env, object item, Vector2 centerPosition)
+        {
+            if (item == null)
+            {
+                return;
+            }
+
+            var content = Draw(gameTime, env, item);
+            if (content.blocks != null)
+            {
+                var pos = new Vector2(centerPosition.X - content.size.X / 2, centerPosition.Y - content.size.Y / 2);
+                DrawContent(env, content, pos, false);
+            }
+        }
+
         private void LoadContent(GraphicsDevice graphicsDevice)
         {
             var res = new NineFormResource();
@@ -68,6 +82,14 @@ namespace WzComparerR2.MapRender.UI
             else if (target is ReactorItem)
             {
                 return DrawItem(gameTime, env, (ReactorItem)target);
+            }
+            else if (target is TooltipItem)
+            {
+                return DrawItem(gameTime, env, (TooltipItem)target);
+            }
+            else if (target is PortalItem.ItemTooltip)
+            {
+                return DrawString(gameTime, env, ((PortalItem.ItemTooltip)target).Title);
             }
             else if (target is string)
             {
@@ -193,6 +215,29 @@ namespace WzComparerR2.MapRender.UI
 
             sb.Length -= 2;
             blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, sb.ToString(), ref current, Color.White, ref size.X));
+            size.Y = current.Y;
+            return new TooltipContent() { blocks = blocks, size = size };
+        }
+
+        private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, TooltipItem item)
+        {
+            var blocks = new List<TextBlock>();
+            Vector2 size = Vector2.Zero;
+            Vector2 current = Vector2.Zero;
+
+            if (!string.IsNullOrEmpty(item.Title))
+            {
+                blocks.Add(PrepareTextLine(env.Fonts.TooltipTitleFont, item.Title, ref current, Color.White, ref size.X));
+            }
+            if (!string.IsNullOrEmpty(item.Desc))
+            {
+                blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, item.Desc, ref current, Color.White, ref size.X));
+            }
+            if (!string.IsNullOrEmpty(item.ItemEU))
+            {
+                blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, item.ItemEU, ref current, Color.White, ref size.X));
+            }
+
             size.Y = current.Y;
             return new TooltipContent() { blocks = blocks, size = size };
         }

@@ -101,6 +101,7 @@
     <Compile Include="Patches2\SceneItem.cs" />
     <Compile Include="Patches2\SkyWhaleItem.cs" />
     <Compile Include="Patches2\TileItem.cs" />
+    <Compile Include="Patches2\TooltipItem.cs" />
     <Compile Include="Patches\BackPatch.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Chat.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="UI\UIMiniMap.cs" />
     <Compile Include="UI\UIMinimap2.cs" />
     <Compile Include="UI\WcR2Engine.cs" />
+    <Compile Include="UI\WcR2Renderer.cs" />
     <Compile Include="UI\WindowEx.cs" />
   </ItemGroup>
   <ItemGroup>

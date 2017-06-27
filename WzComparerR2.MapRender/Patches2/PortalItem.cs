@@ -19,6 +19,7 @@ namespace WzComparerR2.MapRender.Patches2
         public int Image { get; set; }
 
         public ItemView View { get; set; }
+        public ItemTooltip Tooltip { get; set; }
 
         public static PortalItem LoadFromNode(Wz_Node node)
         {
@@ -47,6 +48,11 @@ namespace WzComparerR2.MapRender.Patches2
             public object EditorAnimator { get; set; }
 
             public Controller Controller { get; set; }
+        }
+
+        public class ItemTooltip
+        {
+            public string Title { get; set; }
         }
 
         public class Controller : IDisposable

@@ -3,9 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WzComparerR2.WzLib;
+using WzComparerR2.Common;
+using WzComparerR2.PluginBase;
+using WzComparerR2.Rendering;
 using EmptyKeys.UserInterface;
 using EmptyKeys.UserInterface.Controls;
 using EmptyKeys.UserInterface.Input;
+using EmptyKeys.UserInterface.Media;
 
 namespace WzComparerR2.MapRender.UI
 {
@@ -20,6 +25,12 @@ namespace WzComparerR2.MapRender.UI
             };
             holder.Register();
             return holder;
+        }
+
+        public static TextureBase LoadTexture(Wz_Node node)
+        {
+            var png = node?.GetLinkedSourceNode(PluginManager.FindWz)?.GetValueEx<Wz_Png>(null);
+            return png == null ? null : Engine.Instance.Renderer.CreateTexture(png);
         }
 
         class ClickEventHolder<T> : IDisposable

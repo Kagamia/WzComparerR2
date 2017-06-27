@@ -14,7 +14,7 @@ namespace WzComparerR2.MapRender
             this.fonts = new Dictionary<string, XnaFont>();
             this.graphicsDevice = graphicsDevice;
             fonts["default"] = new XnaFont(graphicsDevice, "宋体", 12f);
-            fonts["npcName"] = new XnaFont(graphicsDevice, "宋体", 14f);
+            fonts["npcName"] = fonts["default"];
             fonts["mobName"] = fonts["default"];
             fonts["mobLevel"] = new XnaFont(graphicsDevice, "Tahoma", 9f);
             fonts["tooltipTitle"] = new XnaFont(graphicsDevice, new Font("宋体", 14f, FontStyle.Bold, GraphicsUnit.Pixel));

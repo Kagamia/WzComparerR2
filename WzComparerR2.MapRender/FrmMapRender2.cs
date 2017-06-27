@@ -78,7 +78,6 @@ namespace WzComparerR2.MapRender
 
         GraphicsDeviceManager graphics;
         Wz_Image mapImg;
-        XnaFont font;
         RenderEnv renderEnv;
         MapData mapData;
         ResourceLoader resLoader;
@@ -321,16 +320,13 @@ namespace WzComparerR2.MapRender
                     });
                     return mouseTarget.item;
                 },
-                (item) => {
-                    this.ui.IsEnabled = true;
-                });
+                this.OnSceneItemClick);
         }
 
         protected override void LoadContent()
         {
             base.LoadContent();
             this.resLoader = new ResourceLoader(this.Services);
-            this.font = new XnaFont(this.GraphicsDevice, "宋体", 12);
             this.mapData = new MapData();
 
             if (this.mapImg != null)
@@ -404,7 +400,46 @@ namespace WzComparerR2.MapRender
                 this.ui.Minimap.MinimapCanvas = null;
             }
 
-            this.ui.Minimap.MapRegion = mapData.VRect.ToRect();
+            this.ui.Minimap.Icons.Clear();
+            foreach(var portal in this.mapData.Scene.Fly.Portal.Slots.OfType<PortalItem>())
+            {
+                switch (portal.Type)
+                {
+                    case 2:
+                    case 7:
+                        object tooltip = portal.Tooltip;
+                        if (tooltip == null && portal.ToMap != null && portal.ToMap != 999999999
+                            && StringLinker.StringMap.TryGetValue(portal.ToMap.Value, out sr))
+                        {
+                            tooltip = sr["mapName"];
+                        }
+                        this.ui.Minimap.Icons.Add(new UIMinimap2.MapIcon()
+                        {
+                            IconType = UIMinimap2.IconType.Portal,
+                            Tooltip = tooltip,
+                            WorldPosition = new EmptyKeys.UserInterface.PointF(portal.X, portal.Y)
+                        });
+                        break;
+
+                    case 10:
+                        this.ui.Minimap.Icons.Add(new UIMinimap2.MapIcon()
+                        {
+                            IconType = UIMinimap2.IconType.Transport,
+                            Tooltip = portal.Tooltip,
+                            WorldPosition = new EmptyKeys.UserInterface.PointF(portal.X, portal.Y)
+                        });
+                        break;
+                }
+            }
+
+            if (mapData.MiniMap.Width > 0 && mapData.MiniMap.Height > 0)
+            {
+                this.ui.Minimap.MapRegion = new Rectangle(-mapData.MiniMap.CenterX, -mapData.MiniMap.CenterY, mapData.MiniMap.Width, mapData.MiniMap.Height).ToRect();
+            }
+            else
+            {
+                this.ui.Minimap.MapRegion = this.mapData.VRect.ToRect();
+            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -436,6 +471,7 @@ namespace WzComparerR2.MapRender
 
             this.GraphicsDevice.Clear(Color.Black);
             DrawScene(gameTime);
+            DrawTooltipItems(gameTime);
             this.ui.Draw(gameTime.ElapsedGameTime.TotalMilliseconds);
             this.tooltip.Draw(gameTime, renderEnv);
             base.Draw(gameTime);
