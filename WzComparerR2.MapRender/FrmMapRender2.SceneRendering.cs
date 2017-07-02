@@ -450,9 +450,26 @@ namespace WzComparerR2.MapRender
             }
 
             //计算坐标
-            var renderObject = (back.View.Animator as FrameAnimator)?.CurrentFrame.Rectangle.Size ?? Point.Zero;
-            int cx = (back.Cx == 0 ? renderObject.X : back.Cx);
-            int cy = (back.Cy == 0 ? renderObject.Y : back.Cy);
+            Point renderSize;
+            if (back.View.Animator is FrameAnimator)
+            {
+                var ani = (FrameAnimator)back.View.Animator;
+                renderSize = ani.CurrentFrame.Rectangle.Size;
+            }
+            else if (back.View.Animator is SpineAnimator)
+            {
+                var ani = (SpineAnimator)back.View.Animator;
+                var data = ani.Data.SkeletonData;
+                var rect = ani.Measure();
+                renderSize = rect.Size; // new Point((int)data.Width, (int)data.Height);
+            }
+            else
+            {
+                renderSize = Point.Zero;
+            }
+            
+            int cx = (back.Cx == 0 ? renderSize.X : back.Cx);
+            int cy = (back.Cy == 0 ? renderSize.Y : back.Cy);
 
             Vector2 tileOff = new Vector2(cx, cy);
             Vector2 position = new Vector2(back.X, back.Y);

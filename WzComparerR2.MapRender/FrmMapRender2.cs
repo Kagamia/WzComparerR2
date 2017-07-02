@@ -451,8 +451,8 @@ namespace WzComparerR2.MapRender
             //需要手动更新数据部分
             this.renderEnv.Camera.AdjustToWorldRect();
             {
-                var point = this.renderEnv.Camera.Center;
-                this.ui.Minimap.CameraCenter = new EmptyKeys.UserInterface.PointF(point.X, point.Y);
+                var rect = this.renderEnv.Camera.ClipRect;
+                this.ui.Minimap.CameraViewPort = new EmptyKeys.UserInterface.Rect(rect.X, rect.Y, rect.Width, rect.Height);
             }
             //更新ui
             this.ui.UpdateLayout(gameTime.ElapsedGameTime.TotalMilliseconds);

@@ -46,6 +46,7 @@ namespace WzComparerR2.MapRender.UI
         private RasterizerState rasterizeStateGeometry = new RasterizerState { ScissorTestEnable = false, CullMode = CullMode.None, FillMode = FillMode.Solid };
         private bool isSpriteRenderInProgress;
 
+        #region notChanged
         /// <summary>
         /// Gets a value indicating whether is full screen.
         /// </summary>
@@ -72,7 +73,7 @@ namespace WzComparerR2.MapRender.UI
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MonoGameRenderer" /> class.
+        /// Initializes a new instance of the <see cref="WcR2Renderer" /> class.
         /// </summary>
         /// <param name="graphicsDevice">The graphics device.</param>
         /// <param name="nativeScreenWidth">Width of the native screen.</param>
@@ -285,15 +286,6 @@ namespace WzComparerR2.MapRender.UI
         }
 
         /// <summary>
-        /// Creates the geometry buffer.
-        /// </summary>
-        /// <returns></returns>
-        public override GeometryBuffer CreateGeometryBuffer()
-        {
-            return new MonoGameGeometryBuffer();
-        }
-
-        /// <summary>
         /// Draws the color of the geometry.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
@@ -315,77 +307,6 @@ namespace WzComparerR2.MapRender.UI
             basicEffect.VertexColorEnabled = true;
 
             DrawGeometry(buffer, position, depth);
-        }
-
-        private void DrawGeometry(GeometryBuffer buffer, PointF position, float depth)
-        {
-            if (isSpriteRenderInProgress)
-            {
-                spriteBatch.End();
-            }
-
-            MonoGameGeometryBuffer monoGameBuffer = buffer as MonoGameGeometryBuffer;
-            GraphicsDevice device = GraphicsDevice;
-
-            RasterizerState rasState = device.RasterizerState;
-            BlendState blendState = device.BlendState;
-            DepthStencilState stencilState = device.DepthStencilState;
-
-            device.BlendState = BlendState.AlphaBlend;
-            device.DepthStencilState = DepthStencilState.DepthRead;
-
-            if (isClipped)
-            {
-                device.RasterizerState = clippingRasterizeState;
-            }
-            else
-            {
-                device.RasterizerState = rasterizeStateGeometry;
-            }
-
-            basicEffect.World = Matrix.CreateTranslation(position.X, position.Y, depth);
-            basicEffect.View = Matrix.CreateLookAt(new Vector3(0.0f, 0.0f, 1.0f), Vector3.Zero, Vector3.Up);
-            basicEffect.Projection = Matrix.CreateOrthographicOffCenter(0, (float)device.Viewport.Width, (float)device.Viewport.Height, 0, 1.0f, 1000.0f);
-
-            device.SetVertexBuffer(monoGameBuffer.VertexBuffer);
-            foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-
-                switch (buffer.PrimitiveType)
-                {
-                    case GeometryPrimitiveType.TriangleList:
-                        device.DrawPrimitives(PrimitiveType.TriangleList, 0, monoGameBuffer.PrimitiveCount);
-                        break;
-                    case GeometryPrimitiveType.TriangleStrip:
-                        device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, monoGameBuffer.PrimitiveCount);
-                        break;
-                    case GeometryPrimitiveType.LineList:
-                        device.DrawPrimitives(PrimitiveType.LineList, 0, monoGameBuffer.PrimitiveCount);
-                        break;
-                    case GeometryPrimitiveType.LineStrip:
-                        device.DrawPrimitives(PrimitiveType.LineStrip, 0, monoGameBuffer.PrimitiveCount);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            device.DepthStencilState = stencilState;
-            device.BlendState = blendState;
-            device.RasterizerState = rasState;
-
-            if (isSpriteRenderInProgress)
-            {
-                if (isClipped)
-                {
-                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, clippingRasterizeState, effect: currentActiveEffect);
-                }
-                else
-                {
-                    spriteBatch.Begin(effect: currentActiveEffect);
-                }
-            }
         }
 
         /// <summary>
@@ -455,6 +376,7 @@ namespace WzComparerR2.MapRender.UI
         {
             throw new NotImplementedException();
         }
+        #endregion
 
         #region changed
         public override FontBase CreateFont(object nativeFont)
@@ -551,6 +473,183 @@ namespace WzComparerR2.MapRender.UI
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearClamp, DepthStencilState.None, clippingRasterizeState, effect: currentActiveEffect);
             clipRectanges.Push(clipRect);
         }
+
+        /// <summary>
+        /// Creates the geometry buffer.
+        /// </summary>
+        /// <returns></returns>
+        public override GeometryBuffer CreateGeometryBuffer()
+        {
+            return new WcR2GeometryBuffer(this.GraphicsDevice);
+        }
+
+        private void DrawGeometry(GeometryBuffer buffer, PointF position, float depth)
+        {
+            if (isSpriteRenderInProgress)
+            {
+                spriteBatch.End();
+            }
+
+            WcR2GeometryBuffer wcR2Buffer = buffer as WcR2GeometryBuffer;
+            GraphicsDevice device = GraphicsDevice;
+
+            RasterizerState rasState = device.RasterizerState;
+            BlendState blendState = device.BlendState;
+            DepthStencilState stencilState = device.DepthStencilState;
+
+            device.BlendState = BlendState.NonPremultiplied;
+            device.DepthStencilState = DepthStencilState.DepthRead;
+
+            if (isClipped)
+            {
+                device.RasterizerState = clippingRasterizeState;
+            }
+            else
+            {
+                device.RasterizerState = rasterizeStateGeometry;
+            }
+
+            basicEffect.World = Matrix.CreateTranslation(position.X, position.Y, depth);
+            basicEffect.View = Matrix.CreateLookAt(new Vector3(0.0f, 0.0f, 1.0f), Vector3.Zero, Vector3.Up);
+            basicEffect.Projection = Matrix.CreateOrthographicOffCenter(0, (float)device.Viewport.Width, (float)device.Viewport.Height, 0, 1.0f, 1000.0f);
+
+            device.SetVertexBuffer(wcR2Buffer.VertexBuffer);
+            foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+
+                switch (buffer.PrimitiveType)
+                {
+                    case GeometryPrimitiveType.TriangleList:
+                        device.DrawPrimitives(PrimitiveType.TriangleList, 0, wcR2Buffer.PrimitiveCount);
+                        break;
+                    case GeometryPrimitiveType.TriangleStrip:
+                        device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, wcR2Buffer.PrimitiveCount);
+                        break;
+                    case GeometryPrimitiveType.LineList:
+                        device.DrawPrimitives(PrimitiveType.LineList, 0, wcR2Buffer.PrimitiveCount);
+                        break;
+                    case GeometryPrimitiveType.LineStrip:
+                        device.DrawPrimitives(PrimitiveType.LineStrip, 0, wcR2Buffer.PrimitiveCount);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            device.DepthStencilState = stencilState;
+            device.BlendState = blendState;
+            device.RasterizerState = rasState;
+
+            if (isSpriteRenderInProgress)
+            {
+                if (isClipped)
+                {
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearClamp, DepthStencilState.None, clippingRasterizeState, effect: currentActiveEffect);
+                }
+                else
+                {
+                    spriteBatch.Begin(effect: currentActiveEffect);
+                }
+            }
+        }
         #endregion
+    }
+
+    public class WcR2GeometryBuffer : GeometryBuffer
+    {
+        /// <summary>
+        /// Gets or sets the vertex buffer.
+        /// </summary>
+        /// <value>
+        /// The vertex buffer.
+        /// </value>
+        public VertexBuffer VertexBuffer { get; set; }
+
+        private GraphicsDevice graphicsDevice;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WcR2GeometryBuffer"/> class.
+        /// </summary>
+        public WcR2GeometryBuffer(GraphicsDevice device)
+            : base()
+        {
+            this.graphicsDevice = device;
+        }
+
+        /// <summary>
+        /// Fills the color type buffer (VertexPositionColor)
+        /// </summary>
+        /// <param name="points">The points.</param>
+        /// <param name="primitiveType">Type of the primitive.</param>
+        public override void FillColor(List<PointF> points, GeometryPrimitiveType primitiveType)
+        {
+            SetPrimitiveCount(primitiveType, points.Count);
+
+            VertexPositionColor[] vertex = new VertexPositionColor[points.Count];
+            for (int i = 0; i < points.Count; i++)
+            {
+                vertex[i] = new VertexPositionColor(new Vector3(points[i].X, points[i].Y, 0), Color.White);
+            }
+
+            VertexBuffer = new VertexBuffer(graphicsDevice, VertexPositionColor.VertexDeclaration, vertex.Length, BufferUsage.WriteOnly);
+            VertexBuffer.SetData<VertexPositionColor>(vertex);
+        }
+
+        private void SetPrimitiveCount(GeometryPrimitiveType primitiveType, int pointCount)
+        {
+            PrimitiveType = primitiveType;
+            switch (primitiveType)
+            {
+                case GeometryPrimitiveType.TriangleList:
+                    PrimitiveCount = pointCount / 3;
+                    break;
+                case GeometryPrimitiveType.TriangleStrip:
+                    PrimitiveCount = pointCount - 2;
+                    break;
+                case GeometryPrimitiveType.LineList:
+                    PrimitiveCount = pointCount / 2;
+                    break;
+                case GeometryPrimitiveType.LineStrip:
+                    PrimitiveCount = pointCount - 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Fills the texture type buffer (VertexPositionTexture)
+        /// </summary>
+        /// <param name="points">The points.</param>
+        /// <param name="destinationSize">Size of the destination.</param>
+        /// <param name="sourceRect">The source rect.</param>
+        /// <param name="primitiveType">Type of the primitive.</param>
+        public override void FillTexture(List<PointF> points, Size destinationSize, Rect sourceRect, GeometryPrimitiveType primitiveType)
+        {
+            SetPrimitiveCount(primitiveType, points.Count);
+
+            VertexPositionTexture[] vertex = new VertexPositionTexture[points.Count];
+            for (int i = 0; i < points.Count; i++)
+            {
+                Vector2 uv = new Vector2(sourceRect.X + (points[i].X / destinationSize.Width) * sourceRect.Width,
+                                         sourceRect.Y + (points[i].Y / destinationSize.Height) * sourceRect.Height);
+                vertex[i] = new VertexPositionTexture(new Vector3(points[i].X, points[i].Y, 0), uv);
+            }
+
+            VertexBuffer = new VertexBuffer(graphicsDevice, VertexPositionTexture.VertexDeclaration, vertex.Length, BufferUsage.WriteOnly);
+            VertexBuffer.SetData<VertexPositionTexture>(vertex);
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public override void Dispose()
+        {
+            if (VertexBuffer != null && !VertexBuffer.IsDisposed)
+            {
+                VertexBuffer.Dispose();
+            }
+        }
     }
 }
