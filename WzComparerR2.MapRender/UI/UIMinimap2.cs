@@ -6,16 +6,13 @@ using System.Threading.Tasks;
 
 using EmptyKeys.UserInterface;
 using EmptyKeys.UserInterface.Controls;
-using EmptyKeys.UserInterface.Input;
 using EmptyKeys.UserInterface.Media;
-using EmptyKeys.UserInterface.Themes;
 using EmptyKeys.UserInterface.Data;
 using EmptyKeys.UserInterface.Renderers;
 using EmptyKeys.UserInterface.Media.Imaging;
 
 using Microsoft.Xna.Framework;
-using WzComparerR2.Rendering;
-using Texture2D = Microsoft.Xna.Framework.Graphics.Texture2D;
+using WzComparerR2.WzLib;
 using Res = CharaSimResource.Resource;
 using MRes = WzComparerR2.MapRender.Properties.Resources;
 using MathHelper = Microsoft.Xna.Framework.MathHelper;
@@ -29,14 +26,15 @@ namespace WzComparerR2.MapRender.UI
         public static readonly DependencyProperty MapNameProperty = DependencyProperty.Register("MapName", typeof(string), typeof(UIMinimap2), new FrameworkPropertyMetadata(null));
         public static readonly DependencyProperty MapMarkProperty = DependencyProperty.Register("MapMark", typeof(TextureBase), typeof(UIMinimap2), new FrameworkPropertyMetadata(null));
         public static readonly DependencyProperty MinimapCanvasProperty = DependencyProperty.Register("MinimapCanvas", typeof(TextureBase), typeof(UIMinimap2), new FrameworkPropertyMetadata(null));
-        public static readonly DependencyProperty MapRegionProperty = DependencyProperty.Register("MapRegion", typeof(Rect), typeof(UIMinimap2), new FrameworkPropertyMetadata(null));
-        public static readonly DependencyProperty CameraCenterProperty = DependencyProperty.Register("CameraCenter", typeof(Rect), typeof(PointF), new FrameworkPropertyMetadata(null));
-        public static readonly DependencyProperty PortalsProperty = DependencyProperty.Register("Portals", typeof(Rect), typeof(UIMinimap2), new FrameworkPropertyMetadata(null));
+        public static readonly DependencyProperty MapRegionProperty = DependencyProperty.Register("MapRegion", typeof(Rect), typeof(UIMinimap2), new FrameworkPropertyMetadata(new Rect()));
+        public static readonly DependencyProperty CameraViewPortProperty = DependencyProperty.Register("CameraViewPort", typeof(Rect), typeof(UIMinimap2), new FrameworkPropertyMetadata(new Rect()));
+        public static readonly DependencyProperty IconsProperty = DependencyProperty.Register("Icons", typeof(List<MapIcon>), typeof(UIMinimap2), new FrameworkPropertyMetadata(null));
+        public static readonly DependencyProperty CameraRegionVisibleProperty = DependencyProperty.Register("CameraRegionVisible", typeof(bool), typeof(UIMinimap2), new FrameworkPropertyMetadata(false));
 
         public UIMinimap2()
         {
             this.Focusable = false;
-            this.Portals = new List<PointF>();
+            this.Icons = new List<MapIcon>();
         }
 
         public string StreetName
@@ -69,20 +67,28 @@ namespace WzComparerR2.MapRender.UI
             set { SetValue(MapRegionProperty, value); }
         }
 
-        public PointF CameraCenter
+        public Rect CameraViewPort
         {
-            get { return (PointF)GetValue(CameraCenterProperty); }
-            set { SetValue(CameraCenterProperty, value); }
+            get { return (Rect)GetValue(CameraViewPortProperty); }
+            set { SetValue(CameraViewPortProperty, value); }
         }
 
-        public List<PointF> Portals
+        public List<MapIcon> Icons
         {
-            get { return (List<PointF>)GetValue(PortalsProperty); }
-            private set { SetValue(PortalsProperty, value); }
+            get { return (List<MapIcon>)GetValue(IconsProperty); }
+            private set { SetValue(IconsProperty, value); }
         }
+
+        public bool CameraRegionVisible
+        {
+            get { return (bool)GetValue(CameraRegionVisibleProperty); }
+            set { SetValue(CameraRegionVisibleProperty, value); }
+        }
+
+        public MapArea MapAreaControl { get; private set;}
 
         private UIMinimapResource resource;
-        private MapArea mapArea;
+       
         private TextBlock lblStreetName;
         private TextBlock lblMapName;
 
@@ -110,7 +116,7 @@ namespace WzComparerR2.MapRender.UI
             this.SetDragTarget(title);
 
             Border mapAreaBorder = new Border();
-            mapAreaBorder.Background = new SolidColorBrush(new ColorW(0f, 0f, 0f, 0.5f));
+            mapAreaBorder.Background = new SolidColorBrush(new ColorW(0f, 0f, 0f, 0.6f));
             Canvas.SetLeft(mapAreaBorder, resource.W.Width);
             Canvas.SetTop(mapAreaBorder, resource.N.Height);
             canvas.Children.Add(mapAreaBorder);
@@ -122,8 +128,9 @@ namespace WzComparerR2.MapRender.UI
             mapAreaBorder.Child = mapArea;
             this.SetBinding(UIMinimap2.MinimapCanvasProperty, new Binding("MinimapTexture") { Source = mapArea, Mode = BindingMode.OneWayToSource });
             this.SetBinding(UIMinimap2.MapRegionProperty, new Binding("MapRegion") { Source = mapArea, Mode = BindingMode.OneWayToSource });
-            this.SetBinding(UIMinimap2.CameraCenterProperty, new Binding("CameraCenter") { Source = mapArea, Mode = BindingMode.OneWayToSource });
-            this.SetBinding(UIMinimap2.PortalsProperty, new Binding("Portals") { Source = mapArea, Mode = BindingMode.OneWayToSource });
+            this.SetBinding(UIMinimap2.CameraViewPortProperty, new Binding("CameraViewPort") { Source = mapArea, Mode = BindingMode.OneWayToSource });
+            this.SetBinding(UIMinimap2.IconsProperty, new Binding("Icons") { Source = mapArea, Mode = BindingMode.OneWayToSource });
+            this.SetBinding(UIMinimap2.CameraRegionVisibleProperty, new Binding("CameraRegionVisible") { Source = mapArea, Mode = BindingMode.OneWayToSource });
 
             Image imgMapMark = new Image();
             imgMapMark.SetBinding(Image.SourceProperty, new Binding("MapMark") { Source = this, Converter = new TextureImageConverter() });
@@ -137,6 +144,7 @@ namespace WzComparerR2.MapRender.UI
             lblStreetName.FontSize = 12;
             lblStreetName.FontStyle = FontStyle.Bold;
             lblStreetName.Foreground = Brushes.White;
+            lblStreetName.Padding = new Thickness(0, 0, 6, 0);
             lblStreetName.SetBinding(TextBlock.TextProperty, new Binding("StreetName") { Source = this });
             lblStreetName.DataContext = this;
             Canvas.SetLeft(lblStreetName, 48);
@@ -148,6 +156,7 @@ namespace WzComparerR2.MapRender.UI
             lblMapName.FontFamily = new FontFamily("宋体");
             lblMapName.FontSize = 12;
             lblMapName.FontStyle = FontStyle.Bold;
+            lblMapName.Padding = new Thickness(0, 0, 6, 0);
             lblMapName.SetBinding(TextBlock.TextProperty, new Binding("MapName") { Source = this });
             lblMapName.Foreground = Brushes.White;
             Canvas.SetLeft(lblMapName, 48);
@@ -163,7 +172,7 @@ namespace WzComparerR2.MapRender.UI
             canvas.Children.Add(cb);
 
             this.resource = resource;
-            this.mapArea = mapArea;
+            this.MapAreaControl = mapArea;
             this.lblStreetName = lblStreetName;
             this.lblMapName = lblMapName;
 
@@ -173,10 +182,11 @@ namespace WzComparerR2.MapRender.UI
 
         protected override void OnPropertyChanged(DependencyProperty property)
         {
-            var res = ResourceDictionary.DefaultDictionary;
             base.OnPropertyChanged(property);
 
-            if (property == MinimapCanvasProperty)
+            if (property == MinimapCanvasProperty 
+                || property == MapNameProperty
+                || property == StreetNameProperty)
             {
                 CalcControlSize();
             }
@@ -195,22 +205,42 @@ namespace WzComparerR2.MapRender.UI
 
             //计算实际大小
             Size desireSize = new Size(minimapSize.Width + left + right, minimapSize.Height + top + bottom);
+
+            //计算标题
+            if (this.lblStreetName.Text != null)
+            {
+                this.lblStreetName.Measure(new Size(double.MaxValue, double.MaxValue));
+                var lblRight = Canvas.GetLeft(this.lblStreetName) + this.lblStreetName.DesiredSize.Width;
+                desireSize.Width = Math.Max(desireSize.Width, lblRight);
+            }
+            if (this.lblMapName.Text != null)
+            {
+                this.lblMapName.Measure(new Size(double.MaxValue, double.MaxValue));
+                var lblRight = Canvas.GetLeft(this.lblMapName) + this.lblMapName.DesiredSize.Width;
+                desireSize.Width = Math.Max(desireSize.Width, lblRight);
+            }
+            
             this.Width = MathHelper.Clamp(desireSize.Width, this.MinWidth, this.MaxWidth);
             this.Height = MathHelper.Clamp(desireSize.Height, this.MinHeight, this.MaxHeight);
-            this.mapArea.Width = Math.Max(0, this.Width - left - right);
-            this.mapArea.Height = Math.Max(0, this.Height - top - bottom);
+            this.MapAreaControl.Width = Math.Max(0, this.Width - left - right);
+            this.MapAreaControl.Height = Math.Max(0, this.Height - top - bottom);
         }
 
         public class MapArea : Control, ITooltipTarget
         {
             public MapArea()
             {
+                iconRectCache = new List<IconRect>();
             }
 
             public TextureBase MinimapTexture { get; set; }
             public Rect MapRegion { get; set; }
-            public PointF CameraCenter { get; set; }
-            public List<PointF> Portals { get; set; }
+            public Rect CameraViewPort { get; set; }
+            public List<MapIcon> Icons { get; set; }
+            public bool CameraRegionVisible { get; set; }
+
+            private List<IconRect> iconRectCache;
+            private PointF canvasPosCache;
 
             protected override void OnDraw(Renderer spriterenderer, double elapsedGameTime, float opacity)
             {
@@ -220,21 +250,29 @@ namespace WzComparerR2.MapRender.UI
                 {
                     return;
                 }
-                
+
                 var pos = this.RenderPosition;
                 var size = this.RenderSize;
                 spriterenderer.End();
                 spriterenderer.BeginClipped(new Rect(pos.X, pos.Y, size.Width, size.Height));
 
                 Matrix transform;
+                Vector2 cameraPos;
+                Vector2 cameraSize;
                 //绘制canvas
                 {
                     var canvas = this.MinimapTexture;
                     var mapRegion = this.MapRegion;
 
-                    
+                    //计算世界坐标系到小地图坐标系的转换
+                    transform = Matrix.CreateTranslation(-mapRegion.X, -mapRegion.Y, 0)
+                            * Matrix.CreateScale((float)canvas.Width / mapRegion.Width, (float)canvas.Height / mapRegion.Height, 0);
+                    var vp = this.CameraViewPort;
+                    cameraPos = Vector2.Transform(new Vector2(vp.X, vp.Y), transform);
+                    cameraSize = new Vector2(vp.Width * transform.Scale.X, vp.Height * transform.Scale.Y);
+
                     //计算小地图显示位置
-                    PointF canvasPos = new PointF();
+                    PointF canvasPos = new PointF(-this.canvasPosCache.X, -this.canvasPosCache.Y);
 
                     if (this.Width >= canvas.Width)
                     {
@@ -242,8 +280,15 @@ namespace WzComparerR2.MapRender.UI
                     }
                     else
                     {
-                        var centerX = (CameraCenter.X - mapRegion.X) * canvas.Width / mapRegion.Width;
-                        canvasPos.X = -MathHelper.Clamp(centerX - this.Width / 2, 0, canvas.Width - this.Width);
+                        if (cameraPos.X < canvasPos.X)
+                        {
+                            canvasPos.X = cameraPos.X;
+                        }
+                        else if (cameraPos.X + cameraSize.X > canvasPos.X + this.Width)
+                        {
+                            canvasPos.X = cameraPos.X + cameraSize.X - this.Width;
+                        }
+                        canvasPos.X = -MathHelper.Clamp(canvasPos.X, 0, canvas.Width - this.Width);
                     }
                     if (this.Height >= canvas.Height)
                     {
@@ -251,44 +296,143 @@ namespace WzComparerR2.MapRender.UI
                     }
                     else
                     {
-                        var centerY = (CameraCenter.Y - mapRegion.Y) * canvas.Height / mapRegion.Height;
-                        canvasPos.Y = -MathHelper.Clamp(centerY - this.Height / 2, 0, canvas.Height - this.Height);
+                        if (cameraPos.Y < canvasPos.Y)
+                        {
+                            canvasPos.Y = cameraPos.Y;
+                        }
+                        else if (cameraPos.Y + cameraSize.Y > canvasPos.Y + this.Height)
+                        {
+                            canvasPos.Y = cameraPos.Y + cameraSize.Y - this.Height;
+                        }
+                        canvasPos.Y = -MathHelper.Clamp(canvasPos.Y, 0, canvas.Height - this.Height);
                     }
 
+                    this.canvasPosCache = canvasPos;
                     //计算全局坐标
                     canvasPos = new PointF(pos.X + canvasPos.X, pos.Y + canvasPos.Y);
 
-                    //计算世界坐标系到小地图坐标系的转换
-                    transform = Matrix.CreateTranslation(-mapRegion.X, -mapRegion.Y, 0)
-                            * Matrix.CreateScale((float)canvas.Width / mapRegion.Width, (float)canvas.Height / mapRegion.Height, 0)
-                            * Matrix.CreateTranslation(canvasPos.X, canvasPos.Y, 0);
+                    
+                    transform *= Matrix.CreateTranslation(canvasPos.X, canvasPos.Y, 0);
 
                     //绘制小地图
                     spriterenderer.Draw(canvas, canvasPos, new Size(canvas.Width, canvas.Height), new ColorW(1f, 1f, 1f, opacity), false);
                 }
 
-                /*
-                using (var gb = spriterenderer.CreateGeometryBuffer())
+                /* 绘制框线*/
+                if (CameraRegionVisible)
                 {
-                    var pts = new List<PointF>();
-                    pts.Add(new PointF(0, 0));
-                    pts.Add(new PointF(0, 180));
-                    pts.Add(new PointF(30, 180));
-                    pts.Add(new PointF(30, 0));
-                    pts.Add(new PointF(0, 0));
-                    gb.FillColor(pts, GeometryPrimitiveType.LineStrip);
+                    using (var gb = spriterenderer.CreateGeometryBuffer())
+                    {
+                        var pts = new List<PointF>();
+                        pts.Add(new PointF(cameraPos.X, cameraPos.Y));
+                        pts.Add(new PointF(cameraPos.X + cameraSize.X, cameraPos.Y));
+                        pts.Add(new PointF(cameraPos.X + cameraSize.X, cameraPos.Y + cameraSize.Y));
+                        pts.Add(new PointF(cameraPos.X, cameraPos.Y + cameraSize.Y));
+                        pts.Add(pts[0]);
+                        gb.FillColor(pts, GeometryPrimitiveType.LineStrip);
 
-                    spriterenderer.DrawGeometryColor(gb, pos, new ColorW(255, 255, 0), opacity, 0f);
-                }*/
-                
+                        spriterenderer.DrawGeometryColor(gb,
+                            new PointF(pos.X + canvasPosCache.X, pos.Y + canvasPosCache.Y),
+                            new ColorW(255, 255, 0), opacity, 0f);
+                    }
+                }
+
+                //绘制小图标
+                Func<TextureBase, PointF, Rect> drawIconFunc = (texture, worldPos) =>
+                {
+                    var iconPos = Vector2.Transform(new Vector2(worldPos.X, worldPos.Y), transform);
+                    var posF = new PointF(
+                        Math.Round(iconPos.X - texture.Width / 2- 0),
+                        Math.Round(iconPos.Y - texture.Height / 2 - 5));
+                    var iconSize = new Size(texture.Width, texture.Height);
+                    spriterenderer.Draw(texture, posF, iconSize, new ColorW(1f, 1f, 1f, opacity), false);
+                    return new Rect(posF.X - pos.X, posF.Y - pos.Y, iconSize.Width, iconSize.Height);
+                };
+
+                iconRectCache.Clear();
+                foreach (var icon in this.Icons)
+                {
+                    switch (icon.IconType)
+                    {
+                        case IconType.Portal:
+                            {
+                                var texture = this.FindResource("portal") as TextureBase;
+                                if (texture != null)
+                                {
+                                    var rect = drawIconFunc(texture, icon.WorldPosition);
+                                    iconRectCache.Add(new IconRect() { Rect = rect, Tooltip = icon.Tooltip });
+                                }
+                            }
+                            break;
+
+                        case IconType.Transport:
+                            {
+                                var texture = this.FindResource("transport") as TextureBase;
+                                if (texture != null)
+                                {
+                                    var rect = drawIconFunc(texture, icon.WorldPosition);
+                                    iconRectCache.Add(new IconRect() { Rect = rect, Tooltip = icon.Tooltip });
+                                }
+                            }
+                            break;
+                    }
+                }
+
                 spriterenderer.EndClipped();
                 spriterenderer.Begin();
             }
 
             public object GetTooltipTarget(PointF mouseLocation)
             {
-                return mouseLocation.ToString();
+                foreach(var iconRect in this.iconRectCache.Reverse<IconRect>())
+                {
+                    if (iconRect.Rect.Contains(mouseLocation))
+                    {
+                        return iconRect.Tooltip;
+                    }
+                }
+                return null;
             }
+
+            public void LoadWzResource()
+            {
+                var mapHelperNode = PluginBase.PluginManager.FindWz("Map/MapHelper.img/minimap");
+                Action<string> addResource = (key) =>
+                {
+                    Wz_Node resNode = mapHelperNode.Nodes[key];
+                    var texture = UIHelper.LoadTexture(resNode);
+                    if (texture != null)
+                    {
+                        this.Resources[key] = texture;
+                    }
+                };
+
+                if (mapHelperNode != null)
+                {
+                    addResource("transport");
+                    addResource("portal");
+                }
+            }
+
+            private struct IconRect
+            {
+                public Rect Rect;
+                public object Tooltip;
+            }
+        }
+
+        public class MapIcon
+        {
+            public IconType IconType { get; set; }
+            public PointF WorldPosition { get; set; }
+            public object Tooltip { get; set; }
+        }
+
+        public enum IconType
+        {
+            Unknown = 0,
+            Portal,
+            Transport,
         }
 
         private sealed class UIMinimapResource : INinePatchResource<TextureBase>

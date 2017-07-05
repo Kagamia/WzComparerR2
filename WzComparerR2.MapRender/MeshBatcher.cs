@@ -136,7 +136,7 @@ namespace WzComparerR2.MapRender
                 switch (text.Align)
                 {
                     case Alignment.Near: break;
-                    case Alignment.Center: pos.X -= size.X / 2; break;
+                    case Alignment.Center: pos.X -= (int)(size.X / 2); break;
                     case Alignment.Far: pos.X -= size.X; break;
                 }
 

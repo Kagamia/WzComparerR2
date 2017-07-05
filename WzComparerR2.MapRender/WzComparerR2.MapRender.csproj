@@ -81,7 +81,9 @@
     <Compile Include="Animation\RepeatableFrameAnimationData.cs" />
     <Compile Include="Animation\RepeatableFrameAnimator.cs" />
     <Compile Include="Animation\StateMachineAnimator.cs" />
+    <Compile Include="Coroutine.cs" />
     <Compile Include="FrmMapRender2.cs" />
+    <Compile Include="FrmMapRender2.SceneManager.cs" />
     <Compile Include="FrmMapRender2.SceneRendering.cs" />
     <Compile Include="GameExt.cs" />
     <Compile Include="LineListMesh.cs" />
@@ -101,6 +103,7 @@
     <Compile Include="Patches2\SceneItem.cs" />
     <Compile Include="Patches2\SkyWhaleItem.cs" />
     <Compile Include="Patches2\TileItem.cs" />
+    <Compile Include="Patches2\TooltipItem.cs" />
     <Compile Include="Patches\BackPatch.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Chat.cs" />
@@ -152,7 +155,9 @@
     <Compile Include="UI\UIHelper.cs" />
     <Compile Include="UI\UIMiniMap.cs" />
     <Compile Include="UI\UIMinimap2.cs" />
+    <Compile Include="UI\UIOptions.cs" />
     <Compile Include="UI\WcR2Engine.cs" />
+    <Compile Include="UI\WcR2Renderer.cs" />
     <Compile Include="UI\WindowEx.cs" />
   </ItemGroup>
   <ItemGroup>

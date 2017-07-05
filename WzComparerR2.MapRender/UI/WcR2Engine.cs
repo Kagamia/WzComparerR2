@@ -62,16 +62,29 @@ namespace WzComparerR2.MapRender.UI
 
         public static void InitialInputManager()
         {
-            var type = typeof(InputManager);
-            var fieldInfo = type.GetFields(BindingFlags.Static | BindingFlags.NonPublic)
-                .FirstOrDefault(_field => _field.FieldType == typeof(InputManager));
-            
-            var ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.CreateInstance | BindingFlags.NonPublic, Type.DefaultBinder, new Type[0], null);
-
-            if (fieldInfo != null && ctor != null)
+            //重置inputManager
             {
-                var instance = ctor.Invoke(new object[0]);
-                fieldInfo.SetValue(null, instance);
+                var type = typeof(InputManager);
+                var fieldInfo = type.GetFields(BindingFlags.Static | BindingFlags.NonPublic)
+                    .FirstOrDefault(_field => _field.FieldType == typeof(InputManager));
+
+                var ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.CreateInstance | BindingFlags.NonPublic, Type.DefaultBinder, new Type[0], null);
+
+                if (fieldInfo != null && ctor != null)
+                {
+                    var instance = ctor.Invoke(new object[0]);
+                    fieldInfo.SetValue(null, instance);
+                }
+            }
+            //重置keyboardState
+            {
+                var type = typeof(Keyboard);
+                var propertyInfo = type.GetProperty(nameof(Keyboard.Modifiers), BindingFlags.Static | BindingFlags.Public);
+
+                if (propertyInfo != null)
+                {
+                    propertyInfo.GetSetMethod(true).Invoke(null, new object[] { ModifierKeys.None });
+                }
             }
         }
 
@@ -130,6 +143,7 @@ namespace WzComparerR2.MapRender.UI
                         field.SetValue(null, value);
                         EmptyKeys.UserInterface.Themes.EmptyKeysTheme.CreateColorsAndBrushes();
                         EmptyKeys.UserInterface.Themes.CommonHelpers.CreateStyles(value);
+                        EmptyKeys.UserInterface.Themes.CommonHelpers.CreateLocalizationResources(value);
                         ResourceDictionary.DefaultDictionary = null;
                     }
                 }
@@ -175,52 +189,6 @@ namespace WzComparerR2.MapRender.UI
             }
 
             return base.LoadTexture(contentManager, file);
-        }
-    }
-
-    class WcR2Renderer : MonoGameRenderer
-    {
-        public WcR2Renderer(GraphicsDevice graphicsDevice, int nativeScreenWidth, int nativeScreenHeight)
-            : base(graphicsDevice, nativeScreenWidth, nativeScreenHeight)
-        {
-            this.graphicsDevice = GraphicsDevice;
-
-            var fieldInfo = typeof(MonoGameRenderer).GetField("spriteBatch", BindingFlags.Instance | BindingFlags.NonPublic);
-            var sbOld = fieldInfo.GetValue(this) as SpriteBatch;
-            sbOld?.Dispose();
-            this.spriteBatch = new SpriteBatchEx(graphicsDevice);
-            fieldInfo.SetValue(this, this.spriteBatch);
-        }
-
-        private GraphicsDevice graphicsDevice;
-        private SpriteBatchEx spriteBatch;
-
-        public override FontBase CreateFont(object nativeFont)
-        {
-            return new WcR2Font(nativeFont);
-        }
-
-        public override TextureBase CreateTexture(object nativeTexture)
-        {
-            if (nativeTexture is System.Drawing.Bitmap)
-            {
-                var texture = ((System.Drawing.Bitmap)nativeTexture).ToTexture(this.graphicsDevice);
-                return base.CreateTexture(texture);
-            }
-
-            return base.CreateTexture(nativeTexture);
-        }
-
-        public override void DrawText(FontBase font, string text, PointF position, Size renderSize, ColorW color, PointF scale, float depth)
-        {
-            XnaFont nativeFont = font.GetNativeFont() as XnaFont;
-            if (nativeFont != null)
-            {
-                spriteBatch.DrawStringEx(nativeFont,
-                    text,
-                    new Vector2(position.X, position.Y),
-                    new Color(color.R, color.G, color.B, color.A));
-            }
         }
     }
     #endregion

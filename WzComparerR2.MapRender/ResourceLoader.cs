@@ -114,23 +114,29 @@ namespace WzComparerR2.MapRender
             isCounting = false;
         }
 
+        public void ClearAnimationCache()
+        {
+            this.loadedAnimationData.Clear();
+        }
+
+        public void Recycle()
+        {
+            var preRemoved = this.loadedItems
+                .Where(kv => kv.Value.Count <= 0)
+                .ToList();
+
+            foreach (var kv in preRemoved)
+            {
+                this.loadedItems.Remove(kv.Key);
+                UnloadResource(kv.Value.Resource);
+            }
+        }
+
         public void Unload()
         {
             foreach(var kv in this.loadedItems)
             {
-                var res = kv.Value.Resource;
-                if (res is Texture2D)
-                {
-                    ((Texture2D)res).Dispose();
-                }
-                else if (res is TextureAtlas) //回头再考虑回收策略
-                {
-                    ((TextureAtlas)res).Texture.Dispose();
-                }
-                else if (res is Music)
-                {
-                    ((Music)res).Dispose();
-                }
+                UnloadResource(kv.Value.Resource);
             }
 
             this.loadedItems.Clear();
@@ -141,6 +147,26 @@ namespace WzComparerR2.MapRender
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        private void UnloadResource(object resource)
+        {
+            if (resource is Texture2D)
+            {
+                ((Texture2D)resource).Dispose();
+            }
+            else if (resource is TextureAtlas) //回头再考虑回收策略
+            {
+                ((TextureAtlas)resource).Texture.Dispose();
+            }
+            else if (resource is Music)
+            {
+                ((Music)resource).Dispose();
+            }
+            else
+            {
+                (resource as IDisposable)?.Dispose();
+            }
         }
 
         private object InnerLoad(Wz_Node node, Type assetType)

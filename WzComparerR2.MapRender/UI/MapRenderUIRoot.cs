@@ -74,6 +74,9 @@ namespace WzComparerR2.MapRender.UI
             SoundManager.Instance.LoadSounds(contentManager);
             EffectManager.Instance.LoadEffects(contentManager);
             FontManager.DefaultFont = FontManager.Instance.GetFont("宋体", 12, FontStyle.Regular);
+
+            //加载其他资源
+            this.Minimap.MapAreaControl.LoadWzResource();
         }
 
         public void UnloadContents()

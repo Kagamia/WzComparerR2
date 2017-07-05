@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using WzComparerR2.PluginBase;
-using WzComparerR2.WzLib;
+using System.Linq;
 using WzComparerR2.MapRender.Patches2;
-using WzComparerR2.Common;
-using WzComparerR2.Rendering;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace WzComparerR2.MapRender
 {
@@ -32,6 +27,14 @@ namespace WzComparerR2.MapRender
         public SceneNode Layers { get; private set; }
         public FlyLayerNode Fly { get; private set; }
         public ContainerNode Front { get; private set; }
+
+
+        public IEnumerable<PortalItem> Portals => this.Fly.Portal.Slots.OfType<PortalItem>();
+
+        public PortalItem FindPortal(string pName)
+        {
+            return this.Portals.FirstOrDefault(_portal => _portal.PName == pName);
+        }
     }
 
     public class LayerNode : SceneNode
