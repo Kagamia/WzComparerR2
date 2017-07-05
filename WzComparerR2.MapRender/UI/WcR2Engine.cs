@@ -143,6 +143,7 @@ namespace WzComparerR2.MapRender.UI
                         field.SetValue(null, value);
                         EmptyKeys.UserInterface.Themes.EmptyKeysTheme.CreateColorsAndBrushes();
                         EmptyKeys.UserInterface.Themes.CommonHelpers.CreateStyles(value);
+                        EmptyKeys.UserInterface.Themes.CommonHelpers.CreateLocalizationResources(value);
                         ResourceDictionary.DefaultDictionary = null;
                     }
                 }

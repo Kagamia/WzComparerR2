@@ -3,25 +3,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using WzComparerR2.WzLib;
-using WzComparerR2.PluginBase;
 using WzComparerR2.Common;
-using WzComparerR2.Rendering;
 using WzComparerR2.MapRender.Patches2;
 using WzComparerR2.MapRender.UI;
-using WzComparerR2.Animation;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-
-using System.Runtime.InteropServices;
-
 using Form = System.Windows.Forms.Form;
+
 #region USING_EK
 using KeyBinding = EmptyKeys.UserInterface.Input.KeyBinding;
 using RelayCommand = EmptyKeys.UserInterface.Input.RelayCommand;
-using KeyGesture = EmptyKeys.UserInterface.Input.KeyGesture;
 using KeyCode = EmptyKeys.UserInterface.Input.KeyCode;
 using ModifierKeys = EmptyKeys.UserInterface.Input.ModifierKeys;
 #endregion
@@ -87,6 +80,7 @@ namespace WzComparerR2.MapRender
         bool prepareCapture;
         Task captureTask;
         Resolution resolution;
+        float opacity;
 
         List<ItemRect> allItems = new List<ItemRect>();
         MapRenderUIRoot ui;
@@ -94,15 +88,21 @@ namespace WzComparerR2.MapRender
         WcR2Engine engine;
         Music bgm;
 
+        CoroutineManager cm;
+
         protected override void Initialize()
         {
             this.renderEnv = new RenderEnv(this, this.graphics);
             this.batcher = new MeshBatcher(this.GraphicsDevice);
+            this.resLoader = new ResourceLoader(this.Services);
             this.ui = new MapRenderUIRoot();
-            this.ui.LoadContents(this.Content);
             this.BindingUIInput();
             this.tooltip = new Tooltip2(this.GraphicsDevice);
             this.tooltip.StringLinker = this.StringLinker;
+            this.cm = new CoroutineManager(this);
+            this.cm.StartCoroutine(OnStart()); //entry
+            this.Components.Add(cm);
+
             SwitchResolution(Resolution.Window_800_600);
             base.Initialize();
         }
@@ -145,7 +145,7 @@ namespace WzComparerR2.MapRender
             }), KeyCode.D7, ModifierKeys.Control));
             this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ =>
             {
-                var portals = this.mapData.Scene.Descendants().OfType<ContainerNode>().SelectMany(container => container.Slots).OfType<PortalItem>();
+                var portals = this.mapData.Scene.Portals;
                 if (!this.patchVisibility.PortalVisible)
                 {
                     this.patchVisibility.PortalVisible = true;
@@ -326,155 +326,42 @@ namespace WzComparerR2.MapRender
         protected override void LoadContent()
         {
             base.LoadContent();
-            this.resLoader = new ResourceLoader(this.Services);
-            this.mapData = new MapData();
-
-            if (this.mapImg != null)
-            {
-                LoadMap(this.mapImg);
-            }
-        }
-
-        private void LoadMap(Wz_Image mapImg)
-        {
-            //加载地图数据
-            this.mapData.Load(mapImg.Node, resLoader);
-            this.mapData.PreloadResource(resLoader);
-
-            //同步UI
-            this.renderEnv.Camera.WorldRect = mapData.VRect;
-
-            //加载bgm
-            if (!string.IsNullOrEmpty(this.mapData.Bgm))
-            {
-                if (this.bgm != null)
-                {
-                    this.bgm.Stop();
-                    this.bgm.Dispose();
-                    this.bgm = null;
-                }
-
-                var path = new List<string>() { "Sound" };
-                path.AddRange(this.mapData.Bgm.Split('/'));
-                path[1] += ".img";
-                var bgmNode = PluginManager.FindWz(string.Join("\\", path));
-                if (bgmNode != null)
-                {
-                    this.bgm = resLoader.Load<Music>(bgmNode);
-                    if (this.bgm != null)
-                    {
-                        this.bgm.IsLoop = true;
-                        this.bgm.Play();
-                    }
-                }
-            }
-
-            StringResult sr;
-            if (this.mapData.ID != null && this.StringLinker != null
-                && StringLinker.StringMap.TryGetValue(this.mapData.ID.Value, out sr))
-            {
-                this.ui.Minimap.StreetName = sr["streetName"];
-                this.ui.Minimap.MapName = sr["mapName"];
-            }
-            else
-            {
-                this.ui.Minimap.StreetName = null;
-                this.ui.Minimap.MapName = null;
-            }
-
-            if (this.mapData.MiniMap.MapMark != null)
-            {
-                this.ui.Minimap.MapMark = engine.Renderer.CreateTexture(this.mapData.MiniMap.MapMark);
-            }
-            else
-            {
-                this.ui.Minimap.MapMark = null;
-            }
-
-            if (this.mapData.MiniMap.Canvas != null)
-            {
-                this.ui.Minimap.MinimapCanvas = engine.Renderer.CreateTexture(this.mapData.MiniMap.Canvas);
-            }
-            else
-            {
-                this.ui.Minimap.MinimapCanvas = null;
-            }
-
-            this.ui.Minimap.Icons.Clear();
-            foreach(var portal in this.mapData.Scene.Fly.Portal.Slots.OfType<PortalItem>())
-            {
-                switch (portal.Type)
-                {
-                    case 2:
-                    case 7:
-                        object tooltip = portal.Tooltip;
-                        if (tooltip == null && portal.ToMap != null && portal.ToMap != 999999999
-                            && StringLinker.StringMap.TryGetValue(portal.ToMap.Value, out sr))
-                        {
-                            tooltip = sr["mapName"];
-                        }
-                        this.ui.Minimap.Icons.Add(new UIMinimap2.MapIcon()
-                        {
-                            IconType = UIMinimap2.IconType.Portal,
-                            Tooltip = tooltip,
-                            WorldPosition = new EmptyKeys.UserInterface.PointF(portal.X, portal.Y)
-                        });
-                        break;
-
-                    case 10:
-                        this.ui.Minimap.Icons.Add(new UIMinimap2.MapIcon()
-                        {
-                            IconType = UIMinimap2.IconType.Transport,
-                            Tooltip = portal.Tooltip,
-                            WorldPosition = new EmptyKeys.UserInterface.PointF(portal.X, portal.Y)
-                        });
-                        break;
-                }
-            }
-
-            if (mapData.MiniMap.Width > 0 && mapData.MiniMap.Height > 0)
-            {
-                this.ui.Minimap.MapRegion = new Rectangle(-mapData.MiniMap.CenterX, -mapData.MiniMap.CenterY, mapData.MiniMap.Width, mapData.MiniMap.Height).ToRect();
-            }
-            else
-            {
-                this.ui.Minimap.MapRegion = this.mapData.VRect.ToRect();
-            }
+            this.ui.LoadContents(this.Content);
         }
 
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            this.renderEnv.Input.Update(gameTime);
-            this.ui.UpdateInput(gameTime.ElapsedGameTime.TotalMilliseconds);
-
-            //需要手动更新数据部分
-            this.renderEnv.Camera.AdjustToWorldRect();
-            {
-                var rect = this.renderEnv.Camera.ClipRect;
-                this.ui.Minimap.CameraViewPort = new EmptyKeys.UserInterface.Rect(rect.X, rect.Y, rect.Width, rect.Height);
-            }
-            //更新ui
-            this.ui.UpdateLayout(gameTime.ElapsedGameTime.TotalMilliseconds);
-            //更新场景
-            UpdateAllItems(mapData.Scene, gameTime.ElapsedGameTime);
-            //更新tooltip
-            UpdateTooltip();
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            if (prepareCapture)
-            {
-                Capture(gameTime);
-            }
+            opacity = MathHelper.Clamp(opacity, 0f, 1f);
 
-            this.GraphicsDevice.Clear(Color.Black);
-            DrawScene(gameTime);
-            DrawTooltipItems(gameTime);
-            this.ui.Draw(gameTime.ElapsedGameTime.TotalMilliseconds);
-            this.tooltip.Draw(gameTime, renderEnv);
-            base.Draw(gameTime);
+            if (opacity <= 0)
+            {
+                this.GraphicsDevice.Clear(Color.Black);
+            }
+            else
+            {
+                if (prepareCapture)
+                {
+                    Capture(gameTime);
+                }
+
+                this.GraphicsDevice.Clear(Color.Black);
+                DrawScene(gameTime);
+                DrawTooltipItems(gameTime);
+                this.ui.Draw(gameTime.ElapsedGameTime.TotalMilliseconds);
+                this.tooltip.Draw(gameTime, renderEnv);
+                if (opacity < 1f)
+                {
+                    this.renderEnv.Sprite.Begin(blendState: BlendState.NonPremultiplied);
+                    var rect = new Rectangle(0, 0, this.renderEnv.Camera.Width, this.renderEnv.Camera.Height);
+                    this.renderEnv.Sprite.FillRectangle(rect, new Color(Color.Black, 1 - opacity));
+                    this.renderEnv.Sprite.End();
+                }
+            }
         }
 
         #region 截图相关

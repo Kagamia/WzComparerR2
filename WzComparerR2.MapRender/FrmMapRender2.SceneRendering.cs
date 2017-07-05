@@ -134,7 +134,14 @@ namespace WzComparerR2.MapRender
 
         private void OnSceneItemClick(SceneItem item)
         {
-
+            if (item is PortalItem)
+            {
+                var portal = (PortalItem)item;
+                if (portal.ToMap != 999999999)
+                {
+                    MoveToPortal(portal.ToMap, portal.ToName, portal.PName);
+                }
+            }
         }
 
         private void DrawScene(GameTime gameTime)
