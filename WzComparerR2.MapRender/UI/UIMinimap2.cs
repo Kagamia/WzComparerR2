@@ -99,8 +99,8 @@ namespace WzComparerR2.MapRender.UI
             this.MinHeight = resource.NW.Height + resource.SW.Height;
             this.Width = this.MinWidth;
             this.Height = this.MinHeight;
-            this.MaxWidth = 300;
-            this.MaxHeight = 300;
+            this.MaxWidth = 1000;
+            this.MaxHeight = 1000;
 
             Canvas canvas = new Canvas();
             canvas.Background = new NinePatchBrush() { Resource = resource };

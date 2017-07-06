@@ -396,39 +396,51 @@ namespace WzComparerR2.MapRender
             }
 
             var rect = Rectangle.Empty;
-            
+
+            int xMAX = int.MinValue;
             foreach(LayerNode layer in this.Scene.Layers.Nodes)
             {
                 foreach (ContainerNode<FootholdItem> item in layer.Foothold.Nodes)
                 {
                     var fh = item.Item;
-                    var fhRect = new Rectangle(fh.X1, fh.Y1, fh.X2 - fh.X1, fh.Y2 - fh.Y1);
+                    var fhRect = new Rectangle(
+                        Math.Min(fh.X1, fh.X2),
+                        Math.Min(fh.Y1, fh.Y2),
+                        Math.Abs(fh.X2 - fh.X1),
+                        Math.Abs(fh.Y2 - fh.Y1));
+                    xMAX = Math.Max(fhRect.Right, xMAX);
+                    var oldrec = rect;
                     if (rect.IsEmpty)
                     {
                         rect = fhRect;
                     }
                     else
                     {
-                        Rectangle.Union(ref rect, ref fhRect, out rect);
+                        Rectangle newRect;
+                        Rectangle.Union(ref rect, ref fhRect, out newRect);
+                        rect = newRect;
                     }
                 }
             }
 
+            rect.Y -= 250;
+            rect.Height += 450;
+
             foreach (LadderRopeItem item in this.Scene.Fly.LadderRope.Slots)
             {
-                var lrRect = new Rectangle(item.X, item.Y1, 1, item.Y2 - item.Y1);
+                var lrRect = new Rectangle(item.X, Math.Min(item.Y1, item.Y2), 1, Math.Abs(item.Y2 - item.Y1));
                 if (rect.IsEmpty)
                 {
                     rect = lrRect;
                 }
                 else
                 {
-                    Rectangle.Union(ref rect, ref lrRect, out rect);
+                    Rectangle newRect;
+                    Rectangle.Union(ref rect, ref lrRect, out newRect);
+                    rect = newRect;
                 }
             }
 
-            rect.Y -= 300;
-            rect.Height += 600;
             this.VRect = rect;
         }
 
