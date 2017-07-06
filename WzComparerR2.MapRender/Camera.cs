@@ -10,6 +10,7 @@ namespace WzComparerR2.MapRender
         public Camera(GraphicsDeviceManager graphics)
         {
             this.graphics = graphics;
+            this.AdjustRectEnabled = true;
         }
 
         GraphicsDeviceManager graphics;
@@ -97,6 +98,8 @@ namespace WzComparerR2.MapRender
             set { useWorldRect = value; }
         }
 
+        public bool AdjustRectEnabled { get; set; }
+
         private void ChangeDisplayMode()
         {
             switch (this.displayMode)
@@ -126,6 +129,9 @@ namespace WzComparerR2.MapRender
         public void AdjustToWorldRect()
         {
             if (this.useWorldRect)
+                return;
+
+            if (!this.AdjustRectEnabled)
                 return;
 
             if (this.Width > worldRect.Width)
