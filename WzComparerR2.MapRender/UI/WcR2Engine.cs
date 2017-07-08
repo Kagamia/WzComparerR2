@@ -60,6 +60,11 @@ namespace WzComparerR2.MapRender.UI
             FixDefaultTheme();
         }
 
+        public static void Unload()
+        {
+            InputManager.Current.FocusedElement = null;
+        }
+
         public static void InitialInputManager()
         {
             //重置inputManager

@@ -192,6 +192,7 @@ namespace WzComparerR2.Common
             stringMap.Clear();
             stringNpc.Clear();
             stringSkill.Clear();
+            stringSkill2.Clear();
         }
 
         public bool HasValues

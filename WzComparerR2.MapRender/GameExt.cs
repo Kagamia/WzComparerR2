@@ -63,6 +63,27 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        public static void RemoveMouseStateCache()
+        {
+            var fieldInfo = typeof(Microsoft.Xna.Framework.Input.Mouse).GetField("PrimaryWindow", BindingFlags.Static | BindingFlags.NonPublic);
+            if (fieldInfo != null)
+            {
+                fieldInfo.SetValue(null, null);
+            }
+
+            fieldInfo = typeof(Microsoft.Xna.Framework.Input.Mouse).GetField("Window", BindingFlags.Static | BindingFlags.NonPublic);
+            if (fieldInfo != null)
+            {
+                fieldInfo.SetValue(null, null);
+            }
+
+            fieldInfo = typeof(Microsoft.Xna.Framework.Input.Touch.TouchPanel).GetField("PrimaryWindow", BindingFlags.Static | BindingFlags.NonPublic);
+            if (fieldInfo != null)
+            {
+                fieldInfo.SetValue(null, null);
+            }
+        }
+
         public static void EnsureGameExit(Game game)
         {
             var tid = GetCurrentThreadId();

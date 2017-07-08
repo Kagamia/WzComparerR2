@@ -497,6 +497,7 @@ namespace WzComparerR2.MapRender
             base.UnloadContent();
             this.resLoader.Unload();
             this.ui.UnloadContents();
+            this.bgm = null;
             this.mapImg = null;
             this.mapData = null;
         }
@@ -511,6 +512,8 @@ namespace WzComparerR2.MapRender
             this.engine = null;
 
             GameExt.RemoveKeyboardEvent(this);
+            GameExt.RemoveMouseStateCache();
+            WcR2Engine.Unload();
         }
 
         private void SwitchResolution()
