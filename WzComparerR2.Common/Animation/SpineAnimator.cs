@@ -25,6 +25,8 @@ namespace WzComparerR2.Animation
 
         public ReadOnlyCollection<string> Animations { get; private set; }
 
+        public ReadOnlyCollection<string> Skins { get; private set; }
+
         public int SelectedAnimationIndex
         {
             get
@@ -73,6 +75,12 @@ namespace WzComparerR2.Animation
                     this.SelectedAnimationIndex = -1;
                 }
             }
+        }
+
+        public string SelectedSkin
+        {
+            get { return this.Skeleton.Skin?.Name; }
+            set { this.Skeleton.SetSkin(value); }
         }
 
         public int CurrentTime
@@ -269,10 +277,20 @@ namespace WzComparerR2.Animation
         private void Load()
         {
             this.Skeleton = new Skeleton(this.Data.SkeletonData);
-            IList<string> aniNames = this.Data.SkeletonData.Animations.Select(ani => ani.Name).ToArray();
+            IList<string> aniNames = this.Data.SkeletonData.Animations.Select(ani => ani.Name).ToList();
             this.Animations = new ReadOnlyCollection<string>(aniNames);
             this._animationState = new AnimationState(new AnimationStateData(this.Data.SkeletonData));
-            
+            this.Skins = new ReadOnlyCollection<string>(this.Data.SkeletonData.Skins.Select(skin => skin.Name).ToList());
+
+            if (!string.IsNullOrEmpty(this.Data.DefaultSkin))
+            {
+                var skin = this.Skeleton.Data.FindSkin(this.Data.DefaultSkin);
+                if (skin != null)
+                {
+                    this.Skeleton.SetSkin(skin);
+                }
+            }
+
             if (this.Animations.Count > 0)
             {
                 this.SelectedAnimationIndex = 0;

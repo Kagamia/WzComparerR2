@@ -354,6 +354,20 @@ namespace WzComparerR2
             }
         }
 
+        private void cmbItemSkins_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.cmbItemSkins.SelectedIndex > -1 && this.pictureBoxEx1.Items.Count > 0)
+            {
+                var aniItem = this.pictureBoxEx1.Items[0] as Animation.SpineAnimator;
+                if (aniItem != null)
+                {
+                    string skinName = this.cmbItemSkins.SelectedItem as string;
+                    aniItem.SelectedSkin = skinName;
+                    this.cmbItemSkins.Tooltip = skinName;
+                }
+            }
+        }
+
         private void buttonItemSaveImage_Click(object sender, EventArgs e)
         {
             if (this.pictureBoxEx1.Items.Count <= 0)
@@ -474,10 +488,16 @@ namespace WzComparerR2
                 {
                     this.pictureBoxEx1.ShowAnimation(spineData);
                     var aniItem = this.pictureBoxEx1.Items[0] as Animation.SpineAnimator;
+
                     this.cmbItemAniNames.Items.Clear();
                     this.cmbItemAniNames.Items.Add("");
                     this.cmbItemAniNames.Items.AddRange(aniItem.Animations.ToArray());
                     this.cmbItemAniNames.SelectedIndex = 0;
+
+                    this.cmbItemSkins.Visible = true;
+                    this.cmbItemSkins.Items.Clear();
+                    this.cmbItemSkins.Items.AddRange(aniItem.Skins.ToArray());
+                    this.cmbItemSkins.SelectedIndex = aniItem.Skins.IndexOf(aniItem.SelectedSkin);
                 }
             }
             else
@@ -488,6 +508,7 @@ namespace WzComparerR2
                 {
                     this.pictureBoxEx1.ShowAnimation(frameData);
                     this.cmbItemAniNames.Items.Clear();
+                    this.cmbItemSkins.Visible = false;
                 }
             }
             this.pictureBoxEx1.PictureName = aniName;
@@ -2942,6 +2963,8 @@ namespace WzComparerR2
                 UpdateWzLoadingSettings();
             }
         }
+
+
     }
 
     #region 内部用扩展方法

@@ -159,6 +159,7 @@
             this.pictureBoxEx1 = new WzComparerR2.PictureBoxEx();
             this.ribbonBar5 = new DevComponents.DotNetBar.RibbonBar();
             this.cmbItemAniNames = new DevComponents.DotNetBar.ComboBoxItem();
+            this.cmbItemSkins = new DevComponents.DotNetBar.ComboBoxItem();
             this.buttonItemSaveImage = new DevComponents.DotNetBar.ButtonItem();
             this.itemContainer27 = new DevComponents.DotNetBar.ItemContainer();
             this.buttonItemAutoSave = new DevComponents.DotNetBar.ButtonItem();
@@ -194,6 +195,7 @@
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.superTabItem1 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.chkResolvePngLink = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.labelX1 = new DevComponents.DotNetBar.LabelX();
@@ -243,7 +245,6 @@
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.dockContainerItem2 = new DevComponents.DotNetBar.DockContainerItem();
             this.panelDockContainer2 = new DevComponents.DotNetBar.PanelDockContainer();
-            this.chkResolvePngLink = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.ribbonControl1.SuspendLayout();
             this.ribbonPanel2.SuspendLayout();
             this.ribbonPanel1.SuspendLayout();
@@ -1655,10 +1656,10 @@
             // 
             this.btnItemOptions.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText;
             this.btnItemOptions.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.btnItemOptions.Name = "buttonItem12";
+            this.btnItemOptions.Name = "btnItemOptions";
             this.btnItemOptions.SubItemsExpandWidth = 24;
             this.btnItemOptions.Text = "Opt&ions";
-            this.btnItemOptions.Click += new System.EventHandler(btnItemOptions_Click);
+            this.btnItemOptions.Click += new System.EventHandler(this.btnItemOptions_Click);
             // 
             // buttonItem13
             // 
@@ -1794,8 +1795,8 @@
             this.superTabControl1.ControlBox.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.superTabControl1.ControlBox.MenuBox,
             this.superTabControl1.ControlBox.CloseBox});
-            this.superTabControl1.Controls.Add(this.superTabControlPanel2);
             this.superTabControl1.Controls.Add(this.superTabControlPanel1);
+            this.superTabControl1.Controls.Add(this.superTabControlPanel2);
             this.superTabControl1.Controls.Add(this.superTabControlPanel3);
             this.superTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControl1.Location = new System.Drawing.Point(0, 0);
@@ -1880,6 +1881,7 @@
             this.ribbonBar5.DragDropSupport = true;
             this.ribbonBar5.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.cmbItemAniNames,
+            this.cmbItemSkins,
             this.buttonItemSaveImage,
             this.buttonItemGif});
             this.ribbonBar5.Location = new System.Drawing.Point(0, 202);
@@ -1906,6 +1908,16 @@
             this.cmbItemAniNames.ItemHeight = 14;
             this.cmbItemAniNames.Name = "cmbItemAniNames";
             this.cmbItemAniNames.SelectedIndexChanged += new System.EventHandler(this.cmbItemAniNames_SelectedIndexChanged);
+            // 
+            // cmbItemSkins
+            // 
+            this.cmbItemSkins.ComboWidth = 80;
+            this.cmbItemSkins.DropDownHeight = 106;
+            this.cmbItemSkins.DropDownWidth = 180;
+            this.cmbItemSkins.ItemHeight = 14;
+            this.cmbItemSkins.Name = "cmbItemSkins";
+            this.cmbItemSkins.Visible = false;
+            this.cmbItemSkins.SelectedIndexChanged += new System.EventHandler(this.cmbItemSkins_SelectedIndexChanged);
             // 
             // buttonItemSaveImage
             // 
@@ -2270,11 +2282,24 @@
             this.superTabControlPanel2.Controls.Add(this.labelXComp1);
             this.superTabControlPanel2.Controls.Add(this.btnEasyCompare);
             this.superTabControlPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.superTabControlPanel2.Location = new System.Drawing.Point(0, 26);
+            this.superTabControlPanel2.Location = new System.Drawing.Point(0, 0);
             this.superTabControlPanel2.Name = "superTabControlPanel2";
-            this.superTabControlPanel2.Size = new System.Drawing.Size(530, 202);
+            this.superTabControlPanel2.Size = new System.Drawing.Size(530, 228);
             this.superTabControlPanel2.TabIndex = 0;
             this.superTabControlPanel2.TabItem = this.superTabItem2;
+            // 
+            // chkResolvePngLink
+            // 
+            // 
+            // 
+            // 
+            this.chkResolvePngLink.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkResolvePngLink.Location = new System.Drawing.Point(318, 34);
+            this.chkResolvePngLink.Name = "chkResolvePngLink";
+            this.chkResolvePngLink.Size = new System.Drawing.Size(107, 23);
+            this.chkResolvePngLink.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkResolvePngLink.TabIndex = 9;
+            this.chkResolvePngLink.Text = "ResolvePngLink";
             // 
             // chkOutputRemovedImg
             // 
@@ -2850,19 +2875,6 @@
             this.panelDockContainer2.Style.GradientAngle = 90;
             this.panelDockContainer2.TabIndex = 2;
             // 
-            // chkResolvePngLink
-            // 
-            // 
-            // 
-            // 
-            this.chkResolvePngLink.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkResolvePngLink.Location = new System.Drawing.Point(318, 34);
-            this.chkResolvePngLink.Name = "chkResolvePngLink";
-            this.chkResolvePngLink.Size = new System.Drawing.Size(107, 23);
-            this.chkResolvePngLink.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkResolvePngLink.TabIndex = 9;
-            this.chkResolvePngLink.Text = "ResolvePngLink";
-            // 
             // MainForm
             // 
             this.ClientSize = new System.Drawing.Size(750, 512);
@@ -3126,5 +3138,6 @@
         private System.Windows.Forms.ToolStripMenuItem tsmi1DumpAsXml;
         private DevComponents.Editors.ComboItem comboItem18;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkResolvePngLink;
+        private DevComponents.DotNetBar.ComboBoxItem cmbItemSkins;
     }
 }

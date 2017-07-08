@@ -19,6 +19,7 @@ namespace WzComparerR2.Animation
 
         public bool PremultipliedAlpha { get; set; }
         public SkeletonData SkeletonData { get; private set; }
+        public string DefaultSkin { get; set; }
 
         public static SpineAnimationData CreateFromNode(Wz_Node atlasNode, bool? useJson, GraphicsDevice graphicsDevice, GlobalFindNodeFunction findNode)
         {
