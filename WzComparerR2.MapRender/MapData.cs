@@ -706,8 +706,8 @@ namespace WzComparerR2.MapRender
 
                 //加载跳转动画
                 var hitNode = frameNode.Nodes["hit"];
-                var uol = hitNode?.GetValue<Wz_Uol>();
-                if (uol != null)
+                Wz_Uol uol;
+                if ((uol = hitNode?.GetValue<Wz_Uol>()) != null)
                 {
                     hitNode = uol.HandleUol(hitNode);
                 }

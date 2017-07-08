@@ -71,8 +71,8 @@ namespace WzComparerR2
         public static BitmapOrigin CreateFromNode(Wz_Node node, GlobalFindNodeFunction findNode)
         {
             BitmapOrigin bp = new BitmapOrigin();
-            Wz_Uol uol = node.GetValue<Wz_Uol>(null);
-            if (uol != null)
+            Wz_Uol uol;
+            while ((uol = node.GetValue<Wz_Uol>(null)) != null)
             {
                 node = uol.HandleUol(node);
             }

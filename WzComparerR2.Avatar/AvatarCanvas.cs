@@ -407,7 +407,7 @@ namespace WzComparerR2.Avatar
                 ActionFrame frame = new ActionFrame();
                 frame.Action = action;
                 frame.Frame = i;
-                if (frameNode.Value is Wz_Uol)
+                while (frameNode.Value is Wz_Uol)
                 {
                     frameNode = frameNode.GetValue<Wz_Uol>().HandleUol(frameNode);
                 }
@@ -530,7 +530,7 @@ namespace WzComparerR2.Avatar
             foreach (Wz_Node partNode in frameNodes)
             {
                 Wz_Node linkPartNode = partNode;
-                if (linkPartNode.Value is Wz_Uol)
+                while (linkPartNode.Value is Wz_Uol)
                 {
                     linkPartNode = linkPartNode.GetValue<Wz_Uol>().HandleUol(linkPartNode);
                 }
@@ -538,13 +538,13 @@ namespace WzComparerR2.Avatar
                 foreach (Wz_Node childNode in linkPartNode.Nodes) //分析部件
                 {
                     Wz_Node linkNode = childNode;
-                    if (childNode.Value is Wz_Uol)
+                    while (linkNode?.Value is Wz_Uol)
                     {
                         linkNode = ((Wz_Uol)childNode.Value).HandleUol(linkNode);
-                        if (linkNode == null)
-                        {
-                            continue;
-                        }
+                    }
+                    if (linkNode == null)
+                    {
+                        continue;
                     }
                     if (childNode.Text == "hairShade")
                     {
@@ -957,8 +957,8 @@ namespace WzComparerR2.Avatar
                     actionNode = actionNode.FindNodeByPath(path);
 
                     //处理uol
-                    Wz_Uol uol = actionNode.GetValueEx<Wz_Uol>(null);
-                    if (uol != null)
+                    Wz_Uol uol;
+                    while ((uol = actionNode.GetValueEx<Wz_Uol>(null)) != null)
                     {
                         actionNode = uol.HandleUol(actionNode);
                     }

@@ -202,7 +202,7 @@ namespace WzComparerR2.MapRender
         {
             if (node != null)
             {
-                if (node.Value is Wz_Uol)
+                while (node.Value is Wz_Uol)
                 {
                     node = ((Wz_Uol)node.Value).HandleUol(node);
                 }
@@ -244,7 +244,7 @@ namespace WzComparerR2.MapRender
         private Frame LoadFrame(Wz_Node node)
         {
             //处理uol
-            if (node.Value is Wz_Uol)
+            while (node.Value is Wz_Uol)
             {
                 node = ((Wz_Uol)node.Value).HandleUol(node);
             }
@@ -307,7 +307,7 @@ namespace WzComparerR2.MapRender
                 }
 
                 //处理uol
-                if (frameNode.Value is Wz_Uol)
+                while (frameNode.Value is Wz_Uol)
                 {
                     frameNode = ((Wz_Uol)frameNode.Value).HandleUol(frameNode);
                 }

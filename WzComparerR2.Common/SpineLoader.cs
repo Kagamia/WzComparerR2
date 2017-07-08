@@ -100,8 +100,8 @@ namespace WzComparerR2.Common
             }
 
             var node = atlasNode.ParentNode.FindNodeByPath(m.Result("$1"));
-            var uol = node.GetValueEx<Wz_Uol>(null);
-            if (uol != null)
+            Wz_Uol uol;
+            while ((uol = node.GetValueEx<Wz_Uol>(null)) != null)
             {
                 node = uol.HandleUol(node);
             }

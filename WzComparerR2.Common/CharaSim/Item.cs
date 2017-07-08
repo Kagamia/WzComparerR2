@@ -57,7 +57,7 @@ namespace WzComparerR2.CharaSim
                     {
                         case "icon":
                             pngNode = subNode;
-                            if (pngNode.Value is Wz_Uol)
+                            while (pngNode.Value is Wz_Uol)
                             {
                                 Wz_Uol uol = pngNode.Value as Wz_Uol;
                                 Wz_Node uolNode = uol.HandleUol(subNode);
@@ -74,7 +74,7 @@ namespace WzComparerR2.CharaSim
 
                         case "iconRaw":
                             pngNode = subNode;
-                            if (pngNode.Value is Wz_Uol)
+                            while (pngNode.Value is Wz_Uol)
                             {
                                 Wz_Uol uol = pngNode.Value as Wz_Uol;
                                 Wz_Node uolNode = uol.HandleUol(subNode);

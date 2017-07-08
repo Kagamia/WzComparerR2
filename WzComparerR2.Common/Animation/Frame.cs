@@ -63,7 +63,7 @@ namespace WzComparerR2.Animation
                 return null;
             }
 
-            if (frameNode.Value is Wz_Uol)
+            while (frameNode.Value is Wz_Uol)
             {
                 Wz_Uol uol = frameNode.Value as Wz_Uol;
                 Wz_Node uolNode = uol.HandleUol(frameNode);
