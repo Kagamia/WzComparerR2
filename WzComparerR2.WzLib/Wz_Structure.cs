@@ -14,6 +14,7 @@ namespace WzComparerR2.WzLib
             this.img_number = 0;
             this.has_basewz = false;
             this.TextEncoding = DefaultEncoding;
+            this.AutoDetectExtFiles = DefaultAutoDetectExtFiles;
         }
 
         public List<Wz_File> wz_files;
@@ -24,6 +25,7 @@ namespace WzComparerR2.WzLib
         public bool sorted;
 
         public Encoding TextEncoding { get; set; }
+        public bool AutoDetectExtFiles { get; set; }
 
         public void Clear()
         {
@@ -110,6 +112,8 @@ namespace WzComparerR2.WzLib
         }
 
         private static Encoding _defaultEncoding;
+
+        public static bool DefaultAutoDetectExtFiles { get; set; }
         #endregion
     }
 }

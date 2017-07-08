@@ -77,6 +77,16 @@ namespace WzComparerR2.Config
             set { this["wzEncoding"] = value; }
         }
 
+        /// <summary>
+        /// 获取或设置一个值，指示加载Base.wz时是否自动检测扩展wz文件（如Map2、Mob2）。
+        /// </summary>
+        [ConfigurationProperty("autoDetectExtFiles")]
+        public ConfigItem<bool> AutoDetectExtFiles
+        {
+            get { return (ConfigItem<bool>)this["autoDetectExtFiles"]; }
+            set { this["autoDetectExtFiles"] = value; }
+        }
+
         [ConfigurationProperty("patcherSettings")]
         [ConfigurationCollection(typeof(PatcherSetting), CollectionType = ConfigurationElementCollectionType.AddRemoveClearMap)]
         public PatcherSettingCollection PatcherSettings

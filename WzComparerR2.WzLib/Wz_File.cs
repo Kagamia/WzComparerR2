@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace WzComparerR2.WzLib
@@ -268,8 +268,6 @@ namespace WzComparerR2.WzLib
             int cs32 = 0;
             //int offs = 0;
 
-            bool parentBase = parent.Text.Equals("base.wz", StringComparison.OrdinalIgnoreCase);
-
             int count = ReadInt32();
 
             for (int i = 0; i < count; i++)
@@ -307,10 +305,39 @@ namespace WzComparerR2.WzLib
                 }
             }
 
+            bool willLoadBaseWz = useBaseWz ? parent.Text.Equals("base.wz", StringComparison.OrdinalIgnoreCase) : false;
+
+            if (willLoadBaseWz && this.WzStructure.AutoDetectExtFiles)
+            {
+                int dirCount = dirs.Count;
+                var baseFolder = Path.GetDirectoryName(this.header.FileName);
+                for (int i = 0; i < dirCount; i++)
+                {
+                    //检测文件名
+                    var m = Regex.Match(dirs[i], @"^([A-Za-z]+)$");
+                    if (m.Success)
+                    {
+                        //检测扩展wz文件
+                        for (int fileID = 2; ; fileID++)
+                        {
+                            string extDirName = m.Result("$1") + fileID;
+                            string extWzFile = Path.Combine(baseFolder, extDirName + ".wz");
+                            if (File.Exists(extWzFile) && !dirs.Take(dirCount).Any(dir => extDirName.Equals(dir, StringComparison.OrdinalIgnoreCase)))
+                            {
+                                dirs.Add(extDirName);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
             foreach (string dir in dirs)
             {
                 Wz_Node t = parent.Nodes.Add(dir);
-                if (parentBase && useBaseWz)
+                if (willLoadBaseWz)
                 {
                     this.WzStructure.has_basewz = true;
                     GetDirTree(t, false);
@@ -326,7 +353,7 @@ namespace WzComparerR2.WzLib
                 }
                 else
                 {
-                    GetDirTree(t);
+                    GetDirTree(t, false);
                 }
             }
         }

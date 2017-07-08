@@ -52,16 +52,24 @@ namespace WzComparerR2
             }
         }
 
+        public bool AutoDetectExtFiles
+        {
+            get { return chkAutoCheckExtFiles.Checked; }
+            set { chkAutoCheckExtFiles.Checked = value; }
+        }
+
         public void Load(WcR2Config config)
         {
             this.SortWzOnOpened = config.SortWzOnOpened;
             this.DefaultWzCodePage = config.WzEncoding;
+            this.AutoDetectExtFiles = config.AutoDetectExtFiles;
         }
 
         public void Save(WcR2Config config)
         {
             config.SortWzOnOpened = this.SortWzOnOpened;
             config.WzEncoding = this.DefaultWzCodePage;
+            config.AutoDetectExtFiles = this.AutoDetectExtFiles;
         }
     }
 }

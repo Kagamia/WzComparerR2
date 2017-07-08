@@ -165,6 +165,7 @@ namespace WzComparerR2
                 enc = null;
             }
             Wz_Structure.DefaultEncoding = enc;
+            Wz_Structure.DefaultAutoDetectExtFiles = config.AutoDetectExtFiles;
         }
 
         void CharaSimLoader_WzFileFinding(object sender, FindWzEventArgs e)
