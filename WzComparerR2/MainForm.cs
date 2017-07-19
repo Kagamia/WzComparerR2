@@ -1344,7 +1344,7 @@ namespace WzComparerR2
                     imagePath.Add("skill");
                     imagePath.Add(id);
                     addPath(0);
-                    if (Regex.IsMatch(id, @"8000\d{4}")) //kmst new skill
+                    if (Regex.IsMatch(id, @"80\d{6}")) //kmst new skill
                     {
                         wzPath[1] = id.Substring(0, 6) + ".img";
                         addPath(1);
