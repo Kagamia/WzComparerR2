@@ -241,7 +241,7 @@ namespace WzComparerR2.MapRender.UI
 
             private List<IconRect> iconRectCache;
             private PointF canvasPosCache;
-
+           
             protected override void OnDraw(Renderer spriterenderer, double elapsedGameTime, float opacity)
             {
                 base.OnDraw(spriterenderer, elapsedGameTime, opacity);

@@ -35,7 +35,7 @@ namespace WzComparerR2.MapRender.UI
             if (content.blocks != null)
             {
                 var pos = env.Input.MousePosition;
-                DrawContent(env, content, new Vector2(pos.X, pos.Y), true);
+                DrawContent(env, content, new Vector2(pos.X + 16, pos.Y + 16), true);
             }
         }
 
@@ -90,6 +90,10 @@ namespace WzComparerR2.MapRender.UI
             else if (target is PortalItem.ItemTooltip)
             {
                 return DrawString(gameTime, env, ((PortalItem.ItemTooltip)target).Title);
+            }
+            else if (target is UIWorldMap.Tooltip)
+            {
+                return DrawItem(gameTime, env, (UIWorldMap.Tooltip)target);
             }
             else if (target is string)
             {
@@ -236,6 +240,31 @@ namespace WzComparerR2.MapRender.UI
             if (!string.IsNullOrEmpty(item.ItemEU))
             {
                 blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, item.ItemEU, ref current, Color.White, ref size.X));
+            }
+
+            size.Y = current.Y;
+            return new TooltipContent() { blocks = blocks, size = size };
+        }
+
+        private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, UIWorldMap.Tooltip item)
+        {
+            var blocks = new List<TextBlock>();
+            Vector2 size = Vector2.Zero;
+            Vector2 current = Vector2.Zero;
+            StringResult sr = null;
+
+            if (item.MapID != null)
+            {
+                this.StringLinker?.StringMap.TryGetValue(item.MapID.Value, out sr);
+                string title = sr != null ? string.Format("{0} : {1}", sr["streetName"], sr["mapName"]) : item.MapID.ToString();
+                blocks.Add(PrepareTextLine(env.Fonts.TooltipTitleFont, title, ref current, Color.White, ref size.X));
+
+                string desc = sr?["mapDesc"];
+                if (!string.IsNullOrEmpty(desc))
+                {
+                    blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, desc, ref current, Color.White, ref size.X));
+                }
+                
             }
 
             size.Y = current.Y;

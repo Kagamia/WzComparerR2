@@ -125,12 +125,12 @@ namespace WzComparerR2.Rendering
             }
         }
 
-        private static void GetTexture_BGRA4444<T>(this Texture2D texture, T[] data) where T : struct
+        public static void GetTexture_BGRA4444<T>(this Texture2D texture, T[] data) where T : struct
         {
             texture.GetTexture_BGRA4444<T>(0, 0, null, data, 0, data.Length);
         }
 
-        private static void GetTexture_BGRA4444<T>(this Texture2D texture, int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+        public static void GetTexture_BGRA4444<T>(this Texture2D texture, int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
         {
             int num = Math.Max(texture.Width >> level, 1);
             int num2 = Math.Max(texture.Height >> level, 1);

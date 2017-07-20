@@ -364,5 +364,10 @@ namespace WzComparerR2.MapRender.UI
         {
             return new Rect(rect.X, rect.Y, rect.Width, rect.Height);
         }
+
+        public static PointF ToPointF(this WzComparerR2.WzLib.Wz_Vector vector)
+        {
+            return vector == null ? new PointF() : new PointF(vector.X, vector.Y);
+        }
     }
 }

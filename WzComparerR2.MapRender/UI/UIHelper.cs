@@ -11,6 +11,7 @@ using EmptyKeys.UserInterface;
 using EmptyKeys.UserInterface.Controls;
 using EmptyKeys.UserInterface.Input;
 using EmptyKeys.UserInterface.Media;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace WzComparerR2.MapRender.UI
 {
@@ -31,6 +32,53 @@ namespace WzComparerR2.MapRender.UI
         {
             var png = node?.GetLinkedSourceNode(PluginManager.FindWz)?.GetValueEx<Wz_Png>(null);
             return png == null ? null : Engine.Instance.Renderer.CreateTexture(png);
+        }
+
+        public static HitMap CreateHitMap(Texture2D texture)
+        {
+            HitMap hitMap = null;
+            byte[] colorData;
+            bool[] rowHit;
+            switch (texture.Format)
+            {
+                case SurfaceFormat.Color:
+                case SurfaceFormat.Bgra32:
+                    hitMap = new HitMap(texture.Width, texture.Height);
+                    colorData = new byte[texture.Width * texture.Height * 4];
+                    rowHit = new bool[texture.Width];
+                    texture.GetData(colorData);
+                    for (int y = 0; y < texture.Height; y++)
+                    {
+                        int rowStart = y * texture.Width * 4;
+                        for (int i = 0; i < rowHit.Length; i++)
+                        {
+                            rowHit[i] = colorData[rowStart + i * 4 + 3] != 0;
+                        }
+                        hitMap.SetRow(y, rowHit);
+                    }
+                    break;
+
+                case SurfaceFormat.Bgra4444:
+                    hitMap = new HitMap(texture.Width, texture.Height);
+                    colorData = new byte[texture.Width * texture.Height * 2];
+                    rowHit = new bool[texture.Width];
+                    texture.GetTexture_BGRA4444(0, 0, new Microsoft.Xna.Framework.Rectangle(0, 0, texture.Width, texture.Height), colorData, 0, colorData.Length);
+                    for (int y = 0; y < texture.Height; y++)
+                    {
+                        int rowStart = y * texture.Width * 2;
+                        for (int i = 0; i < rowHit.Length; i++)
+                        {
+                            rowHit[i] = colorData[rowStart + i * 2 + 1] >> 4 != 0;
+                        }
+                        hitMap.SetRow(y, rowHit);
+                    }
+                    break;
+
+                default:
+                    hitMap = new HitMap(true);
+                    break;
+            }
+            return hitMap;
         }
 
         class ClickEventHolder<T> : IDisposable

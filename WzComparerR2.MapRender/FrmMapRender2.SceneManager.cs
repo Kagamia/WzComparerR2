@@ -203,6 +203,8 @@ namespace WzComparerR2.MapRender
             {
                 this.ui.Minimap.MapRegion = mapData.VRect.ToRect();
             }
+
+            this.ui.WorldMap.CurrentMapID = mapData?.ID;
         }
 
         private IE OnSceneEnter()

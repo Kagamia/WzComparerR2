@@ -29,6 +29,8 @@ namespace WzComparerR2.MapRender.UI
         public ContentPresenter ContentControl { get; private set; }
         public UIMinimap2 Minimap { get; private set; }
 
+        public UIWorldMap WorldMap { get; private set; }
+
         private void InitializeComponents()
         {
             Style style = RootStyle.CreateRootStyle();
@@ -62,8 +64,30 @@ namespace WzComparerR2.MapRender.UI
             var minimap = new UIMinimap2();
             minimap.Parent = this;
             this.Minimap = minimap;
-
             this.Windows.Add(minimap);
+
+            var worldmap = new UIWorldMap();
+            worldmap.Parent = this;
+            worldmap.Visibility = Visibility.Collapsed;
+            worldmap.Visible += Worldmap_Visible;
+            this.WorldMap = worldmap;
+            this.Windows.Add(worldmap);
+        }
+
+        private void Worldmap_Visible(object sender, RoutedEventArgs e)
+        {
+            UIWorldMap wnd = sender as UIWorldMap;
+            wnd.Left = (int)Math.Max(0, (this.Width - wnd.Width) / 2);
+            wnd.Top = (int)Math.Max(0, (this.Height - wnd.Height) / 2);
+
+            if (!wnd.IsDataLoaded)
+            {
+                wnd.LoadWzResource();
+            }
+            else
+            {
+                wnd.JumpToCurrentMap();
+            }
         }
 
         public void LoadContents(object contentManager)

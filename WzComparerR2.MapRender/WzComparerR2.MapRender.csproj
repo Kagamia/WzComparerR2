@@ -142,6 +142,7 @@
     <Compile Include="TextureAtlas.cs" />
     <Compile Include="TextureLoader.cs" />
     <Compile Include="TileMode.cs" />
+    <Compile Include="UI\HitMap.cs" />
     <Compile Include="UI\ITooltipTarget.cs" />
     <Compile Include="UI\LCRBrush.cs" />
     <Compile Include="UI\MapRenderUIRoot.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="UI\UIMiniMap.cs" />
     <Compile Include="UI\UIMinimap2.cs" />
     <Compile Include="UI\UIOptions.cs" />
+    <Compile Include="UI\UIWorldMap.cs" />
     <Compile Include="UI\WcR2Engine.cs" />
     <Compile Include="UI\WcR2Renderer.cs" />
     <Compile Include="UI\WindowEx.cs" />
@@ -196,6 +198,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Basic.img.ComboBox.normal.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.WorldMap.Border.0.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
