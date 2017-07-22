@@ -136,7 +136,7 @@ namespace WzComparerR2.Rendering
             SizeF size;
 
             size = g.MeasureString(text, this.baseFont, byte.MaxValue, StringFormat.GenericTypographic);
-            GDIRect originRect = new GDIRect(gdiBufferX, 0, (int)Math.Ceiling(size.Width), (int)Math.Round(size.Height));
+            GDIRect originRect = new GDIRect(gdiBufferX, 0, (int)Math.Ceiling(size.Width), (int)Math.Ceiling(size.Height));
             if (originRect.Width == 0)
             {
                 originRect.Width = (int)(this.baseFont.Size / 2);

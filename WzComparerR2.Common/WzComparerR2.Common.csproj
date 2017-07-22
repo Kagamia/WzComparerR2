@@ -153,9 +153,13 @@
     <Compile Include="ImageDataObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rendering\XnaFont.cs" />
+    <Compile Include="Rendering\XnaFontRenderer.cs" />
     <Compile Include="SpineLoader.cs" />
     <Compile Include="StringLinker.cs" />
     <Compile Include="StringResult.cs" />
+    <Compile Include="Text\DocumentElements.cs" />
+    <Compile Include="Text\Parser.cs" />
+    <Compile Include="Text\TextRenderer.cs" />
     <Compile Include="Wz_NodeExtension2.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +173,7 @@
     <None Include="Rendering\Effect\PngEffect.fx" />
     <EmbeddedResource Include="Rendering\Effect\PngEffect.mgfxo" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
