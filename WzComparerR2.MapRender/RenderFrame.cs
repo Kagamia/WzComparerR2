@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if MapRenderV1
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -57,3 +58,4 @@ namespace WzComparerR2.MapRender
         }
     }
 }
+#endif

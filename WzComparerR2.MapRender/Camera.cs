@@ -175,6 +175,7 @@ namespace WzComparerR2.MapRender
             return drawingRect;
         }
 
+#if MapRenderV1
         public bool CheckSpriteVisible(RenderFrame frame, Vector2 position, bool flip)
         {
             Rectangle drawingRect;
@@ -196,6 +197,7 @@ namespace WzComparerR2.MapRender
                 flip);
             return this.ClipRect.Intersects(drawingRect);
         }
+#endif
 
         public Point CameraToWorld(Point cameraPoint)
         {

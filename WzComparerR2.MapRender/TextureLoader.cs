@@ -24,6 +24,7 @@ namespace WzComparerR2.MapRender
 
         private Dictionary<string, TextureItem> loadedTexture;
 
+#if MapRenderV1
         public RenderFrame CreateFrame(Wz_Node frameNode)
         {
             string key = frameNode.FullPathToFile.Replace('\\', '/');
@@ -57,6 +58,7 @@ namespace WzComparerR2.MapRender
             frame.A1 = frameNode.FindNodeByPath("a1").GetValueEx<int>(frame.A0);
             return frame;
         }
+#endif
 
         private Texture2D GetTexture(Wz_Png png, string key)
         {
