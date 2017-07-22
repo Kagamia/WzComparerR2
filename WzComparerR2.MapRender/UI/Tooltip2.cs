@@ -262,9 +262,8 @@ namespace WzComparerR2.MapRender.UI
                 string desc = sr?["mapDesc"];
                 if (!string.IsNullOrEmpty(desc))
                 {
-                    blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, desc, ref current, Color.White, ref size.X));
+                    blocks.AddRange(PrepareFormatText(env.Fonts.TooltipContentFont, desc, ref current, 280, ref size.X));
                 }
-                
             }
 
             size.Y = current.Y;

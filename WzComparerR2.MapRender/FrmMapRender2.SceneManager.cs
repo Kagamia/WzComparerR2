@@ -314,8 +314,11 @@ namespace WzComparerR2.MapRender
             var gameTime = cm.GameTime;
             var mapData = this.mapData;
 
-            this.renderEnv.Input.Update(gameTime);
-            this.ui.UpdateInput(gameTime.ElapsedGameTime.TotalMilliseconds);
+            if (this.IsActive)
+            {
+                this.renderEnv.Input.Update(gameTime);
+                this.ui.UpdateInput(gameTime.ElapsedGameTime.TotalMilliseconds);
+            }
 
             //需要手动更新数据部分
             this.renderEnv.Camera.AdjustToWorldRect();

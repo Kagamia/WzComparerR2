@@ -221,7 +221,7 @@ namespace WzComparerR2.MapRender
                     else direction1.Y = 0;
                 };
 
-                this.ui.PreviewKeyDown += (o, e) =>
+                this.ui.KeyDown += (o, e) =>
                 {
                     switch (e.Key)
                     {
@@ -246,7 +246,8 @@ namespace WzComparerR2.MapRender
                             break;
                     }
                 };
-                this.ui.KeyUp += (o, e) =>
+                
+                this.ui.PreviewKeyUp += (o, e) =>
                 {
                     switch (e.Key)
                     {

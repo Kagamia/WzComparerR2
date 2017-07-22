@@ -376,23 +376,33 @@ namespace WzComparerR2.MapRender
             }
         }
 
-        private IEnumerable<KeyValuePair<SceneItem, MeshItem>> GetDrawableItems(SceneNode node)
+        private IEnumerable<ContainerNode> GetSceneContainers(SceneNode node)
         {
             var container = node as ContainerNode;
             if (container != null)  //暂时不考虑缩进z层递归合并  container下没有子节点
             {
-                foreach (var kv in container.Slots.Select(item => new KeyValuePair<SceneItem, MeshItem>(item, GetMesh(item)))
-                    .Where(kv => kv.Value != null)
-                    .OrderBy(kv => kv.Value))
-                {
-                    yield return kv;
-                }
+                yield return container;
             }
             else
             {
-                foreach (var mesh in node.Nodes.SelectMany(child => GetDrawableItems(child)))
+                foreach (var mesh in node.Nodes.SelectMany(child => GetSceneContainers(child)))
                 {
                     yield return mesh;
+                }
+            }
+        }
+
+        private IEnumerable<KeyValuePair<SceneItem, MeshItem>> GetDrawableItems(MapScene scene)
+        {
+            var containers = GetSceneContainers(scene).ToList();
+
+            foreach(var container in containers)
+            {
+                foreach (var kv in container.Slots.Select(item => new KeyValuePair<SceneItem, MeshItem>(item, GetMesh(item)))
+                  .Where(kv => kv.Value != null)
+                  .OrderBy(kv => kv.Value))
+                {
+                    yield return kv;
                 }
             }
         }

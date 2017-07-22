@@ -45,6 +45,22 @@ namespace WzComparerR2.MapRender.UI
             return block;
         }
 
+        public static TextBlock[] PrepareFormatText(XnaFont font, string formatText, ref Vector2 pos, int width, ref float maxWidth)
+        {
+            var layouter = new TextLayouter();
+            int y = (int)pos.Y;
+            var blocks = layouter.LayoutFormatText(font, formatText, width, ref y);
+            for(int i = 0; i < blocks.Length; i++)
+            {
+                blocks[i].Position.X += pos.X;
+                var blockWidth = blocks[i].Font.MeasureString(blocks[i].Text).X;
+                maxWidth = Math.Max(maxWidth, blocks[i].Position.X + blockWidth);
+            }
+            pos.X = 0;
+            pos.Y = y;
+            return blocks;
+        }
+
         public static TextBlock[] Prepare(LifeInfo info, MapRenderFonts fonts, out Vector2 size)
         {
             var blocks = new List<TextBlock>();
@@ -117,6 +133,34 @@ namespace WzComparerR2.MapRender.UI
             public Color ForeColor;
             public XnaFont Font;
             public string Text;
+        }
+
+        public class TextLayouter : XnaFontRenderer
+        {
+            public TextLayouter() : base(null)
+            {
+
+            }
+
+            List<TextBlock> blocks;
+
+            public TextBlock[] LayoutFormatText(XnaFont font, string s, int width, ref int y)
+            {
+                this.blocks = new List<TextBlock>();
+                base.DrawFormatString(s, font, width, ref y, font.Height);
+                return this.blocks.ToArray();
+            }
+
+            protected override void Flush(StringBuilder sb, int startIndex, int length, int x, int y, string colorID)
+            {
+                this.blocks.Add(new TextBlock()
+                {
+                    Position = new Vector2(x,y),
+                    ForeColor = this.GetColor(colorID),
+                    Font = this.font,
+                    Text = sb.ToString(startIndex, length),
+                });
+            }
         }
     }
 }
