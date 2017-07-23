@@ -448,14 +448,14 @@ namespace WzComparerR2.CharaSimControl
             Graphics g;
             RectangleF infinityRect;
             int drawX;
-            Color defautColor;
+            Color defaultColor;
 
             public void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height)
             {
                 //初始化环境
                 this.g = g;
                 this.drawX = x;
-                this.defautColor = Color.White;
+                this.defaultColor = Color.White;
                 float fontLineHeight = GetFontLineHeight(font);
                 this.infinityRect = new RectangleF(0, 0, ushort.MaxValue, fontLineHeight);
 
@@ -467,7 +467,7 @@ namespace WzComparerR2.CharaSimControl
                 //初始化环境
                 this.g = g;
                 this.drawX = x;
-                this.defautColor = color;
+                this.defaultColor = color;
                 float fontLineHeight = GetFontLineHeight(font);
                 this.infinityRect = new RectangleF(0, 0, ushort.MaxValue, fontLineHeight);
 
@@ -587,7 +587,7 @@ namespace WzComparerR2.CharaSimControl
                     case "c": color = GearGraphics.OrangeBrushColor; break;
                     case "g": color = GearGraphics.gearGreenColor; break;
                     case "$": color = GearGraphics.gearCyanColor; break;
-                    default: color = this.defautColor; break;
+                    default: color = this.defaultColor; break;
                 }
                 if (this.UseGDIRenderer)
                 {
