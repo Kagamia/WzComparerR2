@@ -1,4 +1,13 @@
-﻿## 2017.7.20
+﻿## 2017.7.23
+
+### 共通
+- GearGraphics.TextRenderer重构，排版与渲染分离，支持Monogame。
+
+### MapRender
+- 完整支持了UIWorldMap。
+
+
+## 2017.7.20
 
 ### 基础
 - 修复了技能编号8001xxxx无法自动链接的bug。
