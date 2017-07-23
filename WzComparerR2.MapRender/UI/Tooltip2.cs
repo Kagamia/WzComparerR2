@@ -257,9 +257,9 @@ namespace WzComparerR2.MapRender.UI
             {
                 this.StringLinker?.StringMap.TryGetValue(item.MapID.Value, out sr);
                 string title = sr != null ? string.Format("{0} : {1}", sr["streetName"], sr["mapName"]) : item.MapID.ToString();
-                blocks.Add(PrepareTextLine(env.Fonts.TooltipTitleFont, title, ref current, Color.White, ref size.X));
-
                 string desc = sr?["mapDesc"];
+                var titleFont = string.IsNullOrEmpty(desc) ? env.Fonts.TooltipContentFont : env.Fonts.TooltipTitleFont;
+                blocks.Add(PrepareTextLine(titleFont, title, ref current, Color.White, ref size.X));
                 if (!string.IsNullOrEmpty(desc))
                 {
                     blocks.AddRange(PrepareFormatText(env.Fonts.TooltipContentFont, desc, ref current, 280, ref size.X));
