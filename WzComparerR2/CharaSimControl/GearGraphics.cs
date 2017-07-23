@@ -591,7 +591,7 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (this.UseGDIRenderer)
                 {
-                    TR.DrawText(g, content, font, new Point(this.drawX + x, y), color, TextFormatFlags.NoPrefix);
+                    TR.DrawText(g, content, font, new Point(this.drawX + x, y), color, TextFormatFlags.NoPrefix | TextFormatFlags.NoPadding);
                 }
                 else
                 {
