@@ -231,7 +231,9 @@ namespace WzComparerR2.MapRender.UI
 
             if (!string.IsNullOrEmpty(item.Title))
             {
-                blocks.Add(PrepareTextLine(env.Fonts.TooltipTitleFont, item.Title, ref current, Color.White, ref size.X));
+                bool hasDesc = !string.IsNullOrEmpty(item.Desc) || !string.IsNullOrEmpty(item.ItemEU);
+                var titleFont = hasDesc ? env.Fonts.TooltipTitleFont : env.Fonts.TooltipContentFont;
+                blocks.Add(PrepareTextLine(titleFont, item.Title, ref current, Color.White, ref size.X));
             }
             if (!string.IsNullOrEmpty(item.Desc))
             {
