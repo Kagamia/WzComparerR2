@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using WzComparerR2.WzLib;
 using WzComparerR2.Common;
+using WzComparerR2.MapRender.Config;
 using WzComparerR2.MapRender.Patches2;
 using WzComparerR2.MapRender.UI;
 using Microsoft.Xna.Framework;
@@ -43,6 +44,8 @@ namespace WzComparerR2.MapRender
 
             var form = Form.FromHandle(this.Window.Handle) as Form;
             form.Load += Form_Load;
+            form.GotFocus += Form_GotFocus;
+            form.LostFocus += Form_LostFocus;
             form.FormClosed += Form_FormClosed;
         }
 
@@ -51,6 +54,28 @@ namespace WzComparerR2.MapRender
             var form = (Form)sender;
             form.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             form.SetDesktopLocation(0, 0);
+        }
+
+        private void Form_GotFocus(object sender, EventArgs e)
+        {
+            if (MapRenderConfig.Default.MuteOnLeaveFocus)
+            {
+                if (this.bgm != null)
+                {
+                    this.bgm.Volume = 1;
+                }
+            }
+        }
+
+        private void Form_LostFocus(object sender, EventArgs e)
+        {
+            if (MapRenderConfig.Default.MuteOnLeaveFocus)
+            {
+                if (this.bgm != null)
+                {
+                    this.bgm.Volume = 0;
+                }
+            }
         }
 
         private void Form_FormClosed(object sender, System.Windows.Forms.FormClosedEventArgs e)
@@ -103,6 +128,7 @@ namespace WzComparerR2.MapRender
             this.cm.StartCoroutine(OnStart()); //entry
             this.Components.Add(cm);
 
+            this.ApplySetting();
             SwitchResolution(Resolution.Window_800_600);
             base.Initialize();
         }
@@ -126,6 +152,27 @@ namespace WzComparerR2.MapRender
             //开关小地图
             this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.ui.Minimap.Toggle()), KeyCode.M, ModifierKeys.None) { IsRepeatEnabled = true });
             this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.ui.WorldMap.Toggle()), KeyCode.W, ModifierKeys.None) { IsRepeatEnabled = true });
+
+            //选项界面
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ =>
+            {
+                var uiWnd = this.ui.Windows.OfType<UIOptions>().FirstOrDefault();
+                if (uiWnd == null)
+                {
+                    uiWnd = new UIOptions();
+                    uiWnd.DataContext = new UIOptionsDataModel();
+                    uiWnd.OK += UIOption_OK;
+                    uiWnd.Cancel += UIOption_Cancel;
+                    uiWnd.Visible += UiWnd_Visible;
+                    uiWnd.Visibility = EmptyKeys.UserInterface.Visibility.Visible;
+                    this.ui.Windows.Add(uiWnd);
+                    uiWnd.Parent = this.ui;
+                }
+                else
+                {
+                    uiWnd.Toggle();
+                }
+            }), KeyCode.Escape, ModifierKeys.None));
 
             //截图
             this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => { if (CanCapture()) prepareCapture = true; }), KeyCode.Scroll, ModifierKeys.None));
@@ -303,7 +350,7 @@ namespace WzComparerR2.MapRender
                         direction2 = Vector2.Zero;
                     }
                 };
-
+                
                 //更新事件
                 this.ui.InputUpdated += (o, e) =>
                 {
@@ -325,6 +372,29 @@ namespace WzComparerR2.MapRender
                     return mouseTarget.item;
                 },
                 this.OnSceneItemClick);
+        }
+
+        private void UIOption_OK(object sender, EventArgs e)
+        {
+            var wnd = sender as UIOptions;
+            var data = wnd.DataContext as UIOptionsDataModel;
+            SaveOptionData(data);
+            wnd.Visibility = EmptyKeys.UserInterface.Visibility.Hidden;
+
+            ApplySetting();
+        }
+
+        private void UIOption_Cancel(object sender, EventArgs e)
+        {
+            var wnd = sender as UIOptions;
+            wnd.Visibility = EmptyKeys.UserInterface.Visibility.Hidden;
+        }
+
+        private void UiWnd_Visible(object sender, EmptyKeys.UserInterface.RoutedEventArgs e)
+        {
+            var wnd = sender as UIOptions;
+            var data = wnd.DataContext as UIOptionsDataModel;
+            LoadOptionData(data);
         }
 
         protected override void LoadContent()
@@ -491,6 +561,44 @@ namespace WzComparerR2.MapRender
             catch
             {
             }
+        }
+        #endregion
+
+        #region 配置文件相关
+        private void ApplySetting()
+        {
+            var config = MapRenderConfig.Default;
+            Music.GlobalVolume = config.Volume;
+            this.renderEnv.Camera.AdjustRectEnabled = config.ClipMapRegion;
+            this.ui.TopBar.Visibility = config.TopBarVisible ? EmptyKeys.UserInterface.Visibility.Visible : EmptyKeys.UserInterface.Visibility.Hidden;
+            this.ui.Minimap.CameraRegionVisible = config.Minimap_CameraRegionVisible;
+            this.ui.WorldMap.UseImageNameAsInfoName = config.WorldMap_UseImageNameAsInfoName;
+        }
+
+        private void LoadOptionData(UIOptionsDataModel model)
+        {
+            var config = MapRenderConfig.Default;
+            model.SelectedFont = config.DefaultFontIndex;
+            model.Volume = Music.GlobalVolume;
+            model.MuteOnLeaveFocus = config.MuteOnLeaveFocus;
+            model.ClipMapRegion = renderEnv.Camera.AdjustRectEnabled;
+            model.TopBarVisible = this.ui.TopBar.Visibility == EmptyKeys.UserInterface.Visibility.Visible;
+            model.Minimap_CameraRegionVisible = this.ui.Minimap.CameraRegionVisible;
+            model.WorldMap_UseImageNameAsInfoName = this.ui.WorldMap.UseImageNameAsInfoName;
+        }
+
+        private void SaveOptionData(UIOptionsDataModel model)
+        {
+            WzComparerR2.Config.ConfigManager.Reload();
+            var config = MapRenderConfig.Default;
+            config.DefaultFontIndex = model.SelectedFont;
+            config.Volume = model.Volume;
+            config.MuteOnLeaveFocus = model.MuteOnLeaveFocus;
+            config.ClipMapRegion = model.ClipMapRegion;
+            config.TopBarVisible = model.TopBarVisible;
+            config.Minimap_CameraRegionVisible = model.Minimap_CameraRegionVisible;
+            config.WorldMap_UseImageNameAsInfoName = model.WorldMap_UseImageNameAsInfoName;
+            WzComparerR2.Config.ConfigManager.Save();
         }
         #endregion
 

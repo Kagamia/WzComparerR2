@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
 using EmptyKeys.UserInterface;
@@ -13,7 +12,6 @@ using EmptyKeys.UserInterface.Data;
 using EmptyKeys.UserInterface.Renderers;
 using EmptyKeys.UserInterface.Media.Imaging;
 
-using Microsoft.Xna.Framework;
 using WzComparerR2.WzLib;
 using WzComparerR2.Common;
 
@@ -21,13 +19,13 @@ using Res = CharaSimResource.Resource;
 using MRes = WzComparerR2.MapRender.Properties.Resources;
 using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
-
 namespace WzComparerR2.MapRender.UI
 {
     class UIWorldMap : WindowEx
     {
         public static readonly DependencyProperty CurrentWorldMapProperty = DependencyProperty.Register("CurrentWorldMap", typeof(WorldMapInfo), typeof(UIWorldMap), new FrameworkPropertyMetadata(null));
         public static readonly DependencyProperty CurrentMapIDProperty = DependencyProperty.Register("CurrentMapID", typeof(WorldMapInfo), typeof(int?), new FrameworkPropertyMetadata(null));
+        public static readonly DependencyProperty UseImageNameAsInfoNameProperty = DependencyProperty.Register("UseImageNameAsInfoName", typeof(WorldMapInfo), typeof(bool), new FrameworkPropertyMetadata(false));
 
         public UIWorldMap() : base()
         {
@@ -59,6 +57,12 @@ namespace WzComparerR2.MapRender.UI
         {
             get { return (int?)this.GetValue(CurrentMapIDProperty); }
             set { this.SetValue(CurrentMapIDProperty, value); }
+        }
+
+        public bool UseImageNameAsInfoName
+        {
+            get { return (bool)this.GetValue(UseImageNameAsInfoNameProperty); }
+            set { this.SetValue(UseImageNameAsInfoNameProperty, value); }
         }
 
         protected override void InitializeComponents()
@@ -110,7 +114,6 @@ namespace WzComparerR2.MapRender.UI
             base.InitializeComponents();
         }
 
-
         public void LoadWzResource()
         {
             if (this.IsDataLoaded)
@@ -140,7 +143,10 @@ namespace WzComparerR2.MapRender.UI
                     node = img.Node.Nodes["info"];
                     if (node != null)
                     {
-                        worldMapInfo.Name = node.Nodes["WorldMap"].GetValueEx<string>(null);
+                        if (!this.UseImageNameAsInfoName)
+                        {
+                            worldMapInfo.Name = node.Nodes["WorldMap"].GetValueEx<string>(null);
+                        }
                         worldMapInfo.ParentMap = node.Nodes["parentMap"].GetValueEx<string>(null);
                     }
                     if (string.IsNullOrEmpty(worldMapInfo.Name))

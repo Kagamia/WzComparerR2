@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using WzComparerR2.WzLib;
 using WzComparerR2.Common;
+using WzComparerR2.Config;
 using WzComparerR2.PluginBase;
 using DevComponents.DotNetBar;
 using System.Threading;
@@ -42,6 +43,8 @@ namespace WzComparerR2.MapRender
             btnItemMapRenderV2 = new ButtonItem("", "MapRenderV2");
             btnItemMapRenderV2.Click += btnItem_Click;
             bar2.Items.Add(btnItemMapRenderV2);
+
+            ConfigManager.RegisterAllSection();
         }
 
         void btnItem_Click(object sender, EventArgs e)

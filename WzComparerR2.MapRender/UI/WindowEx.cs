@@ -20,7 +20,6 @@ namespace WzComparerR2.MapRender.UI
         protected virtual void InitializeComponents()
         {
             this.Template = new ControlTemplate(CreateControls);
-            this.DataContext = this;
         }
 
         private UIElement CreateControls(UIElement parent)
@@ -34,6 +33,19 @@ namespace WzComparerR2.MapRender.UI
         protected void SetDragTarget(UIElement element)
         {
             element.Name = "PART_WindowTitleBorder";
+        }
+
+        protected override void OnPropertyChanged(DependencyProperty property)
+        {
+            base.OnPropertyChanged(property);
+
+            if (property == VisibilityProperty)
+            {
+                if (this.Visibility == Visibility.Visible)
+                {
+                    this.Focus();
+                }
+            }
         }
 
         public void Toggle()

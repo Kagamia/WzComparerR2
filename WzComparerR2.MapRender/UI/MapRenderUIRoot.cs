@@ -9,7 +9,8 @@ using EmptyKeys.UserInterface.Input;
 using EmptyKeys.UserInterface.Media;
 using EmptyKeys.UserInterface.Media.Effects;
 using EmptyKeys.UserInterface.Themes;
-
+using EmptyKeys.UserInterface.Data;
+using Res = CharaSimResource.Resource;
 
 namespace WzComparerR2.MapRender.UI
 {
@@ -28,8 +29,8 @@ namespace WzComparerR2.MapRender.UI
         public event EventHandler InputUpdated;
         public ContentPresenter ContentControl { get; private set; }
         public UIMinimap2 Minimap { get; private set; }
-
         public UIWorldMap WorldMap { get; private set; }
+        public UITopBar TopBar { get; private set; }
 
         private void InitializeComponents()
         {
@@ -38,28 +39,6 @@ namespace WzComparerR2.MapRender.UI
             this.Style = style;
 
             this.Background = null;
-            /*
-            Canvas c = new Canvas();
-            this.Button1 = new Button();
-            this.Button1.Name = "button1";
-            this.Button1.Content = "233";
-            this.Button1.Width = 100;
-            this.Button1.Height = 100;
-            this.Button1.Background = Brushes.FloralWhite;
-            Canvas.SetLeft(Button1, 200);
-
-            c.Children.Add(this.Button1);
-
-            this.Content = c;
-
-            MyWindow wnd = new MyWindow();
-            wnd.Visibility = Visibility.Visible;
-            wnd.IsOnTop = true;
-            wnd.Parent = this;
-            wnd.Left = 10;
-            wnd.Top = 10;
-            */
-            //this.Windows.Add(wnd);
 
             var minimap = new UIMinimap2();
             minimap.Parent = this;
@@ -72,6 +51,14 @@ namespace WzComparerR2.MapRender.UI
             worldmap.Visible += Worldmap_Visible;
             this.WorldMap = worldmap;
             this.Windows.Add(worldmap);
+
+            var topBar = new UITopBar();
+            topBar.Parent = this;
+            topBar.IsOnTop = false;
+            topBar.SetBinding(Window.WidthProperty, new Binding(UIRoot.WidthProperty) { Source = this });
+            topBar.SetBinding(Window.LeftProperty, new Binding(Window.WidthProperty) { Source = minimap });
+            this.TopBar = topBar;
+            this.Windows.Add(topBar);
         }
 
         private void Worldmap_Visible(object sender, RoutedEventArgs e)
@@ -100,7 +87,31 @@ namespace WzComparerR2.MapRender.UI
             FontManager.DefaultFont = FontManager.Instance.GetFont("宋体", 12, FontStyle.Regular);
 
             //加载其他资源
+            this.LoadResource();
             this.Minimap.MapAreaControl.LoadWzResource();
+        }
+
+        private void LoadResource()
+        {
+            var renderer = Engine.Instance.Renderer;
+
+            var tooltipBrush = new NinePatchBrush()
+            {
+                Resource = new EKNineFormResource()
+                {
+                    NW = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_nw),
+                    N = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_n),
+                    NE = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_ne),
+                    W = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_w),
+                    C = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_c),
+                    E = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_e),
+                    SW = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_sw),
+                    S = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_s),
+                    SE = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_se),
+                }
+            };
+
+            this.Resources[MapRenderResourceKey.TooltipBrush] = tooltipBrush;
         }
 
         public void UnloadContents()
@@ -140,6 +151,5 @@ namespace WzComparerR2.MapRender.UI
         {
             this.InputUpdated?.Invoke(this, e);
         }
-
     }
 }
