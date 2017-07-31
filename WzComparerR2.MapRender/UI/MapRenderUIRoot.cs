@@ -55,8 +55,9 @@ namespace WzComparerR2.MapRender.UI
             var topBar = new UITopBar();
             topBar.Parent = this;
             topBar.IsOnTop = false;
-            topBar.SetBinding(Window.WidthProperty, new Binding(UIRoot.WidthProperty) { Source = this });
-            topBar.SetBinding(Window.LeftProperty, new Binding(Window.WidthProperty) { Source = minimap });
+            topBar.SetBinding(UITopBar.WidthProperty, new Binding(UIRoot.WidthProperty) { Source = this });
+            topBar.SetBinding(UITopBar.PaddingLeftProperty, new Binding(Window.WidthProperty) { Source = minimap });
+            topBar.SetBinding(UITopBar.IsShortModeProperty, new Binding(Window.VisibilityProperty) { Source = minimap, Converter = UIHelper.CreateConverter((Visibility o) => o == Visibility.Visible) });
             this.TopBar = topBar;
             this.Windows.Add(topBar);
         }

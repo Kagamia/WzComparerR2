@@ -132,6 +132,48 @@ namespace WzComparerR2.MapRender
             tooltip.TooltipTarget = target;
         }
 
+        private void UpdateTopBar()
+        {
+            StringBuilder sb = new StringBuilder();
+            var topbar = this.ui.TopBar;
+
+            //显示地图名字
+            int? mapID = this.mapData?.ID;
+            sb.Append("[").Append(mapID != null ? mapID.ToString() : mapImg?.Node.FullPathToFile);
+            if (!topbar.IsShortMode)
+            {
+                sb.Append(" ");
+                StringResult sr;
+                if (this.StringLinker != null && mapID != null 
+                    && this.StringLinker.StringMap.TryGetValue(mapID.Value, out sr))
+                {
+                    sb.Append(sr.Name);
+                }
+                else
+                {
+                    sb.Append("(null)");
+                }
+            }
+            sb.Append("]");
+
+            //显示bgm名字
+            sb.Append(" [").Append(this.mapData?.Bgm ?? "(noBgm)").Append("]");
+
+            //显示fps
+            sb.AppendFormat(" [fps u:{0:f2} d:{1:f2}]", fpsCounter.UpdatePerSec, fpsCounter.DrawPerSec);
+
+            //可见性
+            sb.Append(" ctrl+");
+            int[] array = new[] { 1, 2, 3, 4, 5, 6, 7, 9, 10 };
+            for (int i = 0; i < array.Length; i++)
+            {
+                var objType = (Patches.RenderObjectType)array[i];
+                sb.Append(this.patchVisibility.IsVisible(objType) ? "-" : (i + 1).ToString());
+            }
+
+            this.ui.TopBar.Text = sb.ToString();
+        }
+
         private void OnSceneItemClick(SceneItem item)
         {
             if (item is PortalItem)

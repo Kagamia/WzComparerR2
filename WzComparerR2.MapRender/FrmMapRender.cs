@@ -35,7 +35,7 @@ namespace WzComparerR2.MapRender
             this.willReloadBgm = true;
             this.profile = new StringBuilder();
             this.showProfile = true;
-            this.fpsCounter = new FpsCounter();
+            this.fpsCounter = new FpsCounter(this);
             this.fpsCounter.UseStopwatch = true;
             this.cameraInMap = true;
             this.patchVisibility = new PatchVisibility();

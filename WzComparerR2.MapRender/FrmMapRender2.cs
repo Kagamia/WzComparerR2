@@ -114,6 +114,7 @@ namespace WzComparerR2.MapRender
         Music bgm;
 
         CoroutineManager cm;
+        FpsCounter fpsCounter;
 
         protected override void Initialize()
         {
@@ -127,6 +128,8 @@ namespace WzComparerR2.MapRender
             this.cm = new CoroutineManager(this);
             this.cm.StartCoroutine(OnStart()); //entry
             this.Components.Add(cm);
+            this.fpsCounter = new FpsCounter(this) { UseStopwatch = true };
+            this.Components.Add(fpsCounter);
 
             this.ApplySetting();
             SwitchResolution(Resolution.Window_800_600);
@@ -436,6 +439,8 @@ namespace WzComparerR2.MapRender
                     this.renderEnv.Sprite.End();
                 }
             }
+
+            base.Draw(gameTime);
         }
 
         #region 截图相关

@@ -30,7 +30,7 @@ namespace WzComparerR2.MapRender
                 //添加视图状态
                 viewData = new MapViewData()
                 {
-                    MapID = mapData.ID.Value,
+                    MapID = mapData?.ID ?? -1,
                     Portal = "sp"
                 };
                 yield return cm.Yield(OnSceneEnter());
@@ -129,6 +129,12 @@ namespace WzComparerR2.MapRender
 
         private void AfterLoadMap(MapData mapData)
         {
+            //同步可视化状态
+            foreach(var portal in mapData.Scene.Portals)
+            {
+                portal.View.IsEditorMode = this.patchVisibility.PortalInEditMode;
+            }
+           
             //同步UI
             this.renderEnv.Camera.WorldRect = mapData.VRect;
 
@@ -326,6 +332,8 @@ namespace WzComparerR2.MapRender
                 var rect = this.renderEnv.Camera.ClipRect;
                 this.ui.Minimap.CameraViewPort = new EmptyKeys.UserInterface.Rect(rect.X, rect.Y, rect.Width, rect.Height);
             }
+            //更新topbar
+            UpdateTopBar();
             //更新ui
             this.ui.UpdateLayout(gameTime.ElapsedGameTime.TotalMilliseconds);
             //更新场景

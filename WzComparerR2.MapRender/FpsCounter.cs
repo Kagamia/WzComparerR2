@@ -6,9 +6,9 @@ using Microsoft.Xna.Framework;
 
 namespace WzComparerR2.MapRender
 {
-    public class FpsCounter
+    public class FpsCounter : DrawableGameComponent
     {
-        public FpsCounter()
+        public FpsCounter(Game game) : base(game)
         {
             this.CountInterval = TimeSpan.FromMilliseconds(1000);
             this.swUpdate = new Stopwatch();
@@ -28,7 +28,7 @@ namespace WzComparerR2.MapRender
         private int drawCount;
         private Stopwatch swDraw;
 
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             this.updateCount++;
 
@@ -60,7 +60,7 @@ namespace WzComparerR2.MapRender
             }
         }
 
-        public void Draw(GameTime gameTime)
+        public override void Draw(GameTime gameTime)
         {
             this.drawCount++;
             if (UseStopwatch)

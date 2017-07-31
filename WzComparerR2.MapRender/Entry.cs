@@ -107,6 +107,7 @@ namespace WzComparerR2.MapRender
                                 return;
                             }
                             this.mapRenderGame2 = new FrmMapRender2(img) { StringLinker = sl };
+                            this.mapRenderGame2.Window.Title = "MapRender " + this.Version;
                             try
                             {
                                 using (this.mapRenderGame2)

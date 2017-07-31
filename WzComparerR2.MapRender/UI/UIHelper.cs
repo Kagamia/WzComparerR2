@@ -88,6 +88,15 @@ namespace WzComparerR2.MapRender.UI
             return new CustomConverter(convertFunc);
         }
 
+        public static IValueConverter CreateConverter<TIn, TOut>(Func<TIn, TOut> convertFunc)
+        {
+            var wrapFunc = new Func<object, object>(o =>
+            {
+                return (convertFunc != null && o is TIn) ? (object)convertFunc((TIn)o) : null;
+            });
+            return new CustomConverter(wrapFunc);
+        }
+
         class ClickEventHolder<T> : IDisposable
         {
             public ClickEventHolder(UIElement control)
