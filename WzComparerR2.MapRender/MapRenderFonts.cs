@@ -13,12 +13,21 @@ namespace WzComparerR2.MapRender
         {
             this.fonts = new Dictionary<string, XnaFont>();
             this.graphicsDevice = graphicsDevice;
-            fonts["default"] = new XnaFont(graphicsDevice, "宋体", 12f);
+
+            var config = MapRender.Config.MapRenderConfig.Default;
+            string defaultFontName;
+            switch (config.DefaultFontIndex)
+            {
+                default:
+                case 0: defaultFontName = "SimSun"; break;
+                case 1: defaultFontName = "Dotum"; break;
+            }
+            fonts["default"] = new XnaFont(graphicsDevice, defaultFontName, 12f);
             fonts["npcName"] = fonts["default"];
             fonts["mobName"] = fonts["default"];
             fonts["mobLevel"] = new XnaFont(graphicsDevice, "Tahoma", 9f);
-            fonts["tooltipTitle"] = new XnaFont(graphicsDevice, new Font("宋体", 14f, FontStyle.Bold, GraphicsUnit.Pixel));
-            fonts["tooltipContent"] = fonts["mobName"];
+            fonts["tooltipTitle"] = new XnaFont(graphicsDevice, new Font(defaultFontName, 14f, FontStyle.Bold, GraphicsUnit.Pixel));
+            fonts["tooltipContent"] = fonts["default"];
         }
 
         Dictionary<string, XnaFont> fonts;

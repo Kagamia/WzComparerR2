@@ -203,7 +203,7 @@ namespace WzComparerR2.MapRender.UI
             grid.Children.Add(lbl3);
 
             ComboBox cmb1 = new ComboBox();
-            cmb1.ItemsSource = new[] { "Simsun", "Dotum" };
+            cmb1.ItemsSource = (IEnumerable<string>)this.FindResource(MapRenderResourceKey.FontList); //source reference has bugs.
             cmb1.SetBinding(ComboBox.SelectedIndexProperty, new Binding(nameof(UIOptionsDataModel.SelectedFont)));
             Grid.SetRow(cmb1, 3);
             Grid.SetColumn(cmb1, 1);

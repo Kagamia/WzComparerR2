@@ -140,25 +140,24 @@ namespace WzComparerR2.MapRender.UI
 
             TextBlock lblStreetName = new TextBlock();
             lblStreetName.Name = "lblStreetName";
-            lblStreetName.FontFamily = new FontFamily("宋体");
-            lblStreetName.FontSize = 12;
             lblStreetName.FontStyle = FontStyle.Bold;
             lblStreetName.Foreground = Brushes.White;
             lblStreetName.Padding = new Thickness(0, 0, 6, 0);
             lblStreetName.SetBinding(TextBlock.TextProperty, new Binding("StreetName") { Source = this });
-            lblStreetName.DataContext = this;
+            lblStreetName.SetResourceReference(TextBlock.FontFamilyProperty, MapRenderResourceKey.DefaultFontFamily);
+            lblStreetName.SetResourceReference(TextBlock.FontSizeProperty, MapRenderResourceKey.DefaultFontSize);
             Canvas.SetLeft(lblStreetName, 48);
             Canvas.SetTop(lblStreetName, 20);
             canvas.Children.Add(lblStreetName);
 
             TextBlock lblMapName = new TextBlock();
             lblMapName.Name = "lblMapName";
-            lblMapName.FontFamily = new FontFamily("宋体");
-            lblMapName.FontSize = 12;
             lblMapName.FontStyle = FontStyle.Bold;
+            lblMapName.Foreground = Brushes.White;
             lblMapName.Padding = new Thickness(0, 0, 6, 0);
             lblMapName.SetBinding(TextBlock.TextProperty, new Binding("MapName") { Source = this });
-            lblMapName.Foreground = Brushes.White;
+            lblMapName.SetResourceReference(TextBlock.FontFamilyProperty, MapRenderResourceKey.DefaultFontFamily);
+            lblMapName.SetResourceReference(TextBlock.FontSizeProperty, MapRenderResourceKey.DefaultFontSize);
             Canvas.SetLeft(lblMapName, 48);
             Canvas.SetTop(lblMapName, 34);
             canvas.Children.Add(lblMapName);
@@ -176,7 +175,8 @@ namespace WzComparerR2.MapRender.UI
             this.lblStreetName = lblStreetName;
             this.lblMapName = lblMapName;
 
-            FontManager.Instance.AddFont("宋体", 12, FontStyle.Bold);
+            FontManager.Instance.AddFont(lblStreetName.FontFamily.Source, lblStreetName.FontSize, lblStreetName.FontStyle);
+            FontManager.Instance.AddFont(lblMapName.FontFamily.Source, lblMapName.FontSize, lblMapName.FontStyle);
             base.InitializeComponents();
         }
 

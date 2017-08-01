@@ -18,6 +18,7 @@ namespace WzComparerR2.MapRender.UI
     {
         public MapRenderUIRoot() : base()
         {
+            InitGlobalResource();
             InitializeComponents();
 
             //获取root容器
@@ -80,16 +81,37 @@ namespace WzComparerR2.MapRender.UI
 
         public void LoadContents(object contentManager)
         {
-            FontManager.Instance.AddFont("宋体", 12, FontStyle.Regular);
+            //UI资源
+            FontManager.DefaultFontFamily = (FontFamily)this.FindResource(MapRenderResourceKey.DefaultFontFamily);
+            FontManager.DefaultFontSize = (float)this.FindResource(MapRenderResourceKey.DefaultFontSize);
+            FontManager.Instance.AddFont(FontManager.DefaultFontFamily.Source, FontManager.DefaultFontSize, FontStyle.Regular);
             FontManager.Instance.LoadFonts(contentManager);
             ImageManager.Instance.LoadImages(contentManager);
             SoundManager.Instance.LoadSounds(contentManager);
             EffectManager.Instance.LoadEffects(contentManager);
-            FontManager.DefaultFont = FontManager.Instance.GetFont("宋体", 12, FontStyle.Regular);
+            FontManager.DefaultFont = FontManager.Instance.GetFont(FontManager.DefaultFontFamily.Source, FontManager.DefaultFontSize, FontStyle.Regular);
 
-            //加载其他资源
+            //其他资源
             this.LoadResource();
             this.Minimap.MapAreaControl.LoadWzResource();
+        }
+
+        private void InitGlobalResource()
+        {
+            //初始化字体
+            var fontList = new[] { "SimSun", "Dotum" };
+            var config = MapRender.Config.MapRenderConfig.Default;
+            var resDict = ResourceDictionary.DefaultDictionary;
+
+            var fontIndex = config.DefaultFontIndex;
+            if (fontIndex < 0 || fontIndex >= fontList.Length)
+            {
+                fontIndex = 0;
+            }
+
+            resDict[MapRenderResourceKey.FontList] = fontList;
+            resDict[MapRenderResourceKey.DefaultFontFamily] = new FontFamily(fontList[fontIndex]);
+            resDict[MapRenderResourceKey.DefaultFontSize] = 12f;
         }
 
         private void LoadResource()

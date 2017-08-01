@@ -382,7 +382,7 @@ namespace WzComparerR2.MapRender
             var wnd = sender as UIOptions;
             var data = wnd.DataContext as UIOptionsDataModel;
             SaveOptionData(data);
-            wnd.Visibility = EmptyKeys.UserInterface.Visibility.Hidden;
+            wnd.Visibility = EmptyKeys.UserInterface.Visibility.Collapsed;
 
             ApplySetting();
         }
@@ -390,7 +390,7 @@ namespace WzComparerR2.MapRender
         private void UIOption_Cancel(object sender, EventArgs e)
         {
             var wnd = sender as UIOptions;
-            wnd.Visibility = EmptyKeys.UserInterface.Visibility.Hidden;
+            wnd.Visibility = EmptyKeys.UserInterface.Visibility.Collapsed;
         }
 
         private void UiWnd_Visible(object sender, EmptyKeys.UserInterface.RoutedEventArgs e)
@@ -575,7 +575,7 @@ namespace WzComparerR2.MapRender
             var config = MapRenderConfig.Default;
             Music.GlobalVolume = config.Volume;
             this.renderEnv.Camera.AdjustRectEnabled = config.ClipMapRegion;
-            this.ui.TopBar.Visibility = config.TopBarVisible ? EmptyKeys.UserInterface.Visibility.Visible : EmptyKeys.UserInterface.Visibility.Hidden;
+            this.ui.TopBar.Visibility = config.TopBarVisible ? EmptyKeys.UserInterface.Visibility.Visible : EmptyKeys.UserInterface.Visibility.Collapsed;
             this.ui.Minimap.CameraRegionVisible = config.Minimap_CameraRegionVisible;
             this.ui.WorldMap.UseImageNameAsInfoName = config.WorldMap_UseImageNameAsInfoName;
         }

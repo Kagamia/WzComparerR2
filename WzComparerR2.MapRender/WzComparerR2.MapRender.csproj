@@ -147,7 +147,7 @@
     <Compile Include="UI\HitMap.cs" />
     <Compile Include="UI\ITooltipTarget.cs" />
     <Compile Include="UI\LCRBrush.cs" />
-    <Compile Include="UI\MapRenderResKey.cs" />
+    <Compile Include="UI\MapRenderResourceKey.cs" />
     <Compile Include="UI\MapRenderUIRoot.cs" />
     <Compile Include="UI\NinePatchBrush.cs" />
     <Compile Include="UI\Tooltip.cs" />

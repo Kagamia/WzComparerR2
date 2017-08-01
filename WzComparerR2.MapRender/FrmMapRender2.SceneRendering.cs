@@ -171,6 +171,10 @@ namespace WzComparerR2.MapRender
                 sb.Append(this.patchVisibility.IsVisible(objType) ? "-" : (i + 1).ToString());
             }
 
+            sb.Append(" Mouse:");
+            var mouse = this.renderEnv.Input.MousePosition;
+            var mousePos = this.renderEnv.Camera.CameraToWorld(mouse);
+            sb.AppendFormat("{0},{1}", mousePos.X, mousePos.Y);
             this.ui.TopBar.Text = sb.ToString();
         }
 
