@@ -23,6 +23,7 @@ namespace WzComparerR2.Avatar.UI
             this.animator = new Animator();
             btnReset_Click(btnReset, EventArgs.Empty);
             FillWeaponIdx();
+            FillEarSelection();
         }
 
         public SuperTabControlPanel GetTabPanel()
@@ -264,6 +265,9 @@ namespace WzComparerR2.Avatar.UI
             selectedItem = this.cmbWeaponIdx.SelectedItem as ComboItem;
             this.avatar.WeaponIndex = selectedItem != null ? Convert.ToInt32(selectedItem.Text) : 0;
 
+            //获取耳朵状态
+            selectedItem = this.cmbEar.SelectedItem as ComboItem;
+            this.avatar.EarType = selectedItem != null ? Convert.ToInt32(selectedItem.Text) : 0;
 
             string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5},{6},{7},{8},{9},{10}",
                 this.avatar.ActionName,
@@ -274,7 +278,7 @@ namespace WzComparerR2.Avatar.UI
                 tamingFrame,
                 this.avatar.HairCover ? 1 : 0,
                 this.avatar.ShowHairShade ? 1 : 0,
-                this.avatar.ShowEar ? 1 : 0,
+                this.avatar.EarType,
                 this.avatar.WeaponType,
                 this.avatar.WeaponIndex);
 
@@ -531,6 +535,11 @@ namespace WzComparerR2.Avatar.UI
             FillComboItems(cmbWeaponIdx, 0, 4);
         }
 
+        private void FillEarSelection()
+        {
+            FillComboItems(cmbEar, 0, 3);
+        }
+
         private void FillComboItems(ComboBoxEx comboBox, int start, int count)
         {
             List<ComboItem> items = new List<ComboItem>(count);
@@ -649,6 +658,11 @@ namespace WzComparerR2.Avatar.UI
             UpdateDisplay();
         }
 
+        private void cmbEar_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateDisplay();
+        }
+
         private void chkBodyPlay_CheckedChanged(object sender, EventArgs e)
         {
             if (chkBodyPlay.Checked)
@@ -725,12 +739,6 @@ namespace WzComparerR2.Avatar.UI
         private void chkHairShade_CheckedChanged(object sender, EventArgs e)
         {
             avatar.ShowHairShade = chkHairShade.Checked;
-            UpdateDisplay();
-        }
-
-        private void chkEar_CheckedChanged(object sender, EventArgs e)
-        {
-            avatar.ShowEar = chkEar.Checked;
             UpdateDisplay();
         }
 

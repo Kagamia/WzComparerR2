@@ -42,7 +42,6 @@
             this.cmbWeaponIdx = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbWeaponType = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.labelX4 = new DevComponents.DotNetBar.LabelX();
-            this.chkEar = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkTamingPlay = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkEmotionPlay = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkBodyPlay = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -69,10 +68,12 @@
             this.btnFemale = new DevComponents.DotNetBar.ButtonItem();
             this.btnReset = new DevComponents.DotNetBar.ButtonItem();
             this.btnLock = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonItem1 = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.avatarContainer1 = new WzComparerR2.Avatar.UI.AvatarContainer();
-            this.buttonItem1 = new DevComponents.DotNetBar.ButtonItem();
+            this.labelX5 = new DevComponents.DotNetBar.LabelX();
+            this.cmbEar = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.dockSite2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bar1)).BeginInit();
             this.bar1.SuspendLayout();
@@ -235,10 +236,10 @@
             // 
             this.panelDockContainer2.AutoScroll = true;
             this.panelDockContainer2.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.panelDockContainer2.Controls.Add(this.cmbEar);
             this.panelDockContainer2.Controls.Add(this.cmbWeaponIdx);
             this.panelDockContainer2.Controls.Add(this.cmbWeaponType);
             this.panelDockContainer2.Controls.Add(this.labelX4);
-            this.panelDockContainer2.Controls.Add(this.chkEar);
             this.panelDockContainer2.Controls.Add(this.chkTamingPlay);
             this.panelDockContainer2.Controls.Add(this.chkEmotionPlay);
             this.panelDockContainer2.Controls.Add(this.chkBodyPlay);
@@ -253,6 +254,7 @@
             this.panelDockContainer2.Controls.Add(this.cmbActionBody);
             this.panelDockContainer2.Controls.Add(this.chkHairShade);
             this.panelDockContainer2.Controls.Add(this.chkHairCover);
+            this.panelDockContainer2.Controls.Add(this.labelX5);
             this.panelDockContainer2.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelDockContainer2.Location = new System.Drawing.Point(3, 23);
             this.panelDockContainer2.Name = "panelDockContainer2";
@@ -271,7 +273,7 @@
             this.cmbWeaponIdx.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbWeaponIdx.FormattingEnabled = true;
             this.cmbWeaponIdx.ItemHeight = 15;
-            this.cmbWeaponIdx.Location = new System.Drawing.Point(91, 103);
+            this.cmbWeaponIdx.Location = new System.Drawing.Point(89, 103);
             this.cmbWeaponIdx.Name = "cmbWeaponIdx";
             this.cmbWeaponIdx.Size = new System.Drawing.Size(50, 21);
             this.cmbWeaponIdx.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -306,22 +308,6 @@
             this.labelX4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.labelX4.TabIndex = 13;
             this.labelX4.Text = "武器";
-            // 
-            // chkEar
-            // 
-            this.chkEar.AutoSize = true;
-            this.chkEar.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.chkEar.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkEar.Location = new System.Drawing.Point(160, 84);
-            this.chkEar.Name = "chkEar";
-            this.chkEar.Size = new System.Drawing.Size(45, 19);
-            this.chkEar.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkEar.TabIndex = 11;
-            this.chkEar.Text = "ear";
-            this.chkEar.CheckedChanged += new System.EventHandler(this.chkEar_CheckedChanged);
             // 
             // chkTamingPlay
             // 
@@ -655,6 +641,12 @@
             this.btnLock.Name = "btnLock";
             this.btnLock.Tooltip = "锁定";
             // 
+            // buttonItem1
+            // 
+            this.buttonItem1.Name = "buttonItem1";
+            this.buttonItem1.Text = "buttonItem1";
+            this.buttonItem1.Click += new System.EventHandler(this.buttonItem1_Click_1);
+            // 
             // dockSite3
             // 
             this.dockSite3.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
@@ -681,11 +673,34 @@
             this.avatarContainer1.TabIndex = 8;
             this.avatarContainer1.Text = "avatarContainer1";
             // 
-            // buttonItem1
+            // labelX5
             // 
-            this.buttonItem1.Name = "buttonItem1";
-            this.buttonItem1.Text = "buttonItem1";
-            this.buttonItem1.Click += new System.EventHandler(this.buttonItem1_Click_1);
+            this.labelX5.AutoSize = true;
+            this.labelX5.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX5.Location = new System.Drawing.Point(139, 106);
+            this.labelX5.Name = "labelX5";
+            this.labelX5.Size = new System.Drawing.Size(25, 16);
+            this.labelX5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.labelX5.TabIndex = 14;
+            this.labelX5.Text = "ear";
+            // 
+            // cmbEar
+            // 
+            this.cmbEar.DisplayMember = "Text";
+            this.cmbEar.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cmbEar.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEar.FormattingEnabled = true;
+            this.cmbEar.ItemHeight = 15;
+            this.cmbEar.Location = new System.Drawing.Point(163, 103);
+            this.cmbEar.Name = "cmbEar";
+            this.cmbEar.Size = new System.Drawing.Size(39, 21);
+            this.cmbEar.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.cmbEar.TabIndex = 15;
+            this.cmbEar.SelectedIndexChanged += new System.EventHandler(this.cmbEar_SelectedIndexChanged);
             // 
             // AvatarForm
             // 
@@ -749,7 +764,6 @@
         private System.Windows.Forms.Timer timer1;
         private AvatarContainer avatarContainer1;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHairCover;
-        private DevComponents.DotNetBar.Controls.CheckBoxX chkEar;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWeaponIdx;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWeaponType;
         private DevComponents.DotNetBar.LabelX labelX4;
@@ -762,5 +776,7 @@
         private DevComponents.DotNetBar.ButtonItem btnMale;
         private DevComponents.DotNetBar.ButtonItem btnFemale;
         private DevComponents.DotNetBar.ButtonItem buttonItem1;
+        private DevComponents.DotNetBar.Controls.ComboBoxEx cmbEar;
+        private DevComponents.DotNetBar.LabelX labelX5;
     }
 }

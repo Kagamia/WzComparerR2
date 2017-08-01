@@ -17,7 +17,7 @@ namespace WzComparerR2.Avatar
             this.Emotions = new List<string>();
             this.TamingActions = new List<string>();
             this.Parts = new AvatarPart[18];
-            this.ShowEar = false;
+            this.EarType = 0;
             this.WeaponIndex = 0;
         }
 
@@ -33,9 +33,10 @@ namespace WzComparerR2.Avatar
 
         public bool HairCover { get; set; }
         public bool ShowHairShade { get; set; }
-        public bool ShowEar { get; set; }
+        
         public int WeaponIndex { get; set; }
         public int WeaponType { get; set; }
+        public int EarType { get; set; }
 
         public bool LoadZ()
         {
@@ -560,7 +561,8 @@ namespace WzComparerR2.Avatar
                         switch (childNode.Text)
                         {
                             case "face": if (!(bodyFace ?? face)) continue; break;
-                            case "ear": if (!ShowEar) continue; break;
+                            case "ear": if (this.EarType != 1) continue; break;
+                            case "lefEar": if (this.EarType != 2) continue; break;
                             case "hairOverHead":
                             case "backHairOverCape":
                             case "backHair": if (HairCover) continue; break;
