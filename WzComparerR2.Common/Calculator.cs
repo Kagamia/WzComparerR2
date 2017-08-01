@@ -51,6 +51,7 @@ namespace WzComparerR2
                     case ')': tokens.Add(new Token(TokenType.BracketEnd, null)); break;
                     case ',': tokens.Add(new Token(TokenType.Comma, null)); break;
                     case ' ': break; //whitespace当不存在
+                    case '%': break; //ignore
                     default:
                         if (char.IsDigit(expr[i]))
                         { //尽力读取number

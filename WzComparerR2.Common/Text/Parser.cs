@@ -81,7 +81,7 @@ namespace WzComparerR2.Text
                         {
                             flushRun();
                             colorStack.Push("c");
-                            strPos++;
+                            //strPos++;
                         }
                         else//遇到# 换白刷子并flush
                         {
