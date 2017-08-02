@@ -1,4 +1,20 @@
-﻿## 2017.7.23
+﻿## 2017.8.2
+
+### 共通
+- 支持了渲染Spine骨骼动画的新特性。
+
+### MapRender
+- 新增了一个Option界面和配置文件，TopBar回归。
+
+### CharaSim
+- 忽略属性表达式中的'%'，以强行屏蔽一个bug。
+- 修复了宏字符串中'#'会丢失字符的bug。
+
+### Avatar
+- 支持了选择ear图层类型，以支持KMST新职业。
+
+
+## 2017.7.23
 
 ### 共通
 - GearGraphics.TextRenderer重构，排版与渲染分离，支持Monogame。

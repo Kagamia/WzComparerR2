@@ -59,7 +59,7 @@ namespace WzComparerR2.Avatar
             }*/
 
             canvas.ActionName = "stand1";
-            canvas.EmotionName = "default";
+            canvas.EmotionName = "shine";
             canvas.TamingActionName = "stand1";
             AddPart(canvas, "Character\\00002000.img");
             AddPart(canvas, "Character\\00012000.img");
@@ -67,18 +67,18 @@ namespace WzComparerR2.Avatar
             AddPart(canvas, "Character\\Hair\\00030000.img");
             AddPart(canvas, "Character\\Coat\\01040036.img");
             AddPart(canvas, "Character\\Pants\\01060026.img");
-            AddPart(canvas, "Character\\Weapon\\01442000.img");
+            //AddPart(canvas, "Character\\Weapon\\01442000.img");
             //AddPart(canvas, "Character\\Weapon\\01382007.img");
             //AddPart(canvas, "Character\\Weapon\\01332000.img");
             //AddPart(canvas, "Character\\Weapon\\01342000.img");
 
             var faceFrames = canvas.GetFaceFrames(canvas.EmotionName);
 
-            foreach (var action in canvas.Actions)
+            //foreach (var action in canvas.Actions)
+            foreach (var action in new[] { "walk1", "jump", "stand1"})
             {
-                break;
                 Gif gif = new Gif();
-                var actionFrames = canvas.GetActionFrames(action.Name);
+                var actionFrames = canvas.GetActionFrames(action);
                 foreach (var frame in actionFrames)
                 {
                     if (frame.Delay != 0)
@@ -94,17 +94,28 @@ namespace WzComparerR2.Avatar
                 }
                 
 
-                var gifFile = gif.EncodeGif(Color.Black);
-                string fileName = "D:\\ms\\" + action.Name.Replace('\\', '.');
+                var gifFile = gif.EncodeGif(Color.Transparent);
+                string fileName = "D:\\ms\\new_" + action.Replace('\\', '.');
                 gifFile.Save(fileName + (gif.Frames.Count == 1 ? ".png" : ".gif"));
+
+                var fd = new System.Drawing.Imaging.FrameDimension(gifFile.FrameDimensionsList[0]);
+                //获取帧数(gif图片可能包含多帧，其它格式图片一般仅一帧)
+                int count = gifFile.GetFrameCount(fd);
+                for (int i = 0; i < count; i++)
+                {
+                    gifFile.SelectActiveFrame(fd, i);
+                    gifFile.Save(fileName + "_" + i + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                }
+
                 gifFile.Dispose();
             }
-
+            
+            if (true)
             {
 
-                Gif gif = CreateKeyDownAction(canvas);
+                Gif gif = CreateChair(canvas);
                 var gifFile = gif.EncodeGif(Color.Transparent, 0);
-                string fileName = "D:\\d12";
+                string fileName = "D:\\d16";
 
                 if (false)
                 {
@@ -335,6 +346,90 @@ namespace WzComparerR2.Avatar
                         //绘制角色主动作
                         var bone = canvas.CreateFrame(frame, null, null);
                         var bmp = canvas.DrawFrame(bone, frame);
+                        GifFrame f = new GifFrame(bmp.Bitmap, bmp.Origin, Math.Abs(frame.Delay));
+                        actLayer.Frames.Add(f);
+                        adelay += f.Delay;
+                        //delay += f.Delay;
+                    }
+                }
+            }
+
+            layers.Add(new Tuple<GifLayer, int>(actLayer, 0));
+            //按照z排序
+            layers.Sort((a, b) => a.Item2.CompareTo(b.Item2));
+            gifCanvas.Layers.AddRange(layers.Select(t => t.Item1));
+
+            return gifCanvas.Combine();
+        }
+
+        private Gif CreateChair(AvatarCanvas canvas)
+        {
+            GifCanvas gifCanvas = new GifCanvas();
+            var layers = new List<Tuple<GifLayer, int>>();
+            var actLayer = new GifLayer();
+
+            //gifCanvas.Layers.Add(new GifLayer());
+            int delay = 0;
+            var faceFrames = canvas.GetFaceFrames(canvas.EmotionName);
+
+            var ChairNode = PluginManager.FindWz(@"Item\Install\0301.img\03015660");
+            var actionName = "sit";
+            var pos = ChairNode.FindNodeByPath(@"info\bodyRelMove").GetValueEx<Wz_Vector>(null);
+            
+            Point browPos = new Point(-5, -48);
+
+            //添加特效帧
+            {
+                var effects = new List<Tuple<Gif, int>>();
+
+                for (int i = 1; ; i++)
+                {
+                    Wz_Node effNode = ChairNode.FindNodeByPath("effect"+( i > 1 ? i.ToString() : ""));
+                    if (effNode == null)
+                        break;
+                    var gif = Gif.CreateFromNode(effNode, PluginManager.FindWz);
+                    var z = effNode.FindNodeByPath("z").GetValueEx(0);
+                    var isPos = effNode.Nodes["pos"].GetValueEx(0);
+
+
+                    delay = Math.Max(delay, gif.Frames.Sum(f => f.Delay));
+
+                    var layer = new GifLayer();
+                    if (isPos == 1)
+                    {
+                        layer.Frames.AddRange(gif.Frames.Select(f =>
+                        {
+                            GifFrame frame = (GifFrame)f;
+                            frame.Origin = new Point(frame.Origin.X - browPos.X, frame.Origin.Y - browPos.Y);
+                            return frame;
+                        }));
+                    }
+                    else
+                    {
+                        layer.Frames.AddRange(gif.Frames.Select(f => (GifFrame)f));
+                    }
+                   
+                    layers.Add(new Tuple<GifLayer, int>(layer, z));
+                }
+            }
+
+            //添加角色帧
+            ActionFrame[] actionFrames = canvas.GetActionFrames(actionName);
+            int adelay = 0;
+            var bodyMove = pos == null ? Point.Empty : new Point(pos.X, pos.Y);
+            while (adelay < delay)
+            {
+                for (int i = 0; i < actionFrames.Length; i++)
+                {
+                    var frame = actionFrames[i];
+
+                    if (frame.Delay != 0)
+                    {
+                        //绘制角色主动作
+                        var bone = canvas.CreateFrame(frame, faceFrames[0], null);
+                        bone.Position = bodyMove;
+                        var bmp = canvas.DrawFrame(bone, frame);
+                        
                         GifFrame f = new GifFrame(bmp.Bitmap, bmp.Origin, Math.Abs(frame.Delay));
                         actLayer.Frames.Add(f);
                         adelay += f.Delay;
