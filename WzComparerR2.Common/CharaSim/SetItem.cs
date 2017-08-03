@@ -15,6 +15,7 @@ namespace WzComparerR2.CharaSim
         }
         public int completeCount;
         public int currentCount;
+        public bool parts;
         public SetItemIDList itemIDs;
         public string setItemName;
         public Dictionary<int, SetItemEffect> effects;
@@ -37,6 +38,9 @@ namespace WzComparerR2.CharaSim
                         break;
                     case "completeCount":
                         setItem.completeCount = Convert.ToInt32(subNode.Value);
+                        break;
+                    case "parts":
+                        setItem.parts = subNode.GetValue<int>() != 0;
                         break;
                     case "ItemID":
                         foreach (Wz_Node itemNode in subNode.Nodes)

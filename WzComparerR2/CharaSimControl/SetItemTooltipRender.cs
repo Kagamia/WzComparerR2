@@ -70,6 +70,11 @@ namespace WzComparerR2.CharaSimControl
                 string itemName = setItemPart.Value.RepresentName;
                 string typeName = setItemPart.Value.TypeName;
 
+                if (string.IsNullOrEmpty(typeName) && SetItem.parts)
+                {
+                    typeName = "装备";
+                }
+
                 if (string.IsNullOrEmpty(itemName) || string.IsNullOrEmpty(typeName))
                 {
                     foreach (var itemID in setItemPart.Value.ItemIDs)
@@ -80,18 +85,24 @@ namespace WzComparerR2.CharaSimControl
                             if (StringLinker.StringEqp.TryGetValue(itemID.Key, out sr))
                             {
                                 itemName = sr.Name;
-                                typeName = ItemStringHelper.GetSetItemGearTypeString(Gear.GetGearType(itemID.Key));
+                                if (typeName == null)
+                                {
+                                    typeName = ItemStringHelper.GetSetItemGearTypeString(Gear.GetGearType(itemID.Key));
+                                }
                             }
                             else if (StringLinker.StringItem.TryGetValue(itemID.Key, out sr)) //兼容宠物
                             {
                                 itemName = sr.Name;
-                                if (itemID.Key / 10000 == 500)
+                                if (typeName == null)
                                 {
-                                    typeName = "宠物";
-                                }
-                                else
-                                {
-                                    typeName = "";
+                                    if (itemID.Key / 10000 == 500)
+                                    {
+                                        typeName = "宠物";
+                                    }
+                                    else
+                                    {
+                                        typeName = "";
+                                    }
                                 }
                             }
                         }
