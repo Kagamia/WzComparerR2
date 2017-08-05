@@ -150,9 +150,17 @@ namespace WzComparerR2.Avatar
 
             foreach (Wz_Node actionNode in tamingNode.Nodes)
             {
-                if (actionNode.Text != "info")
+                switch (actionNode.Text)
                 {
-                    this.TamingActions.Add(actionNode.Text);
+                    case "info":
+                    case "characterAtion":
+                    case "characterEmotion":
+                    case "property":
+                        break;
+
+                    default:
+                        this.TamingActions.Add(actionNode.Text);
+                        break;
                 }
             }
 
@@ -294,12 +302,13 @@ namespace WzComparerR2.Avatar
         public ActionFrame[] GetActionFrames(string actionName)
         {
             Action action = this.Actions.Find(act => act.Name == actionName);
-            Wz_Node bodyNode = PluginBase.PluginManager.FindWz("Character\\00002000.img");
             if (action == null)
             {
                 return new ActionFrame[0];
             }
-            else if (action.Level == 2)
+
+            Wz_Node bodyNode = PluginBase.PluginManager.FindWz("Character\\00002000.img");
+            if (action.Level == 2)
             {
                 var actionNode = bodyNode.FindNodeByPath(action.Name);
                 if (actionNode == null)
@@ -316,8 +325,8 @@ namespace WzComparerR2.Avatar
                         break;
                     }
                     ActionFrame frame = new ActionFrame();
-                    frame.Action = frameNode.FindNodeByPath("action").GetValueEx<string>(null);
-                    frame.Frame = frameNode.FindNodeByPath("frame").GetValueEx<int>(0);
+                    frame.Action = frameNode.Nodes["action"].GetValueEx<string>(null);
+                    frame.Frame = frameNode.Nodes["frame"].GetValueEx<int>(0);
                     LoadActionFrameDesc(frameNode, frame);
                     frames.Add(frame);
                 }
@@ -341,22 +350,85 @@ namespace WzComparerR2.Avatar
             }
         }
 
-        public ActionFrame[] GetFaceFrames(string action)
+        private ActionFrame GetActionFrame(string actionName, int frameIndex)
+        {
+            Action action = this.Actions.Find(act => act.Name == actionName);
+            if (action == null)
+            {
+                return null;
+            }
+
+            Wz_Node bodyNode = PluginBase.PluginManager.FindWz("Character\\00002000.img");
+            if (action.Level == 2)
+            {
+                var frameNode = bodyNode.FindNodeByPath($@"action.Name\{frameIndex}");
+                if (frameNode != null)
+                {
+                    ActionFrame frame = new ActionFrame();
+                    frame.Action = frameNode.Nodes["action"].GetValueEx<string>(null);
+                    frame.Frame = frameNode.Nodes["frame"].GetValueEx<int>(0);
+                    LoadActionFrameDesc(frameNode, frame);
+                    return frame;
+                }
+            }
+            else
+            {
+                Wz_Node actionNode = this.Body?.Node.FindNodeByPath(action.Name)
+                    ?? bodyNode.FindNodeByPath(action.Name);
+
+                var frameNode = actionNode?.Nodes[frameIndex.ToString()];
+                if (frameNode != null)
+                {
+                    var frame = LoadStandardFrame(frameNode);
+                    frame.Action = action.Name;
+                    frame.Frame = frameIndex;
+                    return frame;
+                }
+            }
+
+            return null;
+        }
+
+        public ActionFrame[] GetFaceFrames(string emotion)
         {
             List<ActionFrame> frames = new List<ActionFrame>();
             if (this.Face != null)
             {
-                var actionNode = this.Face.Node.FindNodeByPath(action);
-                if (action == "default")
+                if (emotion == "default")
                 {
-                    frames.Add(new ActionFrame() { Action = action });
+                    frames.Add(new ActionFrame() { Action = emotion });
                 }
                 else
                 {
-                    frames.AddRange(LoadStandardFrames(actionNode, action));
+                    var actionNode = this.Face.Node.FindNodeByPath(emotion);
+                    frames.AddRange(LoadStandardFrames(actionNode, emotion));
                 }
             }
             return frames.ToArray();
+        }
+
+        private ActionFrame GetFaceFrame(string emotion, int frameIndex)
+        {
+            if (this.Face != null)
+            {
+                if (emotion == "default")
+                {
+                    return new ActionFrame() { Action = emotion };
+                }
+                else
+                {
+                    var frameNode = this.Face.Node.FindNodeByPath($@"{emotion}\{frameIndex}");
+                    if (frameNode != null)
+                    {
+                        var frame = LoadStandardFrame(frameNode);
+                        frame.Action = emotion;
+                        frame.Frame = frameIndex;
+                        return frame;
+                    }
+                }
+            }
+
+            return null;
         }
 
         public ActionFrame[] GetTamingFrames(string action)
@@ -370,25 +442,44 @@ namespace WzComparerR2.Avatar
             return frames.ToArray();
         }
 
+        private ActionFrame GetTamingFrame(string action, int frameIndex)
+        {
+            var actionNode = this.Taming?.Node.FindNodeByPath($@"action\{frameIndex}");
+            if (actionNode != null)
+            {
+                var frame = LoadStandardFrame(actionNode);
+                frame.Action = action;
+                frame.Frame = frameIndex;
+                return frame;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// 读取扩展属性。
         /// </summary>
         private void LoadActionFrameDesc(Wz_Node frameNode, ActionFrame actionFrame)
         {
-            actionFrame.Delay = frameNode.FindNodeByPath("delay").GetValueEx<int>(100);
-            actionFrame.Flip = frameNode.FindNodeByPath("flip").GetValueEx<int>(0) != 0;
-            var faceNode = frameNode.FindNodeByPath("face");
+            actionFrame.Delay = frameNode.Nodes["delay"].GetValueEx<int>(100);
+            actionFrame.Flip = frameNode.Nodes["flip"].GetValueEx<int>(0) != 0;
+            var faceNode = frameNode.Nodes["face"];
             if (faceNode != null)
             {
                 actionFrame.Face = faceNode.GetValue<int>() != 0;
             }
-            var move = frameNode.FindNodeByPath("move").GetValueEx<Wz_Vector>(null);
+            var move = frameNode.Nodes["move"].GetValueEx<Wz_Vector>(null);
             if (move != null)
             {
                 actionFrame.Move = move;
             }
-            actionFrame.RotateProp = frameNode.FindNodeByPath("rotateProp").GetValueEx<int>(0);
-            actionFrame.Rotate = frameNode.FindNodeByPath("rotate").GetValueEx<int>(0);
+            actionFrame.RotateProp = frameNode.Nodes["rotateProp"].GetValueEx<int>(0);
+            actionFrame.Rotate = frameNode.Nodes["rotate"].GetValueEx<int>(0);
+
+            actionFrame.ForceCharacterAction = frameNode.Nodes["forceCharacterAction"].GetValueEx<string>(null);
+            actionFrame.ForceCharacterActionFrameIndex = frameNode.Nodes["forceCharacterAction"].GetValueEx<int>();
+            actionFrame.ForceCharacterFaceHide = frameNode.Nodes["forceCharacterFaceHide"].GetValueEx<int>(0) != 0;
+            actionFrame.ForceCharacterFlip = frameNode.Nodes["forceCharacterFlip"].GetValueEx<int>(0) != 0;
         }
 
         private IEnumerable<ActionFrame> LoadStandardFrames(Wz_Node actionNode, string action)
@@ -405,16 +496,22 @@ namespace WzComparerR2.Avatar
                 {
                     yield break;
                 }
-                ActionFrame frame = new ActionFrame();
+                var frame = LoadStandardFrame(frameNode);
                 frame.Action = action;
                 frame.Frame = i;
-                while (frameNode.Value is Wz_Uol)
-                {
-                    frameNode = frameNode.GetValue<Wz_Uol>().HandleUol(frameNode);
-                }
-                LoadActionFrameDesc(frameNode, frame);
                 yield return frame;
             }
+        }
+
+        private ActionFrame LoadStandardFrame(Wz_Node frameNode)
+        {
+            ActionFrame frame = new ActionFrame();
+            while (frameNode.Value is Wz_Uol)
+            {
+                frameNode = frameNode.GetValue<Wz_Uol>().HandleUol(frameNode);
+            }
+            LoadActionFrameDesc(frameNode, frame);
+            return frame;
         }
 
         /// <summary>
@@ -425,14 +522,46 @@ namespace WzComparerR2.Avatar
         public Bone CreateFrame(int bodyFrame, int faceFrame, int tamingFrame)
         {
             ActionFrame[] frames;
-            frames = GetActionFrames(this.ActionName);
-            ActionFrame bodyAction = (bodyFrame > -1 && bodyFrame < frames.Length) ? frames[bodyFrame] : null;
+            ActionFrame bodyAction = null, faceAction = null, tamingAction = null;
+            string actionName = this.ActionName,
+                emotionName = this.EmotionName,
+                tamingActionName = this.TamingActionName;
+            bool bodyFlip = false;
 
-            frames = GetFaceFrames(this.EmotionName);
-            ActionFrame faceAction = (faceFrame > -1 && faceFrame < frames.Length) ? frames[faceFrame] : null;
+            //获取骑宠
+            if (this.Taming != null)
+            {
+                tamingAction = GetTamingFrame(tamingActionName, tamingFrame);
 
-            frames = GetTamingFrames(this.TamingActionName);
-            ActionFrame tamingAction = (tamingFrame > -1 && tamingFrame < frames.Length) ? frames[tamingFrame] : null;
+                if (tamingAction != null)
+                {
+                    if (!string.IsNullOrEmpty(tamingAction.ForceCharacterAction)) //强制动作
+                    {
+                        actionName = tamingAction.ForceCharacterAction;
+                        bodyFrame = tamingAction.ForceCharacterActionFrameIndex ?? 0;
+                    }
+
+                    if (tamingAction.ForceCharacterFaceHide) //强制表情
+                    {
+                        emotionName = null;
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(actionName))
+            {
+                bodyAction = GetActionFrame(actionName, bodyFrame);
+
+                if (bodyAction != null && bodyFlip)
+                {
+                    bodyAction.Flip = true;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(emotionName))
+            {
+                faceAction = GetFaceFrame(emotionName, faceFrame);
+            }
 
             return CreateFrame(bodyAction, faceAction, tamingAction);
         }

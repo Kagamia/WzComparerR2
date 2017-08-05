@@ -181,6 +181,7 @@ namespace WzComparerR2.Avatar.UI
                 this.avatar.LoadTamingActions();
                 FillTamingAction();
                 SelectBodyAction("sit");
+                SetTamingDefault();
             }
             else if (part == avatar.Weapon) //同步武器类型
             {
@@ -353,6 +354,19 @@ namespace WzComparerR2.Avatar.UI
             }
         }
 
+        private void SelectEmotion(string emotionName)
+        {
+            for (int i = 0; i < cmbEmotion.Items.Count; i++)
+            {
+                ComboItem item = cmbEmotion.Items[i] as ComboItem;
+                if (item != null && item.Text == emotionName)
+                {
+                    cmbEmotion.SelectedIndex = i;
+                    return;
+                }
+            }
+        }
+
         #region 同步界面
         private void FillBodyAction()
         {
@@ -408,6 +422,28 @@ namespace WzComparerR2.Avatar.UI
         {
             List<int> weaponTypes = avatar.GetCashWeaponTypes();
             FillComboItems(cmbWeaponType, weaponTypes.ConvertAll(i => i.ToString()));
+        }
+
+        private void SetTamingDefault()
+        {
+            if (this.avatar.Taming != null)
+            {
+                var tamingAction =  (this.cmbActionTaming.SelectedItem as ComboItem)?.Text;
+                if (tamingAction != null)
+                {
+                    string forceAction = this.avatar.Taming.Node.FindNodeByPath($@"characterAction\{tamingAction}").GetValueEx<string>(null);
+                    if (forceAction != null)
+                    {
+                        this.SelectBodyAction(forceAction);
+                    }
+
+                    string forceEmotion = this.avatar.Taming.Node.FindNodeByPath($@"characterEmotion\{tamingAction}").GetValueEx<string>(null);
+                    if (forceEmotion != null)
+                    {
+                        this.SelectEmotion(forceEmotion);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -629,6 +665,7 @@ namespace WzComparerR2.Avatar.UI
         {
             this.SuspendUpdateDisplay();
             FillTamingActionFrame();
+            SetTamingDefault();
             this.ResumeUpdateDisplay();
             UpdateDisplay();
         }

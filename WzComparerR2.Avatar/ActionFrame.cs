@@ -26,5 +26,11 @@ namespace WzComparerR2.Avatar
         public Point Move { get; set; }
         public int Rotate { get; set; }
         public int RotateProp { get; set; }
+
+        //骑宠用特殊属性
+        public string ForceCharacterAction { get; set; }
+        public int? ForceCharacterActionFrameIndex { get; set; }
+        public bool ForceCharacterFaceHide { get; set; }
+        public bool ForceCharacterFlip { get; set; }
     }
 }
