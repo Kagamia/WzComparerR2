@@ -444,10 +444,10 @@ namespace WzComparerR2.Avatar
 
         private ActionFrame GetTamingFrame(string action, int frameIndex)
         {
-            var actionNode = this.Taming?.Node.FindNodeByPath($@"action\{frameIndex}");
-            if (actionNode != null)
+            var frameNode = this.Taming?.Node.FindNodeByPath($@"{action}\{frameIndex}");
+            if (frameNode != null)
             {
-                var frame = LoadStandardFrame(actionNode);
+                var frame = LoadStandardFrame(frameNode);
                 frame.Action = action;
                 frame.Frame = frameIndex;
                 return frame;
@@ -521,7 +521,6 @@ namespace WzComparerR2.Avatar
         /// <returns></returns>
         public Bone CreateFrame(int bodyFrame, int faceFrame, int tamingFrame)
         {
-            ActionFrame[] frames;
             ActionFrame bodyAction = null, faceAction = null, tamingAction = null;
             string actionName = this.ActionName,
                 emotionName = this.EmotionName,
