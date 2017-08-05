@@ -49,6 +49,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowSpeed { get; set; }
         public bool ShowLevelOrSealed { get; set; }
         public bool ShowMedalTag { get; set; } = true;
+        public bool IsCombineProperties { get; set; } = true;
 
         public TooltipRender SetItemRender { get; set; }
 
@@ -888,7 +889,8 @@ namespace WzComparerR2.CharaSimControl
 
                     g.DrawString("等级 " + info.Level + (i >= Gear.Seals.Count - 1 ? "(MAX)" : null), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 10, picHeight);
                     picHeight += 16;
-                    foreach (var kv in info.BonusProps)
+                    var props = this.IsCombineProperties ? Gear.CombineProperties(info.BonusProps) : info.BonusProps;
+                    foreach (var kv in props)
                     {
                         string propString = ItemStringHelper.GetGearPropString(kv.Key, kv.Value);
                         g.DrawString(propString, GearGraphics.ItemDetailFont, Brushes.White, 10, picHeight);

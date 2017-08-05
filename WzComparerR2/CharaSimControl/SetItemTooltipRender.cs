@@ -35,19 +35,34 @@ namespace WzComparerR2.CharaSimControl
                 return null;
             }
 
-            int picHeight;
-            Bitmap originBmp = RenderSetItem(out picHeight);
-            Bitmap tooltip = new Bitmap(261, picHeight);
+            int width = 261;
+            int picHeight1;
+            Bitmap originBmp = RenderSetItem(out picHeight1);
+            int picHeight2 = 0;
+            Bitmap effectBmp = null;
+
+            if (this.SetItem.ExpandToolTip)
+            {
+                effectBmp = RenderEffectPart(out picHeight2);
+                width += 261;
+            }
+
+            Bitmap tooltip = new Bitmap(width, Math.Max(picHeight1, picHeight2));
             Graphics g = Graphics.FromImage(tooltip);
 
-            //绘制背景区域
-            GearGraphics.DrawNewTooltipBack(g, 0, 0, tooltip.Width, tooltip.Height);
+            //绘制左侧
+            GearGraphics.DrawNewTooltipBack(g, 0, 0, originBmp.Width, picHeight1);
+            g.DrawImage(originBmp, 0, 0, new Rectangle(0, 0, originBmp.Width, picHeight1), GraphicsUnit.Pixel);
+            
+            //绘制右侧
+            if(effectBmp != null)
+            {
+                GearGraphics.DrawNewTooltipBack(g, originBmp.Width, 0, effectBmp.Width, picHeight2);
+                g.DrawImage(effectBmp, originBmp.Width, 0, new Rectangle(0, 0, effectBmp.Width, picHeight2), GraphicsUnit.Pixel);
+            }
 
-            //复制图像
-            g.DrawImage(originBmp, 0, 0, new Rectangle(0, 0, tooltip.Width, picHeight), GraphicsUnit.Pixel);
-
-            if (originBmp != null)
-                originBmp.Dispose();
+            originBmp?.Dispose();
+            effectBmp?.Dispose();
             g.Dispose();
             return tooltip;
         }
@@ -70,7 +85,7 @@ namespace WzComparerR2.CharaSimControl
                 string itemName = setItemPart.Value.RepresentName;
                 string typeName = setItemPart.Value.TypeName;
 
-                if (string.IsNullOrEmpty(typeName) && SetItem.parts)
+                if (string.IsNullOrEmpty(typeName) && SetItem.Parts)
                 {
                     typeName = "装备";
                 }
@@ -129,9 +144,36 @@ namespace WzComparerR2.CharaSimControl
                 picHeight += 18;
             }
 
-            picHeight += 5;
-            g.DrawLine(Pens.White, 6, picHeight, 254, picHeight);//分割线
-            picHeight += 9;
+            if (!this.SetItem.ExpandToolTip)
+            {
+                picHeight += 5;
+                g.DrawLine(Pens.White, 6, picHeight, 254, picHeight);//分割线
+                picHeight += 9;
+                RenderEffect(g, ref picHeight);
+            }
+            picHeight += 11;
+
+            format.Dispose();
+            g.Dispose();
+            return setBitmap;
+        }
+
+        private Bitmap RenderEffectPart(out int picHeight)
+        {
+            Bitmap effBitmap = new Bitmap(261, DefaultPicHeight);
+            Graphics g = Graphics.FromImage(effBitmap);
+            picHeight = 9;
+            RenderEffect(g, ref picHeight);
+            picHeight += 11;
+            g.Dispose();
+            return effBitmap;
+        }
+
+        /// <summary>
+        /// 绘制套装属性。
+        /// </summary>
+        private void RenderEffect(Graphics g, ref int picHeight)
+        {
             foreach (KeyValuePair<int, SetItemEffect> effect in this.SetItem.effects)
             {
                 g.DrawString(effect.Key + "套装效果", GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 8, picHeight);
@@ -140,7 +182,7 @@ namespace WzComparerR2.CharaSimControl
                 var color = effect.Value.Enabled ? Color.White : GearGraphics.GrayColor2;
 
                 //T116 合并套装
-                var props = IsCombineProperties ? CombineProperties(effect.Value.PropsV5) : effect.Value.PropsV5;
+                var props = IsCombineProperties ? Gear.CombineProperties(effect.Value.PropsV5) : effect.Value.PropsV5;
                 foreach (KeyValuePair<GearPropType, object> prop in props)
                 {
                     if (prop.Key == GearPropType.Option)
@@ -181,102 +223,6 @@ namespace WzComparerR2.CharaSimControl
                     }
                 }
             }
-            picHeight += 11;
-            format.Dispose();
-            g.Dispose();
-            return setBitmap;
-        }
-
-        private IEnumerable<KeyValuePair<GearPropType, object>> CombineProperties(IEnumerable<KeyValuePair<GearPropType, object>> props)
-        {
-            var combinedProps = new SortedDictionary<GearPropType, object>();
-            var propCache = new SortedDictionary<GearPropType, object>();
-            foreach(var kv in props)
-            {
-                propCache.Add(kv.Key, kv.Value);
-            }
-
-            object obj;
-            foreach (var prop in propCache)
-            {
-                switch (prop.Key)
-                {
-                    case GearPropType.incMHP:
-                    case GearPropType.incMMP:
-                        if (combinedProps.ContainsKey(GearPropType.incMHP_incMMP))
-                        {
-                            break;
-                        }
-                        else if (propCache.TryGetValue(prop.Key == GearPropType.incMHP? GearPropType.incMMP : GearPropType.incMHP, out obj)
-                            && object.Equals(prop.Value, obj))
-                        {
-                            combinedProps.Add(GearPropType.incMHP_incMMP, prop.Value);
-                            break;
-                        }
-                        goto default;
-
-                    case GearPropType.incMHPr:
-                    case GearPropType.incMMPr:
-                        if (combinedProps.ContainsKey(GearPropType.incMHPr_incMMPr))
-                        {
-                            break;
-                        }
-                        else if (propCache.TryGetValue(prop.Key == GearPropType.incMHPr ? GearPropType.incMMPr : GearPropType.incMHPr, out obj)
-                            && object.Equals(prop.Value, obj))
-                        {
-                            combinedProps.Add(GearPropType.incMHPr_incMMPr, prop.Value);
-                            break;
-                        }
-                        goto default;
-
-                    case GearPropType.incPAD:
-                    case GearPropType.incMAD:
-                        if (combinedProps.ContainsKey(GearPropType.incPAD_incMAD))
-                        {
-                            break;
-                        }
-                        else if (propCache.TryGetValue(prop.Key == GearPropType.incPAD ? GearPropType.incMAD : GearPropType.incPAD, out obj)
-                            && object.Equals(prop.Value, obj))
-                        {
-                            combinedProps.Add(GearPropType.incPAD_incMAD, prop.Value);
-                            break;
-                        }
-                        goto default;
-
-                    case GearPropType.incPDD:
-                    case GearPropType.incMDD:
-                        if (combinedProps.ContainsKey(GearPropType.incPDD_incMDD))
-                        {
-                            break;
-                        }
-                        else if (propCache.TryGetValue(prop.Key == GearPropType.incPDD ? GearPropType.incMDD : GearPropType.incPDD, out obj)
-                            && object.Equals(prop.Value, obj))
-                        {
-                            combinedProps.Add(GearPropType.incPDD_incMDD, prop.Value);
-                            break;
-                        }
-                        goto default;
-
-                    case GearPropType.incACC:
-                    case GearPropType.incEVA:
-                        if (combinedProps.ContainsKey(GearPropType.incACC_incEVA))
-                        {
-                            break;
-                        }
-                        else if (propCache.TryGetValue(prop.Key == GearPropType.incACC ? GearPropType.incEVA : GearPropType.incACC, out obj)
-                            && object.Equals(prop.Value, obj))
-                        {
-                            combinedProps.Add(GearPropType.incACC_incEVA, prop.Value);
-                            break;
-                        }
-                        goto default;
-
-                    default:
-                        combinedProps.Add(prop.Key, prop.Value);
-                        break;
-                }
-            }
-            return combinedProps;
         }
     }
 }
