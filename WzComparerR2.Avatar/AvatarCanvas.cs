@@ -153,7 +153,7 @@ namespace WzComparerR2.Avatar
                 switch (actionNode.Text)
                 {
                     case "info":
-                    case "characterAtion":
+                    case "characterAction":
                     case "characterEmotion":
                     case "property":
                         break;
