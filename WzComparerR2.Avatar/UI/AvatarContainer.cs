@@ -17,7 +17,7 @@ namespace WzComparerR2.Avatar.UI
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true); // 禁止擦除背景.  
             SetStyle(ControlStyles.DoubleBuffer, true); // 双缓冲  
-            bmpCache = new Dictionary<string, BitmapOrigin>();
+            bmpCache = new Dictionary<string, BitmapOrigin[]>();
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace WzComparerR2.Avatar.UI
         public Point Origin { get; set; }
 
         //绘图相关
-        Dictionary<string, BitmapOrigin> bmpCache;
+        Dictionary<string, BitmapOrigin[]> bmpCache;
         string currentKey;
         Bitmap bg;
 
@@ -39,9 +39,9 @@ namespace WzComparerR2.Avatar.UI
             this.bmpCache.Clear();
         }
 
-        public void AddCache(string key, BitmapOrigin bitmap)
+        public void AddCache(string key, BitmapOrigin[] layers)
         {
-            this.bmpCache[key] = bitmap;
+            this.bmpCache[key] = layers;
         }
 
         public bool HasCache(string key)
@@ -60,11 +60,18 @@ namespace WzComparerR2.Avatar.UI
             Graphics g = pe.Graphics;
             DrawBackgrnd(g);
 
-            BitmapOrigin bmp;
-            if (currentKey != null && this.bmpCache.TryGetValue(currentKey, out bmp) && bmp.Bitmap != null)
+            BitmapOrigin[] layers;
+            if (currentKey != null && this.bmpCache.TryGetValue(currentKey, out layers) && layers != null)
             {
-                Point point = new Point(this.Origin.X - bmp.Origin.X, this.Origin.Y - bmp.Origin.Y);
-                g.DrawImage(bmp.Bitmap, point);
+                foreach(var bmp in layers)
+                {
+                    if (bmp.Bitmap != null)
+                    {
+                        Point point = new Point(this.Origin.X - bmp.Origin.X, this.Origin.Y - bmp.Origin.Y);
+                        g.DrawImage(bmp.Bitmap, point);
+                    }
+                }
+               
             }
 
             base.OnPaint(pe);

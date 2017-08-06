@@ -856,13 +856,12 @@ namespace WzComparerR2.Avatar
 
         public BitmapOrigin DrawFrame(Bone bone)
         {
-            List<AvatarLayer> layers = GenerateLayer(bone);
-            layers.Sort((l0, l1) => l1.ZIndex.CompareTo(l0.ZIndex));
+            var bmpLayers = this.CreateFrameLayers(bone);
             //计算最大图像范围
             Rectangle rect = Rectangle.Empty;
-            foreach (var layer in layers)
+            foreach (var layer in bmpLayers)
             {
-                var newRect = new Rectangle(layer.Position, layer.Bitmap.Size);
+                var newRect = new Rectangle(layer.OpOrigin, layer.Bitmap.Size);
                 rect = rect.Size.IsEmpty ? newRect : Rectangle.Union(rect, newRect);
             }
             rect = rect.Size.IsEmpty ? Rectangle.Empty : rect;
@@ -875,14 +874,28 @@ namespace WzComparerR2.Avatar
             //绘制图像
             Bitmap bmp = new Bitmap(rect.Width, rect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(bmp);
-            layers.ForEach(layer =>
+            foreach (var layer in bmpLayers)
             {
-                g.DrawImage(layer.Bitmap, layer.Position.X - rect.X, layer.Position.Y - rect.Y);
-            });
+                g.DrawImage(layer.Bitmap, layer.OpOrigin.X - rect.X, layer.OpOrigin.Y - rect.Y);
+            }
             
             g.Dispose();
 
             return new BitmapOrigin(bmp, -rect.X, -rect.Y);
+        }
+
+        public BitmapOrigin[] CreateFrameLayers(Bone bone)
+        {
+            List<AvatarLayer> layers = GenerateLayer(bone);
+            layers.Sort((l0, l1) => l1.ZIndex.CompareTo(l0.ZIndex));
+
+            var bmpLayers = new BitmapOrigin[layers.Count];
+            for (int i = 0; i < bmpLayers.Length; i++)
+            {
+                var layer = layers[i];
+                bmpLayers[i] = new BitmapOrigin(layer.Bitmap, -layer.Position.X, -layer.Position.Y);
+            }
+            return bmpLayers;
         }
 
         private unsafe void TransformPixel(Bitmap src, Bitmap dst, Matrix mt)
