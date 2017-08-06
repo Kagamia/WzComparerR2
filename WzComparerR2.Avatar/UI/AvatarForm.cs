@@ -299,7 +299,7 @@ namespace WzComparerR2.Avatar.UI
                     }
 
                     var bone = avatar.CreateFrame(bodyFrame, emoFrame, tamingFrame);
-                    var bmp = avatar.DrawFrame(bone, f);
+                    var bmp = avatar.DrawFrame(bone);
                     avatarContainer1.AddCache(actionTag, bmp);
                 }
                 catch

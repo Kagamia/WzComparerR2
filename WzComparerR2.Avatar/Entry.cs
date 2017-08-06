@@ -84,7 +84,7 @@ namespace WzComparerR2.Avatar
                     if (frame.Delay != 0)
                     {
                         var bone = canvas.CreateFrame(frame, faceFrames[0], null);
-                        var bmp = canvas.DrawFrame(bone, frame);
+                        var bmp = canvas.DrawFrame(bone);
 
                         Point pos = bmp.OpOrigin;
                         pos.Offset(frame.Flip ? new Point(-frame.Move.X, frame.Move.Y) : frame.Move);
@@ -229,7 +229,7 @@ namespace WzComparerR2.Avatar
                     {
                         //绘制角色主动作
                         var bone = canvas.CreateFrame(frame, null, null);
-                        var bmp = canvas.DrawFrame(bone, frame);
+                        var bmp = canvas.DrawFrame(bone);
                         GifFrame f = new GifFrame(bmp.Bitmap, bmp.Origin, Math.Abs(frame.Delay));
                         gifCanvas.Layers[0].Frames.Add(f);
 
@@ -345,7 +345,7 @@ namespace WzComparerR2.Avatar
                     {
                         //绘制角色主动作
                         var bone = canvas.CreateFrame(frame, null, null);
-                        var bmp = canvas.DrawFrame(bone, frame);
+                        var bmp = canvas.DrawFrame(bone);
                         GifFrame f = new GifFrame(bmp.Bitmap, bmp.Origin, Math.Abs(frame.Delay));
                         actLayer.Frames.Add(f);
                         adelay += f.Delay;
@@ -428,7 +428,7 @@ namespace WzComparerR2.Avatar
                         //绘制角色主动作
                         var bone = canvas.CreateFrame(frame, faceFrames[0], null);
                         bone.Position = bodyMove;
-                        var bmp = canvas.DrawFrame(bone, frame);
+                        var bmp = canvas.DrawFrame(bone);
                         
                         GifFrame f = new GifFrame(bmp.Bitmap, bmp.Origin, Math.Abs(frame.Delay));
                         actLayer.Frames.Add(f);

@@ -361,7 +361,7 @@ namespace WzComparerR2.Avatar
             Wz_Node bodyNode = PluginBase.PluginManager.FindWz("Character\\00002000.img");
             if (action.Level == 2)
             {
-                var frameNode = bodyNode.FindNodeByPath($@"action.Name\{frameIndex}");
+                var frameNode = bodyNode.FindNodeByPath($@"{action.Name}\{frameIndex}");
                 if (frameNode != null)
                 {
                     ActionFrame frame = new ActionFrame();
@@ -477,7 +477,7 @@ namespace WzComparerR2.Avatar
             actionFrame.Rotate = frameNode.Nodes["rotate"].GetValueEx<int>(0);
 
             actionFrame.ForceCharacterAction = frameNode.Nodes["forceCharacterAction"].GetValueEx<string>(null);
-            actionFrame.ForceCharacterActionFrameIndex = frameNode.Nodes["forceCharacterAction"].GetValueEx<int>();
+            actionFrame.ForceCharacterActionFrameIndex = frameNode.Nodes["forceCharacterActionFrameIndex"].GetValueEx<int>();
             actionFrame.ForceCharacterFaceHide = frameNode.Nodes["forceCharacterFaceHide"].GetValueEx<int>(0) != 0;
             actionFrame.ForceCharacterFlip = frameNode.Nodes["forceCharacterFlip"].GetValueEx<int>(0) != 0;
         }
@@ -544,6 +544,15 @@ namespace WzComparerR2.Avatar
                     {
                         emotionName = null;
                     }
+
+                    if (tamingAction.ForceCharacterFlip)
+                    {
+                        bodyFlip = true;
+                    }
+                    else if (this.Taming.Node.FindNodeByPath(@"info\flip").GetValueEx(0) != 0)
+                    {
+                        bodyFlip = true;
+                    }
                 }
             }
 
@@ -575,8 +584,8 @@ namespace WzComparerR2.Avatar
             Bone bodyRoot = new Bone("@root");
             bodyRoot.Position = Point.Empty;
             CreateBone(bodyRoot, playerNodes, bodyAction.Face);
+            SetBonePoperty(bodyRoot, BoneGroup.Character, bodyAction);
 
-            
             if (tamingNodes != null && tamingNodes.Length > 0)
             {
                 //骑宠骨骼
@@ -584,33 +593,64 @@ namespace WzComparerR2.Avatar
                 tamingRoot.Position = Point.Empty;
                 CreateBone(tamingRoot, tamingNodes);
 
+                //建立虚拟身体骨骼
+                Bone newRoot = new Bone("@rootAll");
+                newRoot.Position = Point.Empty;
+                bodyRoot.Parent = newRoot;
+
                 //合并骨骼
-                foreach (var childBone in tamingRoot.Children)
+                for(int i = tamingRoot.Children.Count - 1; i >= 0; i--)
                 {
-                    Bone bone = bodyRoot.FindChild(childBone.Name);
+                    var childBone = tamingRoot.Children[i];
+
+                    Bone bone = newRoot.FindChild(childBone.Name);
                     if (bone != null) //翻转骨骼
                     {
-                        RotateBone(bodyRoot, bone);
-                        bone.Position = childBone.Position;
-                        bone.Skins.AddRange(childBone.Skins);
-                        for (int i = childBone.Children.Count - 1; i >= 0; i--)
-                        {
-                            childBone.Children[i].Parent = bone;
-                        }
+                        RotateBone(newRoot, bone);
+                        bone.Name = "@" + bone.Name;
+                        childBone.Parent = newRoot;
+                        bone.Parent = childBone;
+                        bone.Position = Point.Empty;
                     }
                     else //直接添加
                     {
-                        bodyRoot.Children.Add(childBone);
+                        childBone.Parent = newRoot;
                     }
                 }
-                bodyRoot.Skins.AddRange(tamingRoot.Skins);
+                newRoot.Skins.AddRange(tamingRoot.Skins);
+                return newRoot;
             }
 
             return bodyRoot;
         }
 
+        private void SetBonePoperty(Bone bone, BoneGroup group, ActionFrame property)
+        {
+            bone.Group = group;
+            bone.Property = property;
+            foreach(var child in bone.Children)
+            {
+                SetBonePoperty(child, group, property);
+            }
+        }
+
         private void RotateBone(Bone root, Bone childBone)
         {
+            while(childBone.Parent != null && childBone.Parent != root)
+            {
+                var p = childBone.Parent;
+                var pp = p.Parent;
+                var cpos = childBone.Position;
+                var ppos = p.Position;
+
+                childBone.Position = new Point(cpos.X + ppos.X, cpos.Y + ppos.Y);
+                p.Position = new Point(-cpos.X, -cpos.Y);
+
+                childBone.Parent = pp;
+                p.Parent = childBone;
+            }
+            return;
+
             List<Bone> parents = new List<Bone>();
             Bone bone = childBone;
             while (bone != null)
@@ -627,7 +667,6 @@ namespace WzComparerR2.Avatar
 
                 if (b0 == root)
                 { //转接到新root里
-
                     Bone vRoot = new Bone("@" + root.Name);
                     vRoot.Position = new Point(-b1.Position.X, -b1.Position.Y);
                     for (int j = b0.Children.Count - 1; j >= 0; j--)
@@ -817,21 +856,7 @@ namespace WzComparerR2.Avatar
 
         public BitmapOrigin DrawFrame(Bone bone)
         {
-            return DrawFrame(bone, 0, Point.Empty, false);
-        }
-
-        public BitmapOrigin DrawFrame(Bone bone, ActionFrame frame)
-        {
-            if (frame == null)
-            {
-                return DrawFrame(bone);
-            }
-            return DrawFrame(bone, frame.RotateProp == 0 ? frame.Rotate : 0, frame.Move, frame.Flip);
-        }
-
-        public BitmapOrigin DrawFrame(Bone bone, int rotate, Point move, bool flip)
-        {
-            List<AvatarLayer> layers = new List<AvatarLayer>(GenerateLayer(bone, Point.Empty));
+            List<AvatarLayer> layers = GenerateLayer(bone);
             layers.Sort((l0, l1) => l1.ZIndex.CompareTo(l0.ZIndex));
             //计算最大图像范围
             Rectangle rect = Rectangle.Empty;
@@ -856,47 +881,6 @@ namespace WzComparerR2.Avatar
             });
             
             g.Dispose();
-
-            if (flip || rotate != 0) //重新绘制 旋转和镜像
-            {
-                Matrix mt;
-                switch (rotate)
-                {
-                    case 0:
-                        mt = Matrix.Identity;
-                        break;
-                    case 90:
-                        mt = new Matrix(0, 1, -1, 0, bmp.Height - 1, 0);
-                        rect = new Rectangle(-rect.Bottom, rect.X, bmp.Height, bmp.Width);
-                        break;
-                    case 180:
-                        mt = new Matrix(-1, 0, 0, -1, bmp.Width - 1, bmp.Height - 1);
-                        rect = new Rectangle(-rect.Right, -rect.Bottom, bmp.Width, bmp.Height);
-                        break;
-                    case 270:
-                        mt = new Matrix(0, -1, 1, 0, 0, bmp.Width - 1);
-                        rect = new Rectangle(rect.Y, -rect.Right, bmp.Height, bmp.Width);
-                        break;
-                    default:
-                        goto case 0;
-                }
-
-                if (flip)
-                {
-                    mt *= new Matrix(-1, 0, 0, 1, rect.Width - 1, 0);
-                    rect.X = -rect.Right;
-                }
-
-                Bitmap bmpFlip = new Bitmap(rect.Width, rect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                TransformPixel(bmp, bmpFlip, mt);
-                bmp.Dispose();
-                bmp = bmpFlip;
-            }
-
-            if (move != Point.Empty)
-            {
-                rect.Offset(flip && rotate != 0 ? -move.X : move.X, move.Y);
-            }
 
             return new BitmapOrigin(bmp, -rect.X, -rect.Y);
         }
@@ -928,29 +912,130 @@ namespace WzComparerR2.Avatar
             src.UnlockBits(pxData1);
         }
 
-        private IEnumerable<AvatarLayer> GenerateLayer(Bone bone, Point position)
+        private List<AvatarLayer> GenerateLayer(Bone bone)
         {
-            position.Offset(bone.Position);
-            foreach (Skin skin in bone.Skins)
+            var layers = new List<AvatarLayer>();
+
+            //计算角色原点，用于翻转偏移
+            var rootBone = bone.FindChild("@root");
+            Point rootPos = Point.Empty;
             {
-                var layer = new AvatarLayer();
-                layer.Bitmap = skin.Image.Bitmap;
-                layer.Position = new Point(position.X + skin.Offset.X - skin.Image.Origin.X,
-                    position.Y + skin.Offset.Y - skin.Image.Origin.Y);
-                layer.ZIndex = this.ZMap.IndexOf(skin.Z);
-                if (layer.ZIndex < 0)
+                var temp = rootBone;
+                while (temp != null)
                 {
-                    layer.ZIndex = this.ZMap.Count;
+                    rootPos.Offset(temp.Position);
+                    temp = temp.Parent;
                 }
-                yield return layer;
             }
 
-            foreach (var child in bone.Children)
+            Action<Bone, Point> func = null;
+            func = (parent, pos) =>
             {
-                foreach (var layer in GenerateLayer(child, position))
+                pos.Offset(parent.Position);
+                var prop = parent.Property;
+
+                foreach (Skin skin in parent.Skins)
                 {
-                    yield return layer;
+                    var layer = new AvatarLayer();
+                    var bmp = skin.Image.Bitmap;
+                    var position = new Point(pos.X + skin.Offset.X - skin.Image.Origin.X,
+                        pos.Y + skin.Offset.Y - skin.Image.Origin.Y);
+
+                    //计算身体旋转和反转
+                    if (parent.Group == BoneGroup.Character && prop != null)
+                    {
+                        Bitmap bmp2;
+                        Rectangle rect2;
+                        if (RotateFlipImage(bmp, new Rectangle(position, bmp.Size),
+                            prop.Flip, prop.Rotate, prop.Move, rootPos,
+                            out bmp2, out rect2))
+                        {
+                            if (bmp2 != null)
+                            {
+                                bmp = bmp2;
+                            }
+                            position = rect2.Location;
+                        }
+                    }
+
+                    layer.Bitmap = bmp;
+                    layer.Position = position;
+                    layer.ZIndex = this.ZMap.IndexOf(skin.Z);
+                    if (layer.ZIndex < 0)
+                    {
+                        layer.ZIndex = this.ZMap.Count;
+                    }
+                    layers.Add(layer);
                 }
+
+                foreach (var child in parent.Children)
+                {
+                    func(child, pos);
+                }
+            };
+
+            func(bone, Point.Empty);
+            return layers;
+        }
+
+        private bool RotateFlipImage(Bitmap bmp, Rectangle rect, bool flip, int rotate, Point move, Point origin, out Bitmap newBmp, out Rectangle newRect)
+        {
+            bool changed = false;
+            newBmp = null;
+            rect.Offset(-origin.X, -origin.Y);
+
+            if (flip || rotate != 0) //重新绘制 旋转和镜像
+            {
+                Matrix mt;
+                switch (rotate)
+                {
+                    case 0:
+                        mt = Matrix.Identity;
+                        break;
+                    case 90:
+                        mt = new Matrix(0, 1, -1, 0, bmp.Height - 1, 0);
+                        rect = new Rectangle(-rect.Bottom, rect.X, bmp.Height, bmp.Width);
+                        break;
+                    case 180:
+                        mt = new Matrix(-1, 0, 0, -1, bmp.Width - 1, bmp.Height - 1);
+                        rect = new Rectangle(-rect.Right, -rect.Bottom, bmp.Width, bmp.Height);
+                        break;
+                    case 270:
+                        mt = new Matrix(0, -1, 1, 0, 0, bmp.Width - 1);
+                        rect = new Rectangle(rect.Y, -rect.Right, bmp.Height, bmp.Width);
+                        break;
+                    default:
+                        goto case 0;
+                }
+
+                if (flip)
+                {
+                    mt *= new Matrix(-1, 0, 0, 1, rect.Width - 1, 0);
+                    rect.X = -rect.Right;
+                }
+
+                newBmp = new Bitmap(rect.Width, rect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                TransformPixel(bmp, newBmp, mt);
+                changed = true;
+            }
+
+            if (move != Point.Empty)
+            {
+                rect.Offset(flip && rotate != 0 ? -move.X : move.X, move.Y);
+                changed = true;
+            }
+
+            if (changed)
+            {
+                rect.Offset(origin.X, origin.Y);
+                newRect = rect;
+                return true;
+            }
+            else
+            {
+                newBmp = null;
+                newRect = Rectangle.Empty;
+                return false;
             }
         }
 

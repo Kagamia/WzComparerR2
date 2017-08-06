@@ -19,6 +19,9 @@ namespace WzComparerR2.Avatar
         public List<Bone> Children { get; private set; }
         public List<Skin> Skins { get; private set; }
 
+        public BoneGroup Group { get; set; }
+        public ActionFrame Property { get; set; }
+
         private Bone parent;
         public Bone Parent
         {
@@ -55,5 +58,12 @@ namespace WzComparerR2.Avatar
             }
             return null;
         }
+    }
+
+    public enum BoneGroup
+    {
+        Unknown = 0,
+        Character,
+        Taming
     }
 }
