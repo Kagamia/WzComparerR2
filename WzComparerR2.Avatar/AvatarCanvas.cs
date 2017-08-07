@@ -33,7 +33,7 @@ namespace WzComparerR2.Avatar
 
         public bool HairCover { get; set; }
         public bool ShowHairShade { get; set; }
-        
+
         public int WeaponIndex { get; set; }
         public int WeaponType { get; set; }
         public int EarType { get; set; }
@@ -118,7 +118,7 @@ namespace WzComparerR2.Avatar
         /// <returns></returns>
         public bool LoadEmotions()
         {
-            Wz_Node faceNode = this.Face != null? this.Face.Node : PluginBase.PluginManager.FindWz("Character\\Face\\00020000.img");
+            Wz_Node faceNode = this.Face != null ? this.Face.Node : PluginBase.PluginManager.FindWz("Character\\Face\\00020000.img");
             if (faceNode == null)
             {
                 return false;
@@ -156,6 +156,7 @@ namespace WzComparerR2.Avatar
                     case "characterAction":
                     case "characterEmotion":
                     case "property":
+                    case "forcingItem":
                         break;
 
                     default:
@@ -444,7 +445,13 @@ namespace WzComparerR2.Avatar
 
         private ActionFrame GetTamingFrame(string action, int frameIndex)
         {
-            var frameNode = this.Taming?.Node.FindNodeByPath($@"{action}\{frameIndex}");
+            var actionNode = this.Taming?.Node.Nodes[action]?.ResolveUol();
+            if (actionNode == null)
+            {
+                return null;
+            }
+
+            var frameNode = actionNode.Nodes[frameIndex.ToString()];
             if (frameNode != null)
             {
                 var frame = LoadStandardFrame(frameNode);
@@ -484,6 +491,13 @@ namespace WzComparerR2.Avatar
 
         private IEnumerable<ActionFrame> LoadStandardFrames(Wz_Node actionNode, string action)
         {
+            if (actionNode == null)
+            {
+                yield break;
+            }
+
+            actionNode = actionNode.ResolveUol();
+
             if (actionNode == null)
             {
                 yield break;
@@ -553,6 +567,12 @@ namespace WzComparerR2.Avatar
                     {
                         bodyFlip = true;
                     }
+
+                    if (this.Taming.Node.FindNodeByPath(@"info\removeBody").GetValueEx(0) != 0) //自动适用动作
+                    {
+                        actionName = "hideBody";
+                        bodyFrame = 0;
+                    }
                 }
             }
 
@@ -599,7 +619,7 @@ namespace WzComparerR2.Avatar
                 bodyRoot.Parent = newRoot;
 
                 //合并骨骼
-                for(int i = tamingRoot.Children.Count - 1; i >= 0; i--)
+                for (int i = tamingRoot.Children.Count - 1; i >= 0; i--)
                 {
                     var childBone = tamingRoot.Children[i];
 
@@ -628,7 +648,7 @@ namespace WzComparerR2.Avatar
         {
             bone.Group = group;
             bone.Property = property;
-            foreach(var child in bone.Children)
+            foreach (var child in bone.Children)
             {
                 SetBonePoperty(child, group, property);
             }
@@ -636,7 +656,7 @@ namespace WzComparerR2.Avatar
 
         private void RotateBone(Bone root, Bone childBone)
         {
-            while(childBone.Parent != null && childBone.Parent != root)
+            while (childBone.Parent != null && childBone.Parent != root)
             {
                 var p = childBone.Parent;
                 var pp = p.Parent;
@@ -649,46 +669,6 @@ namespace WzComparerR2.Avatar
                 childBone.Parent = pp;
                 p.Parent = childBone;
             }
-            return;
-
-            List<Bone> parents = new List<Bone>();
-            Bone bone = childBone;
-            while (bone != null)
-            {
-                parents.Add(bone);
-                if (bone == root) break;
-                bone = bone.Parent;
-            }
-
-            for (int i = parents.Count - 1; i > 0; i--)
-            {
-                var b0 = parents[i];
-                var b1 = parents[i - 1];
-
-                if (b0 == root)
-                { //转接到新root里
-                    Bone vRoot = new Bone("@" + root.Name);
-                    vRoot.Position = new Point(-b1.Position.X, -b1.Position.Y);
-                    for (int j = b0.Children.Count - 1; j >= 0; j--)
-                    {
-                        if (b0.Children[j] != b1)
-                        {
-                            b0.Children[j].Parent = vRoot;
-                        }
-                    }
-                    if (vRoot.Children.Count > 0)
-                    {
-                        vRoot.Parent = b1;
-                    }
-                }
-                else
-                {
-                    b0.Position = new Point(-b1.Position.X, -b1.Position.Y);
-                    b1.Parent = null;
-                    b0.Parent = b1;
-                }
-            }
-            childBone.Parent = root;
         }
 
         private void CreateBone(Bone root, Wz_Node[] frameNodes, bool? bodyFace = null)
@@ -757,7 +737,19 @@ namespace WzComparerR2.Avatar
                         Skin skin = new Skin();
                         skin.Name = childNode.Text;
                         skin.Image = BitmapOrigin.CreateFromNode(linkNode, PluginBase.PluginManager.FindWz);
-                        skin.Z = linkNode.FindNodeByPath("z").GetValueEx<string>(null);
+                        var zNode = linkNode.FindNodeByPath("z");
+                        if (zNode != null)
+                        {
+                            var val = zNode.Value;
+                            if (val is int)
+                            {
+                                skin.ZIndex = (int)val;
+                            }
+                            else
+                            {
+                                skin.Z = zNode.GetValue<string>();
+                            }
+                        }
 
                         //读取骨骼
                         Wz_Node mapNode = linkNode.FindNodeByPath("map");
@@ -878,7 +870,7 @@ namespace WzComparerR2.Avatar
             {
                 g.DrawImage(layer.Bitmap, layer.OpOrigin.X - rect.X, layer.OpOrigin.Y - rect.Y);
             }
-            
+
             g.Dispose();
 
             return new BitmapOrigin(bmp, -rect.X, -rect.Y);
@@ -973,10 +965,17 @@ namespace WzComparerR2.Avatar
 
                     layer.Bitmap = bmp;
                     layer.Position = position;
-                    layer.ZIndex = this.ZMap.IndexOf(skin.Z);
-                    if (layer.ZIndex < 0)
+                    if (!string.IsNullOrEmpty(skin.Z))
                     {
-                        layer.ZIndex = this.ZMap.Count;
+                        layer.ZIndex = this.ZMap.IndexOf(skin.Z);
+                        if (layer.ZIndex < 0)
+                        {
+                            layer.ZIndex = this.ZMap.Count;
+                        }
+                    }
+                    else
+                    {
+                        layer.ZIndex = (skin.ZIndex < 0) ? (this.ZMap.Count - skin.ZIndex) : (-1 - skin.ZIndex);
                     }
                     layers.Add(layer);
                 }
@@ -1070,7 +1069,7 @@ namespace WzComparerR2.Avatar
                 if (face == null && bodyNode != null) //链接的body内规定
                 {
                     Wz_Node propNode = bodyNode.FindNodeByPath("face");
-                    if(propNode != null)
+                    if (propNode != null)
                     {
                         face = propNode.GetValue<int>(0) != 0;
                     }
@@ -1085,7 +1084,7 @@ namespace WzComparerR2.Avatar
                 {
                     partNode.Add(FindActionFrameNode(this.Head.Node, bodyAction));
                 }
-                
+
                 //脸
                 if (this.Face != null && this.Face.Visible && faceAction != null)
                 {
@@ -1367,10 +1366,10 @@ namespace WzComparerR2.Avatar
             "walk1", "walk2", "stand1", "stand2", "alert",
             "swingO1", "swingO2", "swingO3", "swingOF",
             "swingT1", "swingT2", "swingT3", "swingTF",
-            "swingP1", "swingP2", "swingPF", 
+            "swingP1", "swingP2", "swingPF",
             "stabO1", "stabO2", "stabOF", "stabT1", "stabT2", "stabTF",
             "shoot1", "shoot2", "shootF",
-            "proneStab", "prone", 
+            "proneStab", "prone",
             "heal", "fly", "jump", "sit", "ladder", "rope"
         };
 

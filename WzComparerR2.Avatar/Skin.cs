@@ -12,5 +12,6 @@ namespace WzComparerR2.Avatar
         public BitmapOrigin Image { get; set; }
         public Point Offset { get; set; }
         public string Z { get; set; }
+        public int ZIndex { get; set; }
     }
 }

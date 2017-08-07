@@ -184,7 +184,7 @@ namespace WzComparerR2.Avatar.UI
             {
                 this.avatar.LoadTamingActions();
                 FillTamingAction();
-                SelectBodyAction("sit");
+                SetTamingDefaultBodyAction();
                 SetTamingDefault();
             }
             else if (part == avatar.Weapon) //同步武器类型
@@ -428,6 +428,23 @@ namespace WzComparerR2.Avatar.UI
             FillComboItems(cmbWeaponType, weaponTypes.ConvertAll(i => i.ToString()));
         }
 
+        private void SetTamingDefaultBodyAction()
+        {
+            string actionName;
+            var tamingAction = (this.cmbActionTaming.SelectedItem as ComboItem)?.Text;
+            switch (tamingAction)
+            {
+                case "ladder":
+                case "rope":
+                    actionName = tamingAction;
+                    break;
+                default:
+                    actionName = "sit";
+                    break;
+            }
+            SelectBodyAction(actionName);
+        }
+
         private void SetTamingDefault()
         {
             if (this.avatar.Taming != null)
@@ -669,6 +686,7 @@ namespace WzComparerR2.Avatar.UI
         {
             this.SuspendUpdateDisplay();
             FillTamingActionFrame();
+            SetTamingDefaultBodyAction();
             SetTamingDefault();
             this.ResumeUpdateDisplay();
             UpdateDisplay();

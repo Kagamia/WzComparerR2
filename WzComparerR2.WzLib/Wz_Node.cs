@@ -318,6 +318,18 @@ namespace WzComparerR2.WzLib
             return node.GetValue<T>();
         }
 
+        public static Wz_Node ResolveUol(this Wz_Node node)
+        {
+            if (node == null)
+                return null;
+            Wz_Uol uol;
+            while ((uol = node?.GetValueEx<Wz_Uol>(null)) != null)
+            {
+                node = uol.HandleUol(node);
+            }
+            return node;
+        }
+
         /// <summary>
         /// 搜索node所属的wz_file，若搜索不到则返回null。
         /// </summary>
