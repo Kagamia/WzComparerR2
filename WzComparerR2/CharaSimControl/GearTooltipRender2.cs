@@ -427,17 +427,17 @@ namespace WzComparerR2.CharaSimControl
                     props.Add(p.Key);
             }
             props.Sort();
-            bool epic = Gear.Props.TryGetValue(GearPropType.epicItem, out value) && value > 0;
+            //bool epic = Gear.Props.TryGetValue(GearPropType.epicItem, out value) && value > 0;
             foreach (GearPropType type in props)
             {
-                var font = (epic && Gear.IsEpicPropType(type)) ? GearGraphics.EpicGearDetailFont : GearGraphics.ItemDetailFont;
+                //var font = (epic && Gear.IsEpicPropType(type)) ? GearGraphics.EpicGearDetailFont : GearGraphics.ItemDetailFont;
                 //g.DrawString(ItemStringHelper.GetGearPropString(type, Gear.Props[type]), font, Brushes.White, 11, picH);
                 //picH += 16;
 
                 //绘制属性变化
                 Gear.StandardProps.TryGetValue(type, out value); //standard value
                 var propStr = ItemStringHelper.GetGearPropDiffString(type, Gear.Props[type], value);
-                GearGraphics.DrawString(g, propStr, font, 13, 256, ref picH, 16);
+                GearGraphics.DrawString(g, propStr, GearGraphics.ItemDetailFont, 13, 256, ref picH, 16);
                 hasPart2 = true;
             }
 

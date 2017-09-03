@@ -125,7 +125,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.fixedPotential: return value == 0 ? null : "无法重设潜能";
                 case GearPropType.superiorEqp: return value == 0 ? null : "道具强化成功时，可以获得更高的效果。";
                 case GearPropType.nActivatedSocket: return value == 0 ? null : "#c可以镶嵌星岩#";
-                case GearPropType.jokerToSetItem: return value == 0 ? null : " #c可以当作任何套装组件的幸运道具!#";
+                case GearPropType.jokerToSetItem: return value == 0 ? null : " #c当前装备3个以上的所有套装道具中包含的幸运物品！#";
                 case GearPropType.abilityTimeLimited: return value == 0 ? null : "限期能力值";
                 case GearPropType.blockGoldHammer: return value == 0 ? null : "无法使用黄金锤";
 
