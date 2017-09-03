@@ -46,29 +46,29 @@ namespace WzComparerR2
 
         public void GetFileLength()
         {
-            WebResponse response = null;
+            var uri = new Uri(this.url);
+            switch (uri.Scheme.ToLower())
+            {
+                case "http":
+                    GetFileLengthHttp();
+                    break;
+
+                case "ftp":
+                    GetFileLengthFtp();
+                    break;
+            }
+        }
+
+        private void GetFileLengthHttp()
+        {
             try
             {
-                WebRequest request = WebRequest.Create(url);
-
-                request.Timeout = 15000;
-                response = request.GetResponse();
-
-                if (response is HttpWebResponse)
+                var req = WebRequest.Create(url) as HttpWebRequest;
+                req.Timeout = 15000;
+                using (var resp = req.GetResponse() as HttpWebResponse)
                 {
-                    HttpWebResponse r = (HttpWebResponse)response;
-                    this.lastModified = r.LastModified;
-                    this.fileLength = r.ContentLength;
-                }
-                else if (response is FtpWebResponse)
-                {
-                    FtpWebResponse r = (FtpWebResponse)response;
-                    this.lastModified = r.LastModified;
-                    this.fileLength = r.ContentLength;
-                }
-                else
-                {
-                    this.fileLength = response.ContentLength;
+                    this.lastModified = resp.LastModified;
+                    this.fileLength = resp.ContentLength;
                 }
             }
             catch (Exception ex)
@@ -76,18 +76,38 @@ namespace WzComparerR2
                 this.fileLength = 0;
                 throw;
             }
-            finally
+        }
+
+        private void GetFileLengthFtp()
+        {
+            try
             {
-                if (response != null)
+                var req = WebRequest.Create(url) as FtpWebRequest;
+                req.Method = WebRequestMethods.Ftp.GetFileSize;
+                req.Timeout = 15000;
+                using (var resp = req.GetResponse() as FtpWebResponse)
                 {
-                    try
-                    {
-                        response.Close();
-                    }
-                    catch
-                    {
-                    }
+                    this.fileLength = resp.ContentLength;
                 }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            try
+            {
+                var req = WebRequest.Create(url) as FtpWebRequest;
+                req.Method = WebRequestMethods.Ftp.GetDateTimestamp;
+                req.Timeout = 15000;
+                using (var resp = req.GetResponse() as FtpWebResponse)
+                {
+                    this.lastModified = resp.LastModified;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
 
