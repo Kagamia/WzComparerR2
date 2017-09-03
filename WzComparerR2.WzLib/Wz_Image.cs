@@ -32,7 +32,7 @@ namespace WzComparerR2.WzLib
         public int Checksum { get; set; }
         public uint HashedOffset { get; set; }
         public uint HashedOffsetPosition { get; set; }
-        public int Offset { get; set; }
+        public long Offset { get; set; }
         //已经废弃 使用BMS替代OnList
         public bool IsOnList { get; set; }
         public Wz_Node Node { get; private set; }
@@ -112,7 +112,8 @@ namespace WzComparerR2.WzLib
                 this.WzFile.FileStream.Position = this.Offset;
                 int cs = 0;
                 byte[] buffer = new byte[4096];
-                int count, size = this.Size;
+                int count;
+                int size = this.Size;
                 while ((count = this.WzFile.FileStream.Read(buffer, 0, Math.Min(size, buffer.Length))) > 0)
                 {
                     fixed (byte* pBuffer = buffer)
@@ -136,7 +137,7 @@ namespace WzComparerR2.WzLib
             }
         }
 
-        private void ExtractImg(int offset, Wz_Node parent, int eob)
+        private void ExtractImg(long offset, Wz_Node parent, int eob)
         {
             int entries = 0;
             string tag = this.WzFile.ReadString(offset);
@@ -259,7 +260,7 @@ namespace WzComparerR2.WzLib
         }
         
 
-        private void ExtractValue(int offset, Wz_Node parent)
+        private void ExtractValue(long offset, Wz_Node parent)
         {
             parent = parent.Nodes.Add(this.WzFile.ReadString(offset));
             byte flag = this.WzFile.BReader.ReadByte();

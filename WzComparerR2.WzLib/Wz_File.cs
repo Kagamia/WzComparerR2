@@ -14,7 +14,7 @@ namespace WzComparerR2.WzLib
             this.imageCount = 0;
             this.wzStructure = wz;
             this.loaded = InitLoad(fileName);
-            this.stringTable = new Dictionary<int, string>();
+            this.stringTable = new Dictionary<long, string>();
         }
 
         private FileStream fileStream;
@@ -30,7 +30,7 @@ namespace WzComparerR2.WzLib
 
         public readonly object ReadLock = new object();
 
-        internal Dictionary<int, string> stringTable;
+        internal Dictionary<long, string> stringTable;
         internal byte[] tempBuffer;
 
         public FileStream FileStream
@@ -126,7 +126,7 @@ namespace WzComparerR2.WzLib
             return (fl == -128) ? this.BReader.ReadSingle() : fl;
         }
 
-        public string ReadString(int offset)
+        public string ReadString(long offset)
         {
             byte b = this.BReader.ReadByte();
             switch (b)
@@ -149,7 +149,7 @@ namespace WzComparerR2.WzLib
             return string.Empty;
         }
 
-        public string ReadStringAt(int offset)
+        public string ReadStringAt(long offset)
         {
             long oldoffset = this.FileStream.Position;
             string str;
@@ -239,7 +239,7 @@ namespace WzComparerR2.WzLib
             }
         }
 
-        public int CalcOffset(uint filePos, uint hashedOffset)
+        public uint CalcOffset(uint filePos, uint hashedOffset)
         {
             uint offset = (uint)(filePos - 0x3C) ^ 0xFFFFFFFF;
             int distance = 0;
@@ -252,7 +252,7 @@ namespace WzComparerR2.WzLib
             offset ^= hashedOffset;
             offset += 0x78;
 
-            return (int)offset;
+            return offset;
         }
 
         public void GetDirTree(Wz_Node parent)
@@ -505,7 +505,7 @@ namespace WzComparerR2.WzLib
 
                 while (this.header.TryGetNextVersion())
                 {
-                    int offs = CalcOffset(minSizeImg.HashedOffsetPosition, minSizeImg.HashedOffset);
+                    uint offs = CalcOffset(minSizeImg.HashedOffsetPosition, minSizeImg.HashedOffset);
 
                     if (offs < this.header.HeaderSize || offs + minSizeImg.Size > this.fileStream.Length)  //img块越界
                     {
