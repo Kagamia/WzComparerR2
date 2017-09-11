@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EBDA4AE9-4BCE-4824-84B5-B15660437141}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WzComparerR2.Network</RootNamespace>
+    <AssemblyName>WzComparerR2.Network</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DevComponents.DotNetBar2, Version=12.5.0.2, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\References\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Contracts\ByteArrayConverter.cs" />
+    <Compile Include="Contracts\PackCryptReq.cs" />
+    <Compile Include="Contracts\PackCryptResp.cs" />
+    <Compile Include="Contracts\PackCustomPackage.cs" />
+    <Compile Include="Contracts\PackGetAllUsersReq.cs" />
+    <Compile Include="Contracts\PackGetAllUsersResp.cs" />
+    <Compile Include="Contracts\PackGetServerInfoReq.cs" />
+    <Compile Include="Contracts\PackGetServerInfoResp.cs" />
+    <Compile Include="Contracts\PackHeartBeat.cs" />
+    <Compile Include="Contracts\PackLoginReq.cs" />
+    <Compile Include="Contracts\PackLoginResp.cs" />
+    <Compile Include="Contracts\PackOnChat.cs" />
+    <Compile Include="Contracts\PackOnCustomPackage.cs" />
+    <Compile Include="Contracts\PackOnServerMessage.cs" />
+    <Compile Include="Contracts\PackOnUserUpdate.cs" />
+    <Compile Include="Contracts\PackSendChat.cs" />
+    <Compile Include="Contracts\TypeNameBinder.cs" />
+    <Compile Include="Entry.cs" />
+    <Compile Include="LoggerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoggerForm.Designer.cs">
+      <DependentUpon>LoggerForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Log.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RC4CryptoServiceProvider.cs" />
+    <Compile Include="RingBufferStream.cs" />
+    <Compile Include="WcClient.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj">
+      <Project>{fa74a2fd-0250-4182-845d-dd98d829b525}</Project>
+      <Name>WzComparerR2.PluginBase</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="LoggerForm.resx">
+      <DependentUpon>LoggerForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(TargetDir)*.dll" "$(SolutionDir)WzComparerR2\bin\$(ConfigurationName)\Plugin\$(ProjectName)" /I /Y</PostBuildEvent>
+  </PropertyGroup>
+</Project>

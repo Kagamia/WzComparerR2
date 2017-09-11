@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2", "WzComparerR2\WzComparerR2.csproj", "{5E883BE2-2009-4517-8026-4B90DEB83884}"
 EndProject
@@ -22,6 +22,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2.Common", "WzComparerR2.Common\WzComparerR2.Common.csproj", "{818060BC-404C-470A-94B3-5160716C5247}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2.Avatar", "WzComparerR2.Avatar\WzComparerR2.Avatar.csproj", "{A0753218-2C58-4E4A-9017-A435D2E5F639}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2.Network", "WzComparerR2.Network\WzComparerR2.Network.csproj", "{EBDA4AE9-4BCE-4824-84B5-B15660437141}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -137,6 +139,18 @@ Global
 		{A0753218-2C58-4E4A-9017-A435D2E5F639}.Release|x64.Build.0 = Release|Any CPU
 		{A0753218-2C58-4E4A-9017-A435D2E5F639}.Release|x86.ActiveCfg = Release|Any CPU
 		{A0753218-2C58-4E4A-9017-A435D2E5F639}.Release|x86.Build.0 = Release|Any CPU
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Debug|x64.Build.0 = Debug|Any CPU
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Debug|x86.Build.0 = Debug|Any CPU
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Release|x64.ActiveCfg = Release|Any CPU
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Release|x64.Build.0 = Release|Any CPU
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Release|x86.ActiveCfg = Release|Any CPU
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,5 +160,6 @@ Global
 		{1995B977-CD5E-4A8B-BE3D-15A2AFE1BFB4} = {495B5D02-38A2-48C0-B8D2-C2A1783EC231}
 		{11E362E4-B8FB-4BD4-B0D3-BA078D5FB002} = {495B5D02-38A2-48C0-B8D2-C2A1783EC231}
 		{A0753218-2C58-4E4A-9017-A435D2E5F639} = {495B5D02-38A2-48C0-B8D2-C2A1783EC231}
+		{EBDA4AE9-4BCE-4824-84B5-B15660437141} = {495B5D02-38A2-48C0-B8D2-C2A1783EC231}
 	EndGlobalSection
 EndGlobal

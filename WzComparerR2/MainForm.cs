@@ -2560,6 +2560,11 @@ namespace WzComparerR2
             get { return this; }
         }
 
+        DotNetBarManager PluginContextProvider.DotNetBarManager
+        {
+            get { return this.dotNetBarManager1; }
+        }
+
         IList<Wz_Structure> PluginContextProvider.LoadedWz
         {
             get { return new System.Collections.ObjectModel.ReadOnlyCollection<Wz_Structure>(this.openedWz); }

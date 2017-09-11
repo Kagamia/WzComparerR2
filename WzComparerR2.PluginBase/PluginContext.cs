@@ -23,6 +23,11 @@ namespace WzComparerR2.PluginBase
             get { return this.contextProvider.MainForm; }
         }
 
+        public DotNetBarManager DotNetBarManager
+        {
+            get { return this.contextProvider.DotNetBarManager; }
+        }
+
         public Wz_Node SelectedNode1
         {
             get { return this.contextProvider.SelectedNode1; }
