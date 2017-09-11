@@ -121,6 +121,8 @@ namespace WzComparerR2.Network
         {
             Log.Debug("Begin read loop.");
             var readBuffer = new RingBufferStream();
+            ICryptoTransform transform = null;
+
             var br = new BinaryReader(readBuffer);
             var buffer = new byte[4096];
             int packLen = -1;
@@ -132,14 +134,24 @@ namespace WzComparerR2.Network
                     Log.Debug("Read {0} bytes.", count);
                     if (count <= 0)
                         break;
-                    if (this.readCrypto != null)
-                    {
-                        this.readCrypto.TransformBlock(buffer, 0, count, buffer, 0);
-                    }
                     readBuffer.Append(buffer, 0, count);
                     
                     while (true)
                     {
+                        //切换加密
+                        if (transform != this.readCrypto)
+                        {
+                            transform = this.readCrypto;
+                            if (transform == null)
+                            {
+                                br = new BinaryReader(readBuffer);
+                            }
+                            else
+                            {
+                                var cs = new CryptoStream(readBuffer, transform, CryptoStreamMode.Read);
+                                br = new BinaryReader(cs);
+                            }
+                        }
                         if (packLen < 0)
                         {
                             if (readBuffer.Length >= 2)

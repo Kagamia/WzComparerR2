@@ -20,7 +20,7 @@ namespace WzComparerR2.Network
         private long readIndex;
 
         private readonly LinkedList<byte[]> buffer;
-        private const int BlockSize = 4;
+        private const int BlockSize = 4096;
 
         public override bool CanRead => !this.isDisposed;
 
