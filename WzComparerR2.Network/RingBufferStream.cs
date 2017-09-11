@@ -22,18 +22,30 @@ namespace WzComparerR2.Network
         private readonly LinkedList<byte[]> buffer;
         private const int BlockSize = 4096;
 
-        public override bool CanRead => !this.isDisposed;
+        public override bool CanRead
+        {
+            get { return !this.isDisposed; }
+        }
 
-        public override bool CanSeek => !this.isDisposed;
+        public override bool CanSeek
+        {
+            get { return !this.isDisposed; }
+        }
 
-        public override bool CanWrite => !this.isDisposed;
+        public override bool CanWrite
+        {
+            get { return !this.isDisposed; }
+        }
 
-        public override long Length => endIndex - startIndex;
+        public override long Length
+        {
+            get { return endIndex - startIndex; }
+        }
 
         public override long Position
         {
-            get => readIndex - startIndex;
-            set => this.Seek(value, SeekOrigin.Begin);
+            get { return readIndex - startIndex; }
+            set { this.Seek(value, SeekOrigin.Begin); }
         }
 
         public override void Flush()
