@@ -51,7 +51,12 @@ namespace WzComparerR2.Network
                 if (logLevel >= this.Level)
                 {
                     var color = GetLogColor(logLevel);
-                    this.AppendText($"[{logLevel}]", color);
+
+                    if (logLevel < LogLevel.None)
+                    {
+                        this.AppendText($"[{logLevel}]", color);
+                    }
+                   
                     this.AppendText($"[{DateTime.Now:HH:mm:ss}]", Color.Blue);
                     if (args == null || args.Length <= 0)
                     {
@@ -84,7 +89,7 @@ namespace WzComparerR2.Network
                     case LogLevel.Info: return Color.Black;
                     case LogLevel.Warn: return Color.Orange;
                     case LogLevel.Error: return Color.Red;
-                    default: return Color.Gray;
+                    default: return Color.DarkBlue;
                 }
             }
         }

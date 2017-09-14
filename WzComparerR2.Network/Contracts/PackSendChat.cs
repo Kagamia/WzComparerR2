@@ -6,13 +6,13 @@ using Newtonsoft.Json;
 namespace WzComparerR2.Network.Contracts
 {
     [JsonObject("9")]
-    sealed class PackSendChat
+    public sealed class PackSendChat
     {
         public object Message { get; set; }
         public ChatGroup Group { get; set; }
     }
 
-    enum ChatGroup
+    public enum ChatGroup
     {
         Public = 0,
     }

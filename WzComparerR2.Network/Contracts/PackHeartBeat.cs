@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 namespace WzComparerR2.Network.Contracts
 {
     [JsonObject("0")]
-    sealed class PackHeartBeat
+    public sealed class PackHeartBeat
     {
     }
 }

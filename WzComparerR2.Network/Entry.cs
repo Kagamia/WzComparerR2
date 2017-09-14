@@ -4,15 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using WzComparerR2.Config;
 using WzComparerR2.PluginBase;
 using WzComparerR2.Network.Contracts;
 using System.Security.Cryptography;
 using DevComponents.DotNetBar;
 
+
 namespace WzComparerR2.Network
 {
     public class Entry : PluginEntry
     {
+        static Entry()
+        {
+            DefaultServer = Encoding.UTF8.GetString(Convert.FromBase64String("d2Mua2FnYW1pYS5jb20="));
+        }
+
+        public static readonly string DefaultServer;
+
         public Entry(PluginContext context)
          : base(context)
         {
@@ -24,27 +33,69 @@ namespace WzComparerR2.Network
 
         private Dictionary<Type, Action<object>> handlers;
         private Session session;
+        private LoggerForm.LogPrinter logger;
 
         protected override void OnLoad()
         {
+            WzComparerR2.Config.ConfigManager.RegisterAllSection();
+            CheckConfig();
+            var config = NetworkConfig.Default;
+
             var form1 = new LoggerForm();
             var dockSite = this.Context.DotNetBarManager.BottomDockSite;
             form1.AttachDockBar(dockSite);
             form1.OnCommand += Form1_OnCommand;
 
-            var logger = form1.GetLogger();
-            logger.Level = LogLevel.Info;
+            this.logger = form1.GetLogger();
+            logger.Level = config.LogLevel;
             Log.Loggers.Add(logger);
 
             //TODO: use config file, multi server selection.
             this.Client = new WcClient();
-            this.Client.Host = "kagamia.com";
+            this.Client.Host = DefaultServer;
             this.Client.Port = 2100;
             this.Client.AutoReconnect = true;
             this.Client.Connected += Client_Connected;
             this.Client.Disconnected += Client_Disconnected;
             this.Client.OnPackReceived += Client_OnPackReceived;
             var task = this.Client.Connect();
+        }
+
+        private void CheckConfig()
+        {
+            var config = NetworkConfig.Default;
+
+            Guid guid;
+            bool needSave = false;
+            if (!Guid.TryParse(config.WcID, out guid))
+            {
+                guid = Guid.NewGuid();
+                needSave = true;
+            }
+
+            string nickName = config.NickName;
+            if (string.IsNullOrWhiteSpace(nickName))
+            {
+                nickName = "No Name #" + new Random().Next(10000);
+                needSave = true;
+            }
+
+            string servers = config.Servers;
+            if (string.IsNullOrEmpty(servers))
+            {
+                servers = ":2100;:2101;:2102;:2103;:2104";
+                needSave = true;
+            }
+
+            if (needSave)
+            {
+                ConfigManager.Reload();
+                config = NetworkConfig.Default;
+                config.WcID = guid.ToString();
+                config.NickName = nickName;
+                config.Servers = servers;
+                ConfigManager.Save();
+            }
         }
 
         private void Client_Connected(object sender, EventArgs e)
@@ -89,6 +140,24 @@ namespace WzComparerR2.Network
                             }
                         }
                         Log.Info(sb.ToString());
+                        break;
+
+                    case "/name":
+                        if (Client.IsConnected)
+                        {
+                            string newName = e.Command.Substring(5).Trim();
+                            if (!string.IsNullOrWhiteSpace(newName))
+                            {
+                                ConfigManager.Reload();
+                                NetworkConfig.Default.NickName = newName;
+                                ConfigManager.Save();
+                                var req = new PackUserProfileUpdateReq()
+                                {
+                                    NickName = newName
+                                };
+                                Client.Send(req);
+                            }
+                        }
                         break;
                 }
             }
@@ -172,11 +241,13 @@ namespace WzComparerR2.Network
 
         private void LoginRequest()
         {
-            //TODO: use config file.
+            CheckConfig();
+            var config = NetworkConfig.Default;
+
             var req = new PackLoginReq()
             {
-                WcID = Guid.NewGuid().ToString(),
-                NickName = "No Name #" + new Random().Next(10000)
+                WcID = config.WcID,
+                NickName = config.NickName
             };
             this.Client.Send(req);
         }
@@ -230,7 +301,7 @@ namespace WzComparerR2.Network
             {
                 nickName = this.session.Users.FirstOrDefault(u => u.UID == pack.FromID).NickName ?? pack.FromID;
             }
-            Log.Info("[{0}] {1}", nickName, pack.Message);
+            Log.Write(LogLevel.None, "[{0}] {1}", nickName, pack.Message);
         }
 
         private void OnPackReceived(PackGetAllUsersResp pack)
@@ -268,7 +339,7 @@ namespace WzComparerR2.Network
         {
             lock (this.session.Users)
             {
-                var idx = this.session.Users.FindIndex(u => u.UID == pack.UserInfo.UID);
+                var idx = this.session.Users.FindIndex(u => u.UID == pack.UserInfo.UID && u.SID == pack.UserInfo.SID);
 
                 switch (pack.UpdateReason)
                 {

@@ -6,13 +6,13 @@ using Newtonsoft.Json;
 namespace WzComparerR2.Network.Contracts
 {
     [JsonObject("14")]
-    sealed class PackOnUserUpdate
+    public sealed class PackOnUserUpdate
     {
         public UserUpdateReason UpdateReason { get; set; }
         public UserInfo UserInfo { get; set; }
     }
 
-    enum UserUpdateReason
+    public enum UserUpdateReason
     {
         InfoChanged = 0,
         Online = 1,

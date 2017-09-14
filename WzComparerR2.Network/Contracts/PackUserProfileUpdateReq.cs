@@ -5,10 +5,9 @@ using Newtonsoft.Json;
 
 namespace WzComparerR2.Network.Contracts
 {
-    [JsonObject("1")]
-    public sealed class PackCryptReq
+    [JsonObject("15")]
+    public sealed class PackUserProfileUpdateReq
     {
-        public byte[] Exponent { get; set; }
-        public byte[] Modulus { get; set; }
+        public string NickName { get; set; }
     }
 }

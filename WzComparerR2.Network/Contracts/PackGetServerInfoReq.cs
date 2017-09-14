@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 namespace WzComparerR2.Network.Contracts
 {
     [JsonObject("5")]
-    sealed class PackGetServerInfoReq
+    public sealed class PackGetServerInfoReq
     {
     }
 }

@@ -23,13 +23,6 @@ namespace WzComparerR2.Network
                 Binder = new TypeNameBinder(),
                 Converters = new[] { new ByteArrayConverter() },
             };
-
-            var obj = JsonConvert.SerializeObject(new PackCryptReq()
-            {
-                Exponent = new byte[5]
-            }, DefaultSerializerSetting);
-
-            var obj2 = JsonConvert.DeserializeObject(obj, DefaultSerializerSetting);
         }
 
         public WcClient()
@@ -89,21 +82,25 @@ namespace WzComparerR2.Network
         {
             this.client = new TcpClient();
             Log.Debug("Begin connect.");
-            try
+            while (true)
             {
-                await this.client.ConnectAsync(this.Host, this.Port);
-                Log.Info("Connect success.");
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Connect failed: {0}", ex.Message);
-                var e = new ErrorEventArgs(ex);
-                this.ConnectFailed?.Invoke(this, e);
-                if (AutoReconnect)
+                try
                 {
-                    Reconnect(5000);
+                    await this.client.ConnectAsync(this.Host, this.Port);
+                    Log.Info("Connect success.");
+                    break;
                 }
-                return;
+                catch (Exception ex)
+                {
+                    Log.Error("Connect failed: {0}", ex.Message);
+                    var e = new ErrorEventArgs(ex);
+                    this.ConnectFailed?.Invoke(this, e);
+                    if (AutoReconnect)
+                    {
+                        await Task.Delay(5000);
+                        continue;
+                    }
+                }
             }
 
             this.writeQueue = new BlockingCollection<object>(16);
@@ -205,7 +202,6 @@ namespace WzComparerR2.Network
                 catch
                 {
                 }
-                this.writeQueue.Dispose();
                 ns.Close();
             }
         }
@@ -245,7 +241,7 @@ namespace WzComparerR2.Network
         private async Task WaitForDisconnect()
         {
             await Task.WhenAll(this.readTask, this.writeTask);
-            Log.Debug("Disconnect.");
+            Log.Info("Disconnect.");
             this.Disconnected?.Invoke(this, EventArgs.Empty);
             if (AutoReconnect)
             {
@@ -267,8 +263,9 @@ namespace WzComparerR2.Network
                 {
                     pack = JsonConvert.DeserializeObject<Newtonsoft.Json.Linq.JObject>(json);
                 }
-                catch
+                catch(Exception ex)
                 {
+                    Log.Warn("Decode pack failed: {0}", ex.Message);
                 }
             }
             return pack;
