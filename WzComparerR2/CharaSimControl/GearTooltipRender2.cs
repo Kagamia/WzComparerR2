@@ -396,8 +396,8 @@ namespace WzComparerR2.CharaSimControl
                 picH += 16;
                 hasPart2 = true;
             }
-            
-            if (!Gear.Props.TryGetValue(GearPropType.attackSpeed, out value) 
+
+            if (!Gear.Props.TryGetValue(GearPropType.attackSpeed, out value)
                 && (Gear.IsWeapon(Gear.type) || Gear.type == GearType.katara)) //找不到攻速的武器
             {
                 value = 6; //给予默认速度
@@ -524,6 +524,7 @@ namespace WzComparerR2.CharaSimControl
                 picH += 16;
                 hasPart2 = true;
             }
+
             picH += 5;
 
             //绘制浮动属性
@@ -643,7 +644,7 @@ namespace WzComparerR2.CharaSimControl
 
             //绘制desc
             List<string> desc = new List<string>();
-            GearPropType[] descTypes = new GearPropType[]{ 
+            GearPropType[] descTypes = new GearPropType[]{
                 GearPropType.tradeAvailable,
                 GearPropType.accountShareTag,
                 GearPropType.jokerToSetItem };
@@ -1099,7 +1100,7 @@ namespace WzComparerR2.CharaSimControl
             //DrawReqNum(g, "0", NumberType.LookAhead, x - 5, y + 6, StringAlignment.Far);
 
             //boss伤
-            
+
             g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_bdr, x, y);
             x += 62;
             this.Gear.Props.TryGetValue(GearPropType.bdR, out value);
