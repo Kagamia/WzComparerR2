@@ -475,13 +475,6 @@ namespace WzComparerR2.CharaSimControl
                 picH += 16;
                 hasPart2 = true;
             }
-            
-            if (Gear.Props.TryGetValue(GearPropType.limitBreak, out value) && value > 0) //突破上限
-            {
-                g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.limitBreak, value), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 11, picH);
-                picH += 16;
-                hasPart2 = true;
-            }
 
             //星星锤子
             if (hasTuc && Gear.Hammer > -1)
@@ -512,6 +505,17 @@ namespace WzComparerR2.CharaSimControl
                         picH += 16;
                     }
                 }
+            }
+
+            if (Gear.Props.TryGetValue(GearPropType.limitBreak, out value) && value > 0) //突破上限
+            {
+                g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.limitBreak, value), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 11, picH);
+                picH += 16;
+                hasPart2 = true;
+            }
+
+            if (hasTuc && Gear.Hammer > -1)
+            {
                 picH += 2;
                 g.DrawString("金锤子已提高的强化次数", GearGraphics.ItemDetailFont, GearGraphics.GoldHammerBrush, 11, picH);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
