@@ -75,6 +75,7 @@
       <DependentUpon>LoggerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Log.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="NetworkConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RC4CryptoServiceProvider.cs" />

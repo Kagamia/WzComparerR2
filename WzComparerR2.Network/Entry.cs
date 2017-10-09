@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using WzComparerR2.Config;
 using WzComparerR2.PluginBase;
 using WzComparerR2.Network.Contracts;
@@ -302,6 +303,10 @@ namespace WzComparerR2.Network
                 nickName = this.session.Users.FirstOrDefault(u => u.UID == pack.FromID).NickName ?? pack.FromID;
             }
             Log.Write(LogLevel.None, "[{0}] {1}", nickName, pack.Message);
+            if (!this.Context.MainForm.ContainsFocus)
+            {
+                NativeMethods.FlashWindowEx(this.Context.MainForm);
+            }
         }
 
         private void OnPackReceived(PackGetAllUsersResp pack)
