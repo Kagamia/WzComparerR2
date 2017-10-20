@@ -305,11 +305,11 @@ namespace WzComparerR2.WzLib
                 }
             }
 
+            int dirCount = dirs.Count;
             bool willLoadBaseWz = useBaseWz ? parent.Text.Equals("base.wz", StringComparison.OrdinalIgnoreCase) : false;
 
             if (willLoadBaseWz && this.WzStructure.AutoDetectExtFiles)
             {
-                int dirCount = dirs.Count;
                 var baseFolder = Path.GetDirectoryName(this.header.FileName);
                 for (int i = 0; i < dirCount; i++)
                 {
@@ -331,16 +331,36 @@ namespace WzComparerR2.WzLib
                                 break;
                             }
                         }
+                        //检测CMST1058的wz文件
+                        for (int fileID = 1; ; fileID++)
+                        {
+                            string extDirName = m.Result("$1") + fileID.ToString("D3");
+                            string extWzFile = Path.Combine(baseFolder, extDirName + ".wz");
+                            if (File.Exists(extWzFile) && !dirs.Take(dirCount).Any(dir => extDirName.Equals(dir, StringComparison.OrdinalIgnoreCase)))
+                            {
+                                dirs.Add(extDirName);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
                     }
                 }
             }
-            foreach (string dir in dirs)
+
+            for (int i = 0; i < dirs.Count; i++)
             {
+                string dir = dirs[i];
                 Wz_Node t = parent.Nodes.Add(dir);
                 if (willLoadBaseWz)
                 {
                     this.WzStructure.has_basewz = true;
-                    GetDirTree(t, false);
+                    if (i < dirCount)
+                    {
+                        GetDirTree(t, false);
+                    }
+
                     try
                     {
                         string filePath = Path.Combine(Path.GetDirectoryName(this.Header.FileName), dir + ".wz");
