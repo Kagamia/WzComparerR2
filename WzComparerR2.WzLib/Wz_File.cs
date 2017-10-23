@@ -331,7 +331,7 @@ namespace WzComparerR2.WzLib
                                 break;
                             }
                         }
-                        //检测CMST1058的wz文件
+                        //检测KMST1058的wz文件
                         for (int fileID = 1; ; fileID++)
                         {
                             string extDirName = m.Result("$1") + fileID.ToString("D3");
@@ -469,17 +469,11 @@ namespace WzComparerR2.WzLib
                 }
             }
 
-
             if (this.type == Wz_Type.Unknown) //用文件名来判断
             {
                 string wzName = this.node.Text;
-                int idx = wzName.IndexOf(".wz", StringComparison.OrdinalIgnoreCase);
-                if (idx >= 0)
-                {
-                    wzName = wzName.Substring(0, idx);
-                }
 
-                Match m = Regex.Match(wzName, @"^([A-Za-z]+)\d$");
+                Match m = Regex.Match(wzName, @"^([A-Za-z]+)\d+(?:\.wz)?$");
                 if (m.Success)
                 {
                     wzName = m.Result("$1");
