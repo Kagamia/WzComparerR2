@@ -402,30 +402,33 @@ namespace WzComparerR2
             }
 
             var config = ImageHandlerConfig.Default;
+            var encParams = AnimateEncoderFactory.GetEncoderParams(config.GifEncoder.Value);
 
             string aniName = this.cmbItemAniNames.SelectedItem as string;
-            string gifFileName = pictureBoxEx1.PictureName
+            string aniFileName = pictureBoxEx1.PictureName
                     + (string.IsNullOrEmpty(aniName) ? "" : ("." + aniName))
-                    + ".gif";
+                    + encParams.FileExtension;
+
             if (config.AutoSaveEnabled)
             {
-                gifFileName = Path.Combine(config.AutoSavePictureFolder, gifFileName);
+                aniFileName = Path.Combine(config.AutoSavePictureFolder, aniFileName);
             }
             else
             {
                 var dlg = new SaveFileDialog();
 
-                dlg.Filter = "Gif图片(*.gif)|*.gif|全部文件(*.*)|*.*";
-                dlg.FileName = gifFileName;
+                dlg.Filter = string.Format("{0}(*{1})|*{1}|全部文件(*.*)|*.*", encParams.FileDescription, encParams.FileExtension);
+                dlg.FileName = aniFileName;
+
                 if (dlg.ShowDialog() != DialogResult.OK)
                 {
                     return;
                 }
-                gifFileName = dlg.FileName;
+                aniFileName = dlg.FileName;
             }
 
-            this.pictureBoxEx1.SaveAsGif((AnimationItem)aniItem.Clone(), gifFileName, config);
-            labelItemStatus.Text = "图片保存于" + gifFileName;
+            this.pictureBoxEx1.SaveAsGif((AnimationItem)aniItem.Clone(), aniFileName, config);
+            labelItemStatus.Text = "图片保存于" + aniFileName;
         }
 
         private Node handleUol(Node currentNode, string uolString)

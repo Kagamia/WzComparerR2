@@ -156,6 +156,7 @@
     <Compile Include="FrmQuickViewSetting.Designer.cs">
       <DependentUpon>FrmQuickViewSetting.cs</DependentUpon>
     </Compile>
+    <Compile Include="AnimateEncoderFactory.cs" />
     <Compile Include="ImageDragHandler.cs" />
     <Compile Include="MemoryTributary.cs" />
     <Compile Include="Comparer\CompareDifference.cs" />

@@ -38,6 +38,7 @@
             this.comboBoxEx1 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.comboItem1 = new DevComponents.Editors.ComboItem();
             this.comboItem2 = new DevComponents.Editors.ComboItem();
+            this.comboItem6 = new DevComponents.Editors.ComboItem();
             this.labelX3 = new DevComponents.DotNetBar.LabelX();
             this.slider1 = new DevComponents.DotNetBar.Controls.Slider();
             this.labelX4 = new DevComponents.DotNetBar.LabelX();
@@ -60,6 +61,7 @@
             this.comboItem3 = new DevComponents.Editors.ComboItem();
             this.comboItem4 = new DevComponents.Editors.ComboItem();
             this.comboItem5 = new DevComponents.Editors.ComboItem();
+            this.checkBoxX3 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.panelExMosaic.SuspendLayout();
             this.panelExColor.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.integerInput1)).BeginInit();
@@ -152,7 +154,8 @@
             this.comboBoxEx1.ItemHeight = 15;
             this.comboBoxEx1.Items.AddRange(new object[] {
             this.comboItem1,
-            this.comboItem2});
+            this.comboItem2,
+            this.comboItem6});
             this.comboBoxEx1.Location = new System.Drawing.Point(76, 170);
             this.comboBoxEx1.Name = "comboBoxEx1";
             this.comboBoxEx1.Size = new System.Drawing.Size(129, 21);
@@ -166,6 +169,10 @@
             // comboItem2
             // 
             this.comboItem2.Text = "Index Gif Encoder";
+            // 
+            // comboItem6
+            // 
+            this.comboItem6.Text = "Apng Encoder";
             // 
             // labelX3
             // 
@@ -467,10 +474,25 @@
             // 
             this.comboItem5.Text = "PathToWz";
             // 
+            // checkBoxX3
+            // 
+            this.checkBoxX3.AutoSize = true;
+            // 
+            // 
+            // 
+            this.checkBoxX3.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX3.Location = new System.Drawing.Point(212, 174);
+            this.checkBoxX3.Name = "checkBoxX3";
+            this.checkBoxX3.Size = new System.Drawing.Size(76, 16);
+            this.checkBoxX3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX3.TabIndex = 23;
+            this.checkBoxX3.Text = "Optimize";
+            // 
             // FrmGifSetting
             // 
             this.CancelButton = this.buttonX2;
             this.ClientSize = new System.Drawing.Size(344, 311);
+            this.Controls.Add(this.checkBoxX3);
             this.Controls.Add(this.comboBoxEx2);
             this.Controls.Add(this.labelX9);
             this.Controls.Add(this.integerInput1);
@@ -535,5 +557,7 @@
         private DevComponents.Editors.ComboItem comboItem3;
         private DevComponents.Editors.ComboItem comboItem4;
         private DevComponents.Editors.ComboItem comboItem5;
+        private DevComponents.Editors.ComboItem comboItem6;
+        private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX3;
     }
 }

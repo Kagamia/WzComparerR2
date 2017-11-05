@@ -121,6 +121,12 @@ namespace WzComparerR2
             set { slider2.Value = MathHelper.Clamp(value, slider2.Minimum, slider2.Maximum); }
         }
 
+        public bool PaletteOptimized
+        {
+            get { return checkBoxX3.Checked; }
+            set { checkBoxX3.Checked = value; }
+        }
+
         public void Load(ImageHandlerConfig config)
         {
             this.SavePngFramesEnabled = config.SavePngFramesEnabled;
@@ -134,6 +140,8 @@ namespace WzComparerR2
             this.MosaicColor0 = config.MosaicInfo.Color0;
             this.MosaicColor1 = config.MosaicInfo.Color1;
             this.MosaicBlockSize = config.MosaicInfo.BlockSize;
+
+            this.PaletteOptimized = config.PaletteOptimized;
         }
 
         public void Save(ImageHandlerConfig config)
@@ -149,6 +157,8 @@ namespace WzComparerR2
             config.MosaicInfo.Color0 = this.MosaicColor0;
             config.MosaicInfo.Color1 = this.MosaicColor1;
             config.MosaicInfo.BlockSize = this.MosaicBlockSize;
+
+            config.PaletteOptimized = this.PaletteOptimized;
         }
 
         private void buttonX1_Click(object sender, EventArgs e)

@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animation\KeyFrame.cs" />
+    <Compile Include="BuildInApngEncoder.cs" />
     <Compile Include="BuildInGifEncoder.cs" />
     <Compile Include="Controls\AnimationItemEventArgs.cs" />
     <Compile Include="Controls\AnimationRecoder.cs" />

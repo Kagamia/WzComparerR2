@@ -87,6 +87,13 @@ namespace WzComparerR2.Config
             get { return (ConfigItem<ImageNameMethod>)this["imageNameMethod"]; }
             set { this["imageNameMethod"] = value; }
         }
+
+        [ConfigurationProperty("paletteOptimized")]
+        public ConfigItem<bool> PaletteOptimized
+        {
+            get { return (ConfigItem<bool>)this["paletteOptimized"]; }
+            set { this["paletteOptimized"] = value; }
+        }
     }
 
     public enum ImageBackgroundType

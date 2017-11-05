@@ -188,19 +188,8 @@ namespace WzComparerR2
             }
 
             //选择encoder
-            GifEncoder enc;
-            switch (config.GifEncoder.Value)
-            {
-                default:
-                case 0:
-                    enc = new BuildInGifEncoder(fileName, bounds.Value.Width, bounds.Value.Height);
-                    break;
-
-                case 1:
-                    enc = new IndexGifEncoder(fileName, bounds.Value.Width, bounds.Value.Height);
-                    break;
-            }
-
+            GifEncoder enc = AnimateEncoderFactory.CreateEncoder(fileName, bounds.Value.Width, bounds.Value.Height, config);
+            var encParams = AnimateEncoderFactory.GetEncoderParams(config.GifEncoder.Value);
 
             Action<int> writeFrame = (curTime) =>
             {
@@ -270,7 +259,7 @@ namespace WzComparerR2
                     prevTime = d;
 
                     //透明 额外导出一份gif
-                    if (config.BackgroundType.Value == ImageBackgroundType.Transparent)
+                    if (!encParams.SupportAlphaChannel && config.BackgroundType.Value == ImageBackgroundType.Transparent)
                     {
                         using (var rt2 = rec.GetGifTexture(config.BackgroundColor.Value.ToXnaColor(), config.MinMixedAlpha))
                         {
