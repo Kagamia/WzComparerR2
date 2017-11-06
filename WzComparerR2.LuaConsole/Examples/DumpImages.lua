@@ -24,6 +24,14 @@ local function isPng(value)
   end
 end
 
+local p = Path.GetInvalidFileNameChars()
+local ivStr = ""
+for i, v in each(p) do
+  if v >= 32 then
+    ivStr = ivStr .. string.char(v)
+  end
+end
+local ivPattern = "["..ivStr.."]"
 ------------------------------------------------------------
 
 -- all variables
@@ -59,7 +67,7 @@ for n in enumAllWzNodes(topNode) do
         local png = n2.Value
         if isPng(png) and (png.Width>1 or png.Height>1) then
           
-          local fn = n2.FullPath:sub(img.Name:len()+2):gsub("\\", ".")
+          local fn = n2.FullPath:sub(img.Name:len()+2):gsub("\\", "."):gsub(ivPattern, "")
           fn = Path.Combine(dir, fn .. ".png")
           
           --ensure dir exists
