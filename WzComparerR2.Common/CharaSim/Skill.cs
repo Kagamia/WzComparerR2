@@ -45,7 +45,7 @@ namespace WzComparerR2.CharaSim
             get { return level; }
             set
             {
-                level = Math.Max(0, Math.Min(value, (this.CombatOrders ? 100 : this.MaxLevel)));
+                level = Math.Max(0, Math.Min(value, (this.CombatOrders || this.VSkill ? 100 : this.MaxLevel)));
             }
         }
 
@@ -55,6 +55,7 @@ namespace WzComparerR2.CharaSim
         public bool Invisible { get; set; }
         public bool CombatOrders { get; set; }
         public bool NotRemoved { get; set; }
+        public bool VSkill { get; set; }
         public int MasterLevel { get; set; }
         public Dictionary<int, int> ReqSkill { get; private set; }
         public List<string> Action { get; private set; }
@@ -141,6 +142,9 @@ namespace WzComparerR2.CharaSim
                         break;
                     case "notRemoved":
                         skill.NotRemoved = childNode.GetValue<int>() != 0;
+                        break;
+                    case "vSkill":
+                        skill.VSkill = childNode.GetValue<int>() != 0;
                         break;
                     case "masterLevel":
                         skill.MasterLevel = childNode.GetValue<int>();
