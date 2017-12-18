@@ -434,6 +434,12 @@ namespace WzComparerR2.CharaSim
             {
                 case 61: return "狂龙战士可以装备";
                 case 65: return "爆莉萌天使可以装备";
+                case 21: return "战神职业群可以装备";
+                case 22: return "龙神职业群可以装备";
+                case 23: return "双弩精灵可以装备";
+                case 24: return "幻影可以装备";
+                case 25: return "隐月可以装备";
+                case 27: return "夜光法师可以装备";
                 case 36: return "尖兵可以装备";
                 default: return null;
             }
