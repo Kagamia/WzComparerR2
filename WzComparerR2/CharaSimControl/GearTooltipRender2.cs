@@ -690,7 +690,19 @@ namespace WzComparerR2.CharaSimControl
             bool willDrawMedalTag = this.ShowMedalTag
                 && this.Gear.Props.TryGetValue(GearPropType.medalTag, out value)
                 && this.TryGetMedalResource(value, out medalResNode);
-            if (!string.IsNullOrEmpty(sr.Desc) || desc.Count > 0 || Gear.Sample.Bitmap != null || willDrawMedalTag)
+
+            //判断是否绘制技能desc
+            string levelDesc = null;
+            if (Gear.FixLevel && Gear.Props.TryGetValue(GearPropType.level, out value))
+            {
+                var levelInfo = Gear.Levels.FirstOrDefault(info => info.Level == value);
+                if (levelInfo != null && levelInfo.Prob == levelInfo.ProbTotal && !string.IsNullOrEmpty(levelInfo.HS))
+                {
+                    levelDesc = sr[levelInfo.HS];
+                }
+            }
+
+            if (!string.IsNullOrEmpty(sr.Desc) || !string.IsNullOrEmpty(levelDesc) || desc.Count > 0 || Gear.Sample.Bitmap != null || willDrawMedalTag)
             {
                 //分割线4号
                 if (hasPart2)
@@ -712,6 +724,10 @@ namespace WzComparerR2.CharaSimControl
                 if (!string.IsNullOrEmpty(sr.Desc))
                 {
                     GearGraphics.DrawString(g, sr.Desc, GearGraphics.ItemDetailFont2, 11, 245, ref picH, 16);
+                }
+                if (!string.IsNullOrEmpty(levelDesc))
+                {
+                    GearGraphics.DrawString(g, levelDesc, GearGraphics.ItemDetailFont2, 11, 245, ref picH, 16);
                 }
                 foreach (string str in desc)
                 {

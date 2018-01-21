@@ -18,6 +18,7 @@ namespace WzComparerR2.CharaSim
         public Dictionary<GearPropType, Range> BonusProps { get; private set; }
         public int Exp { get; set; }
 
+        public string HS { get; set; }
         public int Prob { get; set; }
         public int ProbTotal { get; set; }
         public Dictionary<int, int> Skills { get; private set; }

@@ -569,6 +569,13 @@ namespace WzComparerR2.CharaSim
                                         Wz_Node caseLevel = caseNode.Nodes[info.Level.ToString()];
                                         if (caseLevel != null)
                                         {
+                                            //desc
+                                            Wz_Node caseHS = caseLevel.Nodes["hs"];
+                                            if (caseHS != null)
+                                            {
+                                                info.HS = caseHS.GetValue<string>();
+                                            }
+
                                             //随机技能
                                             Wz_Node caseSkill = caseLevel.Nodes["Skill"];
                                             if (caseSkill != null)
