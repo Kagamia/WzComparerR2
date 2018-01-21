@@ -11,15 +11,20 @@ namespace WzComparerR2.CharaSim
     {
         static CharaSimLoader()
         {
-            loadedSetItems = new Dictionary<int, SetItem>();
+            LoadedSetItems = new Dictionary<int, SetItem>();
+            LoadedExclusiveEquips = new Dictionary<int, ExclusiveEquip>();
         }
 
-        private static Dictionary<int, SetItem> loadedSetItems;
+        public static Dictionary<int, SetItem> LoadedSetItems { get; private set; }
+        public static Dictionary<int, ExclusiveEquip> LoadedExclusiveEquips { get; private set; }
 
-        public static Dictionary<int, SetItem> LoadedSetItems
+        public static void LoadSetItemsIfEmpty()
         {
-            get { return loadedSetItems; }
-        } 
+            if (LoadedSetItems.Count == 0)
+            {
+                LoadSetItems();
+            }
+        }
 
         public static void LoadSetItems()
         {
@@ -39,7 +44,7 @@ namespace WzComparerR2.CharaSim
             if (optionNode == null)
                 return;
 
-            loadedSetItems.Clear();
+            LoadedSetItems.Clear();
             foreach (Wz_Node node in setItemNode.Nodes)
             {
                 int setItemIndex;
@@ -47,9 +52,42 @@ namespace WzComparerR2.CharaSim
                 {
                     SetItem setItem = SetItem.CreateFromNode(node, optionNode);
                     if (setItem != null)
-                        loadedSetItems[setItemIndex] = setItem;
+                        LoadedSetItems[setItemIndex] = setItem;
                 }
             }
+        }
+
+        public static void LoadExclusiveEquipsIfEmpty()
+        {
+            if (LoadedExclusiveEquips.Count == 0)
+            {
+                LoadExclusiveEquips();
+            }
+        }
+
+        public static void LoadExclusiveEquips()
+        {
+            Wz_Node exclusiveNode = PluginManager.FindWz("Etc/ExclusiveEquip.img");
+            if (exclusiveNode == null)
+                return;
+
+            LoadedExclusiveEquips.Clear();
+            foreach (Wz_Node node in exclusiveNode.Nodes)
+            {
+                int exclusiveEquipIndex;
+                if (Int32.TryParse(node.Text, out exclusiveEquipIndex))
+                {
+                    ExclusiveEquip exclusiveEquip = ExclusiveEquip.CreateFromNode(node);
+                    if (exclusiveEquip != null)
+                        LoadedExclusiveEquips[exclusiveEquipIndex] = exclusiveEquip;
+                }
+            }
+        }
+
+        public static void ClearAll()
+        {
+            LoadedSetItems.Clear();
+            LoadedExclusiveEquips.Clear();
         }
 
         public static int GetActionDelay(string actionName)

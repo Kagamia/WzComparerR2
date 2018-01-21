@@ -727,13 +727,48 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (!string.IsNullOrEmpty(levelDesc))
                 {
-                    GearGraphics.DrawString(g, levelDesc, GearGraphics.ItemDetailFont2, 11, 245, ref picH, 16);
+                    GearGraphics.DrawString(g, " " + levelDesc, GearGraphics.ItemDetailFont2, 11, 245, ref picH, 16);
                 }
                 foreach (string str in desc)
                 {
                     GearGraphics.DrawString(g, str, GearGraphics.ItemDetailFont, 11, 245, ref picH, 16);
                 }
                 picH += 5;
+            }
+
+            foreach (KeyValuePair<int, ExclusiveEquip> kv in CharaSimLoader.LoadedExclusiveEquips)
+            {
+                if (kv.Value.Items.Contains(Gear.ItemID))
+                {
+                    if (hasPart2)
+                    {
+                        g.DrawImage(res["dotline"].Image, 0, picH);
+                        picH += 8;
+                    }
+
+                    string exclusiveEquip;
+                    if (!string.IsNullOrEmpty(kv.Value.Info))
+                    {
+                        exclusiveEquip = "#c" + kv.Value.Info + "类道具无法重复使用。#";
+                    }
+                    else
+                    {
+                        List<string> itemNames = new List<string>();
+                        foreach (int itemID in kv.Value.Items)
+                        {
+                            StringResult sr2;
+                            if (this.StringLinker == null || !this.StringLinker.StringEqp.TryGetValue(itemID, out sr2))
+                            {
+                                sr2 = new StringResult();
+                                sr2.Name = "(null)";
+                            }
+                            itemNames.Add(sr2.Name);
+                        }
+                        exclusiveEquip = "#c无法重复装备" + string.Join(", ", itemNames) + "。#";
+                    }
+                    GearGraphics.DrawString(g, exclusiveEquip, GearGraphics.ItemDetailFont, 11, 246, ref picH, 16);
+                    break;
+                }
             }
 
             picH += 2;

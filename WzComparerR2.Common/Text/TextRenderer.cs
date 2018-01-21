@@ -232,13 +232,23 @@ namespace WzComparerR2.Text
                         start = run.StartIndex;
                     }
 
-                    if (!run.IsWhiteSpace)
+                    if (!(run.IsWhiteSpace && run.Width <= 0))
                     { //非空 计算宽度
                         curX = run.X - xOffset;
                         if (this.WordWrapEnabled ? (width - curX < run.Width) : (curX >= width))  //奇怪的算法 暂定
                         { //宽度不够
                             if (curX > 0) //(hasContent())
                             { //有内容
+                                // 判断行尾标点是否追加
+                                if (run.ColorID == colorID && run.Length == 1 && ",.".IndexOf(this.sb[run.StartIndex]) > -1)
+                                {
+                                    end = run.StartIndex + run.Length;
+                                    if (++r >= runs.Count)
+                                    {
+                                        break;
+                                    }
+                                    run = runs[r];
+                                }
                                 flush(true);
                                 start = run.StartIndex;
                                 xOffset = run.X;

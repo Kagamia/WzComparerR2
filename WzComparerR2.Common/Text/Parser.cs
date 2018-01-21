@@ -25,7 +25,7 @@ namespace WzComparerR2.Text
 
             Action flushRun = () =>
             {
-                if (offset < format.Length)
+                if (offset < format.Length && sb.Length > offset)
                 {
                     elements.Add(new Span()
                     {

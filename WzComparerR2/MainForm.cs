@@ -710,7 +710,7 @@ namespace WzComparerR2
                 wz.Clear();
             }
             openedWz.Clear();
-            CharaSimLoader.LoadedSetItems.Clear();
+            CharaSimLoader.ClearAll();
             stringLinker.Clear();
             labelItemStatus.Text = "已经清理全部已读取资源...";
             GC.Collect();
@@ -2324,10 +2324,8 @@ namespace WzComparerR2
                 case Wz_Type.Character:
                     if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
                         return;
-                    if (CharaSimLoader.LoadedSetItems.Count == 0)
-                    {
-                        CharaSimLoader.LoadSetItems();
-                    }
+                    CharaSimLoader.LoadSetItemsIfEmpty();
+                    CharaSimLoader.LoadExclusiveEquipsIfEmpty();
                     var gear = Gear.CreateFromNode(image.Node, PluginManager.FindWz);
                     obj = gear;
                     if (gear != null)
@@ -2350,7 +2348,7 @@ namespace WzComparerR2
                     {
                         if (CharaSimLoader.LoadedSetItems.Count == 0) //宠物 预读套装
                         {
-                            CharaSimLoader.LoadSetItems();
+                            CharaSimLoader.LoadSetItemsIfEmpty();
                         }
                         if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
                             return;
@@ -2396,10 +2394,6 @@ namespace WzComparerR2
                 case Wz_Type.Mob:
                     if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
                         return;
-                    if (CharaSimLoader.LoadedSetItems.Count == 0)
-                    {
-                        CharaSimLoader.LoadSetItems();
-                    }
                     var mob = Mob.CreateFromNode(image.Node, PluginManager.FindWz);
                     obj = mob;
                     if (mob != null)
@@ -2411,10 +2405,6 @@ namespace WzComparerR2
                 case Wz_Type.Npc:
                     if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
                         return;
-                    if (CharaSimLoader.LoadedSetItems.Count == 0)
-                    {
-                        CharaSimLoader.LoadSetItems();
-                    }
                     var npc = Npc.CreateFromNode(image.Node, PluginManager.FindWz);
                     obj = npc;
                     if (npc != null)
