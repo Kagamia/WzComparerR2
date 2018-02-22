@@ -168,9 +168,15 @@ namespace WzComparerR2.Comparer
         private void OutputFile(List<Wz_File> fileNew, List<Wz_File> fileOld, Wz_Type type, List<CompareDifference> diffLst, string outputDir)
         {
             string htmlFilePath = Path.Combine(outputDir, type.ToString() + ".html");
-            string srcDirPath = Path.Combine(outputDir, type.ToString() + "_files");
+            for (int i = 1; File.Exists(htmlFilePath); i++)
+            {
+                htmlFilePath = Path.Combine(outputDir, string.Format("{0}_{1}.html", type, i));
+            }
+            string srcDirPath = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(htmlFilePath) + "_files");
             if (OutputPng && !Directory.Exists(srcDirPath))
+            {
                 Directory.CreateDirectory(srcDirPath);
+            }
 
             FileStream htmlFile = null;
             StreamWriter sw = null;
