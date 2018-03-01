@@ -594,7 +594,7 @@ namespace WzComparerR2.Avatar.UI
 
         private void FillEarSelection()
         {
-            FillComboItems(cmbEar, 0, 3);
+            FillComboItems(cmbEar, 0, 4);
         }
 
         private void FillComboItems(ComboBoxEx comboBox, int start, int count)

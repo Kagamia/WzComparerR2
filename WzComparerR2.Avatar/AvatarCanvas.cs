@@ -710,6 +710,7 @@ namespace WzComparerR2.Avatar
                             case "face": if (!(bodyFace ?? face)) continue; break;
                             case "ear": if (this.EarType != 1) continue; break;
                             case "lefEar": if (this.EarType != 2) continue; break;
+                            case "highlefEar": if (this.EarType != 3) continue; break;
                             case "hairOverHead":
                             case "backHairOverCape":
                             case "backHair": if (HairCover) continue; break;
