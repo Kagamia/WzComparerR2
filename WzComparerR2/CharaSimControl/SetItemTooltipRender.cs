@@ -75,12 +75,12 @@ namespace WzComparerR2.CharaSimControl
             format.Alignment = StringAlignment.Center;
 
             picHeight = 10;
-            g.DrawString(this.SetItem.setItemName, GearGraphics.ItemDetailFont2, GearGraphics.GreenBrush2, 130, 10, format);
+            g.DrawString(this.SetItem.SetItemName, GearGraphics.ItemDetailFont2, GearGraphics.GreenBrush2, 130, 10, format);
             picHeight += 25;
 
             format.Alignment = StringAlignment.Far;
 
-            foreach (var setItemPart in this.SetItem.itemIDs.Parts)
+            foreach (var setItemPart in this.SetItem.ItemIDs.Parts)
             {
                 string itemName = setItemPart.Value.RepresentName;
                 string typeName = setItemPart.Value.TypeName;
@@ -174,9 +174,18 @@ namespace WzComparerR2.CharaSimControl
         /// </summary>
         private void RenderEffect(Graphics g, ref int picHeight)
         {
-            foreach (KeyValuePair<int, SetItemEffect> effect in this.SetItem.effects)
+            foreach (KeyValuePair<int, SetItemEffect> effect in this.SetItem.Effects)
             {
-                g.DrawString(effect.Key + "套装效果", GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 8, picHeight);
+                string effTitle;
+                if (this.SetItem.SetItemID < 0)
+                {
+                    effTitle = $"服务器内重复装备效果({effect.Key} / {this.SetItem.CompleteCount})";
+                }
+                else
+                {
+                    effTitle = effect.Key + "套装效果";
+                }
+                g.DrawString(effTitle, GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 8, picHeight);
                 picHeight += 16;
                 //Brush brush = effect.Value.Enabled ? Brushes.White : GearGraphics.GrayBrush2;
                 var color = effect.Value.Enabled ? Color.White : GearGraphics.GrayColor2;

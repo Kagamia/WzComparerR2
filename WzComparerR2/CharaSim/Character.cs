@@ -143,7 +143,7 @@ namespace WzComparerR2.CharaSim
             checkSetItemEnabled();
             foreach (SetItem setItem in CharaSimLoader.LoadedSetItems.Values)
             {
-                foreach (SetItemEffect effect in setItem.effects.Values)
+                foreach (SetItemEffect effect in setItem.Effects.Values)
                 {
                     if (effect.Enabled)
                     {
@@ -293,7 +293,7 @@ namespace WzComparerR2.CharaSim
             List<int> idList = new List<int>();
             foreach (SetItem setItem in CharaSimLoader.LoadedSetItems.Values)
             {
-                foreach (KeyValuePair<int, SetItemIDPart> idPart in setItem.itemIDs.Parts)
+                foreach (KeyValuePair<int, SetItemIDPart> idPart in setItem.ItemIDs.Parts)
                 {
                     idList.AddRange(idPart.Value.ItemIDs.Keys);
                     foreach (int id in idList)
@@ -311,14 +311,14 @@ namespace WzComparerR2.CharaSim
                 if (gear.State == GearState.enable
                     && gear.Props.TryGetValue(GearPropType.setItemID, out setItemID))
                 {
-                    CharaSimLoader.LoadedSetItems[setItemID].itemIDs[gear.ItemID] = true;
+                    CharaSimLoader.LoadedSetItems[setItemID].ItemIDs[gear.ItemID] = true;
                     CharaSimLoader.LoadedSetItems[setItemID].currentCount++;
                 }
             }
             //验证所有setItem
             foreach (SetItem setItem in CharaSimLoader.LoadedSetItems.Values)
             {
-                foreach (KeyValuePair<int, SetItemEffect> effect in setItem.effects)
+                foreach (KeyValuePair<int, SetItemEffect> effect in setItem.Effects)
                 {
                     effect.Value.Enabled = (setItem.currentCount >= effect.Key);
                 }

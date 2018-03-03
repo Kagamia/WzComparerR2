@@ -518,12 +518,12 @@ namespace WzComparerR2.CharaSimControl
                 format.Alignment = StringAlignment.Center;
 
                 picHeight = 10;
-                g.DrawString(setItem.setItemName, GearGraphics.ItemDetailFont, GearGraphics.SetItemNameBrush, 126, 10, format);
+                g.DrawString(setItem.SetItemName, GearGraphics.ItemDetailFont, GearGraphics.SetItemNameBrush, 126, 10, format);
                 picHeight += 25;
 
                 format.Alignment=StringAlignment.Far;
 
-                foreach (var setItemPart in setItem.itemIDs.Parts)
+                foreach (var setItemPart in setItem.ItemIDs.Parts)
                 {
                     string itemName = setItemPart.Value.RepresentName;
                     string typeName = setItemPart.Value.TypeName;
@@ -556,7 +556,7 @@ namespace WzComparerR2.CharaSimControl
                 picHeight += 5;
                 g.DrawLine(Pens.White, 6, picHeight, 245, picHeight);//分割线
                 picHeight += 9;
-                foreach (KeyValuePair<int, SetItemEffect> effect in setItem.effects)
+                foreach (KeyValuePair<int, SetItemEffect> effect in setItem.Effects)
                 {
                     g.DrawString(effect.Key + "套装效果", GearGraphics.ItemDetailFont, GearGraphics.SetItemNameBrush, 8, picHeight);
                     picHeight += 16;

@@ -10,16 +10,18 @@ namespace WzComparerR2.CharaSim
     {
         public SetItem()
         {
-            itemIDs = new SetItemIDList();
-            effects = new Dictionary<int, SetItemEffect>();
+            ItemIDs = new SetItemIDList();
+            Effects = new Dictionary<int, SetItemEffect>();
         }
-        public int completeCount;
+
+        public int SetItemID { get; set; }
+        public int CompleteCount { get; set; }
         public int currentCount;
         public bool Parts { get; set; }
         public bool ExpandToolTip { get; set; }
-        public SetItemIDList itemIDs;
-        public string setItemName;
-        public Dictionary<int, SetItemEffect> effects;
+        public SetItemIDList ItemIDs { get; private set; }
+        public string SetItemName { get; set; }
+        public Dictionary<int, SetItemEffect> Effects { get; private set; }
 
         public static SetItem CreateFromNode(Wz_Node setItemNode, Wz_Node optionNode)
         {
@@ -27,6 +29,11 @@ namespace WzComparerR2.CharaSim
                 return null;
 
             SetItem setItem = new SetItem();
+            int setItemID;
+            if (int.TryParse(setItemNode.Text, out setItemID))
+            {
+                setItem.SetItemID = setItemID;
+            }
 
             Dictionary<string, string> desc = new Dictionary<string, string>();
 
@@ -35,10 +42,10 @@ namespace WzComparerR2.CharaSim
                 switch (subNode.Text)
                 {
                     case "setItemName":
-                        setItem.setItemName = Convert.ToString(subNode.Value);
+                        setItem.SetItemName = Convert.ToString(subNode.Value);
                         break;
                     case "completeCount":
-                        setItem.completeCount = Convert.ToInt32(subNode.Value);
+                        setItem.CompleteCount = Convert.ToInt32(subNode.Value);
                         break;
                     case "parts":
                         setItem.Parts = subNode.GetValue<int>() != 0;
@@ -53,7 +60,7 @@ namespace WzComparerR2.CharaSim
                             if (itemNode.Nodes.Count == 0)
                             {
                                 int itemID = Convert.ToInt32(itemNode.Value);
-                                setItem.itemIDs.Add(idx, new SetItemIDPart(itemID));
+                                setItem.ItemIDs.Add(idx, new SetItemIDPart(itemID));
                             }
                             else
                             {
@@ -77,7 +84,7 @@ namespace WzComparerR2.CharaSim
                                             break;
                                     }
                                 }
-                                setItem.itemIDs.Add(idx, part);
+                                setItem.ItemIDs.Add(idx, part);
                             }
                         }
                         break;
@@ -194,7 +201,7 @@ namespace WzComparerR2.CharaSim
                                         break;
                                 }
                             }
-                            setItem.effects.Add(count, effect);
+                            setItem.Effects.Add(count, effect);
                         }
                         break;
                     case "Desc":
@@ -253,7 +260,7 @@ namespace WzComparerR2.CharaSim
             List<int> itemIDList = new List<int>();
             List<int> preRemovedPartIdx = new List<int>();
             int? idx = null;
-            foreach (var part in setItem.itemIDs.Parts)
+            foreach (var part in setItem.ItemIDs.Parts)
             {
                 bool add = false;
                 foreach (var itemID in part.Value.ItemIDs.Keys)
@@ -279,9 +286,9 @@ namespace WzComparerR2.CharaSim
                 SetItemIDPart part = new SetItemIDPart(itemIDList);
                 foreach (int i in preRemovedPartIdx)
                 {
-                    setItem.itemIDs.Remove(i);
+                    setItem.ItemIDs.Remove(i);
                 }
-                setItem.itemIDs.Add(idx.Value + 1, part);
+                setItem.ItemIDs.Add(idx.Value + 1, part);
                 return part;
             }
             return null;
