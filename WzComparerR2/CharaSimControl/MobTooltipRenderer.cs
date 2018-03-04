@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Text.RegularExpressions;
 using WzComparerR2.CharaSim;
 using WzComparerR2.Common;
 using static WzComparerR2.CharaSimControl.RenderHelper;
@@ -98,18 +99,18 @@ namespace WzComparerR2.CharaSimControl
             }
 
             propBlocks.Add(PrepareText(g, "Level: " + MobInfo.Level, GearGraphics.ItemDetailFont, Brushes.White, 0, picY));
-            propBlocks.Add(PrepareText(g, "HP: " + (!string.IsNullOrEmpty(MobInfo.FinalMaxHP) ? MobInfo.FinalMaxHP : MobInfo.MaxHP.ToString()),
-                GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "MP: " + (!string.IsNullOrEmpty(MobInfo.FinalMaxMP) ? MobInfo.FinalMaxMP : MobInfo.MaxMP.ToString()),
-                GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            string hpNum = !string.IsNullOrEmpty(MobInfo.FinalMaxHP) ? this.AddCommaSeparators(MobInfo.FinalMaxHP) : MobInfo.MaxHP.ToString("N0");
+            propBlocks.Add(PrepareText(g, "HP: " + hpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            string mpNum = !string.IsNullOrEmpty(MobInfo.FinalMaxMP) ? this.AddCommaSeparators(MobInfo.FinalMaxMP) : MobInfo.MaxMP.ToString();
+            propBlocks.Add(PrepareText(g, "MP: " + mpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "PAD: " + MobInfo.PADamage, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "MAD: " + MobInfo.MADamage, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "PDr: " + MobInfo.PDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "MDr: " + MobInfo.MDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "Acc: " + MobInfo.Acc, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "Eva: " + MobInfo.Eva, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "KB: " + MobInfo.Pushed, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "Exp: " + MobInfo.Exp, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "KB: " + MobInfo.Pushed.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "Exp: " + MobInfo.Exp.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, GetElemAttrString(MobInfo.ElemAttr), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             picY += 28;
 
@@ -250,6 +251,21 @@ namespace WzComparerR2.CharaSimControl
                 case ElemResistance.Weak: e = "◎"; break;
             }
             return e ?? "  ";
+        }
+
+        private string AddCommaSeparators(string number)
+        {
+            return Regex.Replace(number, @"^(\d+?)(\d{3})+$", m =>
+            {
+                var sb = new StringBuilder();
+                sb.Append(m.Result("$1"));
+                foreach (Capture cap in m.Groups[2].Captures)
+                {
+                    sb.Append(",");
+                    sb.Append(cap.ToString());
+                }
+                return sb.ToString();
+            });
         }
     }
 }

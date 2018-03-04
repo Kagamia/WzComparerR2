@@ -16,7 +16,7 @@ namespace WzComparerR2.CharaSim
             //this.Animates = new LifeAnimateCollection();
 
             this.FirstAttack = false;
-            this.BodyAttack = true;
+            this.BodyAttack = false;
             this.DamagedByMob = false;
         }
 
