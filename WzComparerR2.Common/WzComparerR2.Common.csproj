@@ -47,6 +47,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\SharpDX.dll</HintPath>
     </Reference>
+    <Reference Include="SharpDX.Direct2D1, Version=2.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\SharpDX.Direct2D1.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX.Direct3D11, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\SharpDX.Direct3D11.dll</HintPath>
@@ -146,6 +150,11 @@
     <Compile Include="GifFrame.cs" />
     <Compile Include="Rendering\AnimationGraphics.cs" />
     <Compile Include="Rendering\BlendEx.cs" />
+    <Compile Include="Rendering\D2DContext.cs" />
+    <Compile Include="Rendering\D2DRenderer.cs" />
+    <Compile Include="Rendering\D2DFactory.cs" />
+    <Compile Include="Rendering\D2DFont.cs" />
+    <Compile Include="Rendering\DxEntension.cs" />
     <Compile Include="Rendering\PngEffect.cs" />
     <Compile Include="Rendering\MonogameUtils.cs" />
     <Compile Include="Rendering\SpriteBatchEx.cs" />

@@ -176,11 +176,12 @@ namespace WzComparerR2.WzLib
             }
             Bitmap pngDecoded = null;
             BitmapData bmpdata;
+            byte[] argb;
 
             switch (this.form)
             {
                 case 1: //16位argba4444
-                    byte[] argb = GetPixelDataBgra4444(pixel, this.w, this.h);
+                    argb = GetPixelDataBgra4444(pixel, this.w, this.h);
                     pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format32bppArgb);
                     bmpdata = pngDecoded.LockBits(new Rectangle(Point.Empty, pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                     Marshal.Copy(argb, 0, bmpdata.Scan0, argb.Length);
@@ -195,54 +196,10 @@ namespace WzComparerR2.WzLib
                     break;
 
                 case 3: //黑白缩略图
+                    argb = GetPixelDataForm3(pixel, this.w, this.h);
                     pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format32bppArgb);
-                    int[] argb2 = new int[this.w * this.h];
-                    {
-                        int index;
-                        int index2;
-                        int p;
-                        int w = ((int)Math.Ceiling(this.w / 4.0));
-                        int h = ((int)Math.Ceiling(this.h / 4.0));
-                        for (int y = 0; y < h; y++)
-                        {
-                            for (int x = 0; x < w; x++)
-                            {
-                                index = (x + y * w) * 2; //原像素索引
-                                index2 = x * 4 + y * this.w * 4; //目标像素索引
-                                p = (pixel[index] & 0x0F) | ((pixel[index] & 0x0F) << 4);
-                                p |= ((pixel[index] & 0xF0) | ((pixel[index] & 0xF0) >> 4)) << 8;
-                                p |= ((pixel[index + 1] & 0x0F) | ((pixel[index + 1] & 0x0F) << 4)) << 16;
-                                p |= ((pixel[index + 1] & 0xF0) | ((pixel[index] & 0xF0) >> 4)) << 24;
-
-                                for (int i = 0; i < 4; i++)
-                                {
-                                    if (x * 4 + i < this.w)
-                                    {
-                                        argb2[index2 + i] = p;
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                            //复制行
-                            index2 = y * this.w * 4;
-                            for (int j = 1; j < 4; j++)
-                            {
-                                if (y *4 + j < this.h)
-                                {
-                                    Array.Copy(argb2, index2, argb2, index2 + j * this.w, this.w);
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    }
                     bmpdata = pngDecoded.LockBits(new Rectangle(Point.Empty, pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-                    Marshal.Copy(argb2, 0, bmpdata.Scan0, argb2.Length);
+                    Marshal.Copy(argb, 0, bmpdata.Scan0, argb.Length);
                     pngDecoded.UnlockBits(bmpdata);
                     break;
 
@@ -254,25 +211,10 @@ namespace WzComparerR2.WzLib
                     break;
 
                 case 517: //16位rgb565缩略图
+                    argb = GetPixelDataForm517(pixel, this.w, this.h);
                     pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format16bppRgb565);
                     bmpdata = pngDecoded.LockBits(new Rectangle(0, 0, this.w, this.h), ImageLockMode.WriteOnly, PixelFormat.Format16bppRgb565);
-                    byte[] lineData = new byte[this.w * 2];
-                    for (int j0 = 0, j1 = this.h / 16; j0 < j1; j0++)
-                    {
-                        for (int i0 = 0, i1 = this.w / 16; i0 < i1; i0++)
-                        {
-                            int idx = (i0 + j0 * i1) * 2;
-                            for (int k = 0; k < 16; k++)
-                            {
-                                lineData[i0 * 32 + k * 2] = pixel[idx];
-                                lineData[i0 * 32 + k * 2 + 1] = pixel[idx + 1];
-                            }
-                        }
-                        for (int k = 0; k < 16; k++)
-                        {
-                            Marshal.Copy(lineData, 0, new IntPtr(bmpdata.Scan0.ToInt32() + lineData.Length * (j0 * 16 + k)), lineData.Length);
-                        }
-                    }
+                    Marshal.Copy(argb, 0, bmpdata.Scan0, argb.Length);
                     pngDecoded.UnlockBits(bmpdata);
                     break;
                    /* pngDecoded = new Bitmap(this.w, this.h);
@@ -400,6 +342,87 @@ namespace WzComparerR2.WzLib
                 }
             }
 
+            return pixel;
+        }
+
+        public static unsafe byte[] GetPixelDataForm3(byte[] rawData, int width, int height)
+        {
+            byte[] pixel = new byte[width * height * 4];
+            fixed (byte* pArray = pixel)
+            {
+                int* argb2 = (int*)pArray;
+                int w = ((int)Math.Ceiling(width / 4.0));
+                int h = ((int)Math.Ceiling(height / 4.0));
+                for (int y = 0; y < h; y++)
+                {
+                    for (int x = 0; x < w; x++)
+                    {
+                        var index = (x + y * w) * 2; //原像素索引
+                        var index2 = x * 4 + y * width * 4; //目标像素索引
+                        var p = (rawData[index] & 0x0F) | ((rawData[index] & 0x0F) << 4)
+                            | ((rawData[index] & 0xF0) | ((rawData[index] & 0xF0) >> 4)) << 8
+                            | ((rawData[index + 1] & 0x0F) | ((rawData[index + 1] & 0x0F) << 4)) << 16
+                            | ((rawData[index + 1] & 0xF0) | ((rawData[index + 1] & 0xF0) >> 4)) << 24;
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            if (x * 4 + i < width)
+                            {
+                                argb2[index2 + i] = p;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    //复制行
+                    var srcIndex = y * width * 4 * 4;
+                    var dstIndex = srcIndex + width * 4;
+                    for (int j = 1; j < 4; j++)
+                    {
+                        if (y * 4 + j < height)
+                        {
+                            Array.Copy(pixel, srcIndex, pixel, dstIndex, width * 4);
+                            dstIndex += width * 4;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            return pixel;
+        }
+
+        public static byte[] GetPixelDataForm517(byte[] rawData, int width, int height)
+        {
+            byte[] pixel = new byte[width * height * 2];
+            int lineIndex = 0;
+            for (int j0 = 0, j1 = width / 16; j0 < j1; j0++)
+            {
+                for (int i0 = 0, i1 = height / 16; i0 < i1; i0++)
+                {
+                    int idx = (i0 + j0 * i1) * 2;
+                    byte b0 = rawData[idx];
+                    byte b1 = rawData[idx + 1];
+                    idx = lineIndex;
+                    for (int k = 0; k < 16; k++)
+                    {
+                        pixel[idx++] = b0;
+                        pixel[idx++] = b1;
+                    }
+                }
+                var dstIndex = lineIndex + width * 2;
+                for (int k = 1; k < 16; k++)
+                {
+                    Array.Copy(pixel, lineIndex, pixel, dstIndex, width * 2);
+                    lineIndex += width * 2;
+                }
+
+                lineIndex += width * 32;
+            }
             return pixel;
         }
 

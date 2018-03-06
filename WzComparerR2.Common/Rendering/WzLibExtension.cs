@@ -12,84 +12,102 @@ namespace WzComparerR2.Rendering
     {
         public static Texture2D ToTexture(this Wz_Png png, GraphicsDevice graphicsDevice)
         {
-            byte[] plainData = png.GetRawData();
-            if (plainData == null)
+            var format = GetTextureFormatOfPng(png.Form);
+            Texture2D t2d = null;
+            if (format == SurfaceFormat.Bgra4444)
             {
-                return null;
+                //检测是否支持
+                if (graphicsDevice.IsSupportBgra4444())
+                {
+                    t2d = MonogameUtils.CreateTexture_BGRA4444(graphicsDevice, png.Width, png.Height);
+                }
+                else
+                {
+                    format = SurfaceFormat.Bgra32;
+                }
+            }
+            if (t2d == null)
+            {
+                t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, format);
             }
 
-            Texture2D t2d;
-
-            switch (png.Form)
-            {
-                case 1:
-                    t2d = null;
-                    try
-                    {
-                        t2d = MonogameUtils.CreateTexture_BGRA4444(graphicsDevice, png.Width, png.Height);
-                        t2d.SetData(plainData);
-                    }
-                    catch  //monogame并不支持这个format 用gdi+转
-                    {
-                        if (t2d != null) t2d.Dispose();
-                        goto default;
-                    }
-                    break;
-
-                case 2:
-                    t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, SurfaceFormat.Bgra32);
-                    t2d.SetData(plainData);
-                    break;
-
-                case 513:
-                    t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, SurfaceFormat.Bgr565);
-                    t2d.SetData(plainData);
-                    break;
-
-                case 517:
-                    t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, SurfaceFormat.Bgr565);
-                    byte[] texData = new byte[png.Width * png.Height * 2];
-                    for (int j0 = 0, j1 = png.Height / 16; j0 < j1; j0++)
-                    {
-                        int idxTex = j0 * 16 * png.Width * 2;
-                        for (int i0 = 0, i1 = png.Width / 16; i0 < i1; i0++)
-                        {
-                            int idx = (i0 + j0 * i1) * 2;
-
-                            for (int k = 0; k < 16; k++)
-                            {
-                                texData[idxTex + i0 * 32 + k * 2] = plainData[idx];
-                                texData[idxTex + i0 * 32 + k * 2 + 1] = plainData[idx + 1];
-                            }
-                        }
-                        for (int k = 1; k < 16; k++)
-                        {
-                            System.Buffer.BlockCopy(texData, idxTex, texData, idxTex + k * png.Width * 2, png.Width * 2);
-                        }
-                    }
-                    t2d.SetData(texData);
-                    break;
-
-                case 1026:
-                    t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, SurfaceFormat.Dxt3);
-                    t2d.SetData(plainData);
-                    break;
-
-                case 2050:
-                    t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, SurfaceFormat.Dxt5);
-                    t2d.SetData(plainData);
-                    break;
-
-                default: //默认从bitmap复制 二次转换
-                    var bitmap = png.ExtractPng();
-                    t2d = bitmap.ToTexture(graphicsDevice);
-                    bitmap.Dispose();
-                    break;
-
-            }
-
+            png.ToTexture(t2d, Point.Zero);
             return t2d;
         }
+
+        public static void ToTexture(this Wz_Png png, Texture2D texture, Point origin)
+        {
+            Rectangle rect = new Rectangle(origin, new Point(png.Width, png.Height));
+
+            //检查大小
+            if (rect.X < 0 || rect.Y < 0 || rect.Right > texture.Width || rect.Bottom > texture.Height)
+            {
+                throw new ArgumentException("Png rectangle is out of bounds.");
+            }
+
+            //检查像素格式
+            var format = GetTextureFormatOfPng(png.Form);
+
+            if (texture.Format == SurfaceFormat.Bgra32)
+            {
+                using (var bmp = png.ExtractPng())
+                {
+                    bmp.ToTexture(texture, origin);
+                }
+            }
+            else if (texture.Format != format)
+            {
+                throw new ArgumentException($"Texture format({texture.Format}) does not fit the png form({png.Form}).");
+            }
+            else
+            {
+                byte[] plainData = png.GetRawData();
+                if (plainData == null)
+                {
+                    throw new Exception("png decoding failed.");
+                }
+
+                switch (png.Form)
+                {
+                    case 1:
+                    case 2:
+                    case 513:
+                    case 1026:
+                    case 2050:
+                        texture.SetData(0, 0, rect, plainData, 0, plainData.Length);
+                        break;
+
+                    case 3:
+                        var pixel = Wz_Png.GetPixelDataForm3(plainData, png.Width, png.Height);
+                        texture.SetData(0, 0, rect, pixel, 0, pixel.Length);
+                        break;
+
+                    case 517:
+                        pixel = Wz_Png.GetPixelDataForm517(plainData, png.Width, png.Height);
+                        texture.SetData(0, 0, rect, pixel, 0, pixel.Length);
+                        break;
+
+                    default:
+                        throw new Exception($"unknown png form ({png.Form}).");
+                }
+            }
+        }
+
+        public static SurfaceFormat GetTextureFormatOfPng(int pngform)
+        {
+            switch (pngform)
+            {
+                case 1: return SurfaceFormat.Bgra4444;
+                case 2:
+                case 3: return SurfaceFormat.Bgra32;
+                case 513: 
+                case 517: return SurfaceFormat.Bgr565;
+                case 1026: return SurfaceFormat.Dxt3;
+                case 2050: return SurfaceFormat.Dxt5;
+                default: return SurfaceFormat.Bgra32;
+            }
+        }
+
 
         public static Point ToPoint(this Wz_Vector vector)
         {

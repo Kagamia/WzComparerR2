@@ -14,7 +14,7 @@ namespace WzComparerR2.Rendering
 {
     public static class MonogameUtils
     {
-        private const SharpDX.DXGI.Format DXGI_FORMAT_B4G4R4A4_UNORM = (SharpDX.DXGI.Format)115;
+        internal const SharpDX.DXGI.Format DXGI_FORMAT_B4G4R4A4_UNORM = (SharpDX.DXGI.Format)115;
 
         public static Color ToXnaColor(this GdipColor color)
         {
@@ -76,6 +76,13 @@ namespace WzComparerR2.Rendering
 
         public static Texture2D ToTexture(this System.Drawing.Bitmap bitmap, GraphicsDevice device)
         {
+            var t2d = new Texture2D(device, bitmap.Width, bitmap.Height, false, SurfaceFormat.Bgra32);
+            bitmap.ToTexture(t2d, Point.Zero);
+            return t2d;
+        }
+
+        public static void ToTexture(this System.Drawing.Bitmap bitmap, Texture2D texture, Point origin)
+        {
             var rect = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
             var bmpData = bitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly,
                 System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -83,9 +90,7 @@ namespace WzComparerR2.Rendering
             Marshal.Copy(bmpData.Scan0, buffer, 0, buffer.Length);
             bitmap.UnlockBits(bmpData);
 
-            var t2d = new Texture2D(device, rect.Width, rect.Height, false, SurfaceFormat.Bgra32);
-            t2d.SetData(buffer);
-            return t2d;
+            texture.SetData(0, 0, new Rectangle(origin.X, origin.Y, rect.Width, rect.Height), buffer, 0, buffer.Length);
         }
 
         public static void BgraToColor(byte[] pixelData)
@@ -208,11 +213,9 @@ namespace WzComparerR2.Rendering
                 .GetValue(device);
         }
 
-        private static Device _d3dDevice(this GraphicsDevice device)
+        public static Device _d3dDevice(this GraphicsDevice device)
         {
-            return (Device)typeof(GraphicsDevice)
-                .GetField("_d3dDevice", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-                .GetValue(device);
+            return (Device)device.Handle;
         }
 
         private static Resource GetTexture(this Texture texture)
@@ -220,6 +223,13 @@ namespace WzComparerR2.Rendering
             return (Resource)typeof(Texture)
                 .GetMethod("GetTexture", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
                 .Invoke(texture, new object[] { });
+        }
+
+        public static bool IsSupportBgra4444(this GraphicsDevice device)
+        {
+            var d3dDevice = device._d3dDevice();
+            var fmtSupport = d3dDevice.CheckFormatSupport(MonogameUtils.DXGI_FORMAT_B4G4R4A4_UNORM);
+            return (fmtSupport & SharpDX.Direct3D11.FormatSupport.Texture2D) != 0;
         }
     }
 }

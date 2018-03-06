@@ -203,6 +203,13 @@ namespace WzComparerR2.Rendering
                 this.Draw(this.singlePixel, dest, null, color, rot, origin, SpriteEffects.None, 0);
             }
         }
+
+        public void Flush()
+        {
+            this.End();
+            this.GetType().BaseType.GetField("_beginCalled", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                .SetValue(this, true);
+        }
         
         protected override void Dispose(bool disposing)
         {
