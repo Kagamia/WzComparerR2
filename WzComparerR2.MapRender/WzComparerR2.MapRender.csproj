@@ -76,6 +76,9 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="TSF">
+      <HintPath>..\References\TSF.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animation\IStateMachineAnimationData.cs" />
@@ -88,6 +91,7 @@
     <Compile Include="FrmMapRender2.SceneManager.cs" />
     <Compile Include="FrmMapRender2.SceneRendering.cs" />
     <Compile Include="GameExt.cs" />
+    <Compile Include="IWcR2Font.cs" />
     <Compile Include="LineListMesh.cs" />
     <Compile Include="MapData.cs" />
     <Compile Include="MapScene.cs" />

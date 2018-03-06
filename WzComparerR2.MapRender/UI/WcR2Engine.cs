@@ -171,8 +171,8 @@ namespace WzComparerR2.MapRender.UI
             var cm = contentManager as WcR2ContentManager;
             if (cm != null)
             {
-                var nativeFont = cm.Load<XnaFont>(file);
-                return Engine.Instance.Renderer.CreateFont(nativeFont);
+                var wcR2Font = cm.Load<IWcR2Font>(file);
+                return Engine.Instance.Renderer.CreateFont(wcR2Font);
             }
 
             return base.LoadFont(contentManager, file);
@@ -203,10 +203,14 @@ namespace WzComparerR2.MapRender.UI
     {
         public WcR2Font(object nativeFont) : base(nativeFont)
         {
-            this.NativeFont = nativeFont as XnaFont;
+            this.NativeFont = nativeFont as IWcR2Font;
+            if (this.NativeFont == null)
+            {
+                throw new ArgumentException("nativeFont not implements IWcR2Font.");
+            }
         }
 
-        public XnaFont NativeFont { get; private set; }
+        public IWcR2Font NativeFont { get; private set; }
 
         public override char? DefaultCharacter
         {
@@ -220,7 +224,7 @@ namespace WzComparerR2.MapRender.UI
 
         public override int LineSpacing
         {
-            get { return NativeFont.Height; }
+            get { return (int)NativeFont.LineHeight; }
         }
 
         public override float Spacing
@@ -236,13 +240,13 @@ namespace WzComparerR2.MapRender.UI
 
         public override Size MeasureString(StringBuilder text, float dpiScaleX, float dpiScaleY)
         {
-            var size = NativeFont.MeasureString(text, 0, text.Length);
+            var size = NativeFont.MeasureString(text);
             return new Size(size.X, size.Y);
         }
 
         public override Size MeasureString(string text, float dpiScaleX, float dpiScaleY)
         {
-            var size = NativeFont.MeasureString(text, 0, text.Length);
+            var size = NativeFont.MeasureString(text);
             return new Size(size.X, size.Y);
         }
     }
@@ -304,13 +308,19 @@ namespace WzComparerR2.MapRender.UI
         {
             get
             {
-                return ((IGraphicsDeviceService)this.ServiceProvider.GetService(typeof(IGraphicsDeviceService))).GraphicsDevice;
+                return this.ServiceProvider.GetService<IGraphicsDeviceService>().GraphicsDevice;
             }
         }
 
+        public bool UseD2DFont { get; set; }
+
         public override T Load<T>(string assetName)
         {
-            if (typeof(T) == typeof(XnaFont))
+            if (assetName == "DirectionalBlurShader")
+            {
+                return default(T);
+            }
+            if (typeof(T) == typeof(IWcR2Font))
             {
                 object value;
                 if (!LoadedAssets.TryGetValue(assetName, out value))
@@ -326,24 +336,29 @@ namespace WzComparerR2.MapRender.UI
             return base.Load<T>(assetName);
         }
 
-        private XnaFont LoadXnaFont(string assetName)
+        private IWcR2Font LoadXnaFont(string assetName)
         {
-            string[] fontDesc = assetName.Split(',');
+            string[] fontDesc = assetName.Split(new[] { ',' }, 3);
             string familyName = fontDesc[0];
             float size;
-            FontStyle style;
+            System.Drawing.FontStyle fStyle;
             if (float.TryParse(fontDesc[1], out size)
-                && Enum.TryParse(fontDesc[2], out style))
+                && Enum.TryParse(fontDesc[2], out fStyle))
             {
-                System.Drawing.FontStyle fStyle = System.Drawing.FontStyle.Regular;
-                switch (style)
+                if (this.UseD2DFont)
                 {
-                    case FontStyle.Regular: fStyle = System.Drawing.FontStyle.Regular; break;
-                    case FontStyle.Bold: fStyle = System.Drawing.FontStyle.Bold; break;
-                    case FontStyle.Italic: fStyle = System.Drawing.FontStyle.Italic; break;
+                    var d2dFont = new D2DFont(familyName, size, 
+                        (fStyle & System.Drawing.FontStyle.Bold) != 0, 
+                        (fStyle & System.Drawing.FontStyle.Italic) != 0
+                        );
+                    return new D2DFontAdapter(d2dFont);
                 }
-                var baseFont = new System.Drawing.Font(familyName, size, fStyle, System.Drawing.GraphicsUnit.Pixel);
-                return new XnaFont(GraphicsDevice, baseFont);
+                else
+                {
+                    var baseFont = new System.Drawing.Font(familyName, size, fStyle, System.Drawing.GraphicsUnit.Pixel);
+                    var xnaFont = new XnaFont(GraphicsDevice, baseFont);
+                    return new XnaFontAdapter(xnaFont);
+                }
             }
             else
             {
@@ -356,7 +371,12 @@ namespace WzComparerR2.MapRender.UI
     {
         public static void AddFont(this FontManager fontManager, string familyName, float size, FontStyle style)
         {
-            string assetName = string.Join(",", familyName, size, style);
+            System.Drawing.FontStyle fStyle = System.Drawing.FontStyle.Regular;
+            if ((style & FontStyle.Bold) != 0)
+                fStyle |= System.Drawing.FontStyle.Bold;
+            if ((style & FontStyle.Italic) != 0)
+                fStyle |= System.Drawing.FontStyle.Italic;
+            string assetName = MapRenderFonts.GetFontResourceKey(familyName, size, fStyle);
             fontManager.AddFont(familyName, size, style, assetName);
         }
 

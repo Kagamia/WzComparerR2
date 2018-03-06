@@ -403,7 +403,8 @@ namespace WzComparerR2.MapRender
         protected override void LoadContent()
         {
             base.LoadContent();
-            this.ui.LoadContents(this.Content);
+            this.ui.LoadContent(this.Content);
+            this.renderEnv.Fonts.LoadContent(this.Content);
         }
 
         protected override void Update(GameTime gameTime)
@@ -578,6 +579,8 @@ namespace WzComparerR2.MapRender
             this.ui.TopBar.Visibility = config.TopBarVisible ? EmptyKeys.UserInterface.Visibility.Visible : EmptyKeys.UserInterface.Visibility.Collapsed;
             this.ui.Minimap.CameraRegionVisible = config.Minimap_CameraRegionVisible;
             this.ui.WorldMap.UseImageNameAsInfoName = config.WorldMap_UseImageNameAsInfoName;
+            this.batcher.D2DEnabled = config.UseD2dRenderer;
+            (this.Content as WcR2ContentManager).UseD2DFont = config.UseD2dRenderer;
         }
 
         private void LoadOptionData(UIOptionsDataModel model)
@@ -587,6 +590,7 @@ namespace WzComparerR2.MapRender
             model.Volume = Music.GlobalVolume;
             model.MuteOnLeaveFocus = config.MuteOnLeaveFocus;
             model.ClipMapRegion = renderEnv.Camera.AdjustRectEnabled;
+            model.UseD2dRenderer = config.UseD2dRenderer;
             model.TopBarVisible = this.ui.TopBar.Visibility == EmptyKeys.UserInterface.Visibility.Visible;
             model.Minimap_CameraRegionVisible = this.ui.Minimap.CameraRegionVisible;
             model.WorldMap_UseImageNameAsInfoName = this.ui.WorldMap.UseImageNameAsInfoName;
@@ -600,6 +604,7 @@ namespace WzComparerR2.MapRender
             config.Volume = model.Volume;
             config.MuteOnLeaveFocus = model.MuteOnLeaveFocus;
             config.ClipMapRegion = model.ClipMapRegion;
+            config.UseD2dRenderer = model.UseD2dRenderer;
             config.TopBarVisible = model.TopBarVisible;
             config.Minimap_CameraRegionVisible = model.Minimap_CameraRegionVisible;
             config.WorldMap_UseImageNameAsInfoName = model.WorldMap_UseImageNameAsInfoName;

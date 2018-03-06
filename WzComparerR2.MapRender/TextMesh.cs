@@ -11,7 +11,7 @@ namespace WzComparerR2.MapRender
     class TextMesh
     {
         public string Text { get; set; }
-        public XnaFont Font { get; set; }
+        public IWcR2Font Font { get; set; }
         public Color BackColor { get; set; }
         public Color ForeColor { get; set; }
         public Margins Padding { get; set; }

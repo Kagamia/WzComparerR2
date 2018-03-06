@@ -19,7 +19,7 @@ namespace WzComparerR2.MapRender.UI
     {
         public UIOptions()
         {
-            
+
         }
 
         public event EventHandler OK;
@@ -35,7 +35,7 @@ namespace WzComparerR2.MapRender.UI
             grid.ColumnDefinitions.Add(new ColumnDefinition());
             grid.SetBinding(BackgroundProperty, new Binding(Control.BackgroundProperty) { Source = this });
             this.Content = grid;
-           
+
             TextBlock title = new TextBlock();
             title.Text = "Options";
             title.IsHitTestVisible = false;
@@ -140,6 +140,8 @@ namespace WzComparerR2.MapRender.UI
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
             grid.ColumnDefinitions.Add(new ColumnDefinition());
             grid.ColumnDefinitions.Add(new ColumnDefinition());
 
@@ -226,7 +228,26 @@ namespace WzComparerR2.MapRender.UI
             Grid.SetColumnSpan(chk2, 2);
             grid.Children.Add(chk2);
 
-            return grid;
+            TextBlock lbl5 = new TextBlock();
+            lbl5.VerticalAlignment = VerticalAlignment.Center;
+            lbl5.Text = "渲染";
+            lbl5.Foreground = Brushes.Yellow;
+            Grid.SetRow(lbl5, 6);
+            Grid.SetColumn(lbl5, 0);
+            grid.Children.Add(lbl5);
+
+            CheckBox chk3 = new CheckBox();
+            chk3.Content = "使用D2D绘制";
+            chk3.Margin = new Thickness(18, 0, 0, 0);
+            chk3.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.UseD2dRenderer)));
+            Grid.SetRow(chk3, 7);
+            Grid.SetColumn(chk3, 0);
+            Grid.SetColumnSpan(chk3, 2);
+            grid.Children.Add(chk3);
+
+            ScrollViewer viewer = new ScrollViewer();
+            viewer.Content = grid;
+            return viewer;
         }
 
         private UIElement GetTabContent2()
@@ -300,8 +321,8 @@ namespace WzComparerR2.MapRender.UI
                  "Alt+Enter 切换分辨率",
                  "ScrollLock 截图",
             };
-            
-            foreach(var tip in tips)
+
+            foreach (var tip in tips)
             {
                 TextBlock lbl = new TextBlock();
                 lbl.TextWrapping = TextWrapping.Wrap;
@@ -316,7 +337,7 @@ namespace WzComparerR2.MapRender.UI
 
         private Style GetTabItemStyle()
         {
-            var style =  EmptyKeys.UserInterface.Themes.TabControlStyle.CreateTabItemStyle();
+            var style = EmptyKeys.UserInterface.Themes.TabControlStyle.CreateTabItemStyle();
             var templateSetter = style.Setters.FirstOrDefault(s => s.Property == Control.TemplateProperty);
             if (templateSetter != null)
             {
@@ -350,10 +371,12 @@ namespace WzComparerR2.MapRender.UI
         private bool _muteOnLeaveFocus;
         private float _volume;
         private int _selectedFont;
-        private bool _ClipMapRegion;
+        private bool _clipMapRegion;
+        private bool _useD2dRenderer;
         private bool _topBarVisible;
         private bool _minimap_cameraRegionVisible;
         private bool _worldmap_useImageNameAsInfoName;
+
 
         public bool MuteOnLeaveFocus
         {
@@ -375,8 +398,14 @@ namespace WzComparerR2.MapRender.UI
 
         public bool ClipMapRegion
         {
-            get { return this._ClipMapRegion; }
-            set { base.SetProperty(ref this._ClipMapRegion, value); }
+            get { return this._clipMapRegion; }
+            set { base.SetProperty(ref this._clipMapRegion, value); }
+        }
+
+        public bool UseD2dRenderer
+        {
+            get { return this._useD2dRenderer; }
+            set { base.SetProperty(ref this._useD2dRenderer, value); }
         }
 
         public bool TopBarVisible

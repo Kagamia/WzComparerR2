@@ -33,7 +33,7 @@ namespace WzComparerR2.MapRender
         {
             get
             {
-                return ((IGraphicsDeviceService)this.Services.GetService(typeof(IGraphicsDeviceService))).GraphicsDevice;
+                return this.Services.GetService<IGraphicsDeviceService>().GraphicsDevice;
             }
         }
 

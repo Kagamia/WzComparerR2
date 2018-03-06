@@ -79,7 +79,7 @@ namespace WzComparerR2.MapRender.UI
             }
         }
 
-        public void LoadContents(object contentManager)
+        public void LoadContent(object contentManager)
         {
             //UI资源
             FontManager.DefaultFontFamily = (FontFamily)this.FindResource(MapRenderResourceKey.DefaultFontFamily);
@@ -99,12 +99,12 @@ namespace WzComparerR2.MapRender.UI
         private void InitGlobalResource()
         {
             //初始化字体
-            var fontList = new[] { "SimSun", "Dotum" };
+            var fontList = MapRenderFonts.DefaultFonts;
             var config = MapRender.Config.MapRenderConfig.Default;
             var resDict = ResourceDictionary.DefaultDictionary;
 
             var fontIndex = config.DefaultFontIndex;
-            if (fontIndex < 0 || fontIndex >= fontList.Length)
+            if (fontIndex < 0 || fontIndex >= fontList.Count)
             {
                 fontIndex = 0;
             }

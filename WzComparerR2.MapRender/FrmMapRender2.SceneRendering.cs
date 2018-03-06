@@ -343,7 +343,7 @@ namespace WzComparerR2.MapRender
                                     ForeColor = Color.White,
                                     BackColor = new Color(Color.Black, 0.7f),
                                     Font = renderEnv.Fonts.MobNameFont,
-                                    Padding = new Margins(2, 2, 2, 1),
+                                    Padding = new Margins(2, 2, 2, 2),
                                     Text = name
                                 }
                             };
@@ -393,7 +393,7 @@ namespace WzComparerR2.MapRender
                                         ForeColor = Color.Yellow,
                                         BackColor = new Color(Color.Black, 0.7f),
                                         Font = renderEnv.Fonts.NpcNameFont,
-                                        Padding = new Margins(2, 2, 2, 1),
+                                        Padding = new Margins(2, 2, 2, 2),
                                         Text = name
                                     }
                                 };
@@ -410,7 +410,7 @@ namespace WzComparerR2.MapRender
                                         ForeColor = Color.Yellow,
                                         BackColor = new Color(Color.Black, 0.7f),
                                         Font = renderEnv.Fonts.NpcNameFont,
-                                        Padding = new Margins(2, 2, 2, 1),
+                                        Padding = new Margins(2, 2, 2, 2),
                                         Text = desc
                                     }
                                 };

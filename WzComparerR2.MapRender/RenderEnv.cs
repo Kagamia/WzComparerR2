@@ -11,43 +11,20 @@ namespace WzComparerR2.MapRender
     {
         public RenderEnv(Game game, GraphicsDeviceManager graphics)
         {
-            this.device = graphics.GraphicsDevice;
-            this.camera = new Camera(graphics);
-            this.sprite = new SpriteBatchEx(this.device);
-            this.input = new InputState(game);
-            this.fonts = new MapRenderFonts(this.device);
+            this.GraphicsDevice = graphics.GraphicsDevice;
+            this.Camera = new Camera(graphics);
+            this.Sprite = new SpriteBatchEx(this.GraphicsDevice);
+            this.D2DRenderer = new D2DRenderer(this.GraphicsDevice);
+            this.Input = new InputState(game);
+            this.Fonts = new MapRenderFonts();
         }
 
-        Camera camera;
-        SpriteBatchEx sprite;
-        InputState input;
-        GraphicsDevice device;
-        MapRenderFonts fonts;
-
-        public Camera Camera
-        {
-            get { return camera; }
-        }
-
-        public SpriteBatchEx Sprite
-        {
-            get { return sprite; }
-        }
-
-        public InputState Input
-        {
-            get { return input; }
-        }
-
-        public MapRenderFonts Fonts
-        {
-            get { return fonts; }
-        }
-
-        public GraphicsDevice GraphicsDevice
-        {
-            get { return device; }
-        }
+        public Camera Camera { get; private set; }
+        public SpriteBatchEx Sprite { get; private set; }
+        public D2DRenderer D2DRenderer { get; private set; }
+        public InputState Input { get; private set; }
+        public GraphicsDevice GraphicsDevice { get; private set; }
+        public MapRenderFonts Fonts { get; private set; }
 
         public void Dispose()
         {
@@ -58,8 +35,8 @@ namespace WzComparerR2.MapRender
         {
             if (disposing)
             {
-                this.sprite.Dispose();
-                this.fonts.Dispose();
+                this.Sprite.Dispose();
+                this.Fonts.Dispose();
             }
         }
     }

@@ -115,7 +115,7 @@ namespace WzComparerR2.MapRender
                 case 2:
                     graphics.PreferredBackBufferWidth = 1366;
                     graphics.PreferredBackBufferHeight = 768;
-                    break; 
+                    break;
                 case 3:
                     graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.DisplayMode.Width;
                     graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.DisplayMode.Height;
@@ -123,6 +123,7 @@ namespace WzComparerR2.MapRender
                 default:
                     goto case 0;
             }
+            WzComparerR2.Rendering.D2DFactory.Instance.ReleaseContext(graphics.GraphicsDevice);
             graphics.ApplyChanges();
         }
 

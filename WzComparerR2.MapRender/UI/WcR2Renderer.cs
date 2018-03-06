@@ -29,24 +29,19 @@ namespace WzComparerR2.MapRender.UI
         private RasterizerState clippingRasterizeState = new RasterizerState { ScissorTestEnable = true, CullMode = CullMode.None };
         private RasterizerState previousState;
         private SpriteBatchEx spriteBatch;
+        private D2DRenderer d2dRenderer;
 
         private bool isClipped;
-        private Rectangle testRectangle;
         private Stack<Rectangle> clipRectanges;
-        private Vector2 vecPosition;
-        private Vector2 vecScale;
-        private Color vecColor;
-        private Rectangle sourceRect;
-        private Rectangle clipRectangle;
 
         private Stack<Effect> activeEffects;
         private Effect currentActiveEffect;
 
         private BasicEffect basicEffect;
         private RasterizerState rasterizeStateGeometry = new RasterizerState { ScissorTestEnable = false, CullMode = CullMode.None, FillMode = FillMode.Solid };
-        private bool isSpriteRenderInProgress;
+        //private bool isSpriteRenderInProgress;
+        private DrawState currState;
 
-        #region notChanged
         /// <summary>
         /// Gets a value indicating whether is full screen.
         /// </summary>
@@ -81,6 +76,7 @@ namespace WzComparerR2.MapRender.UI
         public WcR2Renderer(GraphicsDevice graphicsDevice, int nativeScreenWidth, int nativeScreenHeight)
         {
             spriteBatch = new SpriteBatchEx(graphicsDevice);
+            this.d2dRenderer = new D2DRenderer(graphicsDevice);
             GraphicsDevice = graphicsDevice;
 
             if (graphicsDevice.PresentationParameters.IsFullScreen)
@@ -105,7 +101,6 @@ namespace WzComparerR2.MapRender.UI
         {
             Begin(null);
         }
-
 
         private void UpdateCurrentEffect(EffectBase effect)
         {
@@ -136,15 +131,18 @@ namespace WzComparerR2.MapRender.UI
         /// <param name="centerOrigin">if set to <c>true</c> [center origin].</param>
         public override void Draw(TextureBase texture, PointF position, Size renderSize, ColorW color, bool centerOrigin)
         {
+            Rectangle testRectangle;
             testRectangle.X = (int)position.X;
             testRectangle.Y = (int)position.Y;
             testRectangle.Width = (int)renderSize.Width;
             testRectangle.Height = (int)renderSize.Height;
-            if (isClipped && !spriteBatch.GraphicsDevice.ScissorRectangle.Intersects(testRectangle))
+            if (isClipped && !this.GraphicsDevice.ScissorRectangle.Intersects(testRectangle))
             {
                 return;
             }
 
+            this.Prepare(DrawState.Sprite);
+            Color vecColor = new Color();
             vecColor.PackedValue = color.PackedValue;
             Texture2D native = texture.GetNativeTexture() as Texture2D;
             spriteBatch.Draw(native, testRectangle, vecColor);
@@ -161,19 +159,23 @@ namespace WzComparerR2.MapRender.UI
         /// <param name="centerOrigin">if set to <c>true</c> [center origin].</param>
         public override void Draw(TextureBase texture, PointF position, Size renderSize, ColorW color, Rect source, bool centerOrigin)
         {
+            Rectangle testRectangle;
             testRectangle.X = (int)position.X;
             testRectangle.Y = (int)position.Y;
             testRectangle.Width = (int)renderSize.Width;
             testRectangle.Height = (int)renderSize.Height;
-            if (isClipped && !spriteBatch.GraphicsDevice.ScissorRectangle.Intersects(testRectangle))
+            if (isClipped && !this.GraphicsDevice.ScissorRectangle.Intersects(testRectangle))
             {
                 return;
             }
 
+            this.Prepare(DrawState.Sprite);
+            Rectangle sourceRect;
             sourceRect.X = (int)source.X;
             sourceRect.Y = (int)source.Y;
             sourceRect.Width = (int)source.Width;
             sourceRect.Height = (int)source.Height;
+            Color vecColor = new Color();
             vecColor.PackedValue = color.PackedValue;
             Texture2D native = texture.GetNativeTexture() as Texture2D;
             spriteBatch.Draw(native, testRectangle, sourceRect, vecColor, 0, Vector2.Zero, SpriteEffects.None, 0);
@@ -184,8 +186,8 @@ namespace WzComparerR2.MapRender.UI
         /// </summary>
         public override void End(bool endEffect = false)
         {
+            this.Flush();
             isClipped = false;
-            isSpriteRenderInProgress = false;
             if (endEffect)
             {
                 currentActiveEffect = null;
@@ -195,8 +197,6 @@ namespace WzComparerR2.MapRender.UI
                 activeEffects.Push(currentActiveEffect);
                 currentActiveEffect = null;
             }
-
-            spriteBatch.End();
         }
 
         /// <summary>
@@ -215,6 +215,7 @@ namespace WzComparerR2.MapRender.UI
         /// <param name="effect">The effect.</param>
         public override void BeginClipped(Rect clipRect, EffectBase effect)
         {
+            Rectangle clipRectangle;
             clipRectangle.X = (int)clipRect.X;
             clipRectangle.Y = (int)clipRect.Y;
             clipRectangle.Width = (int)clipRect.Width;
@@ -230,8 +231,9 @@ namespace WzComparerR2.MapRender.UI
         /// </summary>
         public override void EndClipped(bool endEffect = false)
         {
+            this.Flush();
             isClipped = false;
-            isSpriteRenderInProgress = false;
+
             if (endEffect)
             {
                 currentActiveEffect = null;
@@ -242,7 +244,6 @@ namespace WzComparerR2.MapRender.UI
                 currentActiveEffect = null;
             }
 
-            spriteBatch.End();
             clipRectanges.Pop();
         }
 
@@ -343,12 +344,13 @@ namespace WzComparerR2.MapRender.UI
         {
             if (isClipped)
             {
+                Rectangle testRectangle;
                 testRectangle.X = (int)position.X;
                 testRectangle.Y = (int)position.Y;
                 testRectangle.Width = (int)renderSize.Width;
                 testRectangle.Height = (int)renderSize.Height;
 
-                if (!spriteBatch.GraphicsDevice.ScissorRectangle.Intersects(testRectangle))
+                if (!this.GraphicsDevice.ScissorRectangle.Intersects(testRectangle))
                 {
                     return true;
                 }
@@ -376,9 +378,7 @@ namespace WzComparerR2.MapRender.UI
         {
             throw new NotImplementedException();
         }
-        #endregion
 
-        #region changed
         public override FontBase CreateFont(object nativeFont)
         {
             return new WcR2Font(nativeFont);
@@ -407,16 +407,27 @@ namespace WzComparerR2.MapRender.UI
 
         public override void DrawText(FontBase font, string text, PointF position, Size renderSize, ColorW color, PointF scale, float depth)
         {
-            XnaFont nativeFont = font.GetNativeFont() as XnaFont;
-            if (nativeFont != null)
+            var wcR2Font = (font.GetNativeFont() as IWcR2Font)?.BaseFont;
+            if (wcR2Font != null)
             {
-                spriteBatch.DrawStringEx(nativeFont,
-                    text,
-                    new Vector2(position.X, position.Y),
-                    new Color(color.R, color.G, color.B, color.A));
+                if (wcR2Font is XnaFont)
+                {
+                    Prepare(DrawState.Sprite);
+                    spriteBatch.DrawStringEx((XnaFont)wcR2Font,
+                        text,
+                        new Vector2(position.X, position.Y),
+                        new Color(color.R, color.G, color.B, color.A));
+                }
+                else if (wcR2Font is D2DFont)
+                {
+                    Prepare(DrawState.D2D);
+                    d2dRenderer.DrawString((D2DFont)wcR2Font,
+                        text,
+                        new Vector2(position.X, position.Y),
+                        new Color(color.R, color.G, color.B, color.A));
+                }
             }
         }
-
 
         /// <summary>
         /// Begins the rendering with custom effect
@@ -425,22 +436,21 @@ namespace WzComparerR2.MapRender.UI
         public override void Begin(EffectBase effect)
         {
             isClipped = false;
-            isSpriteRenderInProgress = true;
             UpdateCurrentEffect(effect);
             if (previousState != null)
             {
-                spriteBatch.GraphicsDevice.RasterizerState = previousState;
+                GraphicsDevice.RasterizerState = previousState;
                 previousState = null;
             }
 
-            if (clipRectanges.Count == 0)
-            {
-                spriteBatch.Begin(blendState: BlendState.NonPremultiplied, effect: currentActiveEffect);
-            }
-            else
+            if (clipRectanges.Count > 0)
             {
                 Rectangle previousClip = clipRectanges.Pop();
                 BeginClipped(previousClip);
+            }
+            else
+            {
+                currState = DrawState.None;
             }
         }
 
@@ -451,11 +461,11 @@ namespace WzComparerR2.MapRender.UI
         private void BeginClipped(Rectangle clipRect)
         {
             isClipped = true;
-            isSpriteRenderInProgress = true;
+            currState = DrawState.None;
 
             if (clipRectanges.Count > 0)
             {
-                Rectangle previousClip = clipRectanges.Pop();
+                Rectangle previousClip = clipRectanges.Peek();
                 if (previousClip.Intersects(clipRect))
                 {
                     clipRect = Rectangle.Intersect(previousClip, clipRect);
@@ -464,13 +474,10 @@ namespace WzComparerR2.MapRender.UI
                 {
                     clipRect = previousClip;
                 }
-
-                clipRectanges.Push(previousClip);
             }
 
-            spriteBatch.GraphicsDevice.ScissorRectangle = clipRect;
+            GraphicsDevice.ScissorRectangle = clipRect;
             previousState = spriteBatch.GraphicsDevice.RasterizerState;
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearClamp, DepthStencilState.None, clippingRasterizeState, effect: currentActiveEffect);
             clipRectanges.Push(clipRect);
         }
 
@@ -485,10 +492,7 @@ namespace WzComparerR2.MapRender.UI
 
         private void DrawGeometry(GeometryBuffer buffer, PointF position, float depth)
         {
-            if (isSpriteRenderInProgress)
-            {
-                spriteBatch.End();
-            }
+            this.Prepare(DrawState.Geometry);
 
             WcR2GeometryBuffer wcR2Buffer = buffer as WcR2GeometryBuffer;
             GraphicsDevice device = GraphicsDevice;
@@ -540,20 +544,65 @@ namespace WzComparerR2.MapRender.UI
             device.DepthStencilState = stencilState;
             device.BlendState = blendState;
             device.RasterizerState = rasState;
+        }
 
-            if (isSpriteRenderInProgress)
+        private void Prepare(DrawState nextState)
+        {
+            if (this.currState == nextState)
             {
-                if (isClipped)
-                {
-                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearClamp, DepthStencilState.None, clippingRasterizeState, effect: currentActiveEffect);
-                }
-                else
-                {
-                    spriteBatch.Begin(effect: currentActiveEffect);
-                }
+                return;
+            }
+
+            Flush();
+
+            switch (nextState)
+            {
+                case DrawState.None: break;
+                case DrawState.Geometry: break;
+                case DrawState.Sprite:
+                    RasterizerState rasterizer = isClipped ? this.clippingRasterizeState : null;
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.LinearClamp, DepthStencilState.None, rasterizer, effect: currentActiveEffect);
+                    break;
+
+                case DrawState.D2D:
+                    d2dRenderer.Begin();
+                    if (isClipped)
+                    {
+                        d2dRenderer.PushClip(this.GraphicsDevice.ScissorRectangle);
+                    }
+                    break;
+            }
+
+            this.currState = nextState;
+        }
+
+        private void Flush()
+        {
+            switch (this.currState)
+            {
+                case DrawState.None: break;
+                case DrawState.Geometry: break;
+                case DrawState.Sprite:
+                    this.spriteBatch.End();
+                    break;
+
+                case DrawState.D2D:
+                    if (isClipped)
+                    {
+                        this.d2dRenderer.PopClip();
+                    }
+                    this.d2dRenderer.End();
+                    break;
             }
         }
-        #endregion
+
+        enum DrawState
+        {
+            None = 0,
+            Geometry = 1,
+            Sprite = 2,
+            D2D = 3
+        }
     }
 
     public class WcR2GeometryBuffer : GeometryBuffer

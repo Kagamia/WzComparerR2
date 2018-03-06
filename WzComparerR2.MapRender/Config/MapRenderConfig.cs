@@ -46,6 +46,13 @@ namespace WzComparerR2.MapRender.Config
             set { this["clipMapRegion"] = value; }
         }
 
+        [ConfigurationProperty("useD2DRenderer")]
+        public ConfigItem<bool> UseD2dRenderer
+        {
+            get { return (ConfigItem<bool>)this["useD2DRenderer"]; }
+            set { this["useD2DRenderer"] = value; }
+        }
+
         [ConfigurationProperty("topBar.Visible")]
         public ConfigItem<bool> TopBarVisible
         {

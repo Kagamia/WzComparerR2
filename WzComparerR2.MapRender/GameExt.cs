@@ -90,6 +90,11 @@ namespace WzComparerR2.MapRender
             bool success = PostThreadMessage(tid, WM_QUIT, IntPtr.Zero, IntPtr.Zero);
         }
 
+        public static T GetService<T>(this IServiceProvider services) where T : class
+        {
+            return services.GetService(typeof(T)) as T;
+        }
+
         private static Dictionary<IntPtr, RawInputMessageFilter> filterCache = new Dictionary<IntPtr, RawInputMessageFilter>();
 
         class RawInputMessageFilter : IMessageFilter

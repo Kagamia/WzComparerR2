@@ -308,12 +308,26 @@ namespace WzComparerR2.MapRender.UI
                     env.Sprite.Draw(block.Texture, rect, Color.White);
                 }
             }
+            env.Sprite.Flush();
 
             foreach (var block in content.blocks)
             {
                 var pos = new Vector2(position.X + padding.X + block.Position.X,
                     position.Y + padding.Y + block.Position.Y);
-                env.Sprite.DrawStringEx(block.Font, block.Text, pos, block.ForeColor);
+
+                var baseFont = block.Font.BaseFont;
+          
+                if (baseFont is XnaFont)
+                {
+                    env.Sprite.DrawStringEx((XnaFont)baseFont, block.Text, pos, block.ForeColor);
+                    env.Sprite.Flush();
+                }
+                else if (baseFont is D2DFont)
+                {
+                    env.D2DRenderer.Begin();
+                    env.D2DRenderer.DrawString((D2DFont)baseFont, block.Text, pos, block.ForeColor);
+                    env.D2DRenderer.End();
+                }
             }
             env.Sprite.End();
         }

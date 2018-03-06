@@ -15,16 +15,16 @@ namespace WzComparerR2.MapRender
         public MeshBatcher(GraphicsDevice graphicsDevice)
         {
             this.GraphicsDevice = graphicsDevice;
-            this.sprite = new SpriteBatchEx(graphicsDevice);
-            this.spineRender = new SkeletonMeshRenderer(graphicsDevice);
             this.alphaBlendState = StateEx.NonPremultipled_Hidef();
         }
 
         public GraphicsDevice GraphicsDevice { get; private set; }
+        public bool D2DEnabled { get; set; }
 
         //内部batcher
         SpriteBatchEx sprite;
         SkeletonMeshRenderer spineRender;
+        D2DRenderer d2dRender;
         BlendState alphaBlendState;
         ItemType lastItem;
 
@@ -53,12 +53,20 @@ namespace WzComparerR2.MapRender
             }
             else if (mesh.RenderObject is TextMesh)
             {
-                Prepare(ItemType.Sprite);
-                this.DrawItem(mesh, (TextMesh)mesh.RenderObject);
+                //在draw内部prepare
+                var textmesh = (TextMesh)mesh.RenderObject;
+                this.DrawItem(mesh, textmesh);
             }
             else if (mesh.RenderObject is LineListMesh)
             {
-                Prepare(ItemType.Sprite);
+                if (this.D2DEnabled)
+                {
+                    Prepare(ItemType.D2DObject);
+                }
+                else
+                {
+                    Prepare(ItemType.Sprite);
+                }
                 this.DrawItem((LineListMesh)mesh.RenderObject);
             }
         }
@@ -140,6 +148,21 @@ namespace WzComparerR2.MapRender
                     case Alignment.Far: pos.X -= size.X; break;
                 }
 
+                object baseFont = text.Font.BaseFont ?? text.Font;
+
+                if (baseFont is XnaFont)
+                {
+                    Prepare(ItemType.Sprite);
+                }
+                else if (baseFont is D2DFont)
+                {
+                    Prepare(ItemType.D2DObject);
+                }
+                else
+                {
+                    return;
+                }
+
                 if (text.BackColor.A > 0) //绘制背景
                 {
                     var padding = text.Padding;
@@ -148,12 +171,20 @@ namespace WzComparerR2.MapRender
                         (int)(size.X + padding.Left + padding.Right),
                         (int)(size.Y + padding.Top + padding.Bottom)
                         );
-                    sprite.FillRoundCornerRectangle(rect, text.BackColor);
+                    switch (this.lastItem)
+                    {
+                        case ItemType.Sprite: sprite.FillRoundedRectangle(rect, text.BackColor); break;
+                        case ItemType.D2DObject: d2dRender.FillRoundedRectangle(rect, 3, text.BackColor); break;
+                    }
                 }
 
                 if (text.ForeColor.A > 0) //绘制文字
                 {
-                    sprite.DrawStringEx(text.Font, text.Text, pos, text.ForeColor);
+                    switch (this.lastItem)
+                    {
+                        case ItemType.Sprite: sprite.DrawStringEx((XnaFont)baseFont, text.Text, pos, text.ForeColor); break;
+                        case ItemType.D2DObject: d2dRender.DrawString((D2DFont)baseFont, text.Text, pos, text.ForeColor); break;
+                    }
                 }
             }
         }
@@ -163,9 +194,21 @@ namespace WzComparerR2.MapRender
             if (lineList != null && lineList.Lines != null)
             {
                 var vertices = lineList.Lines;
-                for (int i = 0, i1 = vertices.Length / 2 * 2; i < i1; i+=2)
+                int vertexCount = vertices.Length / 2 * 2;
+                if (this.D2DEnabled)
                 {
-                    sprite.DrawLine(vertices[i], vertices[i + 1], lineList.Thickness, lineList.Color);
+                    for (int i = 0; i < vertexCount; i += 2)
+                    {
+                        this.d2dRender.DrawLine(vertices[i].ToVector2(), vertices[i + 1].ToVector2(),
+                            lineList.Thickness, lineList.Color);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < vertexCount; i += 2)
+                    {
+                        sprite.DrawLine(vertices[i], vertices[i + 1], lineList.Thickness, lineList.Color);
+                    }
                 }
             }
         }
@@ -257,14 +300,10 @@ namespace WzComparerR2.MapRender
             switch (itemType)
             {
                 case ItemType.Sprite:
-                    InnerFlush();
-                    lastItem = ItemType.Sprite;
-                    InnerBegin();
-                    break;
-
                 case ItemType.Skeleton:
+                case ItemType.D2DObject:
                     InnerFlush();
-                    lastItem = ItemType.Skeleton;
+                    lastItem = itemType;
                     InnerBegin();
                     break;
             }
@@ -275,12 +314,35 @@ namespace WzComparerR2.MapRender
             switch (lastItem)
             {
                 case ItemType.Sprite:
+                    if (this.sprite == null)
+                    {
+                        this.sprite = new SpriteBatchEx(this.GraphicsDevice);
+                    }
                     this.sprite.Begin(SpriteSortMode.Deferred, this.alphaBlendState, transformMatrix: this.matrix);
                     break;
 
                 case ItemType.Skeleton:
+                    if (this.spineRender == null)
+                    {
+                        this.spineRender = new SkeletonMeshRenderer(this.GraphicsDevice);
+                    }
                     this.spineRender.Effect.World = matrix ?? Matrix.Identity;
                     this.spineRender.Begin();
+                    break;
+
+                case ItemType.D2DObject:
+                    if (this.d2dRender == null)
+                    {
+                        this.d2dRender = new D2DRenderer(this.GraphicsDevice);
+                    }
+                    if (this.matrix == null)
+                    {
+                        this.d2dRender.Begin();
+                    }
+                    else
+                    {
+                        this.d2dRender.Begin(this.matrix.Value);
+                    }
                     break;
             }
         }
@@ -296,13 +358,17 @@ namespace WzComparerR2.MapRender
                 case ItemType.Skeleton:
                     this.spineRender.End();
                     break;
+
+                case ItemType.D2DObject:
+                    this.d2dRender.End();
+                    break;
             }
         }
 
         public void Dispose()
         {
-            this.sprite.Dispose();
-            this.spineRender.Effect.Dispose();
+            this.sprite?.Dispose();
+            this.spineRender?.Effect.Dispose();
             this.alphaBlendState.Dispose();
         }
 
@@ -310,7 +376,8 @@ namespace WzComparerR2.MapRender
         {
             Unknown = 0,
             Sprite,
-            Skeleton
+            Skeleton,
+            D2DObject
         }
 
     }

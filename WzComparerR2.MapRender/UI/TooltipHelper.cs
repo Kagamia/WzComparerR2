@@ -9,7 +9,7 @@ namespace WzComparerR2.MapRender.UI
 {
     public static class TooltipHelper
     {
-        public static TextBlock PrepareTextBlock(XnaFont font, string text, ref Vector2 pos, Color color)
+        public static TextBlock PrepareTextBlock(IWcR2Font font, string text, ref Vector2 pos, Color color)
         {
             Vector2 size = font.MeasureString(text);
 
@@ -23,7 +23,7 @@ namespace WzComparerR2.MapRender.UI
             return block;
         }
 
-        public static TextBlock PrepareTextLine(XnaFont font, string text, ref Vector2 pos, Color color, ref float maxWidth)
+        public static TextBlock PrepareTextLine(IWcR2Font font, string text, ref Vector2 pos, Color color, ref float maxWidth)
         {
             Vector2 size = font.MeasureString(text);
 
@@ -35,17 +35,17 @@ namespace WzComparerR2.MapRender.UI
 
             maxWidth = Math.Max(pos.X + size.X, maxWidth);
             pos.X = 0;
-            pos.Y += font.Height;
+            pos.Y += font.LineHeight;
 
-            if (size.Y >= font.Height)
+            if (size.Y >= font.LineHeight)
             {
-                pos.Y += size.Y - font.BaseFont.Size;
+                pos.Y += size.Y - font.Size;
             }
 
             return block;
         }
 
-        public static TextBlock[] PrepareFormatText(XnaFont font, string formatText, ref Vector2 pos, int width, ref float maxWidth)
+        public static TextBlock[] PrepareFormatText(IWcR2Font font, string formatText, ref Vector2 pos, int width, ref float maxWidth)
         {
             var layouter = new TextLayouter();
             int y = (int)pos.Y;
@@ -131,23 +131,23 @@ namespace WzComparerR2.MapRender.UI
         {
             public Vector2 Position;
             public Color ForeColor;
-            public XnaFont Font;
+            public IWcR2Font Font;
             public string Text;
         }
 
-        public class TextLayouter : XnaFontRenderer
+        public class TextLayouter : WzComparerR2.Text.TextRenderer<IWcR2Font>
         {
-            public TextLayouter() : base(null)
+            public TextLayouter() : base()
             {
 
             }
 
             List<TextBlock> blocks;
 
-            public TextBlock[] LayoutFormatText(XnaFont font, string s, int width, ref int y)
+            public TextBlock[] LayoutFormatText(IWcR2Font font, string s, int width, ref int y)
             {
                 this.blocks = new List<TextBlock>();
-                base.DrawFormatString(s, font, width, ref y, font.Height);
+                base.DrawFormatString(s, font, width, ref y, (int)Math.Ceiling(font.LineHeight));
                 return this.blocks.ToArray();
             }
 
@@ -160,6 +160,51 @@ namespace WzComparerR2.MapRender.UI
                     Font = this.font,
                     Text = sb.ToString(startIndex, length),
                 });
+            }
+
+            protected override void MeasureRuns(List<WzComparerR2.Text.Run> runs)
+            {
+                int x = 0;
+                foreach (var run in runs)
+                {
+                    if (run.IsBreakLine)
+                    {
+                        run.X = x;
+                        run.Length = 0;
+                    }
+                    else
+                    {
+                        var size = base.font.MeasureString(this.sb.ToString(run.StartIndex, run.Length));
+                        run.X = x;
+                        run.Width = (int)size.X;
+                        x += run.Width;
+                    }
+                }
+            }
+
+            protected override System.Drawing.Rectangle[] MeasureChars(int startIndex, int length)
+            {
+                var regions = new System.Drawing.Rectangle[length];
+                int x = 0;
+                for (int i = 0; i < length; i++)
+                {
+                    var text = this.sb[startIndex + i].ToString();
+                    var size = this.font.MeasureString(text);
+                    regions[i] = new System.Drawing.Rectangle(x, 0, (int)size.X, (int)size.Y);
+                    x += (int)size.X;
+                }
+                return regions;
+            }
+
+            public virtual Color GetColor(string colorID)
+            {
+                switch (colorID)
+                {
+                    case "c":
+                        return new Color(255, 153, 0);
+                    default:
+                        return Color.White;
+                }
             }
         }
     }

@@ -164,7 +164,7 @@ namespace WzComparerR2.Rendering
             base.Draw(singlePixel, rectangle, color);
         }
 
-        public void FillRoundCornerRectangle(Rectangle rectangle, Color color)
+        public void FillRoundedRectangle(Rectangle rectangle, Color color)
         {
             if (rectangle.Width > 2 && rectangle.Height > 2)
             {
