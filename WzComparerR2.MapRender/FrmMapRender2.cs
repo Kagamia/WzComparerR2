@@ -119,7 +119,7 @@ namespace WzComparerR2.MapRender
         protected override void Initialize()
         {
             this.renderEnv = new RenderEnv(this, this.graphics);
-            this.batcher = new MeshBatcher(this.GraphicsDevice);
+            this.batcher = new MeshBatcher(this.GraphicsDevice) { CullingEnabled = true };
             this.resLoader = new ResourceLoader(this.Services);
             this.ui = new MapRenderUIRoot();
             this.BindingUIInput();

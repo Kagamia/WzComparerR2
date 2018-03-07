@@ -50,21 +50,24 @@ namespace WzComparerR2.Rendering
             SharpDX.ComObject obj = GetRenderTargetResource(graphicsDevice);
             D2DContext context = GetOrCreateContext(obj);
 
-            if ((context = GetOrCreateContext(obj)) == null)
+            if (context == null)
             {
                 return null;
             }
 
+            AlphaMode alphaMode = AlphaMode.Ignore;
             if (context.DxgiSurface == null || context.DxgiSurface.IsDisposed)
             {
                 if (obj is SharpDX.DXGI.SwapChain)
                 {
                     var swapChain = (SharpDX.DXGI.SwapChain)obj;
                     context.DxgiSurface = SharpDX.DXGI.Surface.FromSwapChain(swapChain, 0);
+                    alphaMode = AlphaMode.Ignore;
                 }
                 else if (obj is SharpDX.Direct3D11.Resource)
                 {
                     context.DxgiSurface = obj.QueryInterface<SharpDX.DXGI.Surface>();
+                    alphaMode = AlphaMode.Premultiplied;
                 }
                 else
                 {
@@ -74,9 +77,10 @@ namespace WzComparerR2.Rendering
 
             if (context.D2DRenderTarget == null || context.D2DRenderTarget.IsDisposed)
             {
-                var rtProp = new RenderTargetProperties(new PixelFormat(SharpDX.DXGI.Format.Unknown, AlphaMode.Premultiplied));
+                var rtProp = new RenderTargetProperties(new PixelFormat(SharpDX.DXGI.Format.Unknown, alphaMode));
                 var d2drt = new RenderTarget(this.factory2D, context.DxgiSurface, rtProp);
                 d2drt.TextRenderingParams = new RenderingParams(factoryDWrite, 1f, 0f, 0f, PixelGeometry.Flat, RenderingMode.CleartypeGdiClassic);
+                d2drt.TextAntialiasMode = TextAntialiasMode.Grayscale;
                 context.D2DRenderTarget = d2drt;
                 context.DxgiSurface.Disposing += (o, e) => d2drt.Dispose();
             }

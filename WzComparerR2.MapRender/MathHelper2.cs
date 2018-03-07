@@ -39,6 +39,23 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        public static float Min(params float[] values)
+        {
+            if (values != null && values.Length > 0)
+            {
+                float minValue = values[0];
+                for (int i = 1; i < values.Length; i++)
+                {
+                    minValue = Math.Min(minValue, values[i]);
+                }
+                return minValue;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         public static Color Lerp(Color[] colors, float amount)
         {
             if (colors == null || colors.Length <= 0)

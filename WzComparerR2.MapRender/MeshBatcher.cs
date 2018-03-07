@@ -16,10 +16,12 @@ namespace WzComparerR2.MapRender
         {
             this.GraphicsDevice = graphicsDevice;
             this.alphaBlendState = StateEx.NonPremultipled_Hidef();
+            this.meshPool = new Stack<MeshItem>();
         }
 
         public GraphicsDevice GraphicsDevice { get; private set; }
         public bool D2DEnabled { get; set; }
+        public bool CullingEnabled { get; set; }
 
         //内部batcher
         SpriteBatchEx sprite;
@@ -27,46 +29,76 @@ namespace WzComparerR2.MapRender
         D2DRenderer d2dRender;
         BlendState alphaBlendState;
         ItemType lastItem;
+        Stack<MeshItem> meshPool;
 
         //start参数
         private Matrix? matrix;
         private bool isInBeginEndPair;
+
+        //culling参数
+        private bool matrixNoRot;
+        private Rectangle viewport;
+        
 
         public void Begin(Matrix? matrix = null)
         {
             this.matrix = matrix;
             this.lastItem = ItemType.Unknown;
             this.isInBeginEndPair = true;
+            this.PrepareCullingParameters();
+        }
+
+        private void PrepareCullingParameters()
+        {
+            if (this.matrix == null)
+            {
+                matrixNoRot = true;
+            }
+            else
+            {
+                var mt = this.matrix.Value;
+                if (mt.M12 == 0 && mt.M21 == 0)
+                {
+                    matrixNoRot = true;
+                }
+                else
+                {
+                    matrixNoRot = false;
+                }
+            }
+
+            //重新计算viewport
+            this.viewport = this.GraphicsDevice.Viewport.Bounds;
+            if (matrixNoRot)
+            {
+                var invmt = Matrix.Invert(this.matrix.Value);
+                var lt = Vector2.Transform(this.viewport.Location.ToVector2(), invmt);
+                var rb = Vector2.Transform(new Vector2(this.viewport.Right, this.viewport.Bottom), invmt);
+                int l = (int)Math.Floor(lt.X);
+                int t = (int)Math.Floor(lt.Y);
+                int r = (int)Math.Ceiling(rb.X);
+                int b = (int)Math.Ceiling(rb.Y);
+                this.viewport = new Rectangle(l, t, r - l, b - t);
+            }
         }
 
         public void Draw(MeshItem mesh)
         {
             if (mesh.RenderObject is Frame)
             {
-                Prepare(ItemType.Sprite);
                 this.DrawItem(mesh, (Frame)mesh.RenderObject);
             }
             else if (mesh.RenderObject is Skeleton)
             {
-                Prepare(ItemType.Skeleton);
                 this.DrawItem(mesh, (Skeleton)mesh.RenderObject);
             }
             else if (mesh.RenderObject is TextMesh)
             {
-                //在draw内部prepare
                 var textmesh = (TextMesh)mesh.RenderObject;
                 this.DrawItem(mesh, textmesh);
             }
             else if (mesh.RenderObject is LineListMesh)
             {
-                if (this.D2DEnabled)
-                {
-                    Prepare(ItemType.D2DObject);
-                }
-                else
-                {
-                    Prepare(ItemType.Sprite);
-                }
                 this.DrawItem((LineListMesh)mesh.RenderObject);
             }
         }
@@ -75,6 +107,12 @@ namespace WzComparerR2.MapRender
         {
             var origin = mesh.FlipX ? new Vector2(frame.Rectangle.Width - frame.Origin.X, frame.Origin.Y) : frame.Origin.ToVector2();
             var eff = mesh.FlipX ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+            var rect = frame.Rectangle;
+            if (mesh.FlipX)
+            {
+                rect.X = -rect.Right;
+            }
 
             //兼容平铺
             if (mesh.TileRegion != null)
@@ -85,6 +123,14 @@ namespace WzComparerR2.MapRender
                     for (int x = region.Left; x < region.Right; x++)
                     {
                         Vector2 pos = mesh.Position + mesh.TileOffset * new Vector2(x, y);
+                        if (this.CullingEnabled)
+                        {
+                            var tileRect = rect;
+                            tileRect.Offset(pos);
+                            if (!this.IntersectsVP(tileRect))
+                                continue;
+                        }
+                        Prepare(ItemType.Sprite);
                         sprite.Draw(frame.Texture, pos,
                             sourceRectangle: frame.AtlasRect,
                             color: new Color(Color.White, frame.A0),
@@ -96,12 +142,17 @@ namespace WzComparerR2.MapRender
             }
             else
             {
-                sprite.Draw(frame.Texture, mesh.Position,
-                    sourceRectangle: frame.AtlasRect,
-                    color: new Color(Color.White, frame.A0),
-                    origin: origin,
-                    effects: eff
-                    );
+                rect.Offset(mesh.Position);
+                if (!this.CullingEnabled || this.IntersectsVP(rect))
+                {
+                    Prepare(ItemType.Sprite);
+                    sprite.Draw(frame.Texture, mesh.Position,
+                        sourceRectangle: frame.AtlasRect,
+                        color: new Color(Color.White, frame.A0),
+                        origin: origin,
+                        effects: eff
+                        );
+                }
             }
         }
 
@@ -121,6 +172,7 @@ namespace WzComparerR2.MapRender
                         skeleton.X = pos.X;
                         skeleton.Y = pos.Y;
                         skeleton.UpdateWorldTransform();
+                        Prepare(ItemType.Skeleton);
                         this.spineRender.Draw(skeleton);
                     }
                 }
@@ -130,6 +182,7 @@ namespace WzComparerR2.MapRender
                 skeleton.X = mesh.Position.X;
                 skeleton.Y = mesh.Position.Y;
                 skeleton.UpdateWorldTransform();
+                Prepare(ItemType.Skeleton);
                 this.spineRender.Draw(skeleton);
             }
         }
@@ -146,6 +199,21 @@ namespace WzComparerR2.MapRender
                     case Alignment.Near: break;
                     case Alignment.Center: pos.X -= (int)(size.X / 2); break;
                     case Alignment.Far: pos.X -= size.X; break;
+                }
+
+                var padding = text.Padding;
+                var rect = new Rectangle((int)(pos.X - padding.Left),
+                    (int)(pos.Y - padding.Top),
+                    (int)(size.X + padding.Left + padding.Right),
+                    (int)(size.Y + padding.Top + padding.Bottom)
+                    );
+
+                if (this.CullingEnabled)
+                {
+                    if (!this.IntersectsVP(rect))
+                    {
+                        return;
+                    }
                 }
 
                 object baseFont = text.Font.BaseFont ?? text.Font;
@@ -165,12 +233,6 @@ namespace WzComparerR2.MapRender
 
                 if (text.BackColor.A > 0) //绘制背景
                 {
-                    var padding = text.Padding;
-                    var rect = new Rectangle((int)(pos.X - padding.Left),
-                        (int)(pos.Y - padding.Top),
-                        (int)(size.X + padding.Left + padding.Right),
-                        (int)(size.Y + padding.Top + padding.Bottom)
-                        );
                     switch (this.lastItem)
                     {
                         case ItemType.Sprite: sprite.FillRoundedRectangle(rect, text.BackColor); break;
@@ -197,6 +259,7 @@ namespace WzComparerR2.MapRender
                 int vertexCount = vertices.Length / 2 * 2;
                 if (this.D2DEnabled)
                 {
+                    Prepare(ItemType.D2DObject);
                     for (int i = 0; i < vertexCount; i += 2)
                     {
                         this.d2dRender.DrawLine(vertices[i].ToVector2(), vertices[i + 1].ToVector2(),
@@ -205,6 +268,7 @@ namespace WzComparerR2.MapRender
                 }
                 else
                 {
+                    Prepare(ItemType.Sprite);
                     for (int i = 0; i < vertexCount; i += 2)
                     {
                         sprite.DrawLine(vertices[i], vertices[i + 1], lineList.Thickness, lineList.Color);
@@ -365,11 +429,69 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        private bool IntersectsVP(Rectangle rect)
+        {
+            if (this.matrixNoRot)
+            {
+                bool isIntersects;
+                this.viewport.Intersects(ref rect, out isIntersects);
+                return isIntersects;
+            }
+            else
+            {
+                var mt = this.matrix.Value;
+                Vector2 lt = new Vector2(rect.Left, rect.Top),
+                    rt = new Vector2(rect.Right, rect.Top),
+                    lb = new Vector2(rect.Left, rect.Bottom),
+                    rb = new Vector2(rect.Right, rect.Bottom);
+                Vector2.Transform(ref lt, ref mt, out lt);
+                Vector2.Transform(ref rt, ref mt, out rt);
+                Vector2.Transform(ref lb, ref mt, out lb);
+                Vector2.Transform(ref rb, ref mt, out rb);
+
+                int left = (int)Math.Floor(MathHelper2.Min(lt.X, rt.X, lb.X, rb.X));
+                int top = (int)Math.Floor(MathHelper2.Min(lt.Y, rt.Y, lb.Y, rb.Y));
+                int right = (int)Math.Ceiling(MathHelper2.Max(lt.X, rt.X, lb.X, rb.X));
+                int bottom = (int)Math.Ceiling(MathHelper2.Max(lt.Y, rt.Y, lb.Y, rb.Y));
+                var bound = new Rectangle(left, top, right - left, bottom - top);
+                bool isIntersects;
+                this.viewport.Intersects(ref bound, out isIntersects);
+                return isIntersects;
+            }
+        }
+
+        public MeshItem MeshPop()
+        {
+            if (this.meshPool.Count > 0)
+            {
+                var mesh = this.meshPool.Pop();
+                mesh.RenderObject = null;
+                mesh.Position = Vector2.Zero;
+                mesh.Z0 = 0;
+                mesh.Z1 = 0;
+                mesh.FlipX = false;
+                mesh.TileRegion = null;
+                mesh.TileOffset = Vector2.Zero;
+                return mesh;
+            }
+            else
+            {
+                return new MeshItem();
+            }
+        }
+
+        public void MeshPush(MeshItem mesh)
+        {
+            mesh.RenderObject = null;
+            this.meshPool.Push(mesh);
+        }
+
         public void Dispose()
         {
             this.sprite?.Dispose();
             this.spineRender?.Effect.Dispose();
             this.alphaBlendState.Dispose();
+            this.meshPool.Clear();
         }
 
         private enum ItemType
