@@ -195,24 +195,26 @@ namespace WzComparerR2.MapRender
             allItems.Clear();
             var origin = this.renderEnv.Camera.Origin.ToPoint();
             this.batcher.Begin(Matrix.CreateTranslation(new Vector3(-origin.X, -origin.Y, 0)));
+            Rectangle[] rects = null;
             //绘制场景
             foreach (var kv in GetDrawableItems(this.mapData.Scene))
             {
                 this.batcher.Draw(kv.Value);
-                
+
                 //绘制标签
                 DrawName(kv.Key);
 
                 //缓存绘图区域
                 {
-                    Rectangle[] rects = this.batcher.Measure(kv.Value);
+                    int rectCount;
+                    this.batcher.Measure(kv.Value, ref rects, out rectCount);
                     if (kv.Value.RenderObject is Frame)
                     {
                         var frame = (Frame)kv.Value.RenderObject;
                     }
-                    if (rects != null && rects.Length > 0)
+                    if (rects != null && rectCount > 0)
                     {
-                        for (int i = 0; i < rects.Length; i++)
+                        for (int i = 0; i < rectCount; i++)
                         {
                             rects[i].X -= origin.X;
                             rects[i].Y -= origin.Y;

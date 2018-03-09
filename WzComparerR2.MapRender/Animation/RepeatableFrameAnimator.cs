@@ -71,12 +71,15 @@ namespace WzComparerR2.Animation
             if (!IsLoop && this.IsStopped)
             {
                 var frame = this.Data.Frames.Last();
-                this.CurrentFrame = new Frame(frame.Texture, frame.AtlasRect)
+                if (this.CurrentFrame == null)
                 {
-                    Z = frame.Z,
-                    Origin = frame.Origin,
-                    A0 = frame.A1
-                };
+                    this.CurrentFrame = new Frame();
+                }
+                this.CurrentFrame.Texture = frame.Texture;
+                this.CurrentFrame.AtlasRect = frame.AtlasRect;
+                this.CurrentFrame.Z = frame.Z;
+                this.CurrentFrame.Origin = frame.Origin;
+                this.CurrentFrame.A0 = frame.A1;
             }
             else
             {

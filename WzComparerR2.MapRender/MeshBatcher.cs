@@ -277,8 +277,17 @@ namespace WzComparerR2.MapRender
             }
         }
 
+
         public Rectangle[] Measure(MeshItem mesh)
         {
+            Rectangle[] region = null;
+            int count;
+            Measure(mesh, ref region, out count);
+            return region;
+        }
+
+        public void Measure(MeshItem mesh, ref Rectangle[] region, out int count)
+        { 
             Rectangle rect = Rectangle.Empty;
 
             if (mesh.RenderObject is TextMesh)
@@ -301,7 +310,10 @@ namespace WzComparerR2.MapRender
                     (int)(size.Y + padding.Top + padding.Bottom)
                     );
                 var rectText = new Rectangle((int)pos.X, (int)pos.Y, (int)size.X, (int)size.Y);
-                return new Rectangle[] { Rectangle.Union(rectBg, rectText) };
+
+                count = 1;
+                EnsureArraySize(ref region, count);
+                Rectangle.Union(ref rectBg, ref rectText, out region[0]);
             }
 
             if (mesh.RenderObject is Frame)
@@ -315,7 +327,7 @@ namespace WzComparerR2.MapRender
             }
             else
             {
-                return new Rectangle[0];
+                count = 0;
             }
 
             rect.X += (int)mesh.Position.X;
@@ -323,27 +335,40 @@ namespace WzComparerR2.MapRender
 
             if (mesh.TileRegion != null)
             {
-                var region = mesh.TileRegion.Value;
-                Rectangle[] rects = new Rectangle[region.Width * region.Height];
+                var tileRegion = mesh.TileRegion.Value;
+                count = tileRegion.Width * tileRegion.Height;
+                EnsureArraySize(ref region, count);
                 Point offset = mesh.TileOffset.ToPoint();
                 int i = 0;
 
-                for (int y = region.Top; y < region.Bottom; y++)
+                for (int y = tileRegion.Top; y < tileRegion.Bottom; y++)
                 {
-                    for (int x = region.Left; x < region.Right; x++)
+                    for (int x = tileRegion.Left; x < tileRegion.Right; x++)
                     {
-                        rects[i++] = new Rectangle(rect.X + x * offset.X,
+                        region[i++] = new Rectangle(rect.X + x * offset.X,
                             rect.Y + y * offset.Y,
                             rect.Width,
                             rect.Height);
                     }
                 }
-
-                return rects;
             }
             else
             {
-                return new[] { rect };
+                count = 1;
+                EnsureArraySize(ref region, count);
+                region[0] = rect;
+            }
+        }
+
+        private void EnsureArraySize<T>(ref T[] array, int length)
+        {
+            if (array == null)
+            {
+                array = new T[length];
+            }
+            else if (array.Length < length)
+            {
+                Array.Resize(ref array, length);
             }
         }
 

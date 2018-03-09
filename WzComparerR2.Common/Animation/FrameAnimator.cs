@@ -87,12 +87,15 @@ namespace WzComparerR2.Animation
             int index = GetProcessFromTimeline(_timeline, _timeOffset, out progress);
 
             var frame = this.Data.Frames[index];
-            this.CurrentFrame = new Frame(frame.Texture, frame.AtlasRect)
+            if (this.CurrentFrame == null)
             {
-                Z = frame.Z,
-                Origin = frame.Origin,
-                A0 = (int)MathHelper.Lerp(frame.A0, frame.A1, progress),
-            };
+                this.CurrentFrame = new Frame();
+            }
+            this.CurrentFrame.Texture = frame.Texture;
+            this.CurrentFrame.AtlasRect = frame.AtlasRect;
+            this.CurrentFrame.Z = frame.Z;
+            this.CurrentFrame.Origin = frame.Origin;
+            this.CurrentFrame.A0 = (int)MathHelper.Lerp(frame.A0, frame.A1, progress);
         }
 
         public static int[] CreateTimeline(IEnumerable<int> delays)
