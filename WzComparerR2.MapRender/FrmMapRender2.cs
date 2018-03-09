@@ -108,6 +108,7 @@ namespace WzComparerR2.MapRender
         float opacity;
 
         List<ItemRect> allItems = new List<ItemRect>();
+        List<KeyValuePair<SceneItem, MeshItem>> drawableItemsCache = new List<KeyValuePair<SceneItem, MeshItem>>();
         MapRenderUIRoot ui;
         Tooltip2 tooltip;
         WcR2Engine engine;
@@ -115,6 +116,7 @@ namespace WzComparerR2.MapRender
 
         CoroutineManager cm;
         FpsCounter fpsCounter;
+        List<IDisposable> attachedEvent = new List<IDisposable>();
 
         protected override void Initialize()
         {
@@ -271,7 +273,9 @@ namespace WzComparerR2.MapRender
                     else direction1.Y = 0;
                 };
 
-                this.ui.KeyDown += (o, e) =>
+                EmptyKeys.UserInterface.Input.KeyEventHandler keyEv;
+
+                keyEv = (o, e) =>
                 {
                     switch (e.Key)
                     {
@@ -296,8 +300,10 @@ namespace WzComparerR2.MapRender
                             break;
                     }
                 };
-                
-                this.ui.PreviewKeyUp += (o, e) =>
+                this.ui.KeyDown += keyEv;
+                this.attachedEvent.Add(EventDisposable(keyEv, _ev => this.ui.KeyDown -= _ev));
+
+                keyEv = (o, e) =>
                 {
                     switch (e.Key)
                     {
@@ -309,6 +315,8 @@ namespace WzComparerR2.MapRender
                             break;
                     }
                 };
+                this.ui.PreviewKeyUp += keyEv;
+                this.attachedEvent.Add(EventDisposable(keyEv, _ev => this.ui.PreviewKeyUp -= _ev));
 
                 //鼠标移动
                 bool isMouseDown = false;
@@ -330,7 +338,10 @@ namespace WzComparerR2.MapRender
                     direction2 = vec * 20;
                 };
 
-                this.ui.MouseDown += (o, e) =>
+                EmptyKeys.UserInterface.Input.MouseEventHandler mouseEv;
+                EmptyKeys.UserInterface.Input.MouseButtonEventHandler mouseBtnEv;
+
+                mouseBtnEv = (o, e) =>
                 {
                     if (e.ChangedButton == EmptyKeys.UserInterface.Input.MouseButton.Right)
                     {
@@ -338,14 +349,20 @@ namespace WzComparerR2.MapRender
                         calcMouseMoveDir(e);
                     }
                 };
-                this.ui.MouseMove += (o, e) =>
+                this.ui.MouseDown += mouseBtnEv;
+                this.attachedEvent.Add(EventDisposable(mouseBtnEv, _ev => this.ui.MouseDown -= _ev));
+
+                mouseEv = (o, e) =>
                 {
                     if (isMouseDown)
                     {
                         calcMouseMoveDir(e);
                     }
                 };
-                this.ui.MouseUp += (o, e) =>
+                this.ui.MouseMove += mouseEv;
+                this.attachedEvent.Add(EventDisposable(mouseEv, _ev => this.ui.MouseMove -= _ev));
+
+                mouseBtnEv = (o, e) =>
                 {
                     if (e.ChangedButton == EmptyKeys.UserInterface.Input.MouseButton.Right)
                     {
@@ -353,18 +370,22 @@ namespace WzComparerR2.MapRender
                         direction2 = Vector2.Zero;
                     }
                 };
-                
+                this.ui.MouseUp += mouseBtnEv;
+                this.attachedEvent.Add(EventDisposable(mouseBtnEv, _ev => this.ui.MouseUp -= _ev));
+
                 //更新事件
-                this.ui.InputUpdated += (o, e) =>
+                EventHandler ev = (o, e) =>
                 {
                     this.renderEnv.Camera.Center += direction1 + direction2 * ((boostMoveFlag != 0) ? 3 : 1);
                     keyboardMoveSlowDown();
                 };
+                this.ui.InputUpdated += ev;
+                this.attachedEvent.Add(EventDisposable(ev, _ev => this.ui.InputUpdated -= _ev));
             }
             #endregion
 
             //点击事件
-            UIHelper.RegisterClickEvent<SceneItem>(this.ui.ContentControl,
+            var disposable = UIHelper.RegisterClickEvent<SceneItem>(this.ui.ContentControl,
                 (sender, point) => {
                     int x = (int)point.X;
                     int y = (int)point.Y;
@@ -375,6 +396,7 @@ namespace WzComparerR2.MapRender
                     return mouseTarget.item;
                 },
                 this.OnSceneItemClick);
+            this.attachedEvent.Add(disposable);
         }
 
         private void UIOption_OK(object sender, EventArgs e)
@@ -631,6 +653,13 @@ namespace WzComparerR2.MapRender
             this.renderEnv = null;
             this.engine = null;
 
+            foreach(var disposable in this.attachedEvent)
+            {
+                disposable.Dispose();
+            }
+            this.attachedEvent.Clear();
+            this.ui.InputBindings.Clear();
+
             GameExt.RemoveKeyboardEvent(this);
             GameExt.RemoveMouseStateCache();
             WcR2Engine.Unload();
@@ -668,6 +697,11 @@ namespace WzComparerR2.MapRender
             engine.Renderer.ResetNativeSize();
         }
 
+        private IDisposable EventDisposable<TDelegate>(TDelegate arg, Action<TDelegate> action)
+        {
+            return new Disposable<TDelegate>(action, arg);
+        }
+
         enum Resolution
         {
             Window_800_600 = 0,
@@ -680,6 +714,23 @@ namespace WzComparerR2.MapRender
         {
             public SceneItem item;
             public Rectangle rect;
+        }
+
+        class Disposable<TDelegate> : IDisposable
+        {
+            public Disposable(Action<TDelegate> action, TDelegate arg)
+            {
+                this.Action = action;
+                this.Arg = arg;
+            }
+
+            public readonly Action<TDelegate> Action;
+            public readonly TDelegate Arg;
+
+            public void Dispose()
+            {
+                this.Action?.Invoke(this.Arg);
+            }
         }
     }
 }

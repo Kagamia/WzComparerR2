@@ -63,6 +63,7 @@ namespace WzComparerR2.MapRender.UI
         public static void Unload()
         {
             InputManager.Current.FocusedElement = null;
+            Engine.instance = null;
         }
 
         public static void InitialInputManager()

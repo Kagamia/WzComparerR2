@@ -103,9 +103,9 @@ namespace WzComparerR2.MapRender
             }
             else
             {
-                foreach (var child in node.Nodes)
+                for (int i = 0, i1 = node.Nodes.Count; i < i1; i++)
                 {
-                    UpdateAllItems(child, elapsed);
+                    UpdateAllItems(node.Nodes[i], elapsed);
                 }
             }
         }
@@ -113,7 +113,7 @@ namespace WzComparerR2.MapRender
         private void UpdateTooltip()
         {
             var mouse = renderEnv.Input.MousePosition;
-            
+
             var mouseElem = EmptyKeys.UserInterface.Input.InputManager.Current.MouseDevice.MouseOverElement;
             object target = null;
             if (mouseElem == this.ui.ContentControl)
@@ -144,7 +144,7 @@ namespace WzComparerR2.MapRender
             {
                 sb.Append(" ");
                 StringResult sr;
-                if (this.StringLinker != null && mapID != null 
+                if (this.StringLinker != null && mapID != null
                     && this.StringLinker.StringMap.TryGetValue(mapID.Value, out sr))
                 {
                     sb.Append(sr.Name);
@@ -427,33 +427,89 @@ namespace WzComparerR2.MapRender
 
         private IEnumerable<ContainerNode> GetSceneContainers(SceneNode node)
         {
+            /*
             var container = node as ContainerNode;
             if (container != null)  //暂时不考虑缩进z层递归合并  container下没有子节点
             {
                 yield return container;
             }
-            else
+            else 
             {
                 foreach (var mesh in node.Nodes.SelectMany(child => GetSceneContainers(child)))
                 {
                     yield return mesh;
                 }
+            }*/
+            Stack<SceneNode> sceneStack = new Stack<SceneNode>();
+            Stack<int> indices = new Stack<int>();
+
+            SceneNode currNode = node;
+            int i = 0;
+
+            while (currNode != null)
+            {
+                var container = currNode as ContainerNode;
+                if (container != null)
+                {
+                    yield return container;
+                    goto _pop;
+                }
+                else
+                {
+                    if (i < currNode.Nodes.Count)
+                    {
+                        var child = currNode.Nodes[i];
+                        //push
+                        sceneStack.Push(currNode);
+                        indices.Push(i + 1);
+                        currNode = child;
+                        i = 0;
+                        continue;
+                    }
+                    else
+                    {
+                        goto _pop;
+                    }
+                }
+
+                _pop:
+                if (sceneStack.Count > 0)
+                {
+                    currNode = sceneStack.Pop();
+                    i = indices.Pop();
+                }
+                else
+                {
+                    break;
+                }
+                continue;
             }
         }
 
         private IEnumerable<KeyValuePair<SceneItem, MeshItem>> GetDrawableItems(MapScene scene)
         {
-            var containers = GetSceneContainers(scene).ToList();
+            var containers = GetSceneContainers(scene);
+            var kvList = this.drawableItemsCache;
 
-            foreach(var container in containers)
+            foreach (var container in containers)
             {
-                foreach (var kv in container.Slots.Select(item => new KeyValuePair<SceneItem, MeshItem>(item, GetMesh(item)))
-                  .Where(kv => kv.Value != null)
-                  .OrderBy(kv => kv.Value))
+                kvList.Clear();
+                foreach (var item in container.Slots)
+                {
+                    var mesh = GetMesh(item);
+                    if (mesh != null)
+                    {
+                        kvList.Add(new KeyValuePair<SceneItem, MeshItem>(item, mesh));
+                    }
+                }
+                kvList.Sort((kv1, kv2) => kv1.Value.CompareTo(kv2.Value));
+                foreach (var kv in kvList)
                 {
                     yield return kv;
                 }
             }
+
+            kvList.Clear();
         }
 
         private MeshItem GetMesh(SceneItem item)
@@ -541,7 +597,7 @@ namespace WzComparerR2.MapRender
             Vector2 position = new Vector2(back.X, back.Y);
 
             //计算水平卷动
-            if (back.TileMode.HasFlag(TileMode.ScrollHorizontial))
+            if ((back.TileMode & TileMode.ScrollHorizontial) != 0)
             {
                 position.X += ((float)back.Rx * 5 * back.View.Time / 1000) % cx;// +this.Camera.Center.X * (100 - Math.Abs(this.rx)) / 100;
             }
@@ -551,7 +607,7 @@ namespace WzComparerR2.MapRender
             }
 
             //计算垂直卷动
-            if (back.TileMode.HasFlag(TileMode.ScrollVertical))
+            if ((back.TileMode & TileMode.ScrollVertical) != 0)
             {
                 position.Y += ((float)back.Ry * 5 * back.View.Time / 1000) % cy;// +this.Camera.Center.Y * (100 - Math.Abs(this.ry)) / 100;
             }
@@ -575,7 +631,7 @@ namespace WzComparerR2.MapRender
                 var cameraRect = renderEnv.Camera.ClipRect;
 
                 int l, t, r, b;
-                if (back.TileMode.HasFlag(TileMode.Horizontal) && cx > 0)
+                if ((back.TileMode & TileMode.Horizontal) != 0 && cx > 0)
                 {
                     l = (int)Math.Floor((cameraRect.Left - position.X) / cx) - 1;
                     r = (int)Math.Ceiling((cameraRect.Right - position.X) / cx) + 1;
@@ -586,7 +642,7 @@ namespace WzComparerR2.MapRender
                     r = 1;
                 }
 
-                if (back.TileMode.HasFlag(TileMode.Vertical) && cy > 0)
+                if ((back.TileMode & TileMode.Vertical) != 0 && cy > 0)
                 {
                     t = (int)Math.Floor((cameraRect.Top - position.Y) / cy) - 1;
                     b = (int)Math.Ceiling((cameraRect.Bottom - position.Y) / cy) + 1;

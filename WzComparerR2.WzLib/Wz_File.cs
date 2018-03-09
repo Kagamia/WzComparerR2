@@ -166,7 +166,7 @@ namespace WzComparerR2.WzLib
         public unsafe string ReadString()
         {
             int size = this.BReader.ReadSByte();
-
+            string result = null;
             if (size < 0)
             {
                 byte mask = 0xAA;
@@ -185,7 +185,7 @@ namespace WzComparerR2.WzLib
                     }
 
                     var enc = this.TextEncoding ?? Encoding.Default;
-                    return enc.GetString(buffer, 0, size);
+                    result = enc.GetString(buffer, 0, size);
                 }
             }
             else if (size > 0)
@@ -209,12 +209,29 @@ namespace WzComparerR2.WzLib
                         unchecked { mask++; }
                     }
 
-                    return new string((char*)pChar, 0, size);
+                    result = new string((char*)pChar, 0, size);
                 }
             }
             else
             {
                 return string.Empty;
+            }
+
+            //memory optimize
+            if (result.Length <= 4) 
+            {
+                for (int i = 0; i < result.Length; i++)
+                {
+                    if (!Char.IsLetterOrDigit(result, i))
+                    {
+                        return result;
+                    }
+                }
+                return string.Intern(result);
+            }
+            else
+            {
+                return result;
             }
         }
 

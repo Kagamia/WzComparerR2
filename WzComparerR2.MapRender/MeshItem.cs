@@ -18,7 +18,7 @@ namespace WzComparerR2.MapRender
         public Rectangle? TileRegion { get; set; }
         public Vector2 TileOffset { get; set; }
 
-        int IComparable<MeshItem>.CompareTo(MeshItem other)
+        public int CompareTo(MeshItem other)
         {
             int comp;
             if ((comp = this.Z0.CompareTo(other.Z0)) != 0
