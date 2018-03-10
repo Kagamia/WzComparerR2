@@ -353,11 +353,9 @@ namespace WzComparerR2.MapRender
                                 Text = name
                             };
                             batcher.Draw(mesh);
-                            batcher.MeshPush(mesh);
 
                             //绘制怪物等级
                             var nameRect = batcher.Measure(mesh)[0];
-                            mesh = batcher.MeshPop();
                             mesh.Position = new Vector2(nameRect.X - 2, nameRect.Y + 3);
                             mesh.RenderObject = new TextMesh()
                             {

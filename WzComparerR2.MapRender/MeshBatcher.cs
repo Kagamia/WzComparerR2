@@ -314,6 +314,7 @@ namespace WzComparerR2.MapRender
                 count = 1;
                 EnsureArraySize(ref region, count);
                 Rectangle.Union(ref rectBg, ref rectText, out region[0]);
+                return;
             }
 
             if (mesh.RenderObject is Frame)
@@ -328,6 +329,7 @@ namespace WzComparerR2.MapRender
             else
             {
                 count = 0;
+                return;
             }
 
             rect.X += (int)mesh.Position.X;
