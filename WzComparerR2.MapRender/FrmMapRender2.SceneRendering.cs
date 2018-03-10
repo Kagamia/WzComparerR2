@@ -595,7 +595,7 @@ namespace WzComparerR2.MapRender
             Vector2 position = new Vector2(back.X, back.Y);
 
             //计算水平卷动
-            if ((back.TileMode & TileMode.ScrollHorizontial) != 0)
+            if ((back.TileMode & TileMode.ScrollHorizontal) != 0)
             {
                 position.X += ((float)back.Rx * 5 * back.View.Time / 1000) % cx;// +this.Camera.Center.X * (100 - Math.Abs(this.rx)) / 100;
             }

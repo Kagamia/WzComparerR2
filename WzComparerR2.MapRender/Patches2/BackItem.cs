@@ -60,9 +60,9 @@ namespace WzComparerR2.MapRender.Patches2
                 case 1: return TileMode.Horizontal;
                 case 2: return TileMode.Vertical;
                 case 3: return TileMode.BothTile;
-                case 4: return TileMode.Horizontal | TileMode.ScrollHorizontial;
+                case 4: return TileMode.Horizontal | TileMode.ScrollHorizontal;
                 case 5: return TileMode.Vertical | TileMode.ScrollVertical;
-                case 6: return TileMode.BothTile | TileMode.ScrollHorizontial;
+                case 6: return TileMode.BothTile | TileMode.ScrollHorizontal;
                 case 7: return TileMode.BothTile | TileMode.ScrollVertical;
                 default: return TileMode.None;
             }

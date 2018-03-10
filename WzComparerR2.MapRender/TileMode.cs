@@ -11,7 +11,7 @@ namespace WzComparerR2.MapRender
         Horizontal = 1,
         Vertical = 2,
         BothTile = Horizontal | Vertical,
-        ScrollHorizontial = 4,
+        ScrollHorizontal = 4,
         ScrollVertical = 8
     }
 }
