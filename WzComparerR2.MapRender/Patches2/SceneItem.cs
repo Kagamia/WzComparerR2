@@ -9,6 +9,7 @@ namespace WzComparerR2.MapRender.Patches2
     {
         public string Name { get; set; }
         public int Index { get; set; }
+        public string Tag { get; set; }
 
         public override string ToString()
         {

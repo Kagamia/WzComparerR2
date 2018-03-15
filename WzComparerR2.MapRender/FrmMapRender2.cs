@@ -120,6 +120,11 @@ namespace WzComparerR2.MapRender
 
         protected override void Initialize()
         {
+            //init services
+            this.Services.AddService<Random>(new Random());
+            this.Services.AddService<IRandom>(new ParticleRandom(this.Services.GetService<Random>()));
+            
+            //init components
             this.renderEnv = new RenderEnv(this, this.graphics);
             this.batcher = new MeshBatcher(this.GraphicsDevice) { CullingEnabled = true };
             this.resLoader = new ResourceLoader(this.Services);

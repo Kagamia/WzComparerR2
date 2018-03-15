@@ -100,6 +100,73 @@ namespace WzComparerR2.MapRender
             return node != null ? LoadAnimationData(node) : null;
         }
 
+        public ParticleDesc LoadParticleDesc(Wz_Node node)
+        {
+            var desc = new ParticleDesc();
+            desc.Name = node.Text;
+            foreach (var pNode in node.Nodes)
+            {
+                switch (pNode.Text)
+                {
+                    case "totalParticle": desc.TotalParticle = pNode.GetValue<int>(); break;
+                    case "angle": desc.Angle = pNode.GetValue<float>(); break;
+                    case "angleVar": desc.AngleVar = pNode.GetValue<float>(); break;
+                    case "duration": desc.Duration = pNode.GetValue<float>(); break;
+                    case "blendFuncSrc": desc.BlendFuncSrc = (ParticleBlendFunc)pNode.GetValue<int>(); break;
+                    case "blendFuncDst": desc.BlendFuncDst = (ParticleBlendFunc)pNode.GetValue<int>(); break;
+                    case "startColor": desc.StartColor = System.Drawing.Color.FromArgb(pNode.GetValue<int>()).ToXnaColor(); break;
+                    case "startColorVar": desc.StartColorVar = System.Drawing.Color.FromArgb(pNode.GetValue<int>()).ToXnaColor(); break;
+                    case "endColor": desc.EndColor = System.Drawing.Color.FromArgb(pNode.GetValue<int>()).ToXnaColor(); break;
+                    case "endColorVar": desc.EndColorVar = System.Drawing.Color.FromArgb(pNode.GetValue<int>()).ToXnaColor(); break;
+                    case "MiddlePoint0": desc.MiddlePoint0 = pNode.GetValue<int>(); break;
+                    case "MiddlePointAlpha0": desc.MiddlePointAlpha0 = pNode.GetValue<int>(); break;
+                    case "MiddlePoint1": desc.MiddlePoint1 = pNode.GetValue<int>(); break;
+                    case "MiddlePointAlpha1": desc.MiddlePointAlpha1 = pNode.GetValue<int>(); break;
+                    case "startSize": desc.StartSize = pNode.GetValue<float>(); break;
+                    case "startSizeVar": desc.StartSizeVar = pNode.GetValue<float>(); break;
+                    case "endSize": desc.EndSize = pNode.GetValue<float>(); break;
+                    case "endSizeVar": desc.EndSizeVar = pNode.GetValue<float>(); break;
+                    case "posX": desc.PosX = pNode.GetValue<float>(); break;
+                    case "posY": desc.PosY = pNode.GetValue<float>(); break;
+                    case "posVarX": desc.PosVarX = pNode.GetValue<float>(); break;
+                    case "posVarY": desc.PosVarY = pNode.GetValue<float>(); break;
+                    case "startSpin": desc.StartSpin = pNode.GetValue<float>(); break;
+                    case "startSpinVar": desc.StartSpinVar = pNode.GetValue<float>(); break;
+                    case "endSpin": desc.EndSpin = pNode.GetValue<float>(); break;
+                    case "endSpinVar": desc.EndSpinVar = pNode.GetValue<float>(); break;
+                    case "GRAVITY":
+                        {
+                            var gravityDesc = new ParticleGravityDesc();
+                            foreach (var pNode2 in pNode.Nodes)
+                            {
+                                switch (pNode2.Text)
+                                {
+                                    case "x": gravityDesc.X = pNode2.GetValue<float>(); break;
+                                    case "y": gravityDesc.Y = pNode2.GetValue<float>(); break;
+                                    case "speed": gravityDesc.Speed = pNode2.GetValue<float>(); break;
+                                    case "speedVar": gravityDesc.SpeedVar = pNode2.GetValue<float>(); break;
+                                    case "radialAccel": gravityDesc.RadialAccel = pNode2.GetValue<float>(); break;
+                                    case "radialAccelVar": gravityDesc.RadialAccelVar = pNode2.GetValue<float>(); break;
+                                    case "tangentialAccel": gravityDesc.TangentialAccel = pNode2.GetValue<float>(); break;
+                                    case "tangentialAccelVar": gravityDesc.TangentialAccelVar = pNode2.GetValue<float>(); break;
+                                    case "rotationIsDir": gravityDesc.RotationIsDir = pNode2.GetValue<int>() != 0; break;
+                                }
+                            }
+                            desc.Gravity = gravityDesc;
+                        }
+                        break;
+                    case "life": desc.Life = pNode.GetValue<float>(); break;
+                    case "lifeVar": desc.LifeVar = pNode.GetValue<float>(); break;
+                    case "opacityModifyRGB": desc.OpacityModifyRGB = pNode.GetValue<int>() != 0; break;
+                    case "positionType": desc.PositionType = pNode.GetValue<int>(); break;
+                    case "texture":
+                        desc.Texture = this.LoadFrame(pNode);
+                        break;
+                }
+            }
+            return desc;
+        }
+
         public void BeginCounting()
         {
             foreach(var kv in this.loadedItems)

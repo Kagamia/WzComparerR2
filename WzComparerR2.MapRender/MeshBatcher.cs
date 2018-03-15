@@ -101,6 +101,10 @@ namespace WzComparerR2.MapRender
             {
                 this.DrawItem((LineListMesh)mesh.RenderObject);
             }
+            else if (mesh.RenderObject is ParticleSystem)
+            {
+                this.DrawItem(mesh, (ParticleSystem)mesh.RenderObject);
+            }
         }
 
         private void DrawItem(MeshItem mesh, Frame frame)
@@ -277,6 +281,26 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        private void DrawItem(MeshItem mesh, ParticleSystem particleSystem)
+        {
+            if (particleSystem.Texture?.Texture != null)
+            {
+                ItemType itemType = ItemType.Unknown;
+                if (particleSystem.BlendFuncSrc == ParticleBlendFunc.SRC_ALPHA)
+                {
+                    if (particleSystem.BlendFuncDst == ParticleBlendFunc.ONE) //5,2
+                        itemType = ItemType.Sprite_BlendAdditive;
+                    else if (particleSystem.BlendFuncDst == ParticleBlendFunc.INV_SRC_ALPHA) //5,6
+                        itemType = ItemType.Sprite_BlendNonPremultiplied;
+                }
+                if (itemType == ItemType.Unknown)
+                {
+                    throw new Exception($"Unknown particle blendfunc: {particleSystem.BlendFuncSrc}, {particleSystem.BlendFuncDst}");
+                }
+                Prepare(itemType);
+                particleSystem.Draw(this.sprite, mesh.Position);
+            }
+        }
 
         public Rectangle[] Measure(MeshItem mesh)
         {
@@ -393,6 +417,8 @@ namespace WzComparerR2.MapRender
                 case ItemType.Sprite:
                 case ItemType.Skeleton:
                 case ItemType.D2DObject:
+                case ItemType.Sprite_BlendAdditive:
+                case ItemType.Sprite_BlendNonPremultiplied:
                     InnerFlush();
                     lastItem = itemType;
                     InnerBegin();
@@ -435,6 +461,22 @@ namespace WzComparerR2.MapRender
                         this.d2dRender.Begin(this.matrix.Value);
                     }
                     break;
+
+                case ItemType.Sprite_BlendAdditive:
+                    if (this.sprite == null)
+                    {
+                        this.sprite = new SpriteBatchEx(this.GraphicsDevice);
+                    }
+                    this.sprite.Begin(SpriteSortMode.Deferred, BlendState.Additive, transformMatrix: this.matrix);
+                    break;
+
+                case ItemType.Sprite_BlendNonPremultiplied:
+                    if (this.sprite == null)
+                    {
+                        this.sprite = new SpriteBatchEx(this.GraphicsDevice);
+                    }
+                    this.sprite.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, transformMatrix: this.matrix);
+                    break;
             }
         }
 
@@ -443,6 +485,8 @@ namespace WzComparerR2.MapRender
             switch (lastItem)
             {
                 case ItemType.Sprite:
+                case ItemType.Sprite_BlendAdditive:
+                case ItemType.Sprite_BlendNonPremultiplied:
                     this.sprite.End();
                     break;
 
@@ -524,9 +568,12 @@ namespace WzComparerR2.MapRender
         private enum ItemType
         {
             Unknown = 0,
-            Sprite,
-            Skeleton,
-            D2DObject
+            Sprite = 1,
+            Skeleton = 2,
+            D2DObject = 3,
+            Sprite_AlphaBlend = Sprite,
+            Sprite_BlendAdditive = 4,
+            Sprite_BlendNonPremultiplied = 5
         }
 
     }

@@ -15,6 +15,7 @@ namespace WzComparerR2.MapRender
                 Layers = new SceneNode(),
                 Fly = new FlyLayerNode(),
                 Front = new ContainerNode(),
+                Effect = new ContainerNode()
             });
 
             for (int i = 0; i <= 7; i++)
@@ -27,7 +28,7 @@ namespace WzComparerR2.MapRender
         public SceneNode Layers { get; private set; }
         public FlyLayerNode Fly { get; private set; }
         public ContainerNode Front { get; private set; }
-
+        public ContainerNode Effect { get; private set; }
 
         public IEnumerable<PortalItem> Portals => this.Fly.Portal.Slots.OfType<PortalItem>();
 

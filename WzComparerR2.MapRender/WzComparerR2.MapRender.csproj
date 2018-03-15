@@ -91,6 +91,7 @@
     <Compile Include="FrmMapRender2.SceneManager.cs" />
     <Compile Include="FrmMapRender2.SceneRendering.cs" />
     <Compile Include="GameExt.cs" />
+    <Compile Include="IRandom.cs" />
     <Compile Include="IWcR2Font.cs" />
     <Compile Include="LineListMesh.cs" />
     <Compile Include="MapData.cs" />
@@ -99,11 +100,17 @@
     <Compile Include="MeshItem.cs" />
     <Compile Include="Music.cs" />
     <Compile Include="Net\ChatClient.cs" />
+    <Compile Include="Particle.cs" />
+    <Compile Include="ParticleDesc.cs" />
+    <Compile Include="ParticleEmitter.cs" />
+    <Compile Include="ParticleRandom.cs" />
+    <Compile Include="ParticleSystem.cs" />
     <Compile Include="Patches2\BackItem.cs" />
     <Compile Include="Patches2\FootholdItem.cs" />
     <Compile Include="Patches2\LadderRopeItem.cs" />
     <Compile Include="Patches2\LifeItem.cs" />
     <Compile Include="Patches2\ObjItem.cs" />
+    <Compile Include="Patches2\ParticleItem.cs" />
     <Compile Include="Patches2\PortalItem.cs" />
     <Compile Include="Patches2\ReactorItem.cs" />
     <Compile Include="Patches2\SceneItem.cs" />

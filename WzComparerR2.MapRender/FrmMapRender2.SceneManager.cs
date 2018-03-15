@@ -49,7 +49,7 @@ namespace WzComparerR2.MapRender
             this.resLoader.BeginCounting();
 
             //加载地图数据
-            var mapData = new MapData();
+            var mapData = new MapData(this.Services.GetService<IRandom>());
             mapData.Load(mapImg.Node, resLoader);
 
             //处理bgm

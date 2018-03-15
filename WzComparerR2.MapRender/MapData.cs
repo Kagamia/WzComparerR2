@@ -16,11 +16,13 @@ namespace WzComparerR2.MapRender
 {
     public class MapData
     {
-        public MapData()
+        public MapData(IRandom random)
         {
             this.Scene = new MapScene();
             this.MiniMap = new MiniMap();
             this.Tooltips = new List<TooltipItem>();
+
+            this.random = random;
         }
 
         #region 基本信息
@@ -43,6 +45,8 @@ namespace WzComparerR2.MapRender
 
         public MapScene Scene { get; private set; }
         public IList<TooltipItem> Tooltips { get; private set; }
+
+        private readonly IRandom random;
 
         public void Load(Wz_Node mapImgNode, ResourceLoader resLoader)
         {
@@ -123,6 +127,10 @@ namespace WzComparerR2.MapRender
             if ((node = mapImgNode.Nodes["ToolTip"]) != null)
             {
                 LoadTooltip(node);
+            }
+            if ((node = mapImgNode.Nodes["particle"]) != null)
+            {
+                LoadParticle(node);
             }
 
             //计算地图大小
@@ -388,6 +396,16 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        private void LoadParticle(Wz_Node node)
+        {
+            foreach(var particleNode in node.Nodes)
+            {
+                var item = ParticleItem.LoadFromNode(particleNode);
+                item.Name = node.Text;
+                Scene.Effect.Slots.Add(item);
+            }
+        }
+
         private void CalcMapSize()
         {
             if (!this.VRect.IsEmpty)
@@ -488,6 +506,10 @@ namespace WzComparerR2.MapRender
                         else if (item is ReactorItem)
                         {
                             PreloadResource(resLoader, (ReactorItem)item);
+                        }
+                        else if (item is ParticleItem)
+                        {
+                            PreloadResource(resLoader, (ParticleItem)item);
                         }
                     }
                 }
@@ -722,6 +744,35 @@ namespace WzComparerR2.MapRender
             reactor.View = view;
         }
 
+        private void PreloadResource(ResourceLoader resLoader, ParticleItem particle)
+        {
+            string path = $@"Effect\particle.img\{particle.ParticleName}";
+            var particleNode = PluginManager.FindWz(path);
+
+            if (particleNode == null)
+            {
+                return;
+            }
+
+            var desc = resLoader.LoadParticleDesc(particleNode);
+            var pSystem = new ParticleSystem(this.random);
+            pSystem.LoadDescription(desc);
+
+            for (int i = 0; i < particle.SubItems.Length; i++)
+            {
+                var subItem = particle.SubItems[i];
+                var pGroup = pSystem.CreateGroup(i.ToString());
+                pGroup.Position = new Vector2(subItem.X, subItem.Y);
+                pGroup.Active();
+                pSystem.Groups.Add(pGroup);
+            }
+
+            particle.View = new ParticleItem.ItemView()
+            {
+                ParticleSystem = pSystem
+            };
+        }
+
         private StateMachineAnimator CreateSMAnimator(Wz_Node node, ResourceLoader resLoader)
         {
             var aniData = new Dictionary<string, RepeatableFrameAnimationData>();
@@ -787,14 +838,13 @@ namespace WzComparerR2.MapRender
 
         private void AddNpcAI(StateMachineAnimator ani)
         {
-            Random r = new Random();
             var actions = new[] { "stand", "say", "mouse", "move", "hand", "laugh", "eye" };
             var availActions = ani.Data.States.Where(act => actions.Contains(act)).ToArray();
             if (availActions.Length > 0)
             {
                 ani.AnimationEnd += (o, e) =>
                 {
-                    e.NextState = availActions[r.Next(availActions.Length)];
+                    e.NextState = availActions[this.random.Next(availActions.Length)];
                 };
             }
         }

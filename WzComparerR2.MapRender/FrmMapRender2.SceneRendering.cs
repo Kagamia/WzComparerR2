@@ -99,6 +99,15 @@ namespace WzComparerR2.MapRender
                             }
                         }
                     }
+                    else if (item is ParticleItem)
+                    {
+                        var particle = (ParticleItem)item;
+                        var pSystem = particle.View?.ParticleSystem;
+                        if (pSystem != null)
+                        {
+                            pSystem.Update(elapsed);
+                        }
+                    }
                 }
             }
             else
@@ -557,7 +566,10 @@ namespace WzComparerR2.MapRender
                     return GetMeshReactor((ReactorItem)item);
                 }
             }
-
+            else if (item is ParticleItem)
+            {
+                return GetMeshParticle((ParticleItem)item);
+            }
             return null;
         }
 
@@ -746,6 +758,25 @@ namespace WzComparerR2.MapRender
             mesh.FlipX = reactor.Flip;
             mesh.Z0 = ((renderObj as Frame)?.Z ?? 0);
             mesh.Z1 = reactor.Index;
+            return mesh;
+        }
+
+        private MeshItem GetMeshParticle(ParticleItem particle)
+        {
+            var pSystem = particle.View?.ParticleSystem;
+            if (pSystem == null)
+            {
+                return null;
+            }
+
+            Vector2 position;
+            position.X = renderEnv.Camera.Center.X * (100 + particle.Rx) / 100;
+            position.Y = renderEnv.Camera.Center.Y * (100 + particle.Ry) / 100;
+
+            var mesh = batcher.MeshPop();
+            mesh.RenderObject = pSystem;
+            mesh.Position = position;
+            mesh.Z0 = particle.Z;
             return mesh;
         }
 
