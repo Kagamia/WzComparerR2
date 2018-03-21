@@ -177,11 +177,20 @@ namespace WzComparerR2.WzLib
 
         public T GetValue<T>(T defaultValue)
         {
-            if (typeof(Wz_Image) == typeof(T) && this is Wz_Image.Wz_ImageNode)
-                return (T)(object)(((Wz_Image.Wz_ImageNode)this).Image);
+            if (typeof(Wz_Image) == typeof(T))
+            {
+                if (this is Wz_Image.Wz_ImageNode)
+                {
+                    return (T)(object)(((Wz_Image.Wz_ImageNode)this).Image);
+                }
+                else
+                {
+                    return (this.value is T) ? (T)this.value : default(T);
+                }
+            }
             if (this.value == null)
                 return defaultValue;
-            if (this.value.GetType() == typeof(T))
+            if (this.value is T)
                 return (T)this.value;
 
             IConvertible iconvertible = this.value as IConvertible;

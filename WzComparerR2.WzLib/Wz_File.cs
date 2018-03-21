@@ -218,11 +218,11 @@ namespace WzComparerR2.WzLib
             }
 
             //memory optimize
-            if (result.Length <= 4) 
+            if (result.Length <= 4)
             {
                 for (int i = 0; i < result.Length; i++)
                 {
-                    if (!Char.IsLetterOrDigit(result, i))
+                    if (result[i] >= 0x80)
                     {
                         return result;
                     }
