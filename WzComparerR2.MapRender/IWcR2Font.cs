@@ -11,7 +11,7 @@ namespace WzComparerR2.MapRender
     public interface IWcR2Font
     {
         float Size { get; }
-        float LineHeight { get; }
+        float LineHeight { get; set; }
         object BaseFont { get; }
         Vector2 MeasureString(string text);
         Vector2 MeasureString(StringBuilder text);
@@ -29,7 +29,11 @@ namespace WzComparerR2.MapRender
         }
 
         public float Size { get { return this._baseFont.Size; } }
-        public float LineHeight { get { return this._baseFont.Height; } }
+        public float LineHeight
+        {
+            get { return this._baseFont.Height; }
+            set { this._baseFont.Height = value; }
+        }
         public object BaseFont { get { return this._baseFont; } }
 
         private readonly D2DFont _baseFont;
@@ -57,7 +61,11 @@ namespace WzComparerR2.MapRender
         }
 
         public float Size { get { return this._baseFont.Height; } }
-        public float LineHeight { get { return this._baseFont.Height; } }
+        public float LineHeight
+        {
+            get { return this._baseFont.Height; }
+            set { this._baseFont.Height = (int)value; }
+        }
         public object BaseFont { get { return this._baseFont; } }
 
         private readonly XnaFont _baseFont;

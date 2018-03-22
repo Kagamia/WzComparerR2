@@ -58,7 +58,7 @@ namespace WzComparerR2.Rendering
             get { return baseFont; }
         }
 
-        public int Height { get; private set; }
+        public int Height { get; set; }
 
         public Vector2 MeasureString(string text)
         {

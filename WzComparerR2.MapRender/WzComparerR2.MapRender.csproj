@@ -217,7 +217,14 @@
   <ItemGroup>
     <None Include="Resources\UIWindow2.img.WorldMap.Border.0.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.ArcaneForce.png" />
+    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.enchantMob.png" />
+    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Line.png" />
+    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Mob.png" />
+    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Npc.png" />
+    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.StarForce.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(TargetDir)*.dll" "$(SolutionDir)WzComparerR2\bin\$(ConfigurationName)\Plugin\$(ProjectName)" /I /Y</PostBuildEvent>

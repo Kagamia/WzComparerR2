@@ -42,30 +42,73 @@ namespace WzComparerR2.Rendering
         {
             get
             {
-                var fontCollection = this.textFormat.FontCollection;
-                int index;
-                if (fontCollection.FindFamilyName(this.textFormat.FontFamilyName, out index))
+                if (this.lineHeight <= 0)
                 {
-                    using (var family = fontCollection.GetFontFamily(index))
+                    var font = this.GetMatchingFont();
+                    if (font != null)
                     {
-                        using (var font = family.GetFirstMatchingFont(this.textFormat.FontWeight,
-                            this.textFormat.FontStretch,
-                            this.textFormat.FontStyle))
+                        using (font)
                         {
                             var metrics = font.Metrics;
                             float ratio = this.textFormat.FontSize / metrics.DesignUnitsPerEm;
                             float size = (metrics.Ascent + metrics.Descent + metrics.LineGap) * ratio;
-                            return size;
+                            this.lineHeight = size;
                         }
                     }
-                      
+                    else
+                    {
+                        this.lineHeight = this.Size;
+                    }
                 }
 
-                return this.Size;
+                return this.lineHeight;
+            }
+            set
+            {
+                /*
+                LineSpacingMethod method;
+                float lineSpacing;
+                float baseLine;
+                this.textFormat.GetLineSpacing(out method, out lineSpacing, out baseLine);
+                if (baseLine <= 0)
+                {
+                    var font = this.GetMatchingFont();
+                    if (font != null)
+                    {
+                        using (font)
+                        {
+                            var metrics = font.Metrics;
+                            float ratio = this.textFormat.FontSize / metrics.DesignUnitsPerEm;
+                            float ascent = metrics.Ascent * ratio;
+                            baseLine = ascent;
+                        }
+                    }
+                }
+                this.textFormat.SetLineSpacing(LineSpacingMethod.Uniform, value, value * 0.8f);
+                */
+                this.lineHeight = value;
             }
         }
 
         private readonly TextFormat textFormat;
+        private float lineHeight;
+
+        private Font GetMatchingFont()
+        {
+            var fontCollection = this.textFormat.FontCollection;
+            int index;
+            if (fontCollection.FindFamilyName(this.textFormat.FontFamilyName, out index))
+            {
+                using (var family = fontCollection.GetFontFamily(index))
+                {
+                    var font = family.GetFirstMatchingFont(this.textFormat.FontWeight,
+                        this.textFormat.FontStretch,
+                        this.textFormat.FontStyle);
+                    return font;
+                }
+            }
+            return null;
+        }
 
         internal void DrawText(D2DContext context, string text, Vector2 position, Color color)
         {

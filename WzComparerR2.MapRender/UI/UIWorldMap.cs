@@ -355,11 +355,10 @@ namespace WzComparerR2.MapRender.UI
                 if (hitItem is MapSpot)
                 {
                     var spot = (MapSpot)hitItem;
-                    var tooltip = new UIWorldMap.Tooltip();
-                    if (spot.MapNo.Count > 0)
+                    var tooltip = new UIWorldMap.Tooltip()
                     {
-                        tooltip.MapID = spot.MapNo[0];
-                    }
+                        Spot = spot
+                    };
                     return tooltip;
                 }
                 return null;
@@ -559,7 +558,7 @@ namespace WzComparerR2.MapRender.UI
 
         public class Tooltip
         {
-            public int? MapID { get; set; }
+            public MapSpot Spot { get; set; }
         }
     }
 }

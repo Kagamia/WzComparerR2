@@ -19,7 +19,7 @@ namespace WzComparerR2.MapRender.Properties {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -86,6 +86,66 @@ namespace WzComparerR2.MapRender.Properties {
         internal static System.Drawing.Bitmap Basic_img_ComboBox_normal_2 {
             get {
                 object obj = ResourceManager.GetObject("Basic_img_ComboBox_normal_2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap UIWindow_img_ToolTip_WorldMap_ArcaneForce {
+            get {
+                object obj = ResourceManager.GetObject("UIWindow_img_ToolTip_WorldMap_ArcaneForce", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap UIWindow_img_ToolTip_WorldMap_enchantMob {
+            get {
+                object obj = ResourceManager.GetObject("UIWindow_img_ToolTip_WorldMap_enchantMob", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap UIWindow_img_ToolTip_WorldMap_Line {
+            get {
+                object obj = ResourceManager.GetObject("UIWindow_img_ToolTip_WorldMap_Line", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap UIWindow_img_ToolTip_WorldMap_Mob {
+            get {
+                object obj = ResourceManager.GetObject("UIWindow_img_ToolTip_WorldMap_Mob", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap UIWindow_img_ToolTip_WorldMap_Npc {
+            get {
+                object obj = ResourceManager.GetObject("UIWindow_img_ToolTip_WorldMap_Npc", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap UIWindow_img_ToolTip_WorldMap_StarForce {
+            get {
+                object obj = ResourceManager.GetObject("UIWindow_img_ToolTip_WorldMap_StarForce", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -4,22 +4,32 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Res = CharaSimResource.Resource;
-using WzComparerR2.MapRender.Patches2;
+using Microsoft.Xna.Framework.Content;
+
+using WzComparerR2.WzLib;
 using WzComparerR2.Common;
 using WzComparerR2.Rendering;
 using WzComparerR2.Animation;
+using WzComparerR2.MapRender.Patches2;
+using WzComparerR2.PluginBase;
+
+using Res = CharaSimResource.Resource;
+using MRes = WzComparerR2.MapRender.Properties.Resources;
 using static WzComparerR2.MapRender.UI.TooltipHelper;
+using TextureBlock = WzComparerR2.MapRender.UI.UIGraphics.RenderBlock<Microsoft.Xna.Framework.Graphics.Texture2D>;
 
 namespace WzComparerR2.MapRender.UI
 {
     class Tooltip2
     {
-        public Tooltip2(GraphicsDevice graphicsDevice)
+        public Tooltip2(ContentManager content)
         {
-            this.LoadContent(graphicsDevice);
+            this.Content = content;
+
+            this.LoadContent(content);
         }
 
+        public ContentManager Content { get; private set; }
         public NineFormResource Resource { get; private set; }
         public StringLinker StringLinker { get; set; }
         public object TooltipTarget { get; set; }
@@ -54,18 +64,18 @@ namespace WzComparerR2.MapRender.UI
             }
         }
 
-        private void LoadContent(GraphicsDevice graphicsDevice)
+        private void LoadContent(ContentManager content)
         {
             var res = new NineFormResource();
-            res.N = Res.UIToolTip_img_Item_Frame2_n.ToTexture(graphicsDevice);
-            res.NE = Res.UIToolTip_img_Item_Frame2_ne.ToTexture(graphicsDevice);
-            res.E = Res.UIToolTip_img_Item_Frame2_e.ToTexture(graphicsDevice);
-            res.SE = Res.UIToolTip_img_Item_Frame2_se.ToTexture(graphicsDevice);
-            res.S = Res.UIToolTip_img_Item_Frame2_s.ToTexture(graphicsDevice);
-            res.SW = Res.UIToolTip_img_Item_Frame2_sw.ToTexture(graphicsDevice);
-            res.W = Res.UIToolTip_img_Item_Frame2_w.ToTexture(graphicsDevice);
-            res.NW = Res.UIToolTip_img_Item_Frame2_nw.ToTexture(graphicsDevice);
-            res.C = Res.UIToolTip_img_Item_Frame2_c.ToTexture(graphicsDevice);
+            res.N = content.Load<Texture2D>(nameof(Res.UIToolTip_img_Item_Frame2_n));
+            res.NE = content.Load<Texture2D>(nameof(Res.UIToolTip_img_Item_Frame2_ne));
+            res.E = content.Load<Texture2D>(nameof(Res.UIToolTip_img_Item_Frame2_e));
+            res.SE = content.Load<Texture2D>(nameof(Res.UIToolTip_img_Item_Frame2_se));
+            res.S = content.Load<Texture2D>(nameof(Res.UIToolTip_img_Item_Frame2_s));
+            res.SW = content.Load<Texture2D>(nameof(Res.UIToolTip_img_Item_Frame2_sw));
+            res.W = content.Load<Texture2D>(nameof(Res.UIToolTip_img_Item_Frame2_w));
+            res.NW = content.Load<Texture2D>(nameof(Res.UIToolTip_img_Item_Frame2_nw));
+            res.C = content.Load<Texture2D>(nameof(Res.UIToolTip_img_Item_Frame2_c));
             this.Resource = res;
         }
 
@@ -251,25 +261,333 @@ namespace WzComparerR2.MapRender.UI
         private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, UIWorldMap.Tooltip item)
         {
             var blocks = new List<TextBlock>();
+            var textures = new List<TextureBlock>();
             Vector2 size = Vector2.Zero;
             Vector2 current = Vector2.Zero;
             StringResult sr = null;
 
-            if (item.MapID != null)
+            var spot = item.Spot;
+            if (spot != null)
             {
-                this.StringLinker?.StringMap.TryGetValue(item.MapID.Value, out sr);
-                string title = sr != null ? string.Format("{0} : {1}", sr["streetName"], sr["mapName"]) : item.MapID.ToString();
-                string desc = sr?["mapDesc"];
-                var titleFont = string.IsNullOrEmpty(desc) ? env.Fonts.TooltipContentFont : env.Fonts.TooltipTitleFont;
-                blocks.Add(PrepareTextLine(titleFont, title, ref current, Color.White, ref size.X));
-                if (!string.IsNullOrEmpty(desc))
+                //计算属性要求 获取怪物列表和npc列表
+                int spotBarrier = 0, spotBarrierArc = 0;
+                var mobNames = new List<string>();
+                var npcNames = new List<string>();
+                int minLevel = 0, maxLevel = 0;
+
+                if (!spot.NoTooltip)
                 {
-                    blocks.AddRange(PrepareFormatText(env.Fonts.TooltipContentFont, desc, ref current, 280, ref size.X));
+                    HashSet<int> mobs = new HashSet<int>();
+                    HashSet<int> npcs = new HashSet<int>();
+                    //TODO: caching mobs level.
+                    foreach (var mapNo in spot.MapNo)
+                    {
+                        var mapNode = PluginManager.FindWz(string.Format("Map/Map/Map{0}/{1:D9}.img/info", mapNo / 100000000, mapNo));
+                        if (mapNode != null)
+                        {
+                            int barrier = mapNode?.Nodes["barrier"].GetValueEx(0) ?? 0;
+                            int barrierArc = mapNode?.Nodes["barrierArc"].GetValueEx(0) ?? 0;
+                            spotBarrier = Math.Max(spotBarrier, barrier);
+                            spotBarrierArc = Math.Max(spotBarrierArc, barrierArc);
+                        }
+
+                        var mapInfo = PluginManager.FindWz(string.Format("Etc/MapObjectInfo.img/{0}", mapNo));
+                        if (mapInfo != null)
+                        {
+                            var mobNode = mapInfo.Nodes["mob"];
+                            if (mobNode != null)
+                            {
+                                foreach (var valNode in mobNode.Nodes)
+                                {
+                                    mobs.Add(valNode.GetValue<int>());
+                                }
+                            }
+                            var npcNode = mapInfo.Nodes["npc"];
+                            if (npcNode != null)
+                            {
+                                foreach (var valNode in npcNode.Nodes)
+                                {
+                                    npcs.Add(valNode.GetValue<int>());
+                                }
+                            }
+                        }
+                    }
+
+                    if (mobs.Count > 0)
+                    {
+                        foreach (var mobID in mobs)
+                        {
+                            this.StringLinker?.StringMob.TryGetValue(mobID, out sr);
+                            var mobLevel = PluginManager.FindWz(string.Format("Mob/{0:D7}.img/info/level", mobID)).GetValueEx<int>(0);
+                            string mobText = sr != null ? string.Format("{0}(Lv.{1})", sr.Name, mobLevel) : mobID.ToString();
+                            mobNames.Add(mobText);
+                            if (mobLevel > 0)
+                            {
+                                if (minLevel > 0) minLevel = Math.Min(minLevel, mobLevel);
+                                else minLevel = mobLevel;
+                                if (maxLevel > 0) maxLevel = Math.Max(maxLevel, mobLevel);
+                                else maxLevel = mobLevel;
+                            }
+                        }
+                        minLevel = Math.Max(10, minLevel - 3);
+                        maxLevel = Math.Max(10, maxLevel - 2);
+                    }
+                    if (npcs.Count > 0)
+                    {
+                        foreach (var npcID in npcs)
+                        {
+                            this.StringLinker?.StringNpc.TryGetValue(npcID, out sr);
+                            string npcText = sr?.Name ?? npcID.ToString();
+                            npcNames.Add(npcText);
+                        }
+                    }
+                }
+
+                //预计算宽度
+                int partWidth = 0;
+                int? drawNpcColumnWidth = null;
+                var font = env.Fonts.TooltipContentFont;
+                if (mobNames.Count > 0 || npcNames.Count > 0)
+                {
+                    float mobWidth = mobNames.Count <= 0 ? 0 : mobNames.Max(text => font.MeasureString(text).X);
+                    float npcWidth = npcNames.Count <= 0 ? 0 : npcNames.Max(text => font.MeasureString(text).X);
+                    if (npcNames.Count > 0 && mobNames.Count + npcNames.Count > 18)
+                    {
+                        partWidth = (int)Math.Max(mobWidth, npcWidth * 2 + 10);
+                        drawNpcColumnWidth = (int)npcWidth;
+                    }
+                    else
+                    {
+                        partWidth = (int)Math.Max(mobWidth, npcWidth);
+                    }
+                    partWidth += 15;
+                }
+
+                //开始绘制
+                //属性要求
+                List<object> part1 = null;
+                float part1Width = 0;
+                if (spotBarrier > 0 || spotBarrierArc > 0)
+                {
+                    part1 = new List<object>();
+                    Action<int, Texture2D, Color> addBarrier = (barrier, icon, foreColor) =>
+                    {
+                        if (icon != null)
+                        {
+                            var rect = new Rectangle((int)current.X, (int)current.Y + 1, icon.Width, icon.Height);
+                            part1.Add(new TextureBlock(icon, rect));
+                            current.X += rect.Width + 1;
+                        }
+
+                        var textBlock = PrepareTextBlock(env.Fonts.DefaultFont, barrier.ToString(), ref current, foreColor);
+                        part1.Add(textBlock);
+                    };
+
+                    if (spotBarrier > 0)
+                    {
+                        var icon = Content.Load<Texture2D>(nameof(MRes.UIWindow_img_ToolTip_WorldMap_StarForce));
+                        addBarrier(spotBarrier, icon, new Color(255, 204, 0));
+                    }
+                    else if (spotBarrierArc > 0)
+                    {
+                        var icon = Content.Load<Texture2D>(nameof(MRes.UIWindow_img_ToolTip_WorldMap_ArcaneForce));
+                        addBarrier(spotBarrierArc, icon, new Color(221, 170, 255));
+                    }
+
+                    part1Width = current.X;
+                    size.X = Math.Max(size.X, current.X);
+                    current.X = 0;
+                    current.Y += 15;
+                }
+
+                //地图名称
+                List<TextBlock> part2 = new List<TextBlock>();
+                List<TextBlock> part2_1 = null;
+                float part2Width = 0;
+                {
+                    int mapID = spot.MapNo[0];
+                    this.StringLinker?.StringMap.TryGetValue(mapID, out sr);
+                    string title = spot.Title ?? (sr != null ? string.Format("{0} : {1}", sr["streetName"], sr["mapName"]) : mapID.ToString());
+                    string desc = spot.Desc ?? sr?["mapDesc"];
+                    var titleFont = string.IsNullOrEmpty(desc) ? env.Fonts.TooltipContentFont : env.Fonts.TooltipTitleFont;
+                    part2.Add(PrepareTextLine(titleFont, title, ref current, Color.White, ref part2Width));
+                    size.X = Math.Max(size.X, part2Width);
+
+                    if (!string.IsNullOrEmpty(desc))
+                    {
+                        current.Y += 2;
+                        part2_1 = new List<TextBlock>();
+                        int width = (int)MathHelper2.Max(280, part2Width, size.X, partWidth);
+                        part2_1.AddRange(PrepareFormatText(env.Fonts.TooltipContentFont, desc, ref current, width, ref size.X));
+                    }
+
+                    current.Y += 4;
+                }
+
+                //准备分割线
+                List<TextureBlock> lines = new List<TextureBlock>();
+                var line = Content.Load<Texture2D>(nameof(MRes.UIWindow_img_ToolTip_WorldMap_Line));
+
+                //绘制怪物
+                List<object> part3 = null;
+                if (mobNames.Count > 0)
+                {
+                    part3 = new List<object>();
+
+                    //绘制分割线
+                    lines.Add(new TextureBlock(line, new Rectangle(current.ToPoint(), Point.Zero)));
+                    current.Y += 8;
+
+                    //推荐等级
+                    current.X = 15;
+                    part3.Add(PrepareTextBlock(font,
+                        string.Format("推荐等级 : Lv.{0} ~ Lv.{1}", minLevel, maxLevel),
+                        ref current, new Color(119, 204, 255)));
+                    size.X = Math.Max(size.X, current.X);
+                    current.X = 0;
+                    current.Y += 18;
+
+                    //绘制分割线
+                    lines.Add(new TextureBlock(line, new Rectangle(current.ToPoint(), Point.Zero)));
+                    current.Y += 8;
+
+                    //怪物列表
+                    Texture2D icon;
+                    Color color;
+                    if (spotBarrier > 0 || spotBarrierArc > 0)
+                    {
+                        icon = Content.Load<Texture2D>(nameof(MRes.UIWindow_img_ToolTip_WorldMap_enchantMob));
+                        color = new Color(255, 0, 102);
+                    }
+                    else
+                    {
+                        icon = Content.Load<Texture2D>(nameof(MRes.UIWindow_img_ToolTip_WorldMap_Mob));
+                        color = new Color(119, 255, 0);
+                    }
+                    part3.Add(new TextureBlock(icon, new Rectangle(0, (int)current.Y + 1, 0, 0)));
+                    foreach (var mobName in mobNames)
+                    {
+                        part3.Add(new TextBlock()
+                        {
+                            Font = font,
+                            Text = mobName,
+                            Position = new Vector2(15, current.Y),
+                            ForeColor = color
+                        });
+                        current.Y += 18;
+                    }
+                }
+
+                //绘制npc
+                List<object> part4 = null;
+                if (npcNames.Count > 0)
+                {
+                    part4 = new List<object>();
+                    //绘制分割线
+                    lines.Add(new TextureBlock(line, new Rectangle(current.ToPoint(), Point.Zero)));
+                    current.Y += 8;
+
+                    //npc列表
+                    Texture2D icon = Content.Load<Texture2D>(nameof(MRes.UIWindow_img_ToolTip_WorldMap_Npc));
+                    Color color = new Color(119, 204, 255);
+                    part4.Add(new TextureBlock(icon, new Rectangle(0, (int)current.Y + 1, 0, 0)));
+                    for (int i = 0; i < npcNames.Count; i++)
+                    {
+                        var pos = new Vector2(15, current.Y);
+                        if (i % 2 == 1 && drawNpcColumnWidth != null)
+                        {
+                            pos.X += 10 + drawNpcColumnWidth.Value;
+                        }
+
+                        part4.Add(new TextBlock()
+                        {
+                            Font = font,
+                            Text = npcNames[i],
+                            Position = pos,
+                            ForeColor = color
+                        });
+
+                        if (i == npcNames.Count - 1 || drawNpcColumnWidth == null || i % 2 == 1)
+                        {
+                            current.X = 0;
+                            current.Y += 18;
+                        }
+                    }
+                }
+
+                size.X = Math.Max(size.X, partWidth);
+                current.Y -= 4;
+
+                //合并parts
+                //对part1 part2居中
+                if (part1 != null)
+                {
+                    int offset = (int)((size.X - part1Width) / 2);
+                    foreach (object obj in part1)
+                    {
+                        if (obj is TextBlock)
+                        {
+                            var tb = (TextBlock)obj;
+                            tb.Position.X += offset;
+                            blocks.Add(tb);
+                        }
+                        else if (obj is TextureBlock)
+                        {
+                            var tex = (TextureBlock)obj;
+                            tex.Rectangle.X += offset;
+                            textures.Add(tex);
+                        }
+                    }
+                }
+                if (part2 != null)
+                {
+                    int offset = (int)((size.X - part2Width) / 2);
+                    for (int i = 0; i < part2.Count; i++)
+                    {
+                        var tb = part2[i];
+                        tb.Position.X += offset;
+                        blocks.Add(tb);
+                    }
+                }
+                if (part2_1 != null)
+                {
+                    foreach(var tb in part2_1)
+                    {
+                        blocks.Add(tb);
+                    }
+                }
+                if (lines != null)
+                {
+                    for (int i = 0; i < lines.Count; i++)
+                    {
+                        var tex = lines[i];
+                        tex.Rectangle.Width = (int)size.X;
+                        tex.Rectangle.Height = 1;
+                        textures.Add(tex);
+                    }
+                }
+                foreach (var _part in new[] { part3, part4 })
+                {
+                    if (_part != null)
+                    {
+                        foreach (object obj in _part)
+                        {
+                            if (obj is TextBlock)
+                            {
+                                var tb = (TextBlock)obj;
+                                blocks.Add(tb);
+                            }
+                            else if (obj is TextureBlock)
+                            {
+                                var tex = (TextureBlock)obj;
+                                textures.Add(tex);
+                            }
+                        }
+                    }
                 }
             }
-
             size.Y = current.Y;
-            return new TooltipContent() { blocks = blocks, size = size };
+            return new TooltipContent() { blocks = blocks, textures = textures, size = size };
         }
 
         private TooltipContent DrawString(GameTime gameTime, RenderEnv env, string text)
@@ -308,6 +626,22 @@ namespace WzComparerR2.MapRender.UI
                     env.Sprite.Draw(block.Texture, rect, Color.White);
                 }
             }
+
+            if (content.textures != null)
+            {
+                foreach (var block in content.textures)
+                {
+                    if (block.Texture != null)
+                    {
+                        var rect = block.Rectangle;
+                        rect.X += (int)(position.X + padding.X);
+                        rect.Y += (int)(position.Y + padding.Y);
+                        if (rect.Width == 0) rect.Width = block.Texture.Width;
+                        if (rect.Height == 0) rect.Height = block.Texture.Height;
+                        env.Sprite.Draw(block.Texture, rect, Color.White);
+                    }
+                }
+            }
             env.Sprite.Flush();
 
             foreach (var block in content.blocks)
@@ -335,6 +669,7 @@ namespace WzComparerR2.MapRender.UI
         private struct TooltipContent
         {
             public List<TextBlock> blocks;
+            public List<TextureBlock> textures;
             public Vector2 size;
         }
     }
