@@ -111,7 +111,7 @@ namespace WzComparerR2.Controls
             _eff.AlphaMixEnabled = false;
 
             _device.Clear(Color.TransparentBlack);
-            _sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, _eff, null);
+            _sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, _eff, null);
             _sb.Draw(_rt2d, Vector2.Zero, Color.White);
             _sb.End();
 
@@ -129,7 +129,7 @@ namespace WzComparerR2.Controls
             _eff.MinMixedAlpha = minMixedAlpha;
            
             _device.Clear(Color.TransparentBlack);
-            _sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null, _eff, null);
+            _sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, _eff, null);
             _sb.Draw(_rt2d, Vector2.Zero, Color.White);
             _sb.End();
 
