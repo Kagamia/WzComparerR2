@@ -404,6 +404,8 @@ namespace WzComparerR2.MapRender
                 },
                 this.OnSceneItemClick);
             this.attachedEvent.Add(disposable);
+
+            this.ui.WorldMap.MapSpotClick += WorldMap_MapSpotClick;
         }
 
         private void UIOption_OK(object sender, EventArgs e)
@@ -427,6 +429,11 @@ namespace WzComparerR2.MapRender
             var wnd = sender as UIOptions;
             var data = wnd.DataContext as UIOptionsDataModel;
             LoadOptionData(data);
+        }
+
+        private void WorldMap_MapSpotClick(object sender, UIWorldMap.MapSpotEventArgs e)
+        {
+            this.MoveToPortal(e.MapID, "sp");
         }
 
         protected override void LoadContent()

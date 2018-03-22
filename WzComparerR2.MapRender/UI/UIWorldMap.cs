@@ -37,6 +37,7 @@ namespace WzComparerR2.MapRender.UI
             {
                 this.CmbMaps.Resources.Add(typeof(WorldMapInfo), template);
             }
+
             //添加默认点击事件
             UIHelper.RegisterClickEvent(this.MapArea, (_, point) => this.MapArea.HitTest(point), this.OnMapAreaClick);
         }
@@ -44,6 +45,8 @@ namespace WzComparerR2.MapRender.UI
         public bool IsDataLoaded { get; private set; }
         public ComboBox CmbMaps { get; private set; }
         public WorldMapArea MapArea { get; private set; }
+
+        public event EventHandler<MapSpotEventArgs> MapSpotClick;
 
         private ObservableCollection<WorldMapInfo> worldMaps;
 
@@ -318,9 +321,17 @@ namespace WzComparerR2.MapRender.UI
             {
                 var link = (MapLink)obj;
                 var linkmapInfo = this.worldMaps.FirstOrDefault(map => map.Name == link.LinkMap);
-                if( linkmapInfo != null)
+                if (linkmapInfo != null)
                 {
                     this.CurrentWorldMap = linkmapInfo;
+                }
+            }
+            else if (obj is MapSpot)
+            {
+                var spot = (MapSpot)obj;
+                if (spot.MapNo.Count > 0)
+                {
+                    this.MapSpotClick?.Invoke(this, new MapSpotEventArgs(spot.MapNo[0]));
                 }
             }
         }
@@ -559,6 +570,16 @@ namespace WzComparerR2.MapRender.UI
         public class Tooltip
         {
             public MapSpot Spot { get; set; }
+        }
+
+        public class MapSpotEventArgs : EventArgs
+        {
+            public MapSpotEventArgs(int mapID)
+            {
+                this.MapID = mapID;
+            }
+
+            public int MapID { get; private set; }
         }
     }
 }
