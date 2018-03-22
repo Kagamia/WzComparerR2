@@ -116,21 +116,21 @@ namespace WzComparerR2.MapRender.UI
 
         private void LoadResource()
         {
-            var renderer = Engine.Instance.Renderer;
+            var assetManager = Engine.Instance.AssetManager;
 
             var tooltipBrush = new NinePatchBrush()
             {
                 Resource = new EKNineFormResource()
                 {
-                    NW = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_nw),
-                    N = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_n),
-                    NE = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_ne),
-                    W = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_w),
-                    C = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_c),
-                    E = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_e),
-                    SW = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_sw),
-                    S = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_s),
-                    SE = renderer.CreateTexture(Res.UIToolTip_img_Item_Frame2_se),
+                    NW = assetManager.LoadTexture(null, nameof(Res.UIToolTip_img_Item_Frame2_nw)),
+                    N = assetManager.LoadTexture(null, nameof(Res.UIToolTip_img_Item_Frame2_n)),
+                    NE = assetManager.LoadTexture(null, nameof(Res.UIToolTip_img_Item_Frame2_ne)),
+                    W = assetManager.LoadTexture(null, nameof(Res.UIToolTip_img_Item_Frame2_w)),
+                    C = assetManager.LoadTexture(null, nameof(Res.UIToolTip_img_Item_Frame2_c)),
+                    E = assetManager.LoadTexture(null, nameof(Res.UIToolTip_img_Item_Frame2_e)),
+                    SW = assetManager.LoadTexture(null, nameof(Res.UIToolTip_img_Item_Frame2_sw)),
+                    S = assetManager.LoadTexture(null, nameof(Res.UIToolTip_img_Item_Frame2_s)),
+                    SE = assetManager.LoadTexture(null, nameof(Res.UIToolTip_img_Item_Frame2_se)),
                 }
             };
 

@@ -439,7 +439,7 @@ namespace WzComparerR2.MapRender.UI
         {
             public UIMinimapResource()
             {
-                this.LoadResource(Engine.Instance.Renderer);
+                this.LoadResource(Engine.Instance.AssetManager);
             }
 
             public bool HasIcon { get; set; }
@@ -494,18 +494,18 @@ namespace WzComparerR2.MapRender.UI
                 return new Microsoft.Xna.Framework.Point(texture.Width, texture.Height);
             }
 
-            private void LoadResource(Renderer renderer)
+            private void LoadResource(AssetManager assetManager)
             {
-                this.NW1 = renderer.CreateTexture(Res.UIWindow2_img_MiniMap_MaxMap_nw);
-                this.NW2 = renderer.CreateTexture(Res.UIWindow2_img_MiniMap_MaxMap_nw2);
-                this.N = renderer.CreateTexture(Res.UIWindow2_img_MiniMap_MaxMap_n);
-                this.NE = renderer.CreateTexture(Res.UIWindow2_img_MiniMap_MaxMap_ne);
-                this.W = renderer.CreateTexture(Res.UIWindow2_img_MiniMap_MaxMap_w);
-                //this.C = renderer.CreateTexture(Res.UIWindow2_img_MiniMap_MaxMap_c);
-                this.E = renderer.CreateTexture(Res.UIWindow2_img_MiniMap_MaxMap_e);
-                this.SW = renderer.CreateTexture(Res.UIWindow2_img_MiniMap_MaxMap_sw);
-                this.S = renderer.CreateTexture(Res.UIWindow2_img_MiniMap_MaxMap_s);
-                this.SE = renderer.CreateTexture(Res.UIWindow2_img_MiniMap_MaxMap_se);
+                this.NW1 = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_nw));
+                this.NW2 = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_nw2));
+                this.N = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_n));
+                this.NE = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_ne));
+                this.W = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_w));
+                //this.C = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_c);
+                this.E = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_e));
+                this.SW = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_sw));
+                this.S = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_s));
+                this.SE = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_se));
             }
         }
 
@@ -513,7 +513,7 @@ namespace WzComparerR2.MapRender.UI
         {
             public ComboBoxBackgroundResource()
             {
-                this.LoadResource(Engine.Instance.Renderer);
+                this.LoadResource(Engine.Instance.AssetManager);
             }
 
             public TextureBase Left { get; set; }
@@ -525,11 +525,11 @@ namespace WzComparerR2.MapRender.UI
                 return new Microsoft.Xna.Framework.Point(texture.Width, texture.Height);
             }
 
-            private void LoadResource(Renderer renderer)
+            private void LoadResource(AssetManager assetManager)
             {
-                this.Left = renderer.CreateTexture(MRes.Basic_img_ComboBox_normal_0);
-                this.Center = renderer.CreateTexture(MRes.Basic_img_ComboBox_normal_1);
-                this.Right = renderer.CreateTexture(MRes.Basic_img_ComboBox_normal_2);
+                this.Left = assetManager.LoadTexture(null, nameof(MRes.Basic_img_ComboBox_normal_0));
+                this.Center = assetManager.LoadTexture(null, nameof(MRes.Basic_img_ComboBox_normal_1));
+                this.Right = assetManager.LoadTexture(null, nameof(MRes.Basic_img_ComboBox_normal_2));
             }
 
             #region Interface implementation

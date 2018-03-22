@@ -32,8 +32,16 @@ namespace WzComparerR2.MapRender.UI
 
         public static TextureBase LoadTexture(Wz_Node node)
         {
-            var png = node?.GetLinkedSourceNode(PluginManager.FindWz)?.GetValueEx<Wz_Png>(null);
-            return png == null ? null : Engine.Instance.Renderer.CreateTexture(png);
+            node = node?.GetLinkedSourceNode(PluginManager.FindWz);
+            var png = node.GetValueEx<Wz_Png>(null);
+            if (png != null)
+            {
+                return Engine.Instance.AssetManager.LoadTexture(null, node.FullPathToFile);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public static HitMap CreateHitMap(Texture2D texture)

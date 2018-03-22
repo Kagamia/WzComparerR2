@@ -68,7 +68,7 @@ namespace WzComparerR2.MapRender.UI
         protected override void InitializeComponents()
         {
             var canvas = new Canvas();
-            var canvasBackTexture = Engine.Instance.Renderer.CreateTexture(MRes.UIWindow2_img_WorldMap_Border_0);
+            var canvasBackTexture = Engine.Instance.AssetManager.LoadTexture(null, nameof(MRes.UIWindow2_img_WorldMap_Border_0));
             canvas.Background = new ImageBrush() { ImageSource = new BitmapImage() { Texture = canvasBackTexture }, Stretch = Stretch.None };
             canvas.SetBinding(Canvas.WidthProperty, new Binding(UIWorldMap.WidthProperty) { Source = this, Mode = BindingMode.TwoWay });
             canvas.SetBinding(Canvas.HeightProperty, new Binding(UIWorldMap.HeightProperty) { Source = this, Mode = BindingMode.TwoWay });

@@ -90,6 +90,8 @@ namespace WzComparerR2.MapRender
                 graphics.PreferredBackBufferHeight);
 
             WcR2Engine.FixEKBugs();
+
+            (this.engine.AssetManager as WcR2AssetManager).DefaultContentManager = this.Content as WcR2ContentManager;
         }
 
         public StringLinker StringLinker { get; set; }
@@ -130,7 +132,7 @@ namespace WzComparerR2.MapRender
             this.resLoader = new ResourceLoader(this.Services);
             this.ui = new MapRenderUIRoot();
             this.BindingUIInput();
-            this.tooltip = new Tooltip2(this.GraphicsDevice);
+            this.tooltip = new Tooltip2(this.Content);
             this.tooltip.StringLinker = this.StringLinker;
             this.cm = new CoroutineManager(this);
             this.cm.StartCoroutine(OnStart()); //entry
@@ -644,6 +646,7 @@ namespace WzComparerR2.MapRender
             base.UnloadContent();
             this.resLoader.Unload();
             this.ui.UnloadContents();
+            this.Content.Unload();
             this.bgm = null;
             this.mapImg = null;
             this.mapData = null;

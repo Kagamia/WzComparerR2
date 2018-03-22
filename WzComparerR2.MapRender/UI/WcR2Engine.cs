@@ -10,10 +10,12 @@ using EmptyKeys.UserInterface.Renderers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Reflection;
+using WzComparerR2.WzLib;
 using WzComparerR2.Rendering;
 using WzComparerR2.MapRender;
 using ContentManager = Microsoft.Xna.Framework.Content.ContentManager;
-using Res = WzComparerR2.MapRender.Properties.Resources;
+using MRes = WzComparerR2.MapRender.Properties.Resources;
+using Res = CharaSimResource.Resource;
 
 namespace WzComparerR2.MapRender.UI
 {
@@ -167,9 +169,11 @@ namespace WzComparerR2.MapRender.UI
 
     class WcR2AssetManager : MonoGameAssetManager
     {
+        public ContentManager DefaultContentManager { get; set; } 
+
         public override FontBase LoadFont(object contentManager, string file)
         {
-            var cm = contentManager as WcR2ContentManager;
+            var cm = (contentManager as WcR2ContentManager) ?? this.DefaultContentManager;
             if (cm != null)
             {
                 var wcR2Font = cm.Load<IWcR2Font>(file);
@@ -184,13 +188,13 @@ namespace WzComparerR2.MapRender.UI
         /// </remarks>
         public override TextureBase LoadTexture(object contentManager, string file)
         {
-            var cm = contentManager as WcR2ContentManager;
+            var cm = (contentManager as WcR2ContentManager) ?? this.DefaultContentManager;
             if (cm != null)
             {
-                var bitmap = Res.ResourceManager.GetObject(file) as System.Drawing.Bitmap;
-                if (bitmap != null)
+                var texture = cm.Load<Texture2D>(file);
+                if (texture != null)
                 {
-                    return Engine.Instance.Renderer.CreateTexture(bitmap);
+                    return Engine.Instance.Renderer.CreateTexture(texture);
                 }
             }
 
@@ -334,6 +338,37 @@ namespace WzComparerR2.MapRender.UI
                 }
                 return (T)value;
             }
+            else if (typeof(T) == typeof(Texture2D))
+            {
+                object value;
+                if (!LoadedAssets.TryGetValue(assetName, out value))
+                {
+                    var bitmap = MRes.ResourceManager.GetObject(assetName) as System.Drawing.Bitmap;
+                    if( bitmap == null)
+                    {
+                        var obj = Res.ResourceManager.GetObject(assetName);
+                        bitmap = Res.ResourceManager.GetObject(assetName) as System.Drawing.Bitmap;
+                    }
+                    if (bitmap != null)
+                    {
+                        value = bitmap.ToTexture(this.GraphicsDevice);
+                    }
+                    else //寻找wz
+                    {
+                        var png = PluginBase.PluginManager.FindWz(assetName).GetValueEx<Wz_Png>(null);
+                        if (png != null)
+                        {
+                            value = png.ToTexture(this.GraphicsDevice);
+                        }
+                    }
+
+                    if (value != null)
+                    {
+                        LoadedAssets[assetName] = value;
+                    }
+                }
+                return (T)value;
+            }
             return base.Load<T>(assetName);
         }
 
@@ -365,6 +400,19 @@ namespace WzComparerR2.MapRender.UI
             {
                 return null;
             }
+        }
+
+        public override void Unload()
+        {
+            foreach(var kv in this.LoadedAssets)
+            {
+                IDisposable disposable = kv.Value as IDisposable;
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                }
+            }
+            base.Unload();
         }
     }
 

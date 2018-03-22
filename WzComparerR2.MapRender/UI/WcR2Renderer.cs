@@ -12,7 +12,7 @@ namespace WzComparerR2.MapRender.UI
     /// <summary>
     /// Implements Mono Game renderer.
     /// </summary>
-    public class WcR2Renderer : Renderer
+    public class WcR2Renderer : Renderer, IDisposable
     {
         /// <summary>
         /// The graphics device
@@ -386,23 +386,14 @@ namespace WzComparerR2.MapRender.UI
 
         public override TextureBase CreateTexture(object nativeTexture)
         {
-            if (nativeTexture == null)
+            if (nativeTexture is Texture2D)
             {
-                return null;
+                return new MonoGameTexture(nativeTexture);
             }
-
-            if (nativeTexture is System.Drawing.Bitmap)
+            else
             {
-                var texture = ((System.Drawing.Bitmap)nativeTexture).ToTexture(GraphicsDevice);
-                return new MonoGameTexture(texture);
+                throw new ArgumentException("nativeTexture is not Texture2D.");
             }
-            else if (nativeTexture is WzLib.Wz_Png)
-            {
-                var texture = ((WzLib.Wz_Png)nativeTexture).ToTexture(GraphicsDevice);
-                return new MonoGameTexture(texture);
-            }
-
-            return new MonoGameTexture(nativeTexture);
         }
 
         public override void DrawText(FontBase font, string text, PointF position, Size renderSize, ColorW color, PointF scale, float depth)
@@ -594,6 +585,16 @@ namespace WzComparerR2.MapRender.UI
                     this.d2dRenderer.End();
                     break;
             }
+        }
+
+        public void Dispose()
+        {
+            this.activeEffects.Clear();
+
+            this.clippingRasterizeState?.Dispose();
+            this.rasterizeStateGeometry?.Dispose();
+            this.spriteBatch?.Dispose();
+            this.basicEffect?.Dispose();
         }
 
         enum DrawState
