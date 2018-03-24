@@ -286,7 +286,8 @@ namespace WzComparerR2.MapRender
             if (particleSystem.Texture?.Texture != null)
             {
                 ItemType itemType = ItemType.Unknown;
-                if (particleSystem.BlendFuncSrc == ParticleBlendFunc.SRC_ALPHA)
+                if (particleSystem.BlendFuncSrc == ParticleBlendFunc.SRC_ALPHA
+                    || (int)particleSystem.BlendFuncSrc == 12) //TODO: what's this? KMS v.293, esfera_temple_big
                 {
                     if (particleSystem.BlendFuncDst == ParticleBlendFunc.ONE) //5,2
                         itemType = ItemType.Sprite_BlendAdditive;
