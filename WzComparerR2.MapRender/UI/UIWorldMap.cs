@@ -11,6 +11,7 @@ using EmptyKeys.UserInterface.Media;
 using EmptyKeys.UserInterface.Data;
 using EmptyKeys.UserInterface.Renderers;
 using EmptyKeys.UserInterface.Media.Imaging;
+using EmptyKeys.UserInterface.Input;
 
 using WzComparerR2.WzLib;
 using WzComparerR2.Common;
@@ -96,6 +97,7 @@ namespace WzComparerR2.MapRender.UI
             WorldMapArea mapArea = new WorldMapArea();
             mapArea.Width = 640;
             mapArea.Height = 480;
+            mapArea.InputBindings.Add(new InputBinding(new RelayCommand(MapArea_RightClick), new MouseGesture(MouseAction.RightClick)));
             Canvas.SetLeft(mapArea, 7);
             Canvas.SetTop(mapArea, 44);
             canvas.Children.Add(mapArea);
@@ -262,7 +264,7 @@ namespace WzComparerR2.MapRender.UI
             }
 
             //处理当前地图信息
-            foreach(var map in this.worldMaps)
+            foreach (var map in this.worldMaps)
             {
                 if (map.ParentMap != null)
                 {
@@ -337,6 +339,16 @@ namespace WzComparerR2.MapRender.UI
         }
 
         private void BtnBack_Click(object sender, RoutedEventArgs e)
+        {
+            this.GoBack();
+        }
+
+        private void MapArea_RightClick(object obj)
+        {
+            this.GoBack();
+        }
+
+        private void GoBack()
         {
             var curMap = this.CurrentWorldMap;
             if (curMap != null && curMap.ParentMap != null)
