@@ -84,6 +84,11 @@ namespace WzComparerR2.MapRender
                 emitter.RadialAccelVar = desc.Gravity.RadialAccelVar;
                 emitter.TangentialAccel = desc.Gravity.TangentialAccel;
                 emitter.TangentialAccelVar = desc.Gravity.TangentialAccelVar;
+                emitter.RotationIsDir = desc.Gravity.RotationIsDir;
+            }
+            if (desc.Radius != null)
+            {
+
             }
             emitter.Life = desc.Life;
             emitter.LifeVar = desc.LifeVar;
@@ -170,16 +175,27 @@ namespace WzComparerR2.MapRender
                     }
 
                     //更新粒子
-                    var dir = p.Dir;
-                    if (dir != Vector2.Zero) //计算方向
+                    var accDir = p.Pos;
+                    if (accDir != Vector2.Zero) //计算方向
                     {
-                        dir.Normalize();
+                        accDir.Normalize();
                     }
-                    var radial = dir * p.RadialAcc; //法线加速度矢量
-                    var tangent = new Vector2(dir.Y, -dir.X) * p.TangentialAcc; //切线加速度矢量
+                    var radial = accDir * p.RadialAcc; //法线加速度矢量
+                    //var tangent = new Vector2(-accDir.Y, accDir.X) * p.TangentialAcc; //切线加速度矢量
+                    var tangent = Vector2.Zero; //tangent not works in the game?
                     var acc = this.Gravity + radial + tangent; //总加速度矢量
                     p.Dir += acc * time; //计算加速度
                     p.Pos += p.Dir * time; //计算位置
+
+                    //计算旋转
+                    p.Angle += p.RotatePerSecond * time;
+                    var rad = MathHelper.Lerp(p.StartRadius, p.EndRadius, p.NormalizedTime);
+                    if (rad > 0)
+                    {
+                        var radian = MathHelper.ToRadians(p.Angle);
+                        accDir = new Vector2((float)Math.Cos(radian), (float)Math.Sin(radian));
+                        p.Pos += accDir * rad * time;
+                    }
                 });
 
                 //回收粒子

@@ -40,6 +40,7 @@ namespace WzComparerR2.MapRender
         public float EndSpin { get; set; }
         public float EndSpinVar { get; set; }
         public ParticleGravityDesc Gravity { get; set; }
+        public ParticleRadiusDesc Radius { get; set; }
         public float Life { get; set; }
         public float LifeVar { get; set; }
         public bool OpacityModifyRGB { get; set; }
@@ -58,6 +59,16 @@ namespace WzComparerR2.MapRender
         public float TangentialAccel { get; set; }
         public float TangentialAccelVar { get; set; }
         public bool RotationIsDir { get; set; }
+    }
+
+    public class ParticleRadiusDesc
+    {
+        public float StartRadius { get; set; }
+        public float StartRadiusVar { get; set; }
+        public float EndRadius { get; set; }
+        public float EndRadiusVar { get; set; }
+        public float RotatePerSecond { get; set; }
+        public float RotatePerSecondVar { get; set; }
     }
 
     //same as d3d11blend

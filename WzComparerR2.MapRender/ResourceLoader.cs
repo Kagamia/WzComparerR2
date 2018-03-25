@@ -155,6 +155,24 @@ namespace WzComparerR2.MapRender
                             desc.Gravity = gravityDesc;
                         }
                         break;
+                    case "RADIUS":
+                        {
+                            var radiusDesc = new ParticleRadiusDesc();
+                            foreach (var pNode2 in pNode.Nodes)
+                            {
+                                switch (pNode2.Text)
+                                {
+                                    case "startRadius": radiusDesc.StartRadius = pNode2.GetValue<float>(); break;
+                                    case "startRadiusVar": radiusDesc.StartRadiusVar = pNode2.GetValue<float>(); break;
+                                    case "endRadius": radiusDesc.EndRadius = pNode2.GetValue<float>(); break;
+                                    case "endRadiusVar": radiusDesc.EndRadiusVar = pNode2.GetValue<float>(); break;
+                                    case "rotatePerSecond": radiusDesc.RotatePerSecond = pNode2.GetValue<float>(); break;
+                                    case "rotatePerSecondVar": radiusDesc.RotatePerSecondVar = pNode2.GetValue<float>(); break;
+                                }
+                            }
+                            desc.Radius = radiusDesc;
+                        }
+                        break;
                     case "life": desc.Life = pNode.GetValue<float>(); break;
                     case "lifeVar": desc.LifeVar = pNode.GetValue<float>(); break;
                     case "opacityModifyRGB": desc.OpacityModifyRGB = pNode.GetValue<int>() != 0; break;

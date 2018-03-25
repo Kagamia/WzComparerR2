@@ -44,6 +44,15 @@ namespace WzComparerR2.MapRender
         public float RadialAccelVar { get; set; }
         public float TangentialAccel { get; set; }
         public float TangentialAccelVar { get; set; }
+        public bool RotationIsDir { get; set; }
+
+        //radius相关
+        public float StartRadius { get; set; }
+        public float StartRadiusVar { get; set; }
+        public float EndRadius { get; set; }
+        public float EndRadiusVar { get; set; }
+        public float RotatePerSecond { get; set; }
+        public float RotatePerSecondVar { get; set; }
 
         //life
         public float Life { get; set; }
@@ -88,9 +97,22 @@ namespace WzComparerR2.MapRender
 
             //计算速度方向
             var speed = r.NextVar(this.Speed, this.SpeedVar);
-            var rot = MathHelper.ToRadians(r.NextVar(this.Angle, this.AngleVar));
+            var rotAngle = r.NextVar(this.Angle, this.AngleVar);
+            var rot = MathHelper.ToRadians(rotAngle);
             var dir = new Vector2((float)Math.Cos(rot), -(float)Math.Sin(rot));
             particle.Dir = dir * speed;
+            if (this.RotationIsDir)
+            {
+                var deltaSpin = particle.EndSpin - particle.StartSpin;
+                particle.StartSpin = rotAngle;
+                particle.EndSize = rotAngle + deltaSpin;
+            }
+
+            //计算圆周运动
+            particle.StartRadius = r.NextVar(this.StartRadius, this.StartRadiusVar, true);
+            particle.EndRadius = r.NextVar(this.EndRadius, this.EndRadiusVar, true);
+            particle.RotatePerSecond = r.NextVar(this.RotatePerSecond, this.RotatePerSecondVar, true);
+            particle.Angle = rotAngle;
 
             //初始化加速度
             particle.RadialAcc = r.NextVar(this.RadialAccel, this.RadialAccelVar);

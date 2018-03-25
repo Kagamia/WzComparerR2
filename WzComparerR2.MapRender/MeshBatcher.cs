@@ -289,10 +289,16 @@ namespace WzComparerR2.MapRender
                 if (particleSystem.BlendFuncSrc == ParticleBlendFunc.SRC_ALPHA
                     || (int)particleSystem.BlendFuncSrc == 12) //TODO: what's this? KMS v.293, esfera_temple_big
                 {
-                    if (particleSystem.BlendFuncDst == ParticleBlendFunc.ONE) //5,2
-                        itemType = ItemType.Sprite_BlendAdditive;
-                    else if (particleSystem.BlendFuncDst == ParticleBlendFunc.INV_SRC_ALPHA) //5,6
-                        itemType = ItemType.Sprite_BlendNonPremultiplied;
+                    switch (particleSystem.BlendFuncDst)
+                    {
+                        case ParticleBlendFunc.ONE: //5,2
+                            itemType = ItemType.Sprite_BlendAdditive;
+                            break;
+                        case ParticleBlendFunc.SRC_COLOR: //12,3
+                        case ParticleBlendFunc.INV_SRC_ALPHA: //5,6
+                            itemType = ItemType.Sprite_BlendNonPremultiplied;
+                            break;
+                    }
                 }
                 if (itemType == ItemType.Unknown)
                 {
@@ -574,7 +580,7 @@ namespace WzComparerR2.MapRender
             D2DObject = 3,
             Sprite_AlphaBlend = Sprite,
             Sprite_BlendAdditive = 4,
-            Sprite_BlendNonPremultiplied = 5
+            Sprite_BlendNonPremultiplied = 5,
         }
 
     }

@@ -10,6 +10,7 @@ namespace WzComparerR2.MapRender
     public class Particle
     {
         public Vector2 Pos;
+        public float Angle;
         public Color StartColor;
         public Color EndColor;
         public float StartSize;
@@ -22,6 +23,11 @@ namespace WzComparerR2.MapRender
         public Vector2 Dir;
         public float RadialAcc;
         public float TangentialAcc;
+
+        //radius
+        public float StartRadius;
+        public float EndRadius;
+        public float RotatePerSecond;
 
         //lifecycle
         public float Time;
@@ -41,6 +47,10 @@ namespace WzComparerR2.MapRender
             this.Dir = Vector2.Zero;
             this.RadialAcc = 0;
             this.TangentialAcc = 0;
+
+            this.StartRadius = 0;
+            this.EndRadius = 0;
+            this.RotatePerSecond = 0;
 
             this.Time = 0;
             this.NormalizedTime = 0;
