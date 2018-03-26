@@ -400,25 +400,25 @@ namespace WzComparerR2.WzLib
         {
             byte[] pixel = new byte[width * height * 2];
             int lineIndex = 0;
-            for (int j0 = 0, j1 = width / 16; j0 < j1; j0++)
+            for (int j0 = 0, j1 = height / 16; j0 < j1; j0++)
             {
-                for (int i0 = 0, i1 = height / 16; i0 < i1; i0++)
+                var dstIndex = lineIndex;
+                for (int i0 = 0, i1 = width / 16; i0 < i1; i0++)
                 {
                     int idx = (i0 + j0 * i1) * 2;
                     byte b0 = rawData[idx];
                     byte b1 = rawData[idx + 1];
-                    idx = lineIndex;
                     for (int k = 0; k < 16; k++)
                     {
-                        pixel[idx++] = b0;
-                        pixel[idx++] = b1;
+                        pixel[dstIndex++] = b0;
+                        pixel[dstIndex++] = b1;
                     }
                 }
-                var dstIndex = lineIndex + width * 2;
+
                 for (int k = 1; k < 16; k++)
                 {
                     Array.Copy(pixel, lineIndex, pixel, dstIndex, width * 2);
-                    lineIndex += width * 2;
+                    dstIndex += width * 2;
                 }
 
                 lineIndex += width * 32;
