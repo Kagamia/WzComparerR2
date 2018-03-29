@@ -13,7 +13,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Form = System.Windows.Forms.Form;
 
+
 #region USING_EK
+using EmptyKeys.UserInterface;
 using KeyBinding = EmptyKeys.UserInterface.Input.KeyBinding;
 using RelayCommand = EmptyKeys.UserInterface.Input.RelayCommand;
 using KeyCode = EmptyKeys.UserInterface.Input.KeyCode;
@@ -413,7 +415,7 @@ namespace WzComparerR2.MapRender
             var wnd = sender as UIOptions;
             var data = wnd.DataContext as UIOptionsDataModel;
             SaveOptionData(data);
-            wnd.Visibility = EmptyKeys.UserInterface.Visibility.Collapsed;
+            wnd.Hide();
 
             ApplySetting();
         }
@@ -421,7 +423,7 @@ namespace WzComparerR2.MapRender
         private void UIOption_Cancel(object sender, EventArgs e)
         {
             var wnd = sender as UIOptions;
-            wnd.Visibility = EmptyKeys.UserInterface.Visibility.Collapsed;
+            wnd.Hide();
         }
 
         private void UiWnd_Visible(object sender, EmptyKeys.UserInterface.RoutedEventArgs e)
@@ -433,7 +435,20 @@ namespace WzComparerR2.MapRender
 
         private void WorldMap_MapSpotClick(object sender, UIWorldMap.MapSpotEventArgs e)
         {
-            this.MoveToPortal(e.MapID, "sp");
+            int mapID = e.MapID;
+
+            var callback = new EmptyKeys.UserInterface.Input.RelayCommand<MessageBoxResult>(r =>
+            {
+                if (r == MessageBoxResult.Yes)
+                {
+                    this.MoveToPortal(mapID, "sp");
+                }
+            });
+
+            StringResult sr = null;
+            this.StringLinker?.StringMap.TryGetValue(mapID, out sr);
+            var message = string.Format("是否传送到地图\r\n{0} ({1})？", sr?.Name ?? "null", mapID);
+            MessageBox.Show(message, "提示", MessageBoxButton.YesNo, callback, false);
         }
 
         protected override void LoadContent()
@@ -612,7 +627,14 @@ namespace WzComparerR2.MapRender
             var config = MapRenderConfig.Default;
             Music.GlobalVolume = config.Volume;
             this.renderEnv.Camera.AdjustRectEnabled = config.ClipMapRegion;
-            this.ui.TopBar.Visibility = config.TopBarVisible ? EmptyKeys.UserInterface.Visibility.Visible : EmptyKeys.UserInterface.Visibility.Collapsed;
+            if (config.TopBarVisible)
+            {
+                this.ui.TopBar.Show();
+            }
+            else
+            {
+                this.ui.TopBar.Hide();
+            }
             this.ui.Minimap.CameraRegionVisible = config.Minimap_CameraRegionVisible;
             this.ui.WorldMap.UseImageNameAsInfoName = config.WorldMap_UseImageNameAsInfoName;
             this.batcher.D2DEnabled = config.UseD2dRenderer;

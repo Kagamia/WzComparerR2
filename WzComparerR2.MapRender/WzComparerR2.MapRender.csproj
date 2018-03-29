@@ -157,9 +157,12 @@
     <Compile Include="TileMode.cs" />
     <Compile Include="UI\HitMap.cs" />
     <Compile Include="UI\ITooltipTarget.cs" />
+    <Compile Include="UI\MapRenderButtonStyle.cs" />
+    <Compile Include="UI\TCBBrush.cs" />
     <Compile Include="UI\LCRBrush.cs" />
     <Compile Include="UI\MapRenderResourceKey.cs" />
     <Compile Include="UI\MapRenderUIRoot.cs" />
+    <Compile Include="UI\MessageBoxStyle.cs" />
     <Compile Include="UI\NinePatchBrush.cs" />
     <Compile Include="UI\Tooltip.cs" />
     <Compile Include="Patches\TooltipPatch.cs" />
@@ -218,6 +221,25 @@
     <None Include="Resources\UIWindow2.img.WorldMap.Border.0.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Basic.img.BtCancel4.disabled.0.png" />
+    <None Include="Resources\Basic.img.BtCancel4.mouseOver.0.png" />
+    <None Include="Resources\Basic.img.BtCancel4.normal.0.png" />
+    <None Include="Resources\Basic.img.BtCancel4.pressed.0.png" />
+    <None Include="Resources\Basic.img.BtClose3.disabled.0.png" />
+    <None Include="Resources\Basic.img.BtClose3.mouseOver.0.png" />
+    <None Include="Resources\Basic.img.BtClose3.normal.0.png" />
+    <None Include="Resources\Basic.img.BtClose3.pressed.0.png" />
+    <None Include="Resources\Basic.img.BtNo3.disabled.0.png" />
+    <None Include="Resources\Basic.img.BtNo3.mouseOver.0.png" />
+    <None Include="Resources\Basic.img.BtNo3.normal.0.png" />
+    <None Include="Resources\Basic.img.BtNo3.pressed.0.png" />
+    <None Include="Resources\Basic.img.BtOK4.disabled.0.png" />
+    <None Include="Resources\Basic.img.BtOK4.mouseOver.0.png" />
+    <None Include="Resources\Basic.img.BtOK4.normal.0.png" />
+    <None Include="Resources\Basic.img.BtOK4.pressed.0.png" />
+    <Content Include="Resources\Basic.img.Notice6.c.png" />
+    <Content Include="Resources\Basic.img.Notice6.s.png" />
+    <Content Include="Resources\Basic.img.Notice6.t.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.ArcaneForce.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.enchantMob.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Line.png" />

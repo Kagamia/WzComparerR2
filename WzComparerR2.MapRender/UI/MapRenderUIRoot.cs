@@ -11,6 +11,7 @@ using EmptyKeys.UserInterface.Media.Effects;
 using EmptyKeys.UserInterface.Themes;
 using EmptyKeys.UserInterface.Data;
 using Res = CharaSimResource.Resource;
+using MRes = WzComparerR2.MapRender.Properties.Resources;
 
 namespace WzComparerR2.MapRender.UI
 {
@@ -38,7 +39,6 @@ namespace WzComparerR2.MapRender.UI
             Style style = RootStyle.CreateRootStyle();
             style.TargetType = this.GetType();
             this.Style = style;
-
             this.Background = null;
 
             var minimap = new UIMinimap2();
@@ -48,7 +48,7 @@ namespace WzComparerR2.MapRender.UI
 
             var worldmap = new UIWorldMap();
             worldmap.Parent = this;
-            worldmap.Visibility = Visibility.Collapsed;
+            worldmap.Hide();
             worldmap.Visible += Worldmap_Visible;
             this.WorldMap = worldmap;
             this.Windows.Add(worldmap);
@@ -61,6 +61,24 @@ namespace WzComparerR2.MapRender.UI
             topBar.SetBinding(UITopBar.IsShortModeProperty, new Binding(Window.VisibilityProperty) { Source = minimap, Converter = UIHelper.CreateConverter((Visibility o) => o == Visibility.Visible) });
             this.TopBar = topBar;
             this.Windows.Add(topBar);
+
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtOK4_normal_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtOK4_mouseOver_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtOK4_pressed_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtOK4_disabled_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtNo3_normal_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtNo3_mouseOver_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtNo3_pressed_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtNo3_disabled_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtCancel4_normal_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtCancel4_mouseOver_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtCancel4_pressed_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtCancel4_disabled_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtClose3_normal_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtClose3_mouseOver_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtClose3_pressed_0));
+            ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtClose3_disabled_0));
+            this.Resources[CommonResourceKeys.MessageBoxWindowStyleKey] = MessageBoxStyle.CreateMessageBoxStyle();
         }
 
         private void Worldmap_Visible(object sender, RoutedEventArgs e)
@@ -112,6 +130,9 @@ namespace WzComparerR2.MapRender.UI
             resDict[MapRenderResourceKey.FontList] = fontList;
             resDict[MapRenderResourceKey.DefaultFontFamily] = new FontFamily(fontList[fontIndex]);
             resDict[MapRenderResourceKey.DefaultFontSize] = 12f;
+
+            //初始化style
+            resDict[MapRenderResourceKey.MapRenderButtonStyle] = MapRenderButtonStyle.CreateMapRenderButtonStyle();
         }
 
         private void LoadResource()
@@ -134,7 +155,18 @@ namespace WzComparerR2.MapRender.UI
                 }
             };
 
+            var msgBoxBackgroundBrush = new TCBBrush()
+            {
+                Resource = new EKNineFormResource()
+                {
+                    N = assetManager.LoadTexture(null, nameof(MRes.Basic_img_Notice6_t)),
+                    C = assetManager.LoadTexture(null, nameof(MRes.Basic_img_Notice6_c)),
+                    S= assetManager.LoadTexture(null, nameof(MRes.Basic_img_Notice6_s)),
+                }
+            };
+
             this.Resources[MapRenderResourceKey.TooltipBrush] = tooltipBrush;
+            this.Resources[MapRenderResourceKey.MessageBoxBackgroundBrush] = msgBoxBackgroundBrush;
         }
 
         public void UnloadContents()

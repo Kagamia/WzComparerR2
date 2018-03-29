@@ -33,23 +33,18 @@ namespace WzComparerR2.Rendering
 
         public void DrawStringEx(XnaFont xnaFont, string text, Vector2 location, Color color)
         {
-            DrawStringEx(xnaFont, text, 0, text == null ? 0 : text.Length, location, color, Vector2.Zero);
+            DrawStringEx(xnaFont, text, 0, text == null ? 0 : text.Length, location, Vector2.Zero, color);
         }
 
-        public void DrawStringEx(XnaFont xnaFont, string text, Vector2 location, Color color, Vector2 origin)
+        public void DrawStringEx(XnaFont xnaFont, string text, Vector2 location, Vector2 size, Color color)
         {
-            DrawStringEx(xnaFont, text, 0, text == null ? 0 : text.Length, location, color, origin);
+            DrawStringEx(xnaFont, text, 0, text == null ? 0 : text.Length, location, size, color);
         }
 
-        public void DrawStringEx(XnaFont xnaFont, string text, int startIndex, int length, Vector2 location, Color color)
-        {
-            DrawStringEx(xnaFont, text, startIndex, length, location, color, Vector2.Zero);
-        }
-
-        public void DrawStringEx(XnaFont xnaFont, string text, int startIndex, int length, Vector2 location, Color color, Vector2 origin)
+        private void DrawStringEx(XnaFont xnaFont, string text, int startIndex, int length, Vector2 location, Vector2 size, Color color)
         {
             IEnumerable<char> e = TextUtils.CreateCharEnumerator(text, startIndex, length);
-            DrawStringEx(xnaFont, e, location, color, origin, 0);
+            DrawStringEx(xnaFont, e, location, size, color, Vector2.Zero, 0);
         }
 
         public void DrawStringEx(XnaFont xnaFont, StringBuilder stringBuilder, Vector2 location, Color color)
@@ -57,9 +52,9 @@ namespace WzComparerR2.Rendering
             DrawStringEx(xnaFont, stringBuilder, 0, stringBuilder == null ? 0 : stringBuilder.Length, location, color, Vector2.Zero);
         }
 
-        public void DrawStringEx(XnaFont xnaFont, StringBuilder stringBuilder, Vector2 location, Color color,Vector2 origin)
+        public void DrawStringEx(XnaFont xnaFont, StringBuilder stringBuilder, Vector2 location, Color color, Vector2 origin)
         {
-            DrawStringEx(xnaFont, stringBuilder, 0, stringBuilder == null ? 0 : stringBuilder.Length, location, color,origin);
+            DrawStringEx(xnaFont, stringBuilder, 0, stringBuilder == null ? 0 : stringBuilder.Length, location, color, origin);
         }
 
         public void DrawStringEx(XnaFont xnaFont, StringBuilder stringBuilder, int startIndex, int length, Vector2 location, Color color)
@@ -70,10 +65,10 @@ namespace WzComparerR2.Rendering
         public void DrawStringEx(XnaFont xnaFont, StringBuilder stringBuilder, int startIndex, int length, Vector2 location, Color color, Vector2 origin)
         {
             IEnumerable<char> e = TextUtils.CreateCharEnumerator(stringBuilder, startIndex, length);
-            DrawStringEx(xnaFont, e, location, color,origin, 0);
+            DrawStringEx(xnaFont, e, location, Vector2.Zero, color, origin, 0);
         }
 
-        private void DrawStringEx(XnaFont font, IEnumerable<char> text, Vector2 location, Color color, Vector2 origin, float layerDepth)
+        private void DrawStringEx(XnaFont font, IEnumerable<char> text, Vector2 location, Vector2 size, Color color, Vector2 origin, float layerDepth)
         {
             if (font == null || text == null)
             {
@@ -97,6 +92,11 @@ namespace WzComparerR2.Rendering
                 else
                 {
                     Rectangle rect = font.TryGetRect(c);
+                    if (size.X > 0 && dx > location.X && dx + rect.Width > location.X + size.X) //强制换行
+                    {
+                        dy += font.Height;
+                        dx = location.X;
+                    }
                     base.Draw(font.TextureBuffer, new Vector2(dx, dy), rect, color, 0f, origin, 1f, SpriteEffects.None, layerDepth);
                     dx += rect.Width;
                 }
@@ -210,7 +210,7 @@ namespace WzComparerR2.Rendering
             this.GetType().BaseType.GetField("_beginCalled", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
                 .SetValue(this, true);
         }
-        
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

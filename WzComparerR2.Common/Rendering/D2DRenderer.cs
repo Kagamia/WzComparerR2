@@ -60,6 +60,11 @@ namespace WzComparerR2.Rendering
             font.DrawText(this.context, text, position, color);
         }
 
+        public void DrawString(D2DFont font, string text, Vector2 position, Vector2 size, Color color)
+        {
+            font.DrawText(this.context, text, position, size, color);
+        }
+
         public void DrawLine(Vector2 point0, Vector2 point1, float width, Color color)
         {
             var rt = this.context.D2DRenderTarget;

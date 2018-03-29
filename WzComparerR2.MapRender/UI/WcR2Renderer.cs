@@ -407,6 +407,7 @@ namespace WzComparerR2.MapRender.UI
                     spriteBatch.DrawStringEx((XnaFont)wcR2Font,
                         text,
                         new Vector2(position.X, position.Y),
+                        new Vector2(renderSize.Width, renderSize.Height),
                         new Color(color.R, color.G, color.B, color.A));
                 }
                 else if (wcR2Font is D2DFont)
@@ -415,6 +416,7 @@ namespace WzComparerR2.MapRender.UI
                     d2dRenderer.DrawString((D2DFont)wcR2Font,
                         text,
                         new Vector2(position.X, position.Y),
+                        new Vector2(renderSize.Width, renderSize.Height),
                         new Color(color.R, color.G, color.B, color.A));
                 }
             }

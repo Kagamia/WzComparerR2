@@ -52,12 +52,22 @@ namespace WzComparerR2.MapRender.UI
         {
             if (this.Visibility == Visibility.Visible)
             {
-                this.Visibility = Visibility.Collapsed;
+                this.Hide();
             }
             else
             {
-                this.Visibility = Visibility.Visible;
+                this.Show();
             }
+        }
+
+        public void Show()
+        {
+            this.Visibility = Visibility.Visible;
+        }
+
+        public void Hide()
+        {
+            this.Visibility = Visibility.Collapsed;
         }
     }
 }

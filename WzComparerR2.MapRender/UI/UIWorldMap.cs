@@ -114,6 +114,14 @@ namespace WzComparerR2.MapRender.UI
             Canvas.SetTop(btnBack, 23);
             canvas.Children.Add(btnBack);
 
+            ImageButton btnClose = new ImageButton();
+            btnClose.Name = "Close";
+            btnClose.Click += BtnClose_Click;
+            btnClose.SetResourceReference(UIElement.StyleProperty, MapRenderResourceKey.MapRenderButtonStyle);
+            Canvas.SetRight(btnClose, 7);
+            Canvas.SetTop(btnClose, 5);
+            canvas.Children.Add(btnClose);
+
             this.Width = canvasBackTexture.Width;
             this.Height = canvasBackTexture.Height;
             base.InitializeComponents();
@@ -346,6 +354,11 @@ namespace WzComparerR2.MapRender.UI
         private void MapArea_RightClick(object obj)
         {
             this.GoBack();
+        }
+
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
         }
 
         private void GoBack()

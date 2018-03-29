@@ -438,5 +438,25 @@ namespace WzComparerR2.MapRender.UI
         {
             return vector == null ? new PointF() : new PointF(vector.X, vector.Y);
         }
+
+        public static Size MeasureString(this FontBase font, string text, Size layoutSize)
+        {
+            var wcR2Font = (font.GetNativeFont() as IWcR2Font)?.BaseFont;
+            if (wcR2Font != null)
+            {
+                if (wcR2Font is XnaFont)
+                {
+                    var xnaFont = (XnaFont)wcR2Font;
+                    var size = xnaFont.MeasureString(text);
+                }
+                else if (wcR2Font is D2DFont)
+                {
+                    var d2dFont = (D2DFont)wcR2Font;
+                    var size = d2dFont.MeasureString(text, new Vector2(layoutSize.Width, layoutSize.Height));
+                    return new Size(size.X, size.Y);
+                }
+            }
+            return font.MeasureString(text, 1, 1);
+        }
     }
 }

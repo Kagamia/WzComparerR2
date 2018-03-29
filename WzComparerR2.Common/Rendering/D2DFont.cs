@@ -27,6 +27,9 @@ namespace WzComparerR2.Rendering
             FontStyle style = italic ? FontStyle.Italic : FontStyle.Normal;
             var factory = D2DFactory.Instance.factoryDWrite;
             this.textFormat = new TextFormat(factory, this.FamilyName, weight, style, this.Size);
+
+            this.CacheFontMetrics();
+            this.Height = this.Height;
         }
 
         public D2DFont(System.Drawing.Font font) :
@@ -44,16 +47,11 @@ namespace WzComparerR2.Rendering
             {
                 if (this.lineHeight <= 0)
                 {
-                    var font = this.GetMatchingFont();
-                    if (font != null)
+                    if (this.metrics.DesignUnitsPerEm > 0)
                     {
-                        using (font)
-                        {
-                            var metrics = font.Metrics;
-                            float ratio = this.textFormat.FontSize / metrics.DesignUnitsPerEm;
-                            float size = (metrics.Ascent + metrics.Descent + metrics.LineGap) * ratio;
-                            this.lineHeight = size;
-                        }
+                        float ratio = this.textFormat.FontSize / this.metrics.DesignUnitsPerEm;
+                        float size = (this.metrics.Ascent + this.metrics.Descent + this.metrics.LineGap) * ratio;
+                        this.lineHeight = (float)Math.Ceiling(size);
                     }
                     else
                     {
@@ -65,33 +63,30 @@ namespace WzComparerR2.Rendering
             }
             set
             {
-                /*
                 LineSpacingMethod method;
                 float lineSpacing;
                 float baseLine;
                 this.textFormat.GetLineSpacing(out method, out lineSpacing, out baseLine);
-                if (baseLine <= 0)
+                if (method == LineSpacingMethod.Default || baseLine <= 0)
                 {
-                    var font = this.GetMatchingFont();
-                    if (font != null)
+                    if (this.metrics.DesignUnitsPerEm > 0)
                     {
-                        using (font)
-                        {
-                            var metrics = font.Metrics;
-                            float ratio = this.textFormat.FontSize / metrics.DesignUnitsPerEm;
-                            float ascent = metrics.Ascent * ratio;
-                            baseLine = ascent;
-                        }
+                        float ratio = this.textFormat.FontSize / metrics.DesignUnitsPerEm;
+                        baseLine = metrics.Ascent * ratio;
+                    }
+                    else
+                    {
+                        baseLine = this.Size;
                     }
                 }
-                this.textFormat.SetLineSpacing(LineSpacingMethod.Uniform, value, value * 0.8f);
-                */
+                this.textFormat.SetLineSpacing(LineSpacingMethod.Uniform, value, baseLine);
                 this.lineHeight = value;
             }
         }
 
         private readonly TextFormat textFormat;
         private float lineHeight;
+        private FontMetrics metrics;
 
         private Font GetMatchingFont()
         {
@@ -110,17 +105,30 @@ namespace WzComparerR2.Rendering
             return null;
         }
 
+        private bool CacheFontMetrics()
+        {
+            var font = this.GetMatchingFont();
+            if (font != null)
+            {
+                using (font)
+                {
+                    this.metrics = font.Metrics;
+                    return true;
+                }
+            }
+            return false;
+        }
+
         internal void DrawText(D2DContext context, string text, Vector2 position, Color color)
         {
+             this.DrawText(context, text, position, Vector2.Zero, color);
+        }
+
+        internal void DrawText(D2DContext context, string text, Vector2 position, Vector2 size, Color color)
+        {
             var rt = context.D2DRenderTarget;
-            /*
-            rt.DrawText(text, this.textFormat,
-                new SharpDX.RectangleF(position.X, position.Y, Int16.MaxValue, 0),
-                context.GetBrush(color),
-                DrawTextOptions.None,
-                MeasuringMode.GdiNatural);
-            */
-            using (var layout = this.LayoutString(text, 0, 0))
+
+            using (var layout = this.LayoutString(text, size.X, size.Y))
             {
                 rt.DrawTextLayout(new SharpDX.Vector2(position.X, position.Y),
                     layout,
@@ -131,21 +139,36 @@ namespace WzComparerR2.Rendering
 
         public Vector2 MeasureString(string text)
         {
-            using (var layout = this.LayoutString(text, 0, 0))
+            return this.MeasureString(text, Vector2.Zero);
+        }
+
+        public Vector2 MeasureString(string text, Vector2 size)
+        {
+            using (var layout = this.LayoutString(text, size.X, size.Y))
             {
                 var metrics = layout.Metrics;
+                if (metrics.LineCount > 0 && this.metrics.DesignUnitsPerEm > 0)
+                {
+                    float ratio = this.textFormat.FontSize / this.metrics.DesignUnitsPerEm;
+                    var gap = this.lineHeight - (this.metrics.Ascent + this.metrics.Descent) * ratio;
+                    if (gap > 0)
+                    {
+                        metrics.Height -= gap;
+                    }
+                }
+
                 return new Vector2(metrics.Width, metrics.Height);
             }
         }
 
-        private TextLayout LayoutString(string text, int maxWidth, int maxHeight)
+        private TextLayout LayoutString(string text, float maxWidth, float maxHeight)
         {
             if (maxWidth <= 0)
             {
                 maxWidth = Int16.MaxValue;
             }
             var layout = new TextLayout(D2DFactory.Instance.factoryDWrite, text, this.textFormat, maxWidth, 0, 1, false);
-            layout.WordWrapping = WordWrapping.NoWrap;
+            layout.WordWrapping = WordWrapping.Wrap;
             layout.TextAlignment = TextAlignment.Leading;
             layout.ParagraphAlignment = ParagraphAlignment.Near;
             return layout;

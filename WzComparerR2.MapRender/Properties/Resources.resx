@@ -148,4 +148,61 @@
   <data name="UIWindow_img_ToolTip_WorldMap_StarForce" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UIWindow.img.ToolTip.WorldMap.StarForce.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Basic_img_Notice6_c" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.Notice6.c.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_Notice6_s" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.Notice6.s.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_Notice6_t" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.Notice6.t.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtCancel4_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtCancel4.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtCancel4_mouseOver_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtCancel4.mouseOver.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtCancel4_normal_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtCancel4.normal.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtCancel4_pressed_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtCancel4.pressed.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtClose3_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtClose3.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtClose3_mouseOver_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtClose3.mouseOver.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtClose3_normal_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtClose3.normal.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtClose3_pressed_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtClose3.pressed.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtNo3_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtNo3.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtNo3_mouseOver_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtNo3.mouseOver.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtNo3_normal_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtNo3.normal.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtNo3_pressed_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtNo3.pressed.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtOK4_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtOK4.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtOK4_mouseOver_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtOK4.mouseOver.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtOK4_normal_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtOK4.normal.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Basic_img_BtOK4_pressed_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Basic.img.BtOK4.pressed.0.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
