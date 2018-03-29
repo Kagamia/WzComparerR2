@@ -19,10 +19,10 @@ namespace WzComparerR2.MapRender
 
         public IEnumerable<SceneNode> Descendants()
         {
-            foreach(var node in this.Nodes)
+            foreach (var node in this.Nodes)
             {
                 yield return node;
-                foreach(var subNode in node.Descendants())
+                foreach (var subNode in node.Descendants())
                 {
                     yield return subNode;
                 }
@@ -40,7 +40,7 @@ namespace WzComparerR2.MapRender
 
             public void AddRange(IEnumerable<SceneNode> nodes)
             {
-                foreach(var node in nodes)
+                foreach (var node in nodes)
                 {
                     this.Add(node);
                 }

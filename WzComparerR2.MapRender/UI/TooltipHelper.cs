@@ -18,7 +18,7 @@ namespace WzComparerR2.MapRender.UI
             block.Text = text;
             block.Position = pos;
             block.ForeColor = color;
-           
+
             pos.X += size.X;
             return block;
         }
@@ -50,7 +50,7 @@ namespace WzComparerR2.MapRender.UI
             var layouter = new TextLayouter();
             int y = (int)pos.Y;
             var blocks = layouter.LayoutFormatText(font, formatText, width, ref y);
-            for(int i = 0; i < blocks.Length; i++)
+            for (int i = 0; i < blocks.Length; i++)
             {
                 blocks[i].Position.X += pos.X;
                 var blockWidth = blocks[i].Font.MeasureString(blocks[i].Text).X;
@@ -155,7 +155,7 @@ namespace WzComparerR2.MapRender.UI
             {
                 this.blocks.Add(new TextBlock()
                 {
-                    Position = new Vector2(x,y),
+                    Position = new Vector2(x, y),
                     ForeColor = this.GetColor(colorID),
                     Font = this.font,
                     Text = sb.ToString(startIndex, length),

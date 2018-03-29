@@ -57,7 +57,7 @@ namespace WzComparerR2.MapRender.UI
             textBlock.Margin = new Thickness(6, 0, 0, 0);
             textBlock.HorizontalAlignment = HorizontalAlignment.Left;
             textBlock.VerticalAlignment = VerticalAlignment.Center;
-           
+
             textBlock.SetBinding(TextBlock.TextProperty, new Binding(TextProperty) { Source = this });
             panel.Children.Add(textBlock);
 

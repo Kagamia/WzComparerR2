@@ -83,7 +83,7 @@ namespace WzComparerR2.MapRender
             Music.GlobalVolumeChanged -= this.OnGlobalVolumeChanged;
             Bass.BASS_StreamFree(hStream);
             this.pData.Free();
-            
+
         }
 
         public enum PlayState

@@ -187,7 +187,7 @@ namespace WzComparerR2.MapRender
 
         public void BeginCounting()
         {
-            foreach(var kv in this.loadedItems)
+            foreach (var kv in this.loadedItems)
             {
                 kv.Value.Count = 0;
             }
@@ -219,7 +219,7 @@ namespace WzComparerR2.MapRender
 
         public void Unload()
         {
-            foreach(var kv in this.loadedItems)
+            foreach (var kv in this.loadedItems)
             {
                 UnloadResource(kv.Value.Resource);
             }

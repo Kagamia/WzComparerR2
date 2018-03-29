@@ -26,7 +26,7 @@ namespace WzComparerR2.MapRender
         {
             this.fonts = new Dictionary<string, IWcR2Font>();
         }
-        
+
         private Dictionary<string, IWcR2Font> fonts;
 
         public void LoadContent(ContentManager content)

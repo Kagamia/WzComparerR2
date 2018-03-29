@@ -169,7 +169,7 @@ namespace WzComparerR2.MapRender.UI
 
     class WcR2AssetManager : MonoGameAssetManager
     {
-        public ContentManager DefaultContentManager { get; set; } 
+        public ContentManager DefaultContentManager { get; set; }
 
         public override FontBase LoadFont(object contentManager, string file)
         {
@@ -344,7 +344,7 @@ namespace WzComparerR2.MapRender.UI
                 if (!LoadedAssets.TryGetValue(assetName, out value))
                 {
                     var bitmap = MRes.ResourceManager.GetObject(assetName) as System.Drawing.Bitmap;
-                    if( bitmap == null)
+                    if (bitmap == null)
                     {
                         var obj = Res.ResourceManager.GetObject(assetName);
                         bitmap = Res.ResourceManager.GetObject(assetName) as System.Drawing.Bitmap;
@@ -383,8 +383,8 @@ namespace WzComparerR2.MapRender.UI
             {
                 if (this.UseD2DFont)
                 {
-                    var d2dFont = new D2DFont(familyName, size, 
-                        (fStyle & System.Drawing.FontStyle.Bold) != 0, 
+                    var d2dFont = new D2DFont(familyName, size,
+                        (fStyle & System.Drawing.FontStyle.Bold) != 0,
                         (fStyle & System.Drawing.FontStyle.Italic) != 0
                         );
                     return new D2DFontAdapter(d2dFont);
@@ -404,7 +404,7 @@ namespace WzComparerR2.MapRender.UI
 
         public override void Unload()
         {
-            foreach(var kv in this.LoadedAssets)
+            foreach (var kv in this.LoadedAssets)
             {
                 IDisposable disposable = kv.Value as IDisposable;
                 if (disposable != null)

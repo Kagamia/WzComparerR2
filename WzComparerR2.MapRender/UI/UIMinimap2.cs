@@ -85,10 +85,10 @@ namespace WzComparerR2.MapRender.UI
             set { SetValue(CameraRegionVisibleProperty, value); }
         }
 
-        public MapArea MapAreaControl { get; private set;}
+        public MapArea MapAreaControl { get; private set; }
 
         private UIMinimapResource resource;
-       
+
         private TextBlock lblStreetName;
         private TextBlock lblMapName;
 
@@ -184,7 +184,7 @@ namespace WzComparerR2.MapRender.UI
         {
             base.OnPropertyChanged(property);
 
-            if (property == MinimapCanvasProperty 
+            if (property == MinimapCanvasProperty
                 || property == MapNameProperty
                 || property == StreetNameProperty)
             {
@@ -219,7 +219,7 @@ namespace WzComparerR2.MapRender.UI
                 var lblRight = Canvas.GetLeft(this.lblMapName) + this.lblMapName.DesiredSize.Width;
                 desireSize.Width = Math.Max(desireSize.Width, lblRight);
             }
-            
+
             this.Width = MathHelper.Clamp(desireSize.Width, this.MinWidth, this.MaxWidth);
             this.Height = MathHelper.Clamp(desireSize.Height, this.MinHeight, this.MaxHeight);
             this.MapAreaControl.Width = Math.Max(0, this.Width - left - right);
@@ -241,7 +241,7 @@ namespace WzComparerR2.MapRender.UI
 
             private List<IconRect> iconRectCache;
             private PointF canvasPosCache;
-           
+
             protected override void OnDraw(Renderer spriterenderer, double elapsedGameTime, float opacity)
             {
                 base.OnDraw(spriterenderer, elapsedGameTime, opacity);
@@ -311,7 +311,7 @@ namespace WzComparerR2.MapRender.UI
                     //计算全局坐标
                     canvasPos = new PointF(pos.X + canvasPos.X, pos.Y + canvasPos.Y);
 
-                    
+
                     transform *= Matrix.CreateTranslation(canvasPos.X, canvasPos.Y, 0);
 
                     //绘制小地图
@@ -342,7 +342,7 @@ namespace WzComparerR2.MapRender.UI
                 {
                     var iconPos = Vector2.Transform(new Vector2(worldPos.X, worldPos.Y), transform);
                     var posF = new PointF(
-                        Math.Round(iconPos.X - texture.Width / 2- 0),
+                        Math.Round(iconPos.X - texture.Width / 2 - 0),
                         Math.Round(iconPos.Y - texture.Height / 2 - 5));
                     var iconSize = new Size(texture.Width, texture.Height);
                     spriterenderer.Draw(texture, posF, iconSize, new ColorW(1f, 1f, 1f, opacity), false);
@@ -384,7 +384,7 @@ namespace WzComparerR2.MapRender.UI
 
             public object GetTooltipTarget(PointF mouseLocation)
             {
-                foreach(var iconRect in this.iconRectCache.Reverse<IconRect>())
+                foreach (var iconRect in this.iconRectCache.Reverse<IconRect>())
                 {
                     if (iconRect.Rect.Contains(mouseLocation))
                     {

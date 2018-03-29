@@ -143,7 +143,7 @@ namespace WzComparerR2.MapRender
                     for (int i = 0; i < count; i++)
                     {
                         var p = this.Emitter.Emit();
-                        if (p.Life <=0) //fix bug
+                        if (p.Life <= 0) //fix bug
                         {
                             continue;
                         }
@@ -161,7 +161,7 @@ namespace WzComparerR2.MapRender
                     }
                 }
             }
-            
+
             //更新所有粒子
             if (pGroup.Particles.Count > 0)
             {

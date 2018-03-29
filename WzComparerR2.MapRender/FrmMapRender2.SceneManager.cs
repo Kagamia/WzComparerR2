@@ -130,11 +130,11 @@ namespace WzComparerR2.MapRender
         private void AfterLoadMap(MapData mapData)
         {
             //同步可视化状态
-            foreach(var portal in mapData.Scene.Portals)
+            foreach (var portal in mapData.Scene.Portals)
             {
                 portal.View.IsEditorMode = this.patchVisibility.PortalInEditMode;
             }
-           
+
             //同步UI
             this.renderEnv.Camera.WorldRect = mapData.VRect;
 

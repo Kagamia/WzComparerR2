@@ -127,7 +127,7 @@ namespace WzComparerR2.MapRender
             //init services
             this.Services.AddService<Random>(new Random());
             this.Services.AddService<IRandom>(new ParticleRandom(this.Services.GetService<Random>()));
-            
+
             //init components
             this.renderEnv = new RenderEnv(this, this.graphics);
             this.batcher = new MeshBatcher(this.GraphicsDevice) { CullingEnabled = true };
@@ -395,7 +395,8 @@ namespace WzComparerR2.MapRender
 
             //点击事件
             var disposable = UIHelper.RegisterClickEvent<SceneItem>(this.ui.ContentControl,
-                (sender, point) => {
+                (sender, point) =>
+                {
                     int x = (int)point.X;
                     int y = (int)point.Y;
                     var mouseTarget = this.allItems.Reverse<ItemRect>().FirstOrDefault(item =>
@@ -690,7 +691,7 @@ namespace WzComparerR2.MapRender
             this.renderEnv = null;
             this.engine = null;
 
-            foreach(var disposable in this.attachedEvent)
+            foreach (var disposable in this.attachedEvent)
             {
                 disposable.Dispose();
             }

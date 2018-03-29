@@ -40,5 +40,4 @@ namespace WzComparerR2.MapRender
         Center = 1,
         Far = 2
     }
-
 }

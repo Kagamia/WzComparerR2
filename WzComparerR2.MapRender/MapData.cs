@@ -211,7 +211,7 @@ namespace WzComparerR2.MapRender
             var objNode = layerNode.Nodes["obj"];
             if (objNode != null)
             {
-                foreach(var node in objNode.Nodes)
+                foreach (var node in objNode.Nodes)
                 {
                     var item = ObjItem.LoadFromNode(node);
                     item.Name = $"obj_{level}_{node.Text}";
@@ -226,7 +226,7 @@ namespace WzComparerR2.MapRender
             var tileNode = layerNode.Nodes["tile"];
             if (tS != null && tileNode != null)
             {
-                foreach(var node in tileNode.Nodes)
+                foreach (var node in tileNode.Nodes)
                 {
                     var item = TileItem.LoadFromNode(node);
                     item.TS = tS;
@@ -242,9 +242,9 @@ namespace WzComparerR2.MapRender
         {
             var layerSceneNode = (LayerNode)this.Scene.Layers.Nodes[level];
 
-            foreach(var group in fhLayerNode.Nodes)
+            foreach (var group in fhLayerNode.Nodes)
             {
-                foreach(var node in group.Nodes)
+                foreach (var node in group.Nodes)
                 {
                     var item = FootholdItem.LoadFromNode(node);
                     item.ID = int.Parse(node.Text);
@@ -258,7 +258,7 @@ namespace WzComparerR2.MapRender
 
         private void LoadLife(Wz_Node lifeNode)
         {
-            foreach(var node in lifeNode.Nodes)
+            foreach (var node in lifeNode.Nodes)
             {
                 var item = LifeItem.LoadFromNode(node);
                 item.Name = $"life_{item.Type}_{node.Text}";
@@ -316,10 +316,10 @@ namespace WzComparerR2.MapRender
         {
             //计算reactor所在层
             var layer = Scene.Layers.Nodes.OfType<LayerNode>()
-                .FirstOrDefault(l => l.Foothold.Nodes.Count > 0) 
+                .FirstOrDefault(l => l.Foothold.Nodes.Count > 0)
                 ?? (Scene.Layers.Nodes[0] as LayerNode);
 
-            foreach(var node in reactorNode.Nodes)
+            foreach (var node in reactorNode.Nodes)
             {
                 var item = ReactorItem.LoadFromNode(node);
                 item.Name = $"reactor_{node.Text}";
@@ -398,7 +398,7 @@ namespace WzComparerR2.MapRender
 
         private void LoadParticle(Wz_Node node)
         {
-            foreach(var particleNode in node.Nodes)
+            foreach (var particleNode in node.Nodes)
             {
                 var item = ParticleItem.LoadFromNode(particleNode);
                 item.Name = node.Text;
@@ -416,7 +416,7 @@ namespace WzComparerR2.MapRender
             var rect = Rectangle.Empty;
 
             int xMAX = int.MinValue;
-            foreach(LayerNode layer in this.Scene.Layers.Nodes)
+            foreach (LayerNode layer in this.Scene.Layers.Nodes)
             {
                 foreach (ContainerNode<FootholdItem> item in layer.Foothold.Nodes)
                 {
@@ -797,7 +797,7 @@ namespace WzComparerR2.MapRender
                 return null;
             }
         }
-        
+
         private object CreateAnimator(object animationData, string aniName = null)
         {
             if (animationData is RepeatableFrameAnimationData)

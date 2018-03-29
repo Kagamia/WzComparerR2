@@ -551,7 +551,7 @@ namespace WzComparerR2.MapRender.UI
                 }
                 if (part2_1 != null)
                 {
-                    foreach(var tb in part2_1)
+                    foreach (var tb in part2_1)
                     {
                         blocks.Add(tb);
                     }
@@ -650,7 +650,7 @@ namespace WzComparerR2.MapRender.UI
                     position.Y + padding.Y + block.Position.Y);
 
                 var baseFont = block.Font.BaseFont;
-          
+
                 if (baseFont is XnaFont)
                 {
                     env.Sprite.DrawStringEx((XnaFont)baseFont, block.Text, pos, block.ForeColor);

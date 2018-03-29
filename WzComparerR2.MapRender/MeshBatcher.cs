@@ -38,7 +38,7 @@ namespace WzComparerR2.MapRender
         //culling参数
         private bool matrixNoRot;
         private Rectangle viewport;
-        
+
 
         public void Begin(Matrix? matrix = null)
         {
@@ -318,7 +318,7 @@ namespace WzComparerR2.MapRender
         }
 
         public void Measure(MeshItem mesh, ref Rectangle[] region, out int count)
-        { 
+        {
             Rectangle rect = Rectangle.Empty;
 
             if (mesh.RenderObject is TextMesh)
