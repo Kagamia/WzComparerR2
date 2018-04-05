@@ -80,6 +80,7 @@ namespace WzComparerR2.Animation
                 this.CurrentFrame.Z = frame.Z;
                 this.CurrentFrame.Origin = frame.Origin;
                 this.CurrentFrame.A0 = frame.A1;
+                this.CurrentFrame.Blend = frame.Blend;
             }
             else
             {

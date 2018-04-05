@@ -36,6 +36,7 @@ namespace WzComparerR2.Animation
         public int Delay { get; set; }
         public int A0 { get; set; }
         public int A1 { get; set; }
+        public bool Blend { get; set; }
 
         public Rectangle Rectangle
         {

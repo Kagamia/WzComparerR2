@@ -134,7 +134,8 @@ namespace WzComparerR2.MapRender
                             if (!this.IntersectsVP(tileRect))
                                 continue;
                         }
-                        Prepare(ItemType.Sprite);
+
+                        Prepare(frame.Blend ? ItemType.Sprite_BlendAdditive : ItemType.Sprite);
                         sprite.Draw(frame.Texture, pos,
                             sourceRectangle: frame.AtlasRect,
                             color: new Color(Color.White, frame.A0),
@@ -149,7 +150,7 @@ namespace WzComparerR2.MapRender
                 rect.Offset(mesh.Position);
                 if (!this.CullingEnabled || this.IntersectsVP(rect))
                 {
-                    Prepare(ItemType.Sprite);
+                    Prepare(frame.Blend ? ItemType.Sprite_BlendAdditive : ItemType.Sprite);
                     sprite.Draw(frame.Texture, mesh.Position,
                         sourceRectangle: frame.AtlasRect,
                         color: new Color(Color.White, frame.A0),

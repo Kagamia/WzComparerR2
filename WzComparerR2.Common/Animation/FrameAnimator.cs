@@ -96,6 +96,7 @@ namespace WzComparerR2.Animation
             this.CurrentFrame.Z = frame.Z;
             this.CurrentFrame.Origin = frame.Origin;
             this.CurrentFrame.A0 = (int)MathHelper.Lerp(frame.A0, frame.A1, progress);
+            this.CurrentFrame.Blend = frame.Blend;
         }
 
         public static int[] CreateTimeline(IEnumerable<int> delays)

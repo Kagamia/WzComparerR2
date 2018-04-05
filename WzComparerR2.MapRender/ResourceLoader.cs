@@ -342,13 +342,13 @@ namespace WzComparerR2.MapRender
             {
                 Texture = atlas.Texture,
                 AtlasRect = atlas.SrcRect,
-                A0 = node.Nodes["a0"].GetValueEx(255),
-                A1 = node.Nodes["a1"].GetValueEx(255),
                 Z = node.Nodes["z"].GetValueEx(0),
                 Delay = node.Nodes["delay"].GetValueEx(100),
+                Blend = node.Nodes["blend"].GetValueEx(0) != 0,
                 Origin = (node.Nodes["origin"]?.Value as Wz_Vector)?.ToPoint() ?? Point.Zero
             };
-
+            frame.A0 = node.Nodes["a0"].GetValueEx(255);
+            frame.A1 = node.Nodes["a1"].GetValueEx(frame.A0);
             return frame;
         }
 
