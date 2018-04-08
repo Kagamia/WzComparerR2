@@ -14,5 +14,6 @@ namespace WzComparerR2.MapRender.UI
         DefaultFontSize,
         MessageBoxBackgroundBrush,
         MapRenderButtonStyle,
+        TextBoxExStyle,
     }
 }

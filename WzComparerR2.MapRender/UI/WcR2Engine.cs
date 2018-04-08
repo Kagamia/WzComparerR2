@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using EmptyKeys.UserInterface;
 using EmptyKeys.UserInterface.Input;
 using EmptyKeys.UserInterface.Media;
 using EmptyKeys.UserInterface.Renderers;
+using EmptyKeys.UserInterface.Mvvm;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Reflection;
@@ -28,6 +30,11 @@ namespace WzComparerR2.MapRender.UI
             _assetManager = new WcR2AssetManager();
             _audioDevice = new WcR2AudioDevice();
             _inputDevice = new MonoGameInputDevice();
+
+            if (ServiceManager.Instance.GetService<IClipboardService>() == null)
+            {
+                ServiceManager.Instance.AddService<IClipboardService>(new ClipBoardService());
+            }
         }
 
         private WcR2AssetManager _assetManager;
@@ -413,6 +420,33 @@ namespace WzComparerR2.MapRender.UI
                 }
             }
             base.Unload();
+        }
+    }
+
+    class ClipBoardService : IClipboardService
+    {
+        public string GetText()
+        {
+            var text = string.Empty;
+            var thread = new Thread(() =>
+            {
+                text = System.Windows.Forms.Clipboard.GetText();
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+            return text;
+        }
+
+        public void SetText(string text)
+        {
+            var thread = new Thread(() =>
+            {
+                System.Windows.Forms.Clipboard.SetText(text);
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
         }
     }
 

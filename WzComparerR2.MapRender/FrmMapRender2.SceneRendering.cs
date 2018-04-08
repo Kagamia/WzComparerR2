@@ -201,6 +201,11 @@ namespace WzComparerR2.MapRender
 
         private void DrawScene(GameTime gameTime)
         {
+            if (this.mapData == null)
+            {
+                return;
+            }
+
             allItems.Clear();
             var origin = this.renderEnv.Camera.Origin.ToPoint();
             this.batcher.Begin(Matrix.CreateTranslation(new Vector3(-origin.X, -origin.Y, 0)));

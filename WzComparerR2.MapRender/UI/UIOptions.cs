@@ -308,7 +308,7 @@ namespace WzComparerR2.MapRender.UI
         {
             StackPanel panel = new StackPanel();
             panel.Orientation = Orientation.Vertical;
-
+            
             var tips = new[]
             {
                  "快捷键指示：",
@@ -318,6 +318,7 @@ namespace WzComparerR2.MapRender.UI
                  "Esc 设置",
                  "Ctrl+1~9 开关图层",
                  "Ctrl+U 解除地图范围锁定",
+                 "~ 开关控制台",
                  "Alt+Enter 切换分辨率",
                  "ScrollLock 截图",
             };
@@ -327,6 +328,7 @@ namespace WzComparerR2.MapRender.UI
                 TextBlock lbl = new TextBlock();
                 lbl.TextWrapping = TextWrapping.Wrap;
                 lbl.Text = tip;
+                lbl.Margin = new Thickness(0, 1, 0, 1);
                 panel.Children.Add(lbl);
             }
 
@@ -354,7 +356,7 @@ namespace WzComparerR2.MapRender.UI
                         ContentPresenter presenter = (elem as Border)?.Child as ContentPresenter;
                         if (presenter != null)
                         {
-                            presenter.Margin = new Thickness(6, 2, 6, 2);
+                            presenter.Margin = new Thickness(6, 1, 6, 1);
                         }
                         return elem;
                     });

@@ -33,6 +33,7 @@ namespace WzComparerR2.MapRender.UI
         public UIMinimap2 Minimap { get; private set; }
         public UIWorldMap WorldMap { get; private set; }
         public UITopBar TopBar { get; private set; }
+        public UIChatBox ChatBox { get; private set; }
 
         private void InitializeComponents()
         {
@@ -61,6 +62,12 @@ namespace WzComparerR2.MapRender.UI
             topBar.SetBinding(UITopBar.IsShortModeProperty, new Binding(Window.VisibilityProperty) { Source = minimap, Converter = UIHelper.CreateConverter((Visibility o) => o == Visibility.Visible) });
             this.TopBar = topBar;
             this.Windows.Add(topBar);
+
+            var chatBox = new UIChatBox();
+            chatBox.Parent = this;
+            chatBox.SetBinding(UIChatBox.TopProperty, new Binding(HeightProperty) { Source = this, Converter = UIHelper.CreateConverter((float height) => height - chatBox.Height) });
+            this.ChatBox = chatBox;
+            this.Windows.Add(chatBox);
 
             ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtOK4_normal_0));
             ImageManager.Instance.AddImage(nameof(MRes.Basic_img_BtOK4_mouseOver_0));
@@ -126,13 +133,14 @@ namespace WzComparerR2.MapRender.UI
             {
                 fontIndex = 0;
             }
-
+            
             resDict[MapRenderResourceKey.FontList] = fontList;
             resDict[MapRenderResourceKey.DefaultFontFamily] = new FontFamily(fontList[fontIndex]);
             resDict[MapRenderResourceKey.DefaultFontSize] = 12f;
 
             //初始化style
             resDict[MapRenderResourceKey.MapRenderButtonStyle] = MapRenderButtonStyle.CreateMapRenderButtonStyle();
+            resDict[MapRenderResourceKey.TextBoxExStyle] = TextBoxEx.CreateStyle();
         }
 
         private void LoadResource()

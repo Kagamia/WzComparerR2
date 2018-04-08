@@ -53,6 +53,9 @@
     <Reference Include="EmptyKeys.UserInterface.MonoGame">
       <HintPath>..\References\EmptyKeys.UserInterface.MonoGame.dll</HintPath>
     </Reference>
+    <Reference Include="IMEHelper">
+      <HintPath>..\References\IMEHelper.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Framework, Version=3.4.0.456, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\MonoGame.Framework.dll</HintPath>
@@ -164,11 +167,13 @@
     <Compile Include="UI\MapRenderUIRoot.cs" />
     <Compile Include="UI\MessageBoxStyle.cs" />
     <Compile Include="UI\NinePatchBrush.cs" />
+    <Compile Include="UI\TextBoxEx.cs" />
     <Compile Include="UI\Tooltip.cs" />
     <Compile Include="Patches\TooltipPatch.cs" />
     <Compile Include="UI\NineFormResource.cs" />
     <Compile Include="UI\Tooltip2.cs" />
     <Compile Include="UI\TooltipHelper.cs" />
+    <Compile Include="UI\UIChatBox.cs" />
     <Compile Include="UI\UIGraphics.cs" />
     <Compile Include="UI\UIHelper.cs" />
     <Compile Include="UI\UIMiniMap.cs" />
@@ -240,6 +245,11 @@
     <Content Include="Resources\Basic.img.Notice6.c.png" />
     <Content Include="Resources\Basic.img.Notice6.s.png" />
     <Content Include="Resources\Basic.img.Notice6.t.png" />
+    <Content Include="Resources\StatusBar3.img.chat.ingame.input.layer_backgrnd.png" />
+    <Content Include="Resources\StatusBar3.img.chat.ingame.input.layer_chatEnter.png" />
+    <Content Include="Resources\StatusBar3.img.chat.ingame.view.max.bottom.png" />
+    <Content Include="Resources\StatusBar3.img.chat.ingame.view.max.center.png" />
+    <Content Include="Resources\StatusBar3.img.chat.ingame.view.max.top.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.ArcaneForce.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.enchantMob.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Line.png" />

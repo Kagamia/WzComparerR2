@@ -157,7 +157,7 @@ namespace WzComparerR2.Rendering
                     }
                 }
 
-                return new Vector2(metrics.Width, metrics.Height);
+                return new Vector2(metrics.WidthIncludingTrailingWhitespace, metrics.Height);
             }
         }
 

@@ -12,7 +12,7 @@ using WzComparerR2.MapRender.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Form = System.Windows.Forms.Form;
-
+using JLChnToZ.IMEHelper;
 
 #region USING_EK
 using EmptyKeys.UserInterface;
@@ -20,6 +20,7 @@ using KeyBinding = EmptyKeys.UserInterface.Input.KeyBinding;
 using RelayCommand = EmptyKeys.UserInterface.Input.RelayCommand;
 using KeyCode = EmptyKeys.UserInterface.Input.KeyCode;
 using ModifierKeys = EmptyKeys.UserInterface.Input.ModifierKeys;
+using ServiceManager = EmptyKeys.UserInterface.Mvvm.ServiceManager;
 #endregion
 
 namespace WzComparerR2.MapRender
@@ -42,13 +43,16 @@ namespace WzComparerR2.MapRender
             this.patchVisibility.FootHoldVisible = false;
             this.patchVisibility.LadderRopeVisible = false;
             this.patchVisibility.SkyWhaleVisible = false;
-            GameExt.FixKeyboard(this);
-
+            
             var form = Form.FromHandle(this.Window.Handle) as Form;
             form.Load += Form_Load;
             form.GotFocus += Form_GotFocus;
             form.LostFocus += Form_LostFocus;
+            form.FormClosing += Form_FormClosing;
             form.FormClosed += Form_FormClosed;
+
+            this.imeHelper = new IMEHandler(this, true);
+            GameExt.FixKeyboard(this);
         }
 
         private void Form_Load(object sender, EventArgs e)
@@ -79,6 +83,10 @@ namespace WzComparerR2.MapRender
                 }
             }
         }
+        private void Form_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)
+        {
+            GameExt.ReleaseKeyboard(this);
+        }
 
         private void Form_FormClosed(object sender, System.Windows.Forms.FormClosedEventArgs e)
         {
@@ -94,6 +102,7 @@ namespace WzComparerR2.MapRender
             WcR2Engine.FixEKBugs();
 
             (this.engine.AssetManager as WcR2AssetManager).DefaultContentManager = this.Content as WcR2ContentManager;
+            
         }
 
         public StringLinker StringLinker { get; set; }
@@ -121,12 +130,16 @@ namespace WzComparerR2.MapRender
         CoroutineManager cm;
         FpsCounter fpsCounter;
         List<IDisposable> attachedEvent = new List<IDisposable>();
+        IMEHandler imeHelper;
 
         protected override void Initialize()
         {
             //init services
             this.Services.AddService<Random>(new Random());
             this.Services.AddService<IRandom>(new ParticleRandom(this.Services.GetService<Random>()));
+            this.Services.AddService<IMEHandler>(this.imeHelper);
+
+            ServiceManager.Instance.AddService<IMEHandler>(this.imeHelper);
 
             //init components
             this.renderEnv = new RenderEnv(this, this.graphics);
@@ -408,7 +421,15 @@ namespace WzComparerR2.MapRender
                 this.OnSceneItemClick);
             this.attachedEvent.Add(disposable);
 
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => {
+                if (this.ui.Visibility == Visibility.Visible)
+                {
+                    this.ui.ChatBox.TextBoxChat.Focus();
+                }
+            }), KeyCode.Enter, ModifierKeys.None));
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.ui.ChatBox.Toggle()), KeyCode.Oem3, ModifierKeys.None));
             this.ui.WorldMap.MapSpotClick += WorldMap_MapSpotClick;
+            this.ui.ChatBox.TextBoxChat.TextSubmit += ChatBox_TextSubmit;
         }
 
         private void UIOption_OK(object sender, EventArgs e)
@@ -427,7 +448,7 @@ namespace WzComparerR2.MapRender
             wnd.Hide();
         }
 
-        private void UiWnd_Visible(object sender, EmptyKeys.UserInterface.RoutedEventArgs e)
+        private void UiWnd_Visible(object sender, RoutedEventArgs e)
         {
             var wnd = sender as UIOptions;
             var data = wnd.DataContext as UIOptionsDataModel;
@@ -450,6 +471,67 @@ namespace WzComparerR2.MapRender
             this.StringLinker?.StringMap.TryGetValue(mapID, out sr);
             var message = string.Format("是否传送到地图\r\n{0} ({1})？", sr?.Name ?? "null", mapID);
             MessageBox.Show(message, "提示", MessageBoxButton.YesNo, callback, false);
+        }
+
+        private void ChatBox_TextSubmit(object sender, TextEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(e.Text))
+            {
+                if (e.Text.StartsWith("/"))
+                {
+                    ChatCommand(e.Text);
+                }
+                else
+                {
+                    this.ui.ChatBox.AppendTextNormal("MapRender: " + e.Text);
+                }
+            }
+        }
+
+        private void ChatCommand(string command)
+        {
+            string[] arguments = command.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+            if (arguments.Length <= 0)
+            {
+                return;
+            }
+
+            switch (arguments[0].ToLower())
+            {
+                case "/help":
+                case "/?":
+                    this.ui.ChatBox.AppendTextHelp(@"/help 显示帮助。");
+                    this.ui.ChatBox.AppendTextHelp(@"/map mapID 跳转地图。");
+                    this.ui.ChatBox.AppendTextHelp(@"/back 回到上一地图。");
+                    break;
+
+                case "/map":
+                    int toMapID;
+                    if (arguments.Length > 1 && Int32.TryParse(arguments[1], out toMapID) && toMapID > -1)
+                    {
+                        this.MoveToPortal(toMapID, "sp");
+                    }
+                    else
+                    {
+                        this.ui.ChatBox.AppendTextSystem($"缺少地图ID。");
+                    }
+                    break;
+
+                case "/back":
+                    if (this.viewHistory.Count > 0)
+                    {
+                        this.MoveToLastMap();
+                    }
+                    else
+                    {
+                        this.ui.ChatBox.AppendTextSystem($"前面没有地图。");
+                    }
+                    break;
+
+                default:
+                    this.ui.ChatBox.AppendTextSystem($"不支持{arguments[0]}命令。");
+                    break;
+            }
         }
 
         protected override void LoadContent()
@@ -480,8 +562,11 @@ namespace WzComparerR2.MapRender
                 }
 
                 this.GraphicsDevice.Clear(Color.Black);
-                DrawScene(gameTime);
-                DrawTooltipItems(gameTime);
+                if (this.mapData != null)
+                {
+                    DrawScene(gameTime);
+                    DrawTooltipItems(gameTime);
+                }
                 this.ui.Draw(gameTime.ElapsedGameTime.TotalMilliseconds);
                 this.tooltip.Draw(gameTime, renderEnv);
                 if (opacity < 1f)
@@ -505,6 +590,11 @@ namespace WzComparerR2.MapRender
 
         private void Capture(GameTime gameTime)
         {
+            if (this.mapData == null)
+            {
+                return;
+            }
+
             var oldTarget = GraphicsDevice.GetRenderTargets();
 
             //检查显卡支持纹理大小
@@ -677,6 +767,7 @@ namespace WzComparerR2.MapRender
             this.resLoader.Unload();
             this.ui.UnloadContents();
             this.Content.Unload();
+            this.imeHelper.Dispose();
             this.bgm = null;
             this.mapImg = null;
             this.mapData = null;
@@ -701,6 +792,7 @@ namespace WzComparerR2.MapRender
             GameExt.RemoveKeyboardEvent(this);
             GameExt.RemoveMouseStateCache();
             WcR2Engine.Unload();
+            ServiceManager.Instance.RemoveService<IMEHandler>();
         }
 
         private void SwitchResolution()

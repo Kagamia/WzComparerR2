@@ -25,15 +25,24 @@ namespace WzComparerR2.MapRender
 
             //开始加载地图
             yield return new WaitTaskCompletedCoroutine(LoadMap());
+
+            //添加视图状态
+            this.viewData = new MapViewData()
+            {
+                MapID = mapData?.ID ?? -1,
+                Portal = "sp"
+            };
+
             if (this.mapData != null)
             {
-                //添加视图状态
-                viewData = new MapViewData()
-                {
-                    MapID = mapData?.ID ?? -1,
-                    Portal = "sp"
-                };
                 yield return cm.Yield(OnSceneEnter());
+            }
+            else
+            {
+                //添加提示语
+                this.ui.ChatBox.AppendTextSystem("MapRender加载失败，没有地图数据。");
+                this.opacity = 1;
+                yield return cm.Yield(OnSceneRunning());
             }
         }
 
@@ -264,13 +273,28 @@ namespace WzComparerR2.MapRender
             //记录历史
             if (this.viewData.MapID != this.viewData.ToMapID && this.viewData.ToMapID != null)
             {
-                viewHistory.AddLast(this.viewData);
-                var toViewData = new MapViewData()
+                if (this.viewData.IsMoveBack 
+                    && this.viewData.ToMapID == this.viewHistory.Last?.Value?.MapID)
                 {
-                    MapID = this.viewData.ToMapID.Value,
-                    Portal = this.viewData.ToPortal ?? "sp"
-                };
-                this.viewData = toViewData;
+                    var last = this.viewHistory.Last.Value;
+                    this.viewHistory.RemoveLast();
+                    var toViewData = new MapViewData()
+                    {
+                        MapID = last.MapID,
+                        Portal = last.Portal ?? "sp"
+                    };
+                    this.viewData = toViewData;
+                }
+                else
+                {
+                    viewHistory.AddLast(this.viewData);
+                    var toViewData = new MapViewData()
+                    {
+                        MapID = this.viewData.ToMapID.Value,
+                        Portal = this.viewData.ToPortal ?? "sp"
+                    };
+                    this.viewData = toViewData;
+                }
             }
             else
             {
@@ -291,7 +315,7 @@ namespace WzComparerR2.MapRender
             while (true)
             {
                 SceneUpdate();
-                if (viewData.ToMapID != null)
+                if (this.viewData?.ToMapID != null)
                 {
                     break;
                 }
@@ -337,14 +361,17 @@ namespace WzComparerR2.MapRender
             //更新ui
             this.ui.UpdateLayout(gameTime.ElapsedGameTime.TotalMilliseconds);
             //更新场景
-            UpdateAllItems(mapData.Scene, gameTime.ElapsedGameTime);
+            if (mapData != null)
+            {
+                UpdateAllItems(mapData.Scene, gameTime.ElapsedGameTime);
+            }
             //更新tooltip
             UpdateTooltip();
         }
 
-        private void MoveToPortal(int? toMap, string pName, string fromPName = null)
+        private void MoveToPortal(int? toMap, string pName, string fromPName = null, bool isBack = false)
         {
-            if (toMap != null && toMap != this.mapData.ID) //跳转地图
+            if (toMap != null && toMap != this.mapData?.ID) //跳转地图
             {
                 //寻找地图数据
                 Wz_Node node;
@@ -357,7 +384,12 @@ namespace WzComparerR2.MapRender
                         viewData.ToMapID = toMap;
                         viewData.ToPortal = pName;
                         viewData.Portal = fromPName;
+                        viewData.IsMoveBack = isBack;
                     }
+                }
+                else
+                {
+                    this.ui.ChatBox.AppendTextSystem($"没有找到ID:{toMap.Value}的地图。");
                 }
             }
             else //当前地图
@@ -373,12 +405,25 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        private void MoveToLastMap()
+        {
+            if (viewHistory.Count > 0)
+            {
+                var last = viewHistory.Last.Value;
+                if (last.MapID > -1)
+                {
+                    MoveToPortal(last.MapID, last.Portal, null, true);
+                }
+            }
+        }
+
         class MapViewData
         {
             public int MapID { get; set; }
             public string Portal { get; set; }
             public int? ToMapID { get; set; }
             public string ToPortal { get; set; }
+            public bool IsMoveBack { get; set; }
         }
     }
 }

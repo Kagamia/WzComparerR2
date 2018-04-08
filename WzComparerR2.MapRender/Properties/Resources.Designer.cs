@@ -283,6 +283,56 @@ namespace WzComparerR2.MapRender.Properties {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap StatusBar3_img_chat_ingame_input_layer_backgrnd {
+            get {
+                object obj = ResourceManager.GetObject("StatusBar3_img_chat_ingame_input_layer_backgrnd", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap StatusBar3_img_chat_ingame_input_layer_chatEnter {
+            get {
+                object obj = ResourceManager.GetObject("StatusBar3_img_chat_ingame_input_layer_chatEnter", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap StatusBar3_img_chat_ingame_view_max_bottom {
+            get {
+                object obj = ResourceManager.GetObject("StatusBar3_img_chat_ingame_view_max_bottom", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap StatusBar3_img_chat_ingame_view_max_center {
+            get {
+                object obj = ResourceManager.GetObject("StatusBar3_img_chat_ingame_view_max_center", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap StatusBar3_img_chat_ingame_view_max_top {
+            get {
+                object obj = ResourceManager.GetObject("StatusBar3_img_chat_ingame_view_max_top", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap UIWindow_img_ToolTip_WorldMap_ArcaneForce {
             get {
                 object obj = ResourceManager.GetObject("UIWindow_img_ToolTip_WorldMap_ArcaneForce", resourceCulture);
