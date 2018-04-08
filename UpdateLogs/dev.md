@@ -1,4 +1,18 @@
-﻿## 2018.3.23
+﻿## 2018.4.8
+
+### WzLib
+- 修复了format517图片解码错误的bug。
+
+### MapRender
+- 添加UIMessageBox用于各种提示信息。
+- 添加UIChatBox，并支持了输入法，用于交互和显示提示。
+- 临时修复粒子系统的渲染错误。
+- UIWorldmap支持右键返回。
+- 修复了back图层的渲染错误，支持blend模式。
+- UI布局略微调整。
+
+
+## 2018.3.23
 
 ### CharaSim
 - 支持了KMST1066版本拆分的03xx.img物品识别。
