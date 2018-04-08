@@ -74,7 +74,7 @@ namespace WzComparerR2.Config
                 try
                 {
                     var baseType = type.BaseType;
-                    return baseType.IsGenericType && baseType.GetGenericTypeDefinition() == typeof(ConfigSectionBase<>);
+                    return baseType != null && baseType.IsGenericType && baseType.GetGenericTypeDefinition() == typeof(ConfigSectionBase<>);
                 }
                 catch
                 {
