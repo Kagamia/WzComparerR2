@@ -161,6 +161,7 @@
     <Compile Include="UI\HitMap.cs" />
     <Compile Include="UI\ITooltipTarget.cs" />
     <Compile Include="UI\MapRenderButtonStyle.cs" />
+    <Compile Include="UI\MessageBoxBackgroundBrush.cs" />
     <Compile Include="UI\TCBBrush.cs" />
     <Compile Include="UI\LCRBrush.cs" />
     <Compile Include="UI\MapRenderResourceKey.cs" />
@@ -242,8 +243,11 @@
     <None Include="Resources\Basic.img.BtOK4.mouseOver.0.png" />
     <None Include="Resources\Basic.img.BtOK4.normal.0.png" />
     <None Include="Resources\Basic.img.BtOK4.pressed.0.png" />
+    <Content Include="Resources\Basic.img.Notice6.box.png" />
     <Content Include="Resources\Basic.img.Notice6.c.png" />
+    <Content Include="Resources\Basic.img.Notice6.c_box.png" />
     <Content Include="Resources\Basic.img.Notice6.s.png" />
+    <Content Include="Resources\Basic.img.Notice6.s_box.png" />
     <Content Include="Resources\Basic.img.Notice6.t.png" />
     <Content Include="Resources\StatusBar3.img.chat.ingame.input.layer_backgrnd.png" />
     <Content Include="Resources\StatusBar3.img.chat.ingame.input.layer_chatEnter.png" />

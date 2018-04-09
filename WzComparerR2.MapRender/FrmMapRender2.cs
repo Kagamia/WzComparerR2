@@ -461,7 +461,7 @@ namespace WzComparerR2.MapRender
 
             var callback = new EmptyKeys.UserInterface.Input.RelayCommand<MessageBoxResult>(r =>
             {
-                if (r == MessageBoxResult.Yes)
+                if (r == MessageBoxResult.OK)
                 {
                     this.MoveToPortal(mapID, "sp");
                 }
@@ -470,7 +470,7 @@ namespace WzComparerR2.MapRender
             StringResult sr = null;
             this.StringLinker?.StringMap.TryGetValue(mapID, out sr);
             var message = string.Format("是否传送到地图\r\n{0} ({1})？", sr?.Name ?? "null", mapID);
-            MessageBox.Show(message, "提示", MessageBoxButton.YesNo, callback, false);
+            MessageBox.Show(message, "提示", MessageBoxButton.OKCancel, callback, false);
         }
 
         private void ChatBox_TextSubmit(object sender, TextEventArgs e)

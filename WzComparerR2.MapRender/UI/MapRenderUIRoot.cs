@@ -163,13 +163,16 @@ namespace WzComparerR2.MapRender.UI
                 }
             };
 
-            var msgBoxBackgroundBrush = new TCBBrush()
+            var msgBoxBackgroundBrush = new MessageBoxBackgroundBrush()
             {
-                Resource = new EKNineFormResource()
+                Resource = new MessageBoxBackgroundResource()
                 {
-                    N = assetManager.LoadTexture(null, nameof(MRes.Basic_img_Notice6_t)),
+                    T = assetManager.LoadTexture(null, nameof(MRes.Basic_img_Notice6_t)),
                     C = assetManager.LoadTexture(null, nameof(MRes.Basic_img_Notice6_c)),
-                    S= assetManager.LoadTexture(null, nameof(MRes.Basic_img_Notice6_s)),
+                    C_Box = assetManager.LoadTexture(null, nameof(MRes.Basic_img_Notice6_c_box)),
+                    Box = assetManager.LoadTexture(null, nameof(MRes.Basic_img_Notice6_box)),
+                    S_Box = assetManager.LoadTexture(null, nameof(MRes.Basic_img_Notice6_s_box)),
+                    S = assetManager.LoadTexture(null, nameof(MRes.Basic_img_Notice6_s)),
                 }
             };
 

@@ -99,10 +99,10 @@ namespace WzComparerR2.MapRender.UI
                     var stackPanel = grid.Children.OfType<StackPanel>().FirstOrDefault();
                     if (stackPanel != null)
                     {
-                        stackPanel.HorizontalAlignment = HorizontalAlignment.Center;
+                        stackPanel.HorizontalAlignment = HorizontalAlignment.Right;
                         foreach (var btn in stackPanel.Children.OfType<Button>())
                         {
-                            btn.Margin = new Thickness(2, 0, 2, 0);
+                            btn.Margin = new Thickness(2, 0, 0, 6);
                         }
                     }
                 }

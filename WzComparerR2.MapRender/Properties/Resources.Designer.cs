@@ -253,6 +253,16 @@ namespace WzComparerR2.MapRender.Properties {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap Basic_img_Notice6_box {
+            get {
+                object obj = ResourceManager.GetObject("Basic_img_Notice6_box", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap Basic_img_Notice6_c {
             get {
                 object obj = ResourceManager.GetObject("Basic_img_Notice6_c", resourceCulture);
@@ -263,9 +273,29 @@ namespace WzComparerR2.MapRender.Properties {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap Basic_img_Notice6_c_box {
+            get {
+                object obj = ResourceManager.GetObject("Basic_img_Notice6_c_box", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap Basic_img_Notice6_s {
             get {
                 object obj = ResourceManager.GetObject("Basic_img_Notice6_s", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Basic_img_Notice6_s_box {
+            get {
+                object obj = ResourceManager.GetObject("Basic_img_Notice6_s_box", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
