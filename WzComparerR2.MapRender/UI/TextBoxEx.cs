@@ -122,6 +122,14 @@ namespace WzComparerR2.MapRender.UI
                     }
                     break;
 
+                case KeyCode.Escape:
+                    if (InputManager.Current.FocusedElement == this)
+                    {
+                        InputManager.Current.ClearFocus();
+                        e.Handled = true;
+                    }
+                    break;
+
                 default:
                     if (imeEnabled)
                     {

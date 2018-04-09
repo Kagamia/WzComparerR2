@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using EmptyKeys.UserInterface;
 using EmptyKeys.UserInterface.Controls;
 using EmptyKeys.UserInterface.Data;
+using EmptyKeys.UserInterface.Input;
 
 namespace WzComparerR2.MapRender.UI
 {
@@ -48,6 +49,26 @@ namespace WzComparerR2.MapRender.UI
             }
         }
 
+        protected override void OnGotFocus(object sender, RoutedEventArgs e)
+        {
+            base.OnGotFocus(sender, e);
+
+            if (this.IsOnTop)
+            {
+                this.BringToFront();
+            }
+        }
+
+        protected override void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            base.OnPreviewMouseDown(sender, e);
+
+            if (this.IsOnTop)
+            {
+                this.Focus();
+            }
+        }
+
         public void Toggle()
         {
             if (this.Visibility == Visibility.Visible)
@@ -57,6 +78,16 @@ namespace WzComparerR2.MapRender.UI
             else
             {
                 this.Show();
+            }
+        }
+
+        public void BringToFront()
+        {
+            var root = this.Parent as UIRoot;
+            if (root != null)
+            {
+                root.Windows.Remove(this);
+                root.Windows.Add(this);
             }
         }
 

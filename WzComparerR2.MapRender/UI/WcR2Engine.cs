@@ -71,8 +71,18 @@ namespace WzComparerR2.MapRender.UI
 
         public static void Unload()
         {
-            InputManager.Current.FocusedElement = null;
+            InputManager.Current.ClearFocus();
             Engine.instance = null;
+            VisualTreeHelper.Instance.ClearParentCache();
+            typeof(MessageBox).GetFields(BindingFlags.Static | BindingFlags.NonPublic)
+                .FirstOrDefault(field => field.FieldType == typeof(MessageBox))
+                .SetValue(null, Activator.CreateInstance(typeof(MessageBox), true));
+            typeof(InputManager).GetFields(BindingFlags.Static | BindingFlags.NonPublic)
+                .FirstOrDefault(field => field.FieldType == typeof(InputManager))
+                .SetValue(null, (InputManager)null);
+            typeof(DragDrop).GetFields(BindingFlags.Static | BindingFlags.NonPublic)
+                .FirstOrDefault(field => field.FieldType == typeof(DragDrop))
+                .SetValue(null, Activator.CreateInstance(typeof(DragDrop), true));
         }
 
         public static void InitialInputManager()
@@ -481,7 +491,8 @@ namespace WzComparerR2.MapRender.UI
                 if (wcR2Font is XnaFont)
                 {
                     var xnaFont = (XnaFont)wcR2Font;
-                    var size = xnaFont.MeasureString(text);
+                    var size = xnaFont.MeasureString(text, new Vector2(layoutSize.Width, layoutSize.Height));
+                    return new Size(size.X, size.Y);
                 }
                 else if (wcR2Font is D2DFont)
                 {

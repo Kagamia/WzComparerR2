@@ -73,6 +73,7 @@ namespace WzComparerR2.MapRender.UI
             textBox.SelectionBrush = Brushes.Blue;
             textBox.CaretBrush = Brushes.White;
             textBox.IMEEnabled = true;
+            textBox.IsTabStop = false;
             textBox.BorderThickness = new Thickness(0);
             textBox.Width = 471;
             textBox.Height = 20;

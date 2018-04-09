@@ -403,6 +403,10 @@ namespace WzComparerR2.MapRender.UI
             {
                 if (wcR2Font is XnaFont)
                 {
+                    //snap pixels
+                    position.X = (float)Math.Round(position.X);
+                    position.Y = (float)Math.Round(position.Y);
+
                     Prepare(DrawState.Sprite);
                     spriteBatch.DrawStringEx((XnaFont)wcR2Font,
                         text,

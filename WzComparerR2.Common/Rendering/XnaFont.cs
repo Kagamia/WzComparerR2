@@ -62,25 +62,37 @@ namespace WzComparerR2.Rendering
 
         public Vector2 MeasureString(string text)
         {
-            return MeasureString(text, 0, text == null ? 0 : text.Length);
+            return MeasureString(text, Vector2.Zero);
         }
 
         public Vector2 MeasureString(StringBuilder stringBuilder)
         {
-            return MeasureString(stringBuilder, 0, stringBuilder == null ? 0 : stringBuilder.Length);
+            return MeasureString(stringBuilder, Vector2.Zero);
+        }
+
+        public Vector2 MeasureString(string text, Vector2 size)
+        {
+            var ie = TextUtils.CreateCharEnumerator(text, 0, text.Length);
+            return MeasureString(ie, size);
+        }
+
+        public Vector2 MeasureString(StringBuilder stringBuilder, Vector2 size)
+        {
+            var ie = TextUtils.CreateCharEnumerator(stringBuilder, 0, stringBuilder.Length);
+            return MeasureString(ie, size);
         }
 
         public Vector2 MeasureString(string text, int startIndex, int length)
         {
-            return MeasureString(TextUtils.CreateCharEnumerator(text, startIndex, length));
+            return MeasureString(TextUtils.CreateCharEnumerator(text, startIndex, length), Vector2.Zero);
         }
 
         public Vector2 MeasureString(StringBuilder stringBuilder, int startIndex, int length)
         {
-            return MeasureString(TextUtils.CreateCharEnumerator(stringBuilder, startIndex, length));
+            return MeasureString(TextUtils.CreateCharEnumerator(stringBuilder, startIndex, length), Vector2.Zero);
         }
 
-        public Vector2 MeasureString(IEnumerable<char> text)
+        public Vector2 MeasureString(IEnumerable<char> text, Vector2 layoutSize)
         {
             if (text == null)
                 return Vector2.Zero;
@@ -108,6 +120,13 @@ namespace WzComparerR2.Rendering
                 else
                 {
                     Rectangle rect = TryGetRect(c);
+                    if (layoutSize.X > 0 && size.Width > 0 && size.Width + rect.Width > layoutSize.X) //强制换行
+                    {
+                        size.Height += this.baseFont.Height;
+                        maxWidth = Math.Max(maxWidth, size.Width);
+                        size.Width = 0;
+                        lineHeight = 0;
+                    }
                     size.Width += rect.Width;
                     lineHeight = Math.Max(rect.Height, lineHeight);
                 }
