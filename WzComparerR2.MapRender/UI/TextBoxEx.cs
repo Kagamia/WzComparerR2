@@ -213,10 +213,6 @@ namespace WzComparerR2.MapRender.UI
                 }
                 this.prevHasComposition = hasComposition;
 
-                var ctx = (IntPtr)imeWindow.GetType()
-                    .GetField("_context", BindingFlags.Instance | BindingFlags.NonPublic)
-                    .GetValue(imeWindow);
-
                 var caretPos = this.textEditor.GetCaretVisualOffset(1, 1);
                 var scrollViewer = this.ScrollViewer;
                 if (scrollViewer != null)
@@ -240,11 +236,11 @@ namespace WzComparerR2.MapRender.UI
                     caretPos.X += this.VisualPosition.X;
                     caretPos.Y += this.VisualPosition.Y;
                 }
-                COMPOSITIONFORM form = new COMPOSITIONFORM();
-                form.dwStyle = CFS_POINT;
+                IMM.COMPOSITIONFORM form = new IMM.COMPOSITIONFORM();
+                form.dwStyle = IMM.CFSPoint;
                 form.ptCurrentPos.x = (int)(caretPos.X);
                 form.ptCurrentPos.y = (int)(caretPos.Y);
-                bool success = ImmSetCompositionWindow(ctx, ref form);
+                bool success = IMM.SetCompositionWindow(imeWindow.IMEContext, ref form);
             }
         }
 
@@ -302,36 +298,6 @@ namespace WzComparerR2.MapRender.UI
             var style = TextBoxStyle.CreateTextBoxStyle();
             style.TargetType = typeof(TextBoxEx);
             return style;
-        }
-
-        [DllImport("imm32.dll", CallingConvention = CallingConvention.Winapi)]
-        private static extern bool ImmSetCompositionWindow(IntPtr hIMC, ref COMPOSITIONFORM compForm);
-
-        private struct COMPOSITIONFORM {
-            public int dwStyle;
-            public POINT ptCurrentPos;
-            public RECT rcArea;
-        }
-
-        private const int CFS_DEFAULT = 0x0000;
-        private const int CFS_RECT = 0x0001;
-        private const int CFS_POINT = 0x0002;
-        private const int CFS_FORCE_POSITION = 0x0020;
-        private const int CFS_CANDIDATEPOS = 0x0040;
-        private const int CFS_EXCLUDE = 0x0080;
-
-        private struct POINT
-        {
-            public int x;
-            public int y;
-        }
-
-        private struct RECT
-        {
-            public int left;
-            public int top;
-            public int right;
-            public int bottom;
         }
 
         private class TextEditorProxy
