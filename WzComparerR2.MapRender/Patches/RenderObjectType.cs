@@ -15,6 +15,8 @@ namespace WzComparerR2.MapRender.Patches
         Foothold,
         LadderRope,
         Portal,
-        Front
+        Front,
+        NpcName,
+        MobName,
     }
 }

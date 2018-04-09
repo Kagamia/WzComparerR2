@@ -740,6 +740,8 @@ namespace WzComparerR2.MapRender
             model.MuteOnLeaveFocus = config.MuteOnLeaveFocus;
             model.ClipMapRegion = renderEnv.Camera.AdjustRectEnabled;
             model.UseD2dRenderer = config.UseD2dRenderer;
+            model.NpcNameVisible = this.patchVisibility.NpcNameVisible;
+            model.MobNameVisible = this.patchVisibility.MobNameVisible;
             model.TopBarVisible = this.ui.TopBar.Visibility == EmptyKeys.UserInterface.Visibility.Visible;
             model.Minimap_CameraRegionVisible = this.ui.Minimap.CameraRegionVisible;
             model.WorldMap_UseImageNameAsInfoName = this.ui.WorldMap.UseImageNameAsInfoName;
@@ -754,6 +756,8 @@ namespace WzComparerR2.MapRender
             config.MuteOnLeaveFocus = model.MuteOnLeaveFocus;
             config.ClipMapRegion = model.ClipMapRegion;
             config.UseD2dRenderer = model.UseD2dRenderer;
+            this.patchVisibility.NpcNameVisible = model.NpcNameVisible;
+            this.patchVisibility.MobNameVisible = model.MobNameVisible;
             config.TopBarVisible = model.TopBarVisible;
             config.Minimap_CameraRegionVisible = model.Minimap_CameraRegionVisible;
             config.WorldMap_UseImageNameAsInfoName = model.WorldMap_UseImageNameAsInfoName;

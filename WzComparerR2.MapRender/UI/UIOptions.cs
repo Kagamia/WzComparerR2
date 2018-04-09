@@ -142,6 +142,8 @@ namespace WzComparerR2.MapRender.UI
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
             grid.ColumnDefinitions.Add(new ColumnDefinition());
             grid.ColumnDefinitions.Add(new ColumnDefinition());
 
@@ -244,6 +246,24 @@ namespace WzComparerR2.MapRender.UI
             Grid.SetColumn(chk3, 0);
             Grid.SetColumnSpan(chk3, 2);
             grid.Children.Add(chk3);
+
+            CheckBox chk4 = new CheckBox();
+            chk4.Content = "显示Npc名称";
+            chk4.Margin = new Thickness(18, 0, 0, 0);
+            chk4.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.NpcNameVisible)));
+            Grid.SetRow(chk4, 8);
+            Grid.SetColumn(chk4, 0);
+            Grid.SetColumnSpan(chk4, 2);
+            grid.Children.Add(chk4);
+
+            CheckBox chk5 = new CheckBox();
+            chk5.Content = "显示Mob名称";
+            chk5.Margin = new Thickness(18, 0, 0, 0);
+            chk5.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.MobNameVisible)));
+            Grid.SetRow(chk5, 9);
+            Grid.SetColumn(chk5, 0);
+            Grid.SetColumnSpan(chk5, 2);
+            grid.Children.Add(chk5);
 
             ScrollViewer viewer = new ScrollViewer();
             viewer.Content = grid;
@@ -375,6 +395,8 @@ namespace WzComparerR2.MapRender.UI
         private int _selectedFont;
         private bool _clipMapRegion;
         private bool _useD2dRenderer;
+        private bool _npcNameVisible;
+        private bool _mobNameVisible;
         private bool _topBarVisible;
         private bool _minimap_cameraRegionVisible;
         private bool _worldmap_useImageNameAsInfoName;
@@ -408,6 +430,18 @@ namespace WzComparerR2.MapRender.UI
         {
             get { return this._useD2dRenderer; }
             set { base.SetProperty(ref this._useD2dRenderer, value); }
+        }
+
+        public bool NpcNameVisible
+        {
+            get { return this._npcNameVisible; }
+            set { base.SetProperty(ref this._npcNameVisible, value); }
+        }
+
+        public bool MobNameVisible
+        {
+            get { return this._mobNameVisible; }
+            set { base.SetProperty(ref this._mobNameVisible, value); }
         }
 
         public bool TopBarVisible

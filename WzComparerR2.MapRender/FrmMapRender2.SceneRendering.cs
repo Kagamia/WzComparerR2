@@ -346,6 +346,7 @@ namespace WzComparerR2.MapRender
                 switch (life.Type)
                 {
                     case LifeItem.LifeType.Mob:
+                        if (this.patchVisibility.MobNameVisible)
                         {
                             string lv = "Lv." + (life.LifeInfo?.level ?? 0);
                             string name;
@@ -386,6 +387,7 @@ namespace WzComparerR2.MapRender
                         break;
 
                     case LifeItem.LifeType.Npc:
+                        if (this.patchVisibility.NpcNameVisible)
                         {
                             string name, desc;
                             if (this.StringLinker?.StringNpc.TryGetValue(life.ID, out sr) ?? false)

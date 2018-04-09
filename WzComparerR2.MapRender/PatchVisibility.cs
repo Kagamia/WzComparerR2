@@ -81,6 +81,18 @@ namespace WzComparerR2.MapRender
             set { this.SetVisible(RenderObjectType.Front, value); }
         }
 
+        public bool NpcNameVisible
+        {
+            get { return IsVisible(RenderObjectType.NpcName); }
+            set { this.SetVisible(RenderObjectType.NpcName, value); }
+        }
+
+        public bool MobNameVisible
+        {
+            get { return IsVisible(RenderObjectType.MobName); }
+            set { this.SetVisible(RenderObjectType.MobName, value); }
+        }
+
         private Dictionary<RenderObjectType, bool> dictVisible;
 
         public bool IsVisible(RenderObjectType type)
