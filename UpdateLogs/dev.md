@@ -1,4 +1,12 @@
-﻿## 2018.4.8
+﻿## 2018.4.9
+
+### MapRender
+- 支持隐藏NPC和怪物名字。
+- 更新了MessageBox样式。
+- 修复了UIChatBox渲染模糊和操作上的bug。
+
+
+## 2018.4.8
 
 ### WzLib
 - 修复了format517图片解码错误的bug。
