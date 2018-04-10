@@ -501,8 +501,10 @@ namespace WzComparerR2.MapRender
                 case "/help":
                 case "/?":
                     this.ui.ChatBox.AppendTextHelp(@"/help 显示帮助。");
-                    this.ui.ChatBox.AppendTextHelp(@"/map mapID 跳转地图。");
+                    this.ui.ChatBox.AppendTextHelp(@"/map (mapID) 跳转地图。");
                     this.ui.ChatBox.AppendTextHelp(@"/back 回到上一地图。");
+                    this.ui.ChatBox.AppendTextHelp(@"/home 回城。");
+                    this.ui.ChatBox.AppendTextHelp(@"/history [maxCount] 查看历史地图。");
                     break;
 
                 case "/map":
@@ -525,6 +527,42 @@ namespace WzComparerR2.MapRender
                     else
                     {
                         this.ui.ChatBox.AppendTextSystem($"前面没有地图。");
+                    }
+                    break;
+
+                case "/home":
+                    var retMapID = this.mapData?.ReturnMap;
+                    if (retMapID == null || retMapID == 999999999)
+                    {
+                        this.ui.ChatBox.AppendTextSystem($"回不到那里去。");
+                    }
+                    else
+                    {
+                        this.MoveToPortal(retMapID, "sp");
+                    }
+                    break;
+
+                case "/history":
+                    int historyCount;
+                    if (!(arguments.Length > 1
+                        && Int32.TryParse(arguments[1], out historyCount)
+                        && historyCount > 0))
+                    {
+                        historyCount = 5;
+                    }
+                    this.ui.ChatBox.AppendTextHelp($"历史地图：({this.viewHistory.Count})");
+                    var node = this.viewHistory.Last;
+                    while (node != null && historyCount > 0)
+                    {
+                        StringResult sr = null;
+                        if (node.Value != null && this.StringLinker != null)
+                        {
+                            this.StringLinker.StringMap.TryGetValue(node.Value.MapID, out sr);
+                        }
+                        this.ui.ChatBox.AppendTextHelp($"  {sr?.Name ?? "(null)"}({node.Value.MapID})");
+                        
+                        node = node.Previous;
+                        historyCount--;
                     }
                     break;
 
