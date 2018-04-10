@@ -209,7 +209,13 @@ namespace WzComparerR2.MapRender.UI
 
         public new void UpdateInput(double elapsedGameTime)
         {
-            base.UpdateInput(elapsedGameTime);
+            try
+            {
+                base.UpdateInput(elapsedGameTime);
+            }
+            catch(Exception ex)
+            {
+            }
             this.OnInputUpdated(EventArgs.Empty);
         }
 
