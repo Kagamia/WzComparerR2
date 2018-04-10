@@ -63,9 +63,9 @@ namespace WzComparerR2.MapRender.UI
         {
             base.OnPreviewMouseDown(sender, e);
 
-            if (this.IsOnTop)
+            if (this.IsOnTop && !this.IsFocused)
             {
-                this.Focus();
+                this.BringToFront();
             }
         }
 
@@ -86,8 +86,11 @@ namespace WzComparerR2.MapRender.UI
             var root = this.Parent as UIRoot;
             if (root != null)
             {
-                root.Windows.Remove(this);
-                root.Windows.Add(this);
+                if (!this.IsZFront)
+                {
+                    root.Windows.Remove(this);
+                    root.Windows.Add(this);
+                }
             }
         }
 
@@ -99,6 +102,25 @@ namespace WzComparerR2.MapRender.UI
         public void Hide()
         {
             this.Visibility = Visibility.Collapsed;
+        }
+
+        private bool IsZFront
+        {
+            get
+            {
+                var root = this.Parent as UIRoot;
+                if (root != null)
+                {
+                    for (int i = root.Windows.Count - 1; i >= 0; i--)
+                    {
+                        if (root.Windows[i].IsOnTop == this.IsOnTop)
+                        {
+                            return root.Windows[i] == this;
+                        }
+                    }
+                }
+                return false;
+            }
         }
     }
 }
