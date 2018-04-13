@@ -225,11 +225,21 @@ namespace WzComparerR2.Rendering
                 .Invoke(texture, new object[] { });
         }
 
-        public static bool IsSupportBgra4444(this GraphicsDevice device)
+        public static bool IsSupportFormat(this GraphicsDevice device, SharpDX.DXGI.Format format)
         {
             var d3dDevice = device._d3dDevice();
-            var fmtSupport = d3dDevice.CheckFormatSupport(MonogameUtils.DXGI_FORMAT_B4G4R4A4_UNORM);
+            var fmtSupport = d3dDevice.CheckFormatSupport(format);
             return (fmtSupport & SharpDX.Direct3D11.FormatSupport.Texture2D) != 0;
+        }
+
+        public static bool IsSupportBgra4444(this GraphicsDevice device)
+        {
+            return device.IsSupportFormat(DXGI_FORMAT_B4G4R4A4_UNORM);
+        }
+
+        public static bool IsSupportBgr565(this GraphicsDevice device)
+        {
+            return device.IsSupportFormat(SharpDX.DXGI.Format.B5G6R5_UNorm);
         }
     }
 }

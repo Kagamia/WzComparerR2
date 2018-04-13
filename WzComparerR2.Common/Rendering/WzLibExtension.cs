@@ -16,7 +16,7 @@ namespace WzComparerR2.Rendering
             Texture2D t2d = null;
             if (format == SurfaceFormat.Bgra4444)
             {
-                //检测是否支持
+                //检测是否支持 pre-win8
                 if (graphicsDevice.IsSupportBgra4444())
                 {
                     t2d = MonogameUtils.CreateTexture_BGRA4444(graphicsDevice, png.Width, png.Height);
@@ -26,6 +26,15 @@ namespace WzComparerR2.Rendering
                     format = SurfaceFormat.Bgra32;
                 }
             }
+            else if (format == SurfaceFormat.Bgr565)
+            {
+                //检测是否支持 pre-win8
+                if (!graphicsDevice.IsSupportBgr565())
+                {
+                    format = SurfaceFormat.Bgra32;
+                }
+            }
+
             if (t2d == null)
             {
                 t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, format);
