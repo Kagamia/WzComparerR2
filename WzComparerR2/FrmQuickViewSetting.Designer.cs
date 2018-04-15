@@ -522,7 +522,7 @@
             this.checkBoxX11.Size = new System.Drawing.Size(101, 18);
             this.checkBoxX11.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX11.TabIndex = 4;
-            this.checkBoxX11.Text = "显示勋章样式";
+            this.checkBoxX11.Text = "显示勋章和称号样式";
             // 
             // FrmQuickViewSetting
             // 
