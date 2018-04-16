@@ -231,6 +231,12 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
 
+            if (Gear.Props.TryGetValue(GearPropType.royalSpecial, out value) && value > 0)
+            {
+                g.DrawString("特标", GearGraphics.ItemDetailFont, GearGraphics.GearNameBrushA, 130, picH, format);
+                picH += 15;
+            }
+
             //装备限时
             if (Gear.TimeLimited)
             {
@@ -290,9 +296,18 @@ namespace WzComparerR2.CharaSimControl
             }
             if (Gear.Cash) //绘制cash标识
             {
-                g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_0),
-                    18 + 68 - 26,
-                    picH + 15 + 68 - 26);
+                if (Gear.Props.TryGetValue(GearPropType.royalSpecial, out value) && value > 0)
+                    g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_label_0),
+                        18 + 68 - 26,
+                        picH + 15 + 68 - 26);
+                else if (Gear.Props.TryGetValue(GearPropType.masterSpecial, out value) && value > 0)
+                    g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_label_3),
+                        18 + 68 - 26,
+                        picH + 15 + 68 - 26);
+                else
+                    g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_0),
+                        18 + 68 - 26,
+                        picH + 15 + 68 - 26);
             }
             //检查星岩
             bool hasSocket = Gear.GetBooleanValue(GearPropType.nActivatedSocket);
@@ -723,7 +738,7 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (!string.IsNullOrEmpty(sr.Desc))
                 {
-                    GearGraphics.DrawString(g, sr.Desc, GearGraphics.ItemDetailFont2, 11, 245, ref picH, 16);
+                    GearGraphics.DrawString(g, sr.Desc.Replace("#", " #"), GearGraphics.ItemDetailFont2, 11, 245, ref picH, 16);
                 }
                 if (!string.IsNullOrEmpty(levelDesc))
                 {

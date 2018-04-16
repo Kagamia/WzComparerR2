@@ -80,10 +80,32 @@ namespace WzComparerR2.CharaSimControl
 
             format.Alignment = StringAlignment.Far;
 
+            Wz_Node characterWz = PluginManager.FindWz(Wz_Type.Character);
+
             foreach (var setItemPart in this.SetItem.ItemIDs.Parts)
             {
                 string itemName = setItemPart.Value.RepresentName;
                 string typeName = setItemPart.Value.TypeName;
+
+                Gear gear = null;
+
+                if (characterWz != null)
+                {
+                    foreach (var itemID in setItemPart.Value.ItemIDs)
+                    {
+                        foreach (Wz_Node typeNode in characterWz.Nodes)
+                        {
+                            Wz_Node itemNode = typeNode.FindNodeByPath(string.Format("{0:D8}.img", itemID.Key), true);
+                            if (itemNode != null)
+                            {
+                                gear = Gear.CreateFromNode(itemNode, PluginManager.FindWz);
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
 
                 if (string.IsNullOrEmpty(typeName) && SetItem.Parts)
                 {
@@ -139,9 +161,26 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 Brush brush = setItemPart.Value.Enabled ? Brushes.White : GearGraphics.GrayBrush2;
-                g.DrawString(itemName, GearGraphics.ItemDetailFont2, brush, 8, picHeight);
-                g.DrawString(typeName, GearGraphics.ItemDetailFont2, brush, 254, picHeight, format);
-                picHeight += 18;
+                if (gear == null || !gear.Cash)
+                {
+                    g.DrawString(itemName, GearGraphics.ItemDetailFont2, brush, 8, picHeight);
+                    g.DrawString(typeName, GearGraphics.ItemDetailFont2, brush, 254, picHeight, format);
+                    picHeight += 18;
+                }
+                else
+                {
+                    g.FillRectangle(GearGraphics.GearIconBackBrush2, 10, picHeight, 36, 36);
+                    g.DrawImage(Resource.Item_shadow, 10 + 2 + 3, picHeight + 2 + 32 - 6);
+                    if (gear != null && gear.IconRaw.Bitmap != null)
+                    {
+                        g.DrawImage(gear.IconRaw.Bitmap, 10 + 2 - gear.IconRaw.Origin.X, picHeight + 2 + 32 - gear.IconRaw.Origin.Y);
+                    }
+                    g.DrawImage(Resource.CashItem_0, 10 + 2 + 20, picHeight + 2 + 32 - 12);
+                    g.DrawString(itemName, GearGraphics.ItemDetailFont2, brush, 50, picHeight);
+                    g.DrawString(typeName, GearGraphics.ItemDetailFont2, brush, 254, picHeight, format);
+                    picHeight += 40;
+                }
+
             }
 
             if (!this.SetItem.ExpandToolTip)

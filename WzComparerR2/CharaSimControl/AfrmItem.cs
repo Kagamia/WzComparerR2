@@ -297,7 +297,13 @@ namespace WzComparerR2.CharaSimControl
             }
             if (gear.Cash)
             {
-                g.DrawImage(Resource.CashItem_0, origin.X + 20, origin.Y - 12);
+                int value;
+                if (gear.Props.TryGetValue(GearPropType.royalSpecial, out value) && value > 0)
+                    g.DrawImage(Resource.CashItem_label_0, origin.X + 20, origin.Y - 12);
+                else if (gear.Props.TryGetValue(GearPropType.masterSpecial, out value) && value > 0)
+                    g.DrawImage(Resource.CashItem_label_3, origin.X + 20, origin.Y - 12);
+                else
+                    g.DrawImage(Resource.CashItem_0, origin.X + 20, origin.Y - 12);
             }
         }
 
