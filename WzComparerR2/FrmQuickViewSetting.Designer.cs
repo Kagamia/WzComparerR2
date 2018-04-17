@@ -66,6 +66,7 @@
             this.buttonX2 = new DevComponents.DotNetBar.ButtonX();
             this.buttonX1 = new DevComponents.DotNetBar.ButtonX();
             this.checkBoxX11 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX12 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
             this.superTabControlPanel1.SuspendLayout();
@@ -338,6 +339,7 @@
             // 
             // superTabControlPanel3
             // 
+            this.superTabControlPanel3.Controls.Add(this.checkBoxX12);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX9);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX8);
             this.superTabControlPanel3.Controls.Add(this.checkBoxX5);
@@ -347,6 +349,21 @@
             this.superTabControlPanel3.Size = new System.Drawing.Size(242, 171);
             this.superTabControlPanel3.TabIndex = 0;
             this.superTabControlPanel3.TabItem = this.superTabItem3;
+            // 
+            // checkBoxX12
+            // 
+            this.checkBoxX12.AutoSize = true;
+            this.checkBoxX12.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX12.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX12.Location = new System.Drawing.Point(13, 84);
+            this.checkBoxX12.Name = "checkBoxX12";
+            this.checkBoxX12.Size = new System.Drawing.Size(101, 18);
+            this.checkBoxX12.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX12.TabIndex = 5;
+            this.checkBoxX12.Text = "显示称号样式";
             // 
             // checkBoxX9
             // 
@@ -522,7 +539,7 @@
             this.checkBoxX11.Size = new System.Drawing.Size(101, 18);
             this.checkBoxX11.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX11.TabIndex = 4;
-            this.checkBoxX11.Text = "显示勋章和称号样式";
+            this.checkBoxX11.Text = "显示勋章样式";
             // 
             // FrmQuickViewSetting
             // 
@@ -592,5 +609,6 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX8;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX10;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX11;
+        private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX12;
     }
 }

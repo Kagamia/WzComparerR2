@@ -231,12 +231,6 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
 
-            if (Gear.Props.TryGetValue(GearPropType.royalSpecial, out value) && value > 0)
-            {
-                g.DrawString("特标", GearGraphics.ItemDetailFont, GearGraphics.GearNameBrushA, 130, picH, format);
-                picH += 15;
-            }
-
             //装备限时
             if (Gear.TimeLimited)
             {
@@ -296,6 +290,8 @@ namespace WzComparerR2.CharaSimControl
             }
             if (Gear.Cash) //绘制cash标识
             {
+                /* not installed since CMST136
+                 * 
                 if (Gear.Props.TryGetValue(GearPropType.royalSpecial, out value) && value > 0)
                     g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_label_0),
                         18 + 68 - 26,
@@ -305,9 +301,10 @@ namespace WzComparerR2.CharaSimControl
                         18 + 68 - 26,
                         picH + 15 + 68 - 26);
                 else
-                    g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_0),
-                        18 + 68 - 26,
-                        picH + 15 + 68 - 26);
+                */
+                g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_0),
+                    18 + 68 - 26,
+                    picH + 15 + 68 - 26);
             }
             //检查星岩
             bool hasSocket = Gear.GetBooleanValue(GearPropType.nActivatedSocket);
@@ -733,12 +730,12 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (medalResNode != null)
                 {
-                    this.DrawMedalTag(g, medalResNode, sr.Name, ref picH);
+                    GearGraphics.DrawNameTag(g, medalResNode, sr.Name, bitmap.Width, ref picH);
                     picH += 4;
                 }
                 if (!string.IsNullOrEmpty(sr.Desc))
                 {
-                    GearGraphics.DrawString(g, sr.Desc.Replace("#", " #"), GearGraphics.ItemDetailFont2, 11, 245, ref picH, 16);
+                    GearGraphics.DrawString(g, sr.Desc, GearGraphics.ItemDetailFont2, 11, 245, ref picH, 16);
                 }
                 if (!string.IsNullOrEmpty(levelDesc))
                 {
@@ -1370,65 +1367,6 @@ namespace WzComparerR2.CharaSimControl
         {
             resNode = PluginBase.PluginManager.FindWz("UI/NameTag.img/medal/" + medalTag);
             return resNode != null;
-        }
-
-        private void DrawMedalTag(Graphics g, Wz_Node resNode, string medalName, ref int picH)
-        {
-            if (g == null || resNode == null)
-                return;
-
-            //加载资源和文本颜色
-            var wce = new[] { "w", "c", "e" }.Select(n =>
-            {
-                var node = resNode.FindNodeByPath(n);
-                if (node == null)
-                {
-                    return new BitmapOrigin();
-                }
-                return BitmapOrigin.CreateFromNode(node, PluginBase.PluginManager.FindWz);
-            }).ToArray();
-
-            Color color = Color.FromArgb(resNode.FindNodeByPath("clr").GetValueEx(-1));
-
-            //测试y轴大小
-            int offsetY = wce.Min(bmp => bmp.OpOrigin.Y);
-            int height = wce.Max(bmp => bmp.Rectangle.Bottom);
-
-            //测试宽度
-            var font = GearGraphics.ItemDetailFont2;
-            var fmt = StringFormat.GenericTypographic;
-            int width = string.IsNullOrEmpty(medalName) ? 0 : (int)Math.Ceiling(g.MeasureString(medalName, font, 261, fmt).Width);
-            int left = 130 - width / 2;
-            int right = left + width;
-
-            //开始绘制背景
-            picH -= offsetY;
-            if (wce[0].Bitmap != null)
-            {
-                g.DrawImage(wce[0].Bitmap, left - wce[0].Origin.X, picH - wce[0].Origin.Y);
-            }
-            if (wce[1].Bitmap != null) //不用拉伸 用纹理平铺 看运气
-            {
-                var brush = new TextureBrush(wce[1].Bitmap);
-                Rectangle rect = new Rectangle(left, picH - wce[1].Origin.Y, right - left, brush.Image.Height);
-                brush.TranslateTransform(rect.X, rect.Y);
-                g.FillRectangle(brush, rect);
-                brush.Dispose();
-            }
-            if (wce[2].Bitmap != null)
-            {
-                g.DrawImage(wce[2].Bitmap, right - wce[2].Origin.X, picH - wce[2].Origin.Y);
-            }
-
-            //绘制文字
-            if (!string.IsNullOrEmpty(medalName))
-            {
-                var brush = new SolidBrush(color);
-                g.DrawString(medalName, font, brush, 130 - width / 2, picH, fmt);
-                brush.Dispose();
-            }
-
-            picH += height;
         }
 
         private enum NumberType

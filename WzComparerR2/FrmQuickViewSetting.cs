@@ -125,6 +125,13 @@ namespace WzComparerR2
             set { checkBoxX9.Checked = value; }
         }
 
+        [Link]
+        public bool Item_ShowNickTag
+        {
+            get { return checkBoxX12.Checked; }
+            set { checkBoxX12.Checked = value; }
+        }
+
         public void Load(CharaSimConfig config)
         {
             var linkProp = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
