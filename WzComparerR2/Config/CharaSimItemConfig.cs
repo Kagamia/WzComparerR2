@@ -28,5 +28,12 @@ namespace WzComparerR2.Config
             get { return (bool)this["linkRecipeItem"]; }
             set { this["linkRecipeItem"] = value; }
         }
+
+        [ConfigurationProperty("showNickTag", DefaultValue = false)]
+        public bool ShowNickTag
+        {
+            get { return (bool)this["showNickTag"]; }
+            set { this["showNickTag"] = value; }
+        }
     }
 }

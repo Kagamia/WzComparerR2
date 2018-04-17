@@ -365,7 +365,7 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (nickResNode != null)
                 {
-                    this.DrawNickTag(g, nickResNode, sr.Name, tooltip.Width, ref picH);
+                    GearGraphics.DrawNameTag(g, nickResNode, sr.Name, tooltip.Width, ref picH);
                     picH += 4;
                 }
             }
@@ -499,65 +499,6 @@ namespace WzComparerR2.CharaSimControl
         {
             resNode = PluginBase.PluginManager.FindWz("UI/NameTag.img/nick/" + nickTag);
             return resNode != null;
-        }
-
-        private void DrawNickTag(Graphics g, Wz_Node resNode, string nickName, int picW, ref int picH)
-        {
-            if (g == null || resNode == null)
-                return;
-
-            //加载资源和文本颜色
-            var wce = new[] { "w", "c", "e" }.Select(n =>
-            {
-                var node = resNode.FindNodeByPath(n);
-                if (node == null)
-                {
-                    return new BitmapOrigin();
-                }
-                return BitmapOrigin.CreateFromNode(node, PluginBase.PluginManager.FindWz);
-            }).ToArray();
-
-            Color color = Color.FromArgb(resNode.FindNodeByPath("clr").GetValueEx(-1));
-
-            //测试y轴大小
-            int offsetY = wce.Min(bmp => bmp.OpOrigin.Y);
-            int height = wce.Max(bmp => bmp.Rectangle.Bottom);
-
-            //测试宽度
-            var font = GearGraphics.ItemDetailFont;
-            var fmt = StringFormat.GenericTypographic;
-            int width = string.IsNullOrEmpty(nickName) ? 0 : (int)Math.Ceiling(g.MeasureString(nickName, font, picW, fmt).Width);
-            int left = picW / 2 - width / 2;
-            int right = left + width;
-
-            //开始绘制背景
-            picH -= offsetY;
-            if (wce[0].Bitmap != null)
-            {
-                g.DrawImage(wce[0].Bitmap, left - wce[0].Origin.X, picH - wce[0].Origin.Y);
-            }
-            if (wce[1].Bitmap != null) //不用拉伸 用纹理平铺 看运气
-            {
-                var brush = new TextureBrush(wce[1].Bitmap);
-                Rectangle rect = new Rectangle(left, picH - wce[1].Origin.Y, right - left, brush.Image.Height);
-                brush.TranslateTransform(rect.X, rect.Y);
-                g.FillRectangle(brush, rect);
-                brush.Dispose();
-            }
-            if (wce[2].Bitmap != null)
-            {
-                g.DrawImage(wce[2].Bitmap, right - wce[2].Origin.X, picH - wce[2].Origin.Y);
-            }
-
-            //绘制文字
-            if (!string.IsNullOrEmpty(nickName))
-            {
-                var brush = new SolidBrush(color);
-                g.DrawString(nickName, font, brush, picW / 2 - width / 2, picH, fmt);
-                brush.Dispose();
-            }
-
-            picH += height;
         }
     }
 }
