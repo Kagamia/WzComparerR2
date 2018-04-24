@@ -45,7 +45,10 @@ namespace WzComparerR2.CharaSim
             get { return level; }
             set
             {
-                level = Math.Max(0, Math.Min(value, (this.CombatOrders || this.VSkill ? 100 : this.MaxLevel)));
+                bool canBreakLevel = this.CombatOrders || this.VSkill 
+                    || this.SkillID / 100000 == 4000; //fix for evan
+                int maxLevel = canBreakLevel ? 100 : this.MaxLevel;
+                level = Math.Max(0, Math.Min(value, maxLevel));
             }
         }
 
