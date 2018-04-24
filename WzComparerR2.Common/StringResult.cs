@@ -8,91 +8,98 @@ namespace WzComparerR2.Common
     {
         public StringResult()
         {
-            allValues = new Dictionary<string, string>();
         }
 
-        public StringResult(bool initSkillH)
-            : this()
+        public string Name { get; set; }
+        public string Desc { get; set; }
+        public string Pdesc { get; set; }
+        public string AutoDesc { get; set; }
+        public string FullPath { get; set; }
+
+        private List<KeyValuePair<string, string>> allValues;
+
+        public virtual List<string> SkillH
         {
-            if (initSkillH)
-            {
-                this.skillH = new List<string>();
-                this.skillpH = new List<string>();
-                this.skillhcH = new List<string>();
-            }
+            get { return null; }
         }
 
-        private string name;
-        private string desc;
-        private string pdesc;
-        private string autodesc;
-        private List<string> skillH;
-        private List<string> skillpH;
-        private List<string> skillhcH;
-        private string fullPath;
-        private Dictionary<string, string> allValues;
-
-        public string Name
+        public virtual List<string> SkillpH
         {
-            get { return name; }
-            set { name = value; }
+            get { return null; }
         }
 
-        public string Desc
+        public virtual List<string> SkillhcH
         {
-            get { return desc; }
-            set { desc = value; }
-        }
-
-        public string Pdesc
-        {
-            get { return pdesc; }
-            set { pdesc = value; }
-        }
-
-        public string AutoDesc
-        {
-            get { return autodesc; }
-            set { autodesc = value; }
-        }
-
-        public List<string> SkillH
-        {
-            get { return skillH; }
-        }
-
-        public List<string> SkillpH
-        {
-            get { return skillpH; }
-        }
-
-        public List<string> SkillhcH
-        {
-            get { return skillhcH; }
-        }
-
-        public string FullPath
-        {
-            get { return fullPath; }
-            set { fullPath = value; }
-        }
-
-        public Dictionary<string, string> AllValues
-        {
-            get { return allValues; }
+            get { return null; }
         }
 
         public string this[string key]
         {
             get
             {
-                string value = null;
+                if (this.allValues != null && key != null)
+                {
+                    foreach(var kv in this.allValues)
+                    {
+                        if (kv.Key == key)
+                        {
+                            return kv.Value;
+                        }
+                    }
+                }
+                return null;
+            }
+            set
+            {
                 if (key != null)
                 {
-                    this.allValues.TryGetValue(key, out value);
+                    if (this.allValues == null)
+                    {
+                        this.allValues = new List<KeyValuePair<string, string>>();
+                    }
+
+                    for(int i = 0; i < this.allValues.Count; i++)
+                    {
+                        var kv = this.allValues[i];
+                        if (kv.Key == key)
+                        {
+                            this.allValues[i] = new KeyValuePair<string, string>(key, value);
+                            return;
+                        }
+                    }
+                    this.allValues.Add(new KeyValuePair<string, string>(key, value));
                 }
-                return value;
             }
         }
+    }
+
+    public sealed class StringResultSkill : StringResult
+    {
+
+        public StringResultSkill()
+        {
+            this.skillH = new List<string>();
+            this.skillpH = new List<string>();
+            this.skillhcH = new List<string>();
+        }
+
+        public override List<string> SkillH
+        {
+            get { return this.skillH; }
+        }
+
+        public override List<string> SkillpH
+        {
+            get { return this.skillpH; }
+        }
+
+        public override List<string> SkillhcH
+        {
+            get { return this.skillhcH; }
+        }
+
+        private readonly List<string> skillH;
+        private readonly List<string> skillpH;
+        private readonly List<string> skillhcH;
     }
 }

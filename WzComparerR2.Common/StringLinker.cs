@@ -126,7 +126,7 @@ namespace WzComparerR2.Common
                         if (!image.TryExtract()) break;
                         foreach (Wz_Node tree in image.Node.Nodes)
                         {
-                            StringResult strResult = new StringResult(true);
+                            StringResult strResult = new StringResultSkill();
                             strResult.Name = GetDefaultString(tree, "name");//?? GetDefaultString(tree, "bookName");
                             strResult.Desc = GetDefaultString(tree, "desc");
                             strResult.Pdesc = GetDefaultString(tree, "pdesc");
@@ -224,7 +224,7 @@ namespace WzComparerR2.Common
             {
                 if (child.Value != null)
                 {
-                    sr.AllValues[child.Text] = child.GetValue<string>();
+                    sr[child.Text] = child.GetValue<string>();
                 }
             }
         }

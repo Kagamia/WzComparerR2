@@ -71,7 +71,7 @@ namespace WzComparerR2.CharaSimControl
             StringResult sr;
             if (StringLinker == null || !StringLinker.StringSkill.TryGetValue(Skill.SkillID, out sr))
             {
-                sr = new StringResult(true);
+                sr = new StringResultSkill();
                 sr.Name = "(null)";
             }
 
