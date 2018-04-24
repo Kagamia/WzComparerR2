@@ -84,6 +84,16 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        public static void DisposeSwapChain(Microsoft.Xna.Framework.Graphics.GraphicsDevice graphicsDevice)
+        {
+            var fieldInfo = graphicsDevice.GetType().GetField("_swapChain", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (fieldInfo != null)
+            {
+                IDisposable swapChain = fieldInfo.GetValue(graphicsDevice) as IDisposable;
+                swapChain?.Dispose();
+            }
+        }
+
         public static void EnsureGameExit(Game game)
         {
             var tid = GetCurrentThreadId();
