@@ -837,6 +837,15 @@ namespace WzComparerR2.MapRender
             ServiceManager.Instance.RemoveService<IMEHandler>();
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                GameExt.DisposeSwapChain(this.GraphicsDevice);
+            }
+            base.Dispose(disposing);
+        }
+
         private void SwitchResolution()
         {
             var r = (Resolution)(((int)this.resolution + 1) % 4);
