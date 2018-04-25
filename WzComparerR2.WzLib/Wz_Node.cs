@@ -214,70 +214,163 @@ namespace WzComparerR2.WzLib
         }
 
         //innerClass
-        public class WzNodeCollection : System.Collections.ObjectModel.KeyedCollection<string, Wz_Node>
+        public class WzNodeCollection : IEnumerable<Wz_Node>
         {
-            public WzNodeCollection(Wz_Node baseNode)
-                : base()
+            public WzNodeCollection(Wz_Node owner)
+
             {
-                this.parentNode = baseNode;
+                this.owner = owner;
+                this.innerCollection = null;
+            }
+
+            private readonly Wz_Node owner;
+            private InnerCollection innerCollection;
+
+            public Wz_Node this[int index]
+            {
+                get { return this.innerCollection?[index]; }
+            }
+
+            public Wz_Node this[string key]
+            {
+                get { return this.innerCollection?[key]; }
+            }
+
+            public int Count
+            {
+                get { return this.innerCollection?.Count ?? 0; }
             }
 
             public Wz_Node Add(string nodeText)
             {
-                Wz_Node newNode = new Wz_Node(nodeText);
-                this.Add(newNode);
-                return newNode;
+                this.EnsureInnerCollection();
+                return this.innerCollection.Add(nodeText);
             }
 
-            public new void Add(Wz_Node item)
+            public void Add(Wz_Node item)
             {
-                base.Add(item);
-                if (item.parentNode != null)
-                {
-                    int index = item.parentNode.nodes.Items.IndexOf(item);
-                    if (index > -1)
-                    {
-                        item.parentNode.nodes.RemoveItem(index);
-                    }
-                }
-                item.parentNode = this.parentNode;
+                this.EnsureInnerCollection();
+                this.innerCollection.Add(item);
             }
-
-            protected override void RemoveItem(int index)
-            {
-                var item = this[index];
-                if (item != null)
-                {
-                    item.parentNode = null;
-                }
-                base.RemoveItem(index);
-            }
-
-            private Wz_Node parentNode;
 
             public void Sort()
             {
-                List<Wz_Node> lst = base.Items as List<Wz_Node>;
-                if (lst != null)
-                    lst.Sort();
+                this.innerCollection?.Sort();
             }
 
-            public new Wz_Node this[string key]
+            public void Trim()
             {
-                get
+                this.innerCollection?.Trim();
+            }
+
+            public void Clear()
+            {
+                this.innerCollection?.Clear();
+            }
+
+            public IEnumerator<Wz_Node> GetEnumerator()
+            {
+                return this.innerCollection?.GetEnumerator() ?? System.Linq.Enumerable.Empty<Wz_Node>().GetEnumerator();
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                return this.GetEnumerator();
+            }
+
+            private void EnsureInnerCollection()
+            {
+                if (this.innerCollection == null)
                 {
-                    Wz_Node node;
-                    if (key != null && this.Dictionary != null && this.Dictionary.TryGetValue(key, out node))
-                        return node;
-                    return null;
+                    this.innerCollection = new InnerCollection(this.owner);
                 }
             }
 
-            protected override string GetKeyForItem(Wz_Node item)
+
+            private class InnerCollection : System.Collections.ObjectModel.KeyedCollection<string, Wz_Node>
             {
-                if (item != null)
+                public InnerCollection(Wz_Node owner)
+                    : base(null, 12)
+                {
+                    this.parentNode = owner;
+                }
+
+                public Wz_Node Add(string nodeText)
+                {
+                    Wz_Node newNode = new Wz_Node(nodeText);
+                    this.Add(newNode);
+                    return newNode;
+                }
+
+                public new void Add(Wz_Node item)
+                {
+                    base.Add(item);
+                    if (item.parentNode != null)
+                    {
+                        int index = item.parentNode.nodes.innerCollection.Items.IndexOf(item);
+                        if (index > -1)
+                        {
+                            item.parentNode.nodes.innerCollection.RemoveItem(index);
+                        }
+                    }
+                    item.parentNode = this.parentNode;
+                }
+
+                protected override void RemoveItem(int index)
+                {
+                    var item = this[index];
+                    if (item != null)
+                    {
+                        item.parentNode = null;
+                    }
+                    base.RemoveItem(index);
+                }
+
+                private readonly Wz_Node parentNode;
+
+                public void Sort()
+                {
+                    (base.Items as List<Wz_Node>)?.Sort();
+                }
+
+                public void Trim()
+                {
+                    (base.Items as List<Wz_Node>)?.TrimExcess();
+                }
+
+                public new Wz_Node this[string key]
+                {
+                    get
+                    {
+                        if (key == null)
+                        {
+                            return null;
+                        }
+                        if (this.Dictionary != null)
+                        {
+                            Wz_Node node;
+                            this.Dictionary.TryGetValue(key, out node);
+                            return node;
+                        }
+                        else
+                        {
+                            List<Wz_Node> list = this.Items as List<Wz_Node>;
+                            foreach (var node in list)
+                            {
+                                if (this.Comparer.Equals(this.GetKeyForItem(node), key))
+                                {
+                                    return node;
+                                }
+                            }
+                            return null;
+                        }
+                    }
+                }
+
+                protected override string GetKeyForItem(Wz_Node item)
+                {
                     return item.text;
-                return null;
+                }
             }
         }
 

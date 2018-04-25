@@ -393,6 +393,8 @@ namespace WzComparerR2.WzLib
                     GetDirTree(t, false);
                 }
             }
+
+            parent.Nodes.Trim();
         }
 
         private string getFullPath(Wz_Node parent, string name)
