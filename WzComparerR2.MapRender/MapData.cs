@@ -258,11 +258,23 @@ namespace WzComparerR2.MapRender
 
         private void LoadLife(Wz_Node lifeNode)
         {
-            foreach (var node in lifeNode.Nodes)
+            bool isCategory = lifeNode.Nodes["isCategory"].GetValueEx<int>(0) != 0;
+            var lifeNodeList = !isCategory ? lifeNode.Nodes : lifeNode.Nodes.SelectMany(n => n.Nodes);
+
+            int i = 0;
+            foreach (var node in lifeNodeList)
             {
                 var item = LifeItem.LoadFromNode(node);
-                item.Name = $"life_{item.Type}_{node.Text}";
-                item.Index = int.Parse(node.Text);
+                if (isCategory)
+                {
+                    item.Name = $"life_{item.Type}_{node.ParentNode.Text}_{node.Text}";
+                    item.Index = i++;
+                }
+                else
+                {
+                    item.Name = $"life_{item.Type}_{node.Text}";
+                    item.Index = int.Parse(node.Text);
+                }
 
                 //直接绑定foothold
                 ContainerNode<FootholdItem> fhNode;
