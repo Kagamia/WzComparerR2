@@ -320,7 +320,19 @@ namespace WzComparerR2.CharaSimControl
             }
             if (item.Cash)
             {
-                g.DrawImage(Resource.CashItem_0, origin.X + 20, origin.Y - 12);
+                int value;
+                if (item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && value > 0)
+                {
+                    Image label = Resource.ResourceManager.GetObject("CashItem_label_" + (value + 3)) as Image;
+                    if (label != null)
+                    {
+                        g.DrawImage(new Bitmap(label), origin.X + 20, origin.Y - 12);
+                    }
+                }
+                else
+                {
+                    g.DrawImage(Resource.CashItem_0, origin.X + 20, origin.Y - 12);
+                }
             }
         }
 

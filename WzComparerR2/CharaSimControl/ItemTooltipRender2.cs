@@ -295,9 +295,22 @@ namespace WzComparerR2.CharaSimControl
             }
             if (item.Cash)
             {
-                g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_0),
+                if (item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && value > 0)
+                {
+                    Image label = Resource.ResourceManager.GetObject("CashItem_label_" + (value + 3)) as Image;
+                    if (label != null)
+                    {
+                        g.DrawImage(GearGraphics.EnlargeBitmap(new Bitmap(label)),
+                            iconX + 6 + 68 - 26,
+                            picH + 6 + 68 - 26);
+                    }
+                }
+                else
+                {
+                    g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_0),
                     iconX + 6 + 68 - 26,
                     picH + 6 + 68 - 26);
+                }
             }
             g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, iconX + 4, picH + 4); //绘制左上角cover
 
