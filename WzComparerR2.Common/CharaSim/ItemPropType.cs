@@ -21,5 +21,6 @@ namespace WzComparerR2.CharaSim
         setItemID,
         nickTag,
         wonderGrade,
+        life,
     }
 }
