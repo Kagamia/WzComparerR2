@@ -322,6 +322,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicGauntlet: return "魔力手套";
                 case GearType.transmitter: return "武器传送装置";
                 case GearType.magicWing: return "魔力翅膀";
+                case GearType.pathOfAbyss: return "深渊精气珠";
 
                 default: return null;
             }
@@ -440,6 +441,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicGauntlet: 
                 case GearType.magicWing: return GetExtraJobReqString(152);
 
+                case GearType.pathOfAbyss: return GetExtraJobReqString(155);
+
                 default: return null;
             }
         }
@@ -472,7 +475,7 @@ namespace WzComparerR2.CharaSim
                 case 112: return "林之灵可以装备";
                 case 142: return "超能力者可以装备";
                 case 152: return "圣晶使徒职业可用";
-
+                case 155: return "影魂异人可装备";
                 default: return null;
             }
         }
