@@ -439,11 +439,15 @@ namespace WzComparerR2
             string[] dirs = uolString.Split('/');
             currentNode = currentNode.Parent;
 
-            foreach (string dir in dirs)
+            for (int i = 0; i < dirs.Length; i++)
             {
+                string dir = dirs[i];
                 if (dir == "..")
                 {
-                    currentNode = currentNode.Parent;
+                    if (i > 0)
+                    {
+                        currentNode = currentNode.Parent;
+                    }
                 }
                 else
                 {

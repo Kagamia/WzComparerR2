@@ -31,8 +31,9 @@ namespace WzComparerR2.WzLib
 
             bool outImg = false;
 
-            foreach (string dir in dirs)
+            for (int i = 0; i < dirs.Length; i++)
             {
+                string dir = dirs[i];
                 if (dir == "..")
                 {
                     if (currentNode.ParentNode == null)
@@ -48,7 +49,7 @@ namespace WzComparerR2.WzLib
                             currentNode = null;
                         }
                     }
-                    else
+                    else if (i > 0)
                     {
                         currentNode = currentNode.ParentNode;
                     }
