@@ -13,7 +13,9 @@ namespace WzComparerR2.WzLib
         {
             this.imageCount = 0;
             this.wzStructure = wz;
-            this.loaded = InitLoad(fileName);
+            this.fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            this.bReader = new BinaryReader(this.FileStream);
+            this.loaded = this.GetHeader(fileName);
             this.stringTable = new Dictionary<long, string>();
         }
 
@@ -85,20 +87,15 @@ namespace WzComparerR2.WzLib
                 this.fileStream.Close();
         }
 
-        private bool InitLoad(string fileName)
-        {
-            this.fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            this.bReader = new BinaryReader(this.FileStream);
-
-            return GetHeader(fileName);
-        }
-
         private bool GetHeader(string fileName)
         {
+            this.fileStream.Position = 0;
+            int filesize = (int)this.FileStream.Length;
+            if (filesize < 4) { return false; }
+
             string signature = new string(this.BReader.ReadChars(4));
             if (signature != "PKG1") { return false; }
-
-            int filesize = (int)this.FileStream.Length;
+            
             int datasize = (int)this.BReader.ReadInt64();
             int headersize = this.BReader.ReadInt32();
             string copyright = new string(this.BReader.ReadChars(headersize - (int)this.FileStream.Position));

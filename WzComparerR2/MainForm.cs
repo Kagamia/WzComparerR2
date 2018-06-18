@@ -2,7 +2,8 @@
 using System.Collections.Generic; 
 using System.ComponentModel;
 using System.Data;
-using System.Drawing; 
+using System.Drawing;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -233,7 +234,7 @@ namespace WzComparerR2
                 }
                 return;
             }
-      
+
             if (preSearch.Count <= 0)
             {
                 return;
@@ -635,6 +636,64 @@ namespace WzComparerR2
                 WcR2Config.Default.RecentDocuments.Remove(wzFilePath);
                 WcR2Config.Default.RecentDocuments.Insert(0, wzFilePath);
                 ConfigManager.Save();
+                refreshRecentDocItems();
+            }
+            catch (FileNotFoundException)
+            {
+                MessageBoxEx.Show("文件没有找到", "嗯?");
+            }
+            catch (Exception ex)
+            {
+                MessageBoxEx.Show(ex.ToString(), "嗯?");
+                wz.Clear();
+            }
+            finally
+            {
+                advTree1.EndUpdate();
+            }
+        }
+
+        private void btnItemOpenImg_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog dlg = new OpenFileDialog())
+            {
+                dlg.Title = "请选择冒险岛img文件...";
+                dlg.Filter = "*.img|*.img|*.wz|*.wz";
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    openImg(dlg.FileName);
+                }
+            }
+        }
+
+        private void openImg(string imgFileName)
+        {
+            foreach (Wz_Structure wzs in openedWz)
+            {
+                foreach (Wz_File wz_f in wzs.wz_files)
+                {
+                    if (StringComparer.OrdinalIgnoreCase.Equals(wz_f.Header.FileName, imgFileName))
+                    {
+                        MessageBoxEx.Show("已经打开的wz。", "喵~");
+                        return;
+                    }
+                }
+            }
+
+            Wz_Structure wz = new Wz_Structure();
+            var sw = Stopwatch.StartNew();
+            advTree1.BeginUpdate();
+            try
+            {
+                wz.LoadImg(imgFileName);
+
+                Node node = createNode(wz.WzNode);
+                node.Expand();
+                advTree1.Nodes.Add(node);
+                this.openedWz.Add(wz);
+                OnWzOpened(new WzStructureEventArgs(wz)); //触发事件
+                sw.Stop();
+                labelItemStatus.Text = $"读取成功,用时{sw.ElapsedMilliseconds}ms.";
                 refreshRecentDocItems();
             }
             catch (FileNotFoundException)
