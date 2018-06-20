@@ -36,6 +36,12 @@ namespace WzComparerR2
             set { chkWzAutoSort.Checked = value; }
         }
 
+        public bool SortWzByImgID
+        {
+            get { return chkWzSortByImgID.Checked; }
+            set { chkWzSortByImgID.Checked = value; }
+        }
+
         public int DefaultWzCodePage
         {
             get
@@ -61,6 +67,7 @@ namespace WzComparerR2
         public void Load(WcR2Config config)
         {
             this.SortWzOnOpened = config.SortWzOnOpened;
+            this.SortWzByImgID = config.SortWzByImgID;
             this.DefaultWzCodePage = config.WzEncoding;
             this.AutoDetectExtFiles = config.AutoDetectExtFiles;
         }
@@ -68,6 +75,7 @@ namespace WzComparerR2
         public void Save(WcR2Config config)
         {
             config.SortWzOnOpened = this.SortWzOnOpened;
+            config.SortWzByImgID = this.SortWzByImgID;
             config.WzEncoding = this.DefaultWzCodePage;
             config.AutoDetectExtFiles = this.AutoDetectExtFiles;
         }

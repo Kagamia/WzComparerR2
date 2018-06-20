@@ -23,7 +23,7 @@ namespace WzComparerR2.WzLib
         public Wz_Node WzNode;
         public int img_number;
         public bool has_basewz;
-        public bool sorted;
+        public bool sorted; //暂时弃用
 
         public Encoding TextEncoding { get; set; }
         public bool AutoDetectExtFiles { get; set; }

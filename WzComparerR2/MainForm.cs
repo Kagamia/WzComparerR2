@@ -330,13 +330,25 @@ namespace WzComparerR2
 
         private void sortWzNode(Wz_Node wzNode)
         {
+            this.sortWzNode(wzNode, WcR2Config.Default.SortWzByImgID);
+        }
+
+        private void sortWzNode(Wz_Node wzNode, bool sortByImgID)
+        {
             if (wzNode.Nodes.Count > 1)
             {
-                wzNode.Nodes.Sort();
+                if (sortByImgID)
+                {
+                    wzNode.Nodes.SortByImgID();
+                }
+                else
+                {
+                    wzNode.Nodes.Sort();
+                }
             }
             foreach (Wz_Node subNode in wzNode.Nodes)
             {
-                sortWzNode(subNode);
+                sortWzNode(subNode, sortByImgID);
             }
         }
         #endregion
@@ -1531,24 +1543,26 @@ namespace WzComparerR2
         {
             if (openedWz.Count > 0)
             {
-                QueryPerformance.Start();
+                var sw = Stopwatch.StartNew();
                 advTree1.BeginUpdate();
-                advTree1.ClearAndDisposeAllNodes();
-                GC.Collect();
-                foreach (Wz_Structure wz in openedWz)
+                try
                 {
-                    if (!wz.sorted)
+                    advTree1.ClearAndDisposeAllNodes();
+                    foreach (Wz_Structure wz in openedWz)
                     {
                         sortWzNode(wz.WzNode);
-                        wz.sorted = true;
+                        Node node = createNode(wz.WzNode);
+                        node.Expand();
+                        advTree1.Nodes.Add(node);
                     }
-                    Node node = createNode(wz.WzNode);
-                    node.Expand();
-                    advTree1.Nodes.Add(node);
                 }
-                advTree1.EndUpdate();
-                QueryPerformance.End();
-                labelItemStatus.Text = "排序成功,用时" + (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000) + "ms.";
+                finally
+                {
+                    advTree1.EndUpdate();
+                    sw.Stop();
+                }
+                GC.Collect();
+                labelItemStatus.Text = $"排序成功,用时{sw.ElapsedMilliseconds}ms.";
             }
             else
             {
