@@ -101,6 +101,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.imdR: return "无视怪物防御率：+" + value + "%";
                 case GearPropType.limitBreak: return "伤害上限突破至" + value + "。";
                 case GearPropType.reduceReq: return "装备等级降低：- " + value;
+                case GearPropType.nbdR: return "攻击普通怪物时，伤害+" + value + "%";
 
                 case GearPropType.only: return value == 0 ? null : "固有道具";
                 case GearPropType.tradeBlock: return value == 0 ? null : "不可交换";
