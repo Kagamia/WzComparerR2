@@ -39,6 +39,7 @@
             this.chkWzAutoSort = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTabItem1 = new DevComponents.DotNetBar.SuperTabItem();
             this.chkWzSortByImgID = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkImgCheckDisabled = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.panelEx1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
@@ -126,6 +127,7 @@
             // 
             // superTabControlPanel1
             // 
+            this.superTabControlPanel1.Controls.Add(this.chkImgCheckDisabled);
             this.superTabControlPanel1.Controls.Add(this.chkWzSortByImgID);
             this.superTabControlPanel1.Controls.Add(this.chkAutoCheckExtFiles);
             this.superTabControlPanel1.Controls.Add(this.cmbWzEncoding);
@@ -217,6 +219,21 @@
             this.chkWzSortByImgID.TabIndex = 5;
             this.chkWzSortByImgID.Text = "按照ImgID排序";
             // 
+            // chkImgCheckDisabled
+            // 
+            this.chkImgCheckDisabled.AutoSize = true;
+            this.chkImgCheckDisabled.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkImgCheckDisabled.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkImgCheckDisabled.Location = new System.Drawing.Point(14, 110);
+            this.chkImgCheckDisabled.Name = "chkImgCheckDisabled";
+            this.chkImgCheckDisabled.Size = new System.Drawing.Size(132, 18);
+            this.chkImgCheckDisabled.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkImgCheckDisabled.TabIndex = 6;
+            this.chkImgCheckDisabled.Text = "跳过img校验和检测";
+            // 
             // FrmOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -252,5 +269,6 @@
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWzEncoding;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkAutoCheckExtFiles;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkWzSortByImgID;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkImgCheckDisabled;
     }
 }

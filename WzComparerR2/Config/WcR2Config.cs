@@ -99,6 +99,16 @@ namespace WzComparerR2.Config
             set { this["autoDetectExtFiles"] = value; }
         }
 
+        /// <summary>
+        /// 获取或设置一个值，指示读取wz是否跳过img检测。
+        /// </summary>
+        [ConfigurationProperty("imgCheckDisabled")]
+        public ConfigItem<bool> ImgCheckDisabled
+        {
+            get { return (ConfigItem<bool>)this["imgCheckDisabled"]; }
+            set { this["imgCheckDisabled"] = value; }
+        }
+
         [ConfigurationProperty("patcherSettings")]
         [ConfigurationCollection(typeof(PatcherSetting), CollectionType = ConfigurationElementCollectionType.AddRemoveClearMap)]
         public PatcherSettingCollection PatcherSettings

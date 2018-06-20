@@ -64,12 +64,19 @@ namespace WzComparerR2
             set { chkAutoCheckExtFiles.Checked = value; }
         }
 
+        public bool ImgCheckDisabled
+        {
+            get { return chkImgCheckDisabled.Checked; }
+            set { chkImgCheckDisabled.Checked = value; }
+        }
+
         public void Load(WcR2Config config)
         {
             this.SortWzOnOpened = config.SortWzOnOpened;
             this.SortWzByImgID = config.SortWzByImgID;
             this.DefaultWzCodePage = config.WzEncoding;
             this.AutoDetectExtFiles = config.AutoDetectExtFiles;
+            this.ImgCheckDisabled = config.ImgCheckDisabled;
         }
 
         public void Save(WcR2Config config)
@@ -78,6 +85,7 @@ namespace WzComparerR2
             config.SortWzByImgID = this.SortWzByImgID;
             config.WzEncoding = this.DefaultWzCodePage;
             config.AutoDetectExtFiles = this.AutoDetectExtFiles;
+            config.ImgCheckDisabled = this.ImgCheckDisabled;
         }
     }
 }
