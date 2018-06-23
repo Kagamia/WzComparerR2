@@ -458,10 +458,7 @@ namespace WzComparerR2
                 string dir = dirs[i];
                 if (dir == "..")
                 {
-                    if (i > 0)
-                    {
-                        currentNode = currentNode.Parent;
-                    }
+                    currentNode = currentNode.Parent;
                 }
                 else
                 {

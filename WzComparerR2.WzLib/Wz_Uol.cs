@@ -49,7 +49,7 @@ namespace WzComparerR2.WzLib
                             currentNode = null;
                         }
                     }
-                    else if (i > 0)
+                    else
                     {
                         currentNode = currentNode.ParentNode;
                     }
