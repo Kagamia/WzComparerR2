@@ -5,6 +5,7 @@ using System.Drawing;
 using Resource = CharaSimResource.Resource;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
+using WzComparerR2.WzLib;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -133,7 +134,69 @@ namespace WzComparerR2.CharaSimControl
                     GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, 8, 272, ref picH, 16);
                 }
             }
-            picH += 9;
+            picH += 3;
+
+            if (Skill.AddAttackToolTipDescSkill != 0)
+            {
+                g.DrawLine(Pens.White, 6, picH, 283, picH);
+                picH += 9;
+                GearGraphics.DrawString(g, "#$[组合技能]#", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
+                BitmapOrigin icon = new BitmapOrigin();
+                Wz_Node skillNode = PluginBase.PluginManager.FindWz(string.Format(@"Skill\{0}.img\skill\{1}", Skill.AddAttackToolTipDescSkill / 10000, Skill.AddAttackToolTipDescSkill));
+                if (skillNode != null)
+                {
+                    Skill skill = Skill.CreateFromNode(skillNode, PluginBase.PluginManager.FindWz);
+                    icon = skill.Icon;
+                }
+                if (icon.Bitmap != null)
+                {
+                    g.DrawImage(icon.Bitmap, 10 - icon.Origin.X, picH + 32 - icon.Origin.Y);
+                }
+                string skillName;
+                if (this.StringLinker != null && this.StringLinker.StringSkill.TryGetValue(Skill.AddAttackToolTipDescSkill, out sr))
+                {
+                    skillName = sr.Name;
+                }
+                else
+                {
+                    skillName = Skill.AddAttackToolTipDescSkill.ToString();
+                }
+                picH += 10;
+                GearGraphics.DrawString(g, skillName, GearGraphics.ItemDetailFont, 46, 272, ref picH, 16);
+                picH += 6;
+                picH += 8;
+            }
+
+            if (Skill.AssistSkillLink != 0)
+            {
+                g.DrawLine(Pens.White, 6, picH, 283, picH);
+                picH += 9;
+                GearGraphics.DrawString(g, "#c[助攻技能]#", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
+                BitmapOrigin icon = new BitmapOrigin();
+                Wz_Node skillNode = PluginBase.PluginManager.FindWz(string.Format(@"Skill\{0}.img\skill\{1}", Skill.AssistSkillLink / 10000, Skill.AssistSkillLink));
+                if (skillNode != null)
+                {
+                    Skill skill = Skill.CreateFromNode(skillNode, PluginBase.PluginManager.FindWz);
+                    icon = skill.Icon;
+                }
+                if (icon.Bitmap != null)
+                {
+                    g.DrawImage(icon.Bitmap, 10 - icon.Origin.X, picH + 32 - icon.Origin.Y);
+                }
+                string skillName;
+                if (this.StringLinker != null && this.StringLinker.StringSkill.TryGetValue(Skill.AssistSkillLink, out sr))
+                {
+                    skillName = sr.Name;
+                }
+                else
+                {
+                    skillName = Skill.AssistSkillLink.ToString();
+                }
+                picH += 10;
+                GearGraphics.DrawString(g, skillName, GearGraphics.ItemDetailFont, 46, 272, ref picH, 16);
+                picH += 6;
+                picH += 8;
+            }
 
             List<string> skillDescEx = new List<string>();
             if (ShowProperties)

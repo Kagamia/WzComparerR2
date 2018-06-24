@@ -19,6 +19,8 @@ namespace WzComparerR2.CharaSim
         accountSharable,
         timeLimited,
         setItemID,
-        nickTag, 
+        nickTag,
+        wonderGrade,
+        life,
     }
 }

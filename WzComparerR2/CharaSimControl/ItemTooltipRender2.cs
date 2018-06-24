@@ -263,6 +263,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             //绘制标题
+            bool hasPart2 = false;
             format.Alignment = StringAlignment.Center;
             g.DrawString(sr.Name, GearGraphics.ItemNameFont2, Brushes.White, tooltip.Width / 2, picH, format);
             picH += 22;
@@ -273,6 +274,21 @@ namespace WzComparerR2.CharaSimControl
             {
                 g.DrawString(attr, GearGraphics.ItemDetailFont, GearGraphics.GearNameBrushC, tooltip.Width / 2, picH, format);
                 picH += 19;
+                hasPart2 = true;
+            }
+
+            if (item.Props.TryGetValue(ItemPropType.life, out value) && value != 0)
+            {
+                DateTime time = DateTime.Now.AddDays(value);
+                string expireStr = time.ToString("魔法时间：到 yyyy年 M月 d日 HH时");
+                g.DrawString(expireStr, GearGraphics.ItemDetailFont, Brushes.White, tooltip.Width / 2, picH, format);
+                picH += 16;
+                hasPart2 = true;
+            }
+
+            if (hasPart2)
+            {
+                picH += 1;
             }
 
             //装备限时
@@ -296,9 +312,22 @@ namespace WzComparerR2.CharaSimControl
             }
             if (item.Cash)
             {
-                g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_0),
+                if (item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && value > 0)
+                {
+                    Image label = Resource.ResourceManager.GetObject("CashItem_label_" + (value + 3)) as Image;
+                    if (label != null)
+                    {
+                        g.DrawImage(GearGraphics.EnlargeBitmap(new Bitmap(label)),
+                            iconX + 6 + 68 - 26,
+                            picH + 6 + 68 - 26);
+                    }
+                }
+                else
+                {
+                    g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_0),
                     iconX + 6 + 68 - 26,
                     picH + 6 + 68 - 26);
+                }
             }
             g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, iconX + 4, picH + 4); //绘制左上角cover
 
