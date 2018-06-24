@@ -13,8 +13,9 @@ namespace WzComparerR2.WzLib
             this.encryption = new Wz_Crypto();
             this.img_number = 0;
             this.has_basewz = false;
-            this.TextEncoding = DefaultEncoding;
-            this.AutoDetectExtFiles = DefaultAutoDetectExtFiles;
+            this.TextEncoding = Wz_Structure.DefaultEncoding;
+            this.AutoDetectExtFiles = Wz_Structure.DefaultAutoDetectExtFiles;
+            this.ImgCheckDisabled = Wz_Structure.DefaultImgCheckDisabled;
         }
 
         public List<Wz_File> wz_files;
@@ -22,10 +23,11 @@ namespace WzComparerR2.WzLib
         public Wz_Node WzNode;
         public int img_number;
         public bool has_basewz;
-        public bool sorted;
+        public bool sorted; //暂时弃用
 
         public Encoding TextEncoding { get; set; }
         public bool AutoDetectExtFiles { get; set; }
+        public bool ImgCheckDisabled { get; set; }
 
         public void Clear()
         {
@@ -104,6 +106,38 @@ namespace WzComparerR2.WzLib
             }
         }
 
+        public void LoadImg(string fileName)
+        {
+            this.WzNode = new Wz_Node(Path.GetFileName(fileName));
+            this.LoadFileImg(fileName, WzNode);
+        }
+
+        public void LoadFileImg(string fileName, Wz_Node node)
+        {
+            Wz_File file;
+
+            try
+            {
+                file = new Wz_File(fileName, this);
+                file.TextEncoding = this.TextEncoding;
+                var imgNode = new Wz_Node(node.Text);
+                //跳过checksum检测
+                var img = new Wz_Image(node.Text, (int)file.FileStream.Length, 0, 0, 0, file)
+                {
+                    OwnerNode = imgNode,
+                    Offset = 0,
+                    IsChecksumChecked = true
+                };
+                imgNode.Value = img;
+                node.Nodes.Add(imgNode);
+                this.wz_files.Add(file);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         #region Global Settings
         public static Encoding DefaultEncoding
         {
@@ -114,6 +148,8 @@ namespace WzComparerR2.WzLib
         private static Encoding _defaultEncoding;
 
         public static bool DefaultAutoDetectExtFiles { get; set; }
+
+        public static bool DefaultImgCheckDisabled { get; set; }
         #endregion
     }
 }

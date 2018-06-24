@@ -33,12 +33,16 @@ namespace WzComparerR2.WzLib
         public uint HashedOffset { get; set; }
         public uint HashedOffsetPosition { get; set; }
         public long Offset { get; set; }
-        //已经废弃 使用BMS替代OnList
-        public bool IsOnList { get; set; }
+        
         public Wz_Node Node { get; private set; }
 
         public Wz_Node OwnerNode { get; set; }
 
+        public bool IsChecksumChecked
+        {
+            get { return this.checEnc; }
+            internal set { this.checEnc = value; }
+        }
         public bool IsLuaImage
         {
             get { return this.Name.EndsWith(".lua"); }
@@ -54,9 +58,10 @@ namespace WzComparerR2.WzLib
         {
             if (!this.extr)
             {
-                if (!this.chec)
+                bool disabledChec = this.WzFile?.WzStructure?.ImgCheckDisabled ?? false;
+                if (!disabledChec && !this.chec)
                 {
-                    if (this.Checksum != GetCheckSum())
+                    if (this.Checksum != CalcCheckSum())
                     {
                         e = new ArgumentException("checksum error");
                         return false;
@@ -105,7 +110,7 @@ namespace WzComparerR2.WzLib
             this.Node.Nodes.Clear();
         }
 
-        private unsafe int GetCheckSum()
+        public unsafe int CalcCheckSum()
         {
             lock (this.WzFile.ReadLock)
             {

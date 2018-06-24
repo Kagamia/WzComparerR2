@@ -13,7 +13,9 @@ namespace WzComparerR2.WzLib
         {
             this.imageCount = 0;
             this.wzStructure = wz;
-            this.loaded = InitLoad(fileName);
+            this.fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            this.bReader = new BinaryReader(this.FileStream);
+            this.loaded = this.GetHeader(fileName);
             this.stringTable = new Dictionary<long, string>();
         }
 
@@ -85,20 +87,15 @@ namespace WzComparerR2.WzLib
                 this.fileStream.Close();
         }
 
-        private bool InitLoad(string fileName)
-        {
-            this.fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            this.bReader = new BinaryReader(this.FileStream);
-
-            return GetHeader(fileName);
-        }
-
         private bool GetHeader(string fileName)
         {
+            this.fileStream.Position = 0;
+            int filesize = (int)this.FileStream.Length;
+            if (filesize < 4) { return false; }
+
             string signature = new string(this.BReader.ReadChars(4));
             if (signature != "PKG1") { return false; }
-
-            int filesize = (int)this.FileStream.Length;
+            
             int datasize = (int)this.BReader.ReadInt64();
             int headersize = this.BReader.ReadInt32();
             string copyright = new string(this.BReader.ReadChars(headersize - (int)this.FileStream.Position));
@@ -420,79 +417,70 @@ namespace WzComparerR2.WzLib
             {
                 return;
             }
-            if (this.node.Nodes.Count < 100)
+
+            if (this.node.Nodes["smap.img"] != null
+                || this.node.Nodes["zmap.img"] != null)
             {
-                foreach (Wz_Node subNode in this.node.Nodes)
-                {
-                    switch (subNode.Text)
-                    {
-                        case "smap.img":
-                        case "zmap.img":
-                            this.type = Wz_Type.Base;
-                            break;
-
-                        case "00002000.img":
-                        case "Accessory":
-                        case "Weapon":
-                            this.type = Wz_Type.Character;
-                            break;
-
-                        case "BasicEff.img":
-                        case "SetItemInfoEff.img":
-                            this.type = Wz_Type.Effect;
-                            break;
-
-                        case "Commodity.img":
-                        case "Curse.img":
-                            this.type = Wz_Type.Etc;
-                            break;
-
-                        case "Cash":
-                        case "Consume":
-                            this.type = Wz_Type.Item;
-                            break;
-
-                        case "Back":
-                        case "Physics.img":
-                            this.type = Wz_Type.Map;
-                            break;
-
-                        case "PQuest.img":
-                        case "QuestData":
-                            this.type = Wz_Type.Quest;
-                            break;
-
-                        case "Attacktype.img":
-                        case "MobSkill.img":
-                            this.type = Wz_Type.Skill;
-                            break;
-
-                        case "Bgm00.img":
-                        case "BgmUI.img":
-                            this.type = Wz_Type.Sound;
-                            break;
-
-                        case "MonsterBook.img":
-                        case "EULA.img":
-                            this.type = Wz_Type.String;
-                            break;
-
-                        case "CashShop.img":
-                        case "UIWindow.img":
-                            this.type = Wz_Type.UI;
-                            break;
-
-                    }
-                    if (this.type != Wz_Type.Unknown)
-                        return;
-                }
+                this.type = Wz_Type.Base;
             }
-
+            else if (this.node.Nodes["00002000.img"] != null
+                || this.node.Nodes["Accessory"] != null
+                || this.node.Nodes["Weapon"] != null)
+            {
+                this.type = Wz_Type.Character;
+            }
+            else if (this.node.Nodes["BasicEff.img"] != null
+                || this.node.Nodes["SetItemInfoEff.img"] != null)
+            {
+                this.type = Wz_Type.Effect;
+            }
+            else if (this.node.Nodes["Commodity.img"] != null
+                || this.node.Nodes["Curse.img"] != null)
+            {
+                this.type = Wz_Type.Etc;
+            }
+            else if (this.node.Nodes["Cash"] != null
+                || this.node.Nodes["Consume"] != null)
+            {
+                this.type = Wz_Type.Item;
+            }
+            else if (this.node.Nodes["Back"] != null
+                || this.node.Nodes["Obj"] != null
+                || this.node.Nodes["Physics.img"] != null)
+            {
+                this.type = Wz_Type.Map;
+            }
+            else if (this.node.Nodes["PQuest.img"] != null
+                || this.node.Nodes["QuestData"] != null)
+            {
+                this.type = Wz_Type.Quest;
+            }
+            else if (this.node.Nodes["Attacktype.img"] != null
+                || this.node.Nodes["MobSkill.img"] != null)
+            {
+                this.type = Wz_Type.Skill;
+            }
+            else if (this.node.Nodes["Bgm00.img"] != null
+                || this.node.Nodes["BgmUI.img"] != null)
+            {
+                this.type = Wz_Type.Sound;
+            }
+            else if (this.node.Nodes["MonsterBook.img"] != null
+                || this.node.Nodes["EULA.img"] != null)
+            {
+                this.type = Wz_Type.String;
+            }
+            else if (this.node.Nodes["CashShop.img"] != null
+                || this.node.Nodes["UIWindow.img"] != null)
+            {
+                this.type = Wz_Type.UI;
+            }
+            
             if (this.type == Wz_Type.Unknown) //用文件名来判断
             {
                 string wzName = this.node.Text;
 
-                Match m = Regex.Match(wzName, @"^([A-Za-z]+)\d+(?:\.wz)?$");
+                Match m = Regex.Match(wzName, @"^([A-Za-z]+)(\d+)?(?:\.wz)?$");
                 if (m.Success)
                 {
                     wzName = m.Result("$1");

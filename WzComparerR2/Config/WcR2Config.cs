@@ -15,6 +15,8 @@ namespace WzComparerR2.Config
         {
             this.MainStyle = DevComponents.DotNetBar.eStyle.Office2007VistaGlass;
             this.MainStyleColor = Color.DimGray;
+            this.SortWzOnOpened = true;
+            this.AutoDetectExtFiles = true;
         }
 
         /// <summary>
@@ -70,6 +72,16 @@ namespace WzComparerR2.Config
         /// <summary>
         /// 获取或设置一个值，指示Wz文件加载后是否自动排序。
         /// </summary>
+        [ConfigurationProperty("sortWzByImgID")]
+        public ConfigItem<bool> SortWzByImgID
+        {
+            get { return (ConfigItem<bool>)this["sortWzByImgID"]; }
+            set { this["sortWzByImgID"] = value; }
+        }
+
+        /// <summary>
+        /// 获取或设置一个值，指示Wz加载中对于ansi字符串的编码。
+        /// </summary>
         [ConfigurationProperty("wzEncoding")]
         public ConfigItem<int> WzEncoding
         {
@@ -85,6 +97,16 @@ namespace WzComparerR2.Config
         {
             get { return (ConfigItem<bool>)this["autoDetectExtFiles"]; }
             set { this["autoDetectExtFiles"] = value; }
+        }
+
+        /// <summary>
+        /// 获取或设置一个值，指示读取wz是否跳过img检测。
+        /// </summary>
+        [ConfigurationProperty("imgCheckDisabled")]
+        public ConfigItem<bool> ImgCheckDisabled
+        {
+            get { return (ConfigItem<bool>)this["imgCheckDisabled"]; }
+            set { this["imgCheckDisabled"] = value; }
         }
 
         [ConfigurationProperty("patcherSettings")]

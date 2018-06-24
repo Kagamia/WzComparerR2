@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using Resource = CharaSimResource.Resource;
@@ -394,7 +395,19 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (nickResNode != null)
                 {
-                    GearGraphics.DrawNameTag(g, nickResNode, sr.Name, tooltip.Width, ref picH);
+                    //获取称号名称
+                    string nickName;
+                    string nickWithQR = sr["nickWithQR"];
+                    if (nickWithQR != null)
+                    {
+                        string qrDefault = sr["qrDefault"] ?? string.Empty;
+                        nickName = Regex.Replace(nickWithQR, "#qr.*?#", qrDefault);
+                    }
+                    else
+                    {
+                        nickName = sr.Name;
+                    }
+                    GearGraphics.DrawNameTag(g, nickResNode, nickName, tooltip.Width, ref picH);
                     picH += 4;
                 }
             }

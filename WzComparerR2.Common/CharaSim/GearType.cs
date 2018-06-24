@@ -334,6 +334,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         magicWing = 135350,
         /// <summary>
+        /// 精气珠 135360
+        /// </summary>
+        pathOfAbyss = 135360,
+        /// <summary>
         /// 手杖
         /// </summary>
         cane = 136,

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Xml;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace WzComparerR2.WzLib
 {
@@ -258,6 +261,18 @@ namespace WzComparerR2.WzLib
                 this.innerCollection?.Sort();
             }
 
+            public void Sort<T>(Func<Wz_Node, T> getKeyFunc) where T : IComparable<T>
+            {
+                if (getKeyFunc == null)
+                {
+                    this.Sort();
+                }
+                else if (this.innerCollection != null)
+                {
+                    this.innerCollection.Sort(getKeyFunc);
+                }
+            }
+
             public void Trim()
             {
                 this.innerCollection?.Trim();
@@ -286,8 +301,7 @@ namespace WzComparerR2.WzLib
                 }
             }
 
-
-            private class InnerCollection : System.Collections.ObjectModel.KeyedCollection<string, Wz_Node>
+            private class InnerCollection : KeyedCollection<string, Wz_Node>
             {
                 public InnerCollection(Wz_Node owner)
                     : base(null, 12)
@@ -333,6 +347,11 @@ namespace WzComparerR2.WzLib
                     (base.Items as List<Wz_Node>)?.Sort();
                 }
 
+                public void Sort<T>(Func<Wz_Node, T> getKeyFunc) where T : IComparable<T>
+                {
+                    ListSorter.Sort(base.Items as List<Wz_Node>, getKeyFunc);
+                }
+
                 public void Trim()
                 {
                     (base.Items as List<Wz_Node>)?.TrimExcess();
@@ -372,6 +391,25 @@ namespace WzComparerR2.WzLib
                     return item.text;
                 }
             }
+
+            internal static class ListSorter
+            {
+                public static void Sort<T, TKey>(List<T> list, Func<T, TKey> getKeyFunc)
+                {
+                    T[] innerArray = list.GetType()
+                        .GetField("_items", BindingFlags.Instance | BindingFlags.NonPublic)
+                        .GetValue(list) as T[];
+
+                    TKey[] keys = new TKey[list.Count];
+
+                    for (int i = 0; i < keys.Length; i++)
+                    {
+                        keys[i] = getKeyFunc(innerArray[i]);
+                    }
+
+                    Array.Sort(keys, innerArray, 0, keys.Length);
+                }
+            }
         }
 
         public object Clone()
@@ -395,7 +433,7 @@ namespace WzComparerR2.WzLib
         {
             if (other != null)
             {
-                return string.Compare(this.Text, other.Text, StringComparison.InvariantCulture);
+                return string.Compare(this.Text, other.Text, StringComparison.Ordinal);
             }
             else
             {
@@ -541,6 +579,43 @@ namespace WzComparerR2.WzLib
 
             //结束标识
             writer.WriteEndElement();
+        }
+
+        public static void SortByImgID(this Wz_Node.WzNodeCollection nodes)
+        {
+            if (regexImgID == null)
+            {
+                regexImgID = new Regex(@"^(\d+)\.img$", RegexOptions.Compiled);
+            }
+
+            nodes.Sort(GetKey);
+        }
+
+        private static Regex regexImgID;
+
+        private static SortKey GetKey(Wz_Node node)
+        {
+            var key = new SortKey();
+            var m = regexImgID.Match(node.Text);
+            if (m.Success)
+            {
+                key.HasID = Int32.TryParse(m.Result("$1"), out key.ImgID);
+            }
+            key.Text = node.Text;
+            return key;
+        }
+
+        private struct SortKey : IComparable<SortKey>
+        {
+            public bool HasID;
+            public int ImgID;
+            public string Text;
+
+            public int CompareTo(SortKey other)
+            {
+                if (this.HasID && other.HasID) return this.ImgID.CompareTo(other.ImgID);
+                return StringComparer.Ordinal.Compare(this.Text, other.Text);
+            }
         }
     }
 }

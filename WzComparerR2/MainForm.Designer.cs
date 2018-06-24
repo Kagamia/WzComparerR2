@@ -245,6 +245,7 @@
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.dockContainerItem2 = new DevComponents.DotNetBar.DockContainerItem();
             this.panelDockContainer2 = new DevComponents.DotNetBar.PanelDockContainer();
+            this.btnItemOpenImg = new DevComponents.DotNetBar.ButtonItem();
             this.ribbonControl1.SuspendLayout();
             this.ribbonPanel2.SuspendLayout();
             this.ribbonPanel1.SuspendLayout();
@@ -1574,6 +1575,7 @@
             this.itemContainer3.Name = "itemContainer3";
             this.itemContainer3.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.btnItemOpenWz,
+            this.btnItemOpenImg,
             this.buttonItemClose,
             this.buttonItemCloseAll});
             // 
@@ -2875,6 +2877,12 @@
             this.panelDockContainer2.Style.GradientAngle = 90;
             this.panelDockContainer2.TabIndex = 2;
             // 
+            // btnItemOpenImg
+            // 
+            this.btnItemOpenImg.Name = "btnItemOpenImg";
+            this.btnItemOpenImg.Text = "Open Img...";
+            this.btnItemOpenImg.Click += new System.EventHandler(this.btnItemOpenImg_Click);
+            // 
             // MainForm
             // 
             this.ClientSize = new System.Drawing.Size(750, 512);
@@ -3139,5 +3147,6 @@
         private DevComponents.Editors.ComboItem comboItem18;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkResolvePngLink;
         private DevComponents.DotNetBar.ComboBoxItem cmbItemSkins;
+        private DevComponents.DotNetBar.ButtonItem btnItemOpenImg;
     }
 }

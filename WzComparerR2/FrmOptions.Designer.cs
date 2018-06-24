@@ -33,11 +33,13 @@
             this.buttonX1 = new DevComponents.DotNetBar.ButtonX();
             this.superTabControl1 = new DevComponents.DotNetBar.SuperTabControl();
             this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.chkAutoCheckExtFiles = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.cmbWzEncoding = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.labelX1 = new DevComponents.DotNetBar.LabelX();
             this.chkWzAutoSort = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTabItem1 = new DevComponents.DotNetBar.SuperTabItem();
-            this.chkAutoCheckExtFiles = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkWzSortByImgID = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkImgCheckDisabled = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.panelEx1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
@@ -125,6 +127,8 @@
             // 
             // superTabControlPanel1
             // 
+            this.superTabControlPanel1.Controls.Add(this.chkImgCheckDisabled);
+            this.superTabControlPanel1.Controls.Add(this.chkWzSortByImgID);
             this.superTabControlPanel1.Controls.Add(this.chkAutoCheckExtFiles);
             this.superTabControlPanel1.Controls.Add(this.cmbWzEncoding);
             this.superTabControlPanel1.Controls.Add(this.labelX1);
@@ -136,6 +140,21 @@
             this.superTabControlPanel1.TabIndex = 1;
             this.superTabControlPanel1.TabItem = this.superTabItem1;
             // 
+            // chkAutoCheckExtFiles
+            // 
+            this.chkAutoCheckExtFiles.AutoSize = true;
+            this.chkAutoCheckExtFiles.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkAutoCheckExtFiles.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkAutoCheckExtFiles.Location = new System.Drawing.Point(14, 86);
+            this.chkAutoCheckExtFiles.Name = "chkAutoCheckExtFiles";
+            this.chkAutoCheckExtFiles.Size = new System.Drawing.Size(193, 18);
+            this.chkAutoCheckExtFiles.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkAutoCheckExtFiles.TabIndex = 4;
+            this.chkAutoCheckExtFiles.Text = "自动检测扩展wz文件(map2...)";
+            // 
             // cmbWzEncoding
             // 
             this.cmbWzEncoding.DisplayMember = "Text";
@@ -143,7 +162,7 @@
             this.cmbWzEncoding.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbWzEncoding.FormattingEnabled = true;
             this.cmbWzEncoding.ItemHeight = 15;
-            this.cmbWzEncoding.Location = new System.Drawing.Point(86, 37);
+            this.cmbWzEncoding.Location = new System.Drawing.Point(86, 59);
             this.cmbWzEncoding.Name = "cmbWzEncoding";
             this.cmbWzEncoding.Size = new System.Drawing.Size(121, 21);
             this.cmbWzEncoding.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -157,7 +176,7 @@
             // 
             // 
             this.labelX1.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX1.Location = new System.Drawing.Point(14, 39);
+            this.labelX1.Location = new System.Drawing.Point(14, 61);
             this.labelX1.Name = "labelX1";
             this.labelX1.Size = new System.Drawing.Size(68, 18);
             this.labelX1.TabIndex = 2;
@@ -185,20 +204,35 @@
             this.superTabItem1.Name = "superTabItem1";
             this.superTabItem1.Text = "WzLoading";
             // 
-            // chkAutoCheckExtFiles
+            // chkWzSortByImgID
             // 
-            this.chkAutoCheckExtFiles.AutoSize = true;
-            this.chkAutoCheckExtFiles.BackColor = System.Drawing.Color.Transparent;
+            this.chkWzSortByImgID.AutoSize = true;
+            this.chkWzSortByImgID.BackColor = System.Drawing.Color.Transparent;
             // 
             // 
             // 
-            this.chkAutoCheckExtFiles.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkAutoCheckExtFiles.Location = new System.Drawing.Point(14, 64);
-            this.chkAutoCheckExtFiles.Name = "chkAutoCheckExtFiles";
-            this.chkAutoCheckExtFiles.Size = new System.Drawing.Size(193, 18);
-            this.chkAutoCheckExtFiles.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.chkAutoCheckExtFiles.TabIndex = 4;
-            this.chkAutoCheckExtFiles.Text = "自动检测扩展wz文件(map2...)";
+            this.chkWzSortByImgID.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkWzSortByImgID.Location = new System.Drawing.Point(31, 36);
+            this.chkWzSortByImgID.Name = "chkWzSortByImgID";
+            this.chkWzSortByImgID.Size = new System.Drawing.Size(107, 18);
+            this.chkWzSortByImgID.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkWzSortByImgID.TabIndex = 5;
+            this.chkWzSortByImgID.Text = "按照ImgID排序";
+            // 
+            // chkImgCheckDisabled
+            // 
+            this.chkImgCheckDisabled.AutoSize = true;
+            this.chkImgCheckDisabled.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkImgCheckDisabled.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkImgCheckDisabled.Location = new System.Drawing.Point(14, 110);
+            this.chkImgCheckDisabled.Name = "chkImgCheckDisabled";
+            this.chkImgCheckDisabled.Size = new System.Drawing.Size(132, 18);
+            this.chkImgCheckDisabled.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkImgCheckDisabled.TabIndex = 6;
+            this.chkImgCheckDisabled.Text = "跳过img校验和检测";
             // 
             // FrmOptions
             // 
@@ -234,5 +268,7 @@
         private DevComponents.DotNetBar.LabelX labelX1;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWzEncoding;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkAutoCheckExtFiles;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkWzSortByImgID;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkImgCheckDisabled;
     }
 }
