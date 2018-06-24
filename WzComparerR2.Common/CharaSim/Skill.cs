@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Text;
 using WzComparerR2.WzLib;
 
@@ -46,7 +45,7 @@ namespace WzComparerR2.CharaSim
             get { return level; }
             set
             {
-                bool canBreakLevel = this.CombatOrders || this.VSkill 
+                bool canBreakLevel = this.CombatOrders || this.VSkill
                     || this.SkillID / 100000 == 4000; //fix for evan
                 int maxLevel = canBreakLevel ? 100 : this.MaxLevel;
                 level = Math.Max(0, Math.Min(value, maxLevel));
@@ -63,8 +62,6 @@ namespace WzComparerR2.CharaSim
         public int MasterLevel { get; set; }
         public Dictionary<int, int> ReqSkill { get; private set; }
         public List<string> Action { get; private set; }
-        public int AddAttackToolTipDescSkill { get; set; }
-        public int AssistSkillLink { get; set; }
 
         public int MaxLevel
         {
@@ -188,45 +185,6 @@ namespace WzComparerR2.CharaSim
                             skill.Action.Add(idxNode.GetValue<string>());
                         }
                         break;
-                    case "addAttack":
-                        Wz_Node toolTipDescNode = childNode.FindNodeByPath("toolTipDesc");
-                        if (toolTipDescNode != null && toolTipDescNode.GetValue<int>() != 0)
-                        {
-                            skill.AddAttackToolTipDescSkill = childNode.FindNodeByPath("toolTipDescSkill").GetValue<int>();
-                        }
-                        break;
-                    case "assistSkillLink":
-                        skill.AssistSkillLink = childNode.FindNodeByPath("skill").GetValue<int>();
-                        break;
-                }
-            }
-
-            if ((skill.common.ContainsKey("forceCon") || (skill.levelCommon.Count > 0 && skill.levelCommon[0].ContainsKey("forceCon"))))
-            {
-                Wz_Node forceNode = null;
-                if (skill.SkillID / 10000 == 3001 || skill.SkillID / 10000 == 3100 || skill.SkillID / 10000 == 3110 || skill.SkillID / 10000 == 3111 || skill.SkillID / 10000 == 3112)
-                {
-                    forceNode = findNode.Invoke(string.Format("UI\\UIWindow2.img\\Skill\\main\\Force\\{0}", (Int32.Parse(skill.common["forceCon"]) - 1) / 30));
-                }
-                else if (skill.SkillID / 10000 / 1000 == 10)
-                {
-                    forceNode = findNode.Invoke(string.Format("UI\\UIWindow2.img\\SkillZero\\main\\Alpha\\{0}", skill.SkillID / 1000 % 10));
-                }
-                if (forceNode != null)
-                {
-                    BitmapOrigin force = BitmapOrigin.CreateFromNode(forceNode, findNode);
-                    using (Graphics graphics = Graphics.FromImage(skill.Icon.Bitmap))
-                    {
-                        graphics.DrawImage(force.Bitmap, new Point(0, 0));
-                    }
-                    using (Graphics graphics = Graphics.FromImage(skill.IconMouseOver.Bitmap))
-                    {
-                        graphics.DrawImage(force.Bitmap, new Point(0, 0));
-                    }
-                    using (Graphics graphics = Graphics.FromImage(skill.IconDisabled.Bitmap))
-                    {
-                        graphics.DrawImage(force.Bitmap, new Point(0, 0));
-                    }
                 }
             }
 

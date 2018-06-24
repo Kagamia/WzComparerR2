@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using Resource = CharaSimResource.Resource;
 using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
@@ -79,78 +80,85 @@ namespace WzComparerR2.CharaSimControl
             picHeight += 25;
 
             format.Alignment = StringAlignment.Far;
-
-            Wz_Node characterWz = PluginManager.FindWz(Wz_Type.Character);            
+            Wz_Node characterWz = PluginManager.FindWz(Wz_Type.Character);
 
             foreach (var setItemPart in this.SetItem.ItemIDs.Parts)
             {
                 string itemName = setItemPart.Value.RepresentName;
-                string typeName = setItemPart.Value.TypeName;          
-                
+                string typeName = setItemPart.Value.TypeName;
+
                 if (string.IsNullOrEmpty(typeName) && SetItem.Parts)
                 {
-                    typeName = "装备";
+                    typeName = "特殊";
                 }
 
-                bool Cash = false;
+                ItemBase itemBase = null;
+                bool cash = false;
                 int wonderGrade = 0;
-                BitmapOrigin IconRaw = new BitmapOrigin();
 
-                foreach (var itemID in setItemPart.Value.ItemIDs)
+                if (setItemPart.Value.ItemIDs.Count > 0)
                 {
-                    StringResult sr;
-                    if (StringLinker != null)
-                    {
-                        if (StringLinker.StringEqp.TryGetValue(itemID.Key, out sr))
-                        {
-                            string[] fullPath = sr.FullPath.Split('\\');
-                            Wz_Node itemNode = PluginBase.PluginManager.FindWz(string.Format(@"Character\{0}\{1:D8}.img", String.Join("\\", new List<string>(fullPath).GetRange(2, fullPath.Length - 3).ToArray()), itemID.Key));
-                            if (itemNode != null)
-                            {
-                                Gear item = Gear.CreateFromNode(itemNode, PluginManager.FindWz);
-                                Cash = item.Cash;
-                                IconRaw = item.IconRaw;
-                            }
-                        }
-                        else if (StringLinker.StringItem.TryGetValue(itemID.Key, out sr))
-                        {
-                            Wz_Node itemNode = PluginBase.PluginManager.FindWz(string.Format(@"Item\Pet\{0:D7}.img", itemID.Key));
-                            if (itemNode != null)
-                            {
-                                Item item = Item.CreateFromNode(itemNode, PluginManager.FindWz);
-                                Cash = item.Cash;
-                                item.Props.TryGetValue(ItemPropType.wonderGrade, out wonderGrade);
-                                IconRaw = item.IconRaw;
-                            }
-                        }
-                    }
+                    var itemID = setItemPart.Value.ItemIDs.First().Key;
 
-                    break;
+                    switch (itemID / 1000000)
+                    {
+                        case 0: //avatar
+                        case 1: //gear
+                            if (characterWz != null)
+                            {
+                                foreach (Wz_Node typeNode in characterWz.Nodes)
+                                {
+                                    Wz_Node itemNode = typeNode.FindNodeByPath(string.Format("{0:D8}.img", itemID), true);
+                                    if (itemNode != null)
+                                    {
+                                        var gear = Gear.CreateFromNode(itemNode, PluginManager.FindWz);
+                                        cash = gear.Cash;
+                                        itemBase = gear;
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 5: //Pet
+                            {
+                                Wz_Node itemNode = PluginBase.PluginManager.FindWz(string.Format(@"Item\Pet\{0:D7}.img", itemID));
+                                if (itemNode != null)
+                                {
+                                    var item = Item.CreateFromNode(itemNode, PluginManager.FindWz);
+                                    cash = item.Cash;
+                                    item.Props.TryGetValue(ItemPropType.wonderGrade, out wonderGrade);
+                                    itemBase = item;
+                                }
+                            }
+                            break;
+                    }
                 }
 
                 if (string.IsNullOrEmpty(itemName) || string.IsNullOrEmpty(typeName))
                 {
-                    foreach (var itemID in setItemPart.Value.ItemIDs)
+                    if (setItemPart.Value.ItemIDs.Count > 0)
                     {
+                        var itemID = setItemPart.Value.ItemIDs.First().Key;
                         StringResult sr = null; ;
-                        if (StringLinker != null)
+                        if (this.StringLinker != null)
                         {
-                            if (StringLinker.StringEqp.TryGetValue(itemID.Key, out sr))
+                            if (this.StringLinker.StringEqp.TryGetValue(itemID, out sr))
                             {
                                 itemName = sr.Name;
                                 if (typeName == null)
                                 {
-                                    typeName = ItemStringHelper.GetSetItemGearTypeString(Gear.GetGearType(itemID.Key));
+                                    typeName = ItemStringHelper.GetSetItemGearTypeString(Gear.GetGearType(itemID));
                                 }
                             }
-                            else if (StringLinker.StringItem.TryGetValue(itemID.Key, out sr)) //兼容宠物
+                            else if (this.StringLinker.StringItem.TryGetValue(itemID, out sr)) //兼容宠物
                             {
                                 itemName = sr.Name;
                                 if (typeName == null)
                                 {
-                                    if (itemID.Key / 10000 == 500)
+                                    if (itemID / 10000 == 500)
                                     {
-                                        typeName = "宠物";
+                                        typeName = "特殊";
                                     }
                                     else
                                     {
@@ -163,8 +171,6 @@ namespace WzComparerR2.CharaSimControl
                         {
                             itemName = "(null)";
                         }
-
-                        break;
                     }
                 }
 
@@ -177,7 +183,7 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 Brush brush = setItemPart.Value.Enabled ? Brushes.White : GearGraphics.GrayBrush2;
-                if (!Cash)
+                if (!cash)
                 {
                     g.DrawString(itemName, GearGraphics.ItemDetailFont2, brush, 8, picHeight);
                     g.DrawString(typeName, GearGraphics.ItemDetailFont2, brush, 254, picHeight, format);
@@ -187,27 +193,27 @@ namespace WzComparerR2.CharaSimControl
                 {
                     g.FillRectangle(GearGraphics.GearIconBackBrush2, 10, picHeight, 36, 36);
                     g.DrawImage(Resource.Item_shadow, 10 + 2 + 3, picHeight + 2 + 32 - 6);
-                    if (IconRaw.Bitmap != null)
+                    if (itemBase?.IconRaw.Bitmap != null)
                     {
-                        g.DrawImage(IconRaw.Bitmap, 10 + 2 - IconRaw.Origin.X, picHeight + 2 + 32 - IconRaw.Origin.Y);
+                        var icon = itemBase.IconRaw;
+                        g.DrawImage(icon.Bitmap, 10 + 2 - icon.Origin.X, picHeight + 2 + 32 - icon.Origin.Y);
                     }
+
+                    Bitmap cashImg = null;
                     if (wonderGrade > 0)
                     {
-                        Image label = Resource.ResourceManager.GetObject("CashItem_label_" + (wonderGrade + 3)) as Bitmap;
-                        if (label != null)
-                        {
-                            g.DrawImage(label, 10 + 2 + 20, picHeight + 2 + 32 - 12);
-                        }
+                        string resKey = $"CashShop_img_CashItem_label_{wonderGrade + 3}";
+                        cashImg = Resource.ResourceManager.GetObject(resKey) as Bitmap;
                     }
-                    else
+                    if (cashImg == null) //default cashImg
                     {
-                        g.DrawImage(Resource.CashItem_0, 10 + 2 + 20, picHeight + 2 + 32 - 12);
+                        cashImg = Resource.CashItem_0;
                     }
+                    g.DrawImage(cashImg, 10 + 2 + 20, picHeight + 2 + 32 - 12);
                     g.DrawString(itemName, GearGraphics.ItemDetailFont2, brush, 50, picHeight);
                     g.DrawString(typeName, GearGraphics.ItemDetailFont2, brush, 254, picHeight, format);
                     picHeight += 40;
                 }
-
             }
 
             if (!this.SetItem.ExpandToolTip)
@@ -287,7 +293,7 @@ namespace WzComparerR2.CharaSimControl
                                 sr = new StringResult();
                                 sr.Name = p.SkillID.ToString();
                             }
-                            string summary = "激活技能<" + sr.Name + "> Lv." + p.Level;
+                            string summary = $"可以使用<{sr.Name}>技能";
                             GearGraphics.DrawPlainText(g, summary, GearGraphics.ItemDetailFont2, color, 10, 244, ref picHeight, 16);
                         }
                     }

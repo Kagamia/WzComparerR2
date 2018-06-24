@@ -277,11 +277,19 @@ namespace WzComparerR2.CharaSimControl
                 hasPart2 = true;
             }
 
-            if (item.Props.TryGetValue(ItemPropType.life, out value) && value != 0)
+            string expireTime = null;
+            if (item.Props.TryGetValue(ItemPropType.permanent, out value) && value != 0)
+            {
+                expireTime = ItemStringHelper.GetItemPropString(ItemPropType.permanent, value);
+            }
+            else if (item.Props.TryGetValue(ItemPropType.life, out value) && value > 0)
             {
                 DateTime time = DateTime.Now.AddDays(value);
-                string expireStr = time.ToString("魔法时间：到 yyyy年 M月 d日 HH时");
-                g.DrawString(expireStr, GearGraphics.ItemDetailFont, Brushes.White, tooltip.Width / 2, picH, format);
+                expireTime = time.ToString("魔法时间：到 yyyy年 M月 d日 H时");
+            }
+            if (!string.IsNullOrEmpty(expireTime))
+            {
+                g.DrawString(expireTime, GearGraphics.ItemDetailFont, Brushes.White, tooltip.Width / 2, picH, format);
                 picH += 16;
                 hasPart2 = true;
             }
@@ -312,22 +320,21 @@ namespace WzComparerR2.CharaSimControl
             }
             if (item.Cash)
             {
+                Bitmap cashImg = null;
+
                 if (item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && value > 0)
                 {
-                    Image label = Resource.ResourceManager.GetObject("CashItem_label_" + (value + 3)) as Image;
-                    if (label != null)
-                    {
-                        g.DrawImage(GearGraphics.EnlargeBitmap(new Bitmap(label)),
-                            iconX + 6 + 68 - 26,
-                            picH + 6 + 68 - 26);
-                    }
+                    string resKey = $"CashShop_img_CashItem_label_{value + 3}";
+                    cashImg = Resource.ResourceManager.GetObject(resKey) as Bitmap;
                 }
-                else
+                if (cashImg == null) //default cashImg
                 {
-                    g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_0),
+                    cashImg = Resource.CashItem_0;
+                }
+
+                g.DrawImage(GearGraphics.EnlargeBitmap(cashImg),
                     iconX + 6 + 68 - 26,
                     picH + 6 + 68 - 26);
-                }
             }
             g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, iconX + 4, picH + 4); //绘制左上角cover
 

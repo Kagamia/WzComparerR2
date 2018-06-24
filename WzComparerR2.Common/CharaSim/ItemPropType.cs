@@ -22,5 +22,6 @@ namespace WzComparerR2.CharaSim
         nickTag,
         wonderGrade,
         life,
+        permanent,
     }
 }

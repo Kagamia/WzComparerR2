@@ -497,6 +497,8 @@ namespace WzComparerR2.CharaSim
                     return value == 0 ? null : "任务道具";
                 case ItemPropType.pquest:
                     return value == 0 ? null : "组队任务道具";
+                case ItemPropType.permanent:
+                    return value == 0 ? null : "可以一直使用魔法的神奇宠物。";
                 default:
                     return null;
             }
