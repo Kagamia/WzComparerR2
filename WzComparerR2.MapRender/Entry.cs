@@ -124,6 +124,7 @@ namespace WzComparerR2.MapRender
                         }
                         catch (Exception ex)
                         {
+                            PluginManager.LogError("MapRender", ex, "MapRender error:");
                             MessageBoxEx.Show(ex.ToString(), "MapRender");
                         }
 #endif

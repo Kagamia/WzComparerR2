@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using IE = System.Collections.IEnumerator;
@@ -158,6 +159,17 @@ namespace WzComparerR2.MapRender
             while (!Task.IsCompleted)
             {
                 yield return null;
+            }
+            if (Task.IsFaulted)
+            {
+                PluginBase.PluginManager.LogError("MapRender", Task.Exception, "Coroutine Error: ");
+#if DEBUG
+                if (Debugger.IsAttached)
+                {
+                    var ex = Task.Exception;
+                    Debugger.Break();
+                }
+#endif
             }
         }
     }

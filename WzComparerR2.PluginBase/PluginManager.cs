@@ -75,6 +75,30 @@ namespace WzComparerR2.PluginBase
             return null;
         }
 
+        public static void LogError(string logger, string format, params object[] args)
+        {
+            LogError(logger, null, format, args);
+        }
+
+        public static void LogError(string logger, Exception ex, string format, params object[] args)
+        {
+            string logText = string.Format("[{0:yyyy-MM-dd HH:mm:ss}][Error][{1}] {2}{3}",
+                DateTime.Now,
+                logger,
+                args == null ? format : string.Format(format, args),
+                ex?.ToString());
+
+            string logFile = Path.Combine(Path.GetDirectoryName(MainExecutorPath), "error.log");
+
+            try
+            {
+                File.AppendAllLines(logFile, new[] { logText });
+            }
+            catch
+            {
+            }
+        }
+
         internal static string MainExecutorPath
         {
             get
