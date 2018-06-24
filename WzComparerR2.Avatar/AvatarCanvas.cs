@@ -1065,7 +1065,7 @@ namespace WzComparerR2.Avatar
                 Wz_Node bodyNode = FindBodyActionNode(bodyAction);
                 partNode.Add(bodyNode);
 
-                //头部
+                //计算面向
                 bool? face = bodyAction.Face; //扩展动作规定头部
                 if (face == null && bodyNode != null) //链接的body内规定
                 {
@@ -1076,33 +1076,41 @@ namespace WzComparerR2.Avatar
                     }
                 }
 
-                if (face ?? false)
+                //头部
+                var headNode = FindActionFrameNode(this.Head.Node, bodyAction);
+                if (headNode == null)
                 {
-                    ActionFrame headAction = new ActionFrame() { Action = "front" };
-                    partNode.Add(FindActionFrameNode(this.Head.Node, headAction));
+                    string actName = this.GetHeadActionName(bodyAction.Action, face);
+                    if (actName != null)
+                    {
+                        ActionFrame headAction = new ActionFrame() { Action = actName };
+                        headNode = FindActionFrameNode(this.Head.Node, headAction);
+                    }
                 }
-                else
-                {
-                    partNode.Add(FindActionFrameNode(this.Head.Node, bodyAction));
-                }
+                partNode.Add(headNode);
 
                 //脸
                 if (this.Face != null && this.Face.Visible && faceAction != null)
                 {
-                    partNode.Add(FindActionFrameNode(this.Face.Node, faceAction));
+                    if (face ?? true)
+                    {
+                        partNode.Add(FindActionFrameNode(this.Face.Node, faceAction));
+                    }
                 }
                 //毛
-                if (this.Hair != null && this.Hair.Visible)
+                if (headNode != null && this.Hair != null && this.Hair.Visible)
                 {
-                    if (face ?? false)
+                    var hairNode = FindActionFrameNode(this.Hair.Node, bodyAction);
+                    if (hairNode == null)
                     {
-                        ActionFrame headAction = new ActionFrame() { Action = "default" };
-                        partNode.Add(FindActionFrameNode(this.Hair.Node, headAction));
+                        string actName = this.GetHairActionName(bodyAction.Action, face);
+                        if (actName != null)
+                        {
+                            ActionFrame hairAction = new ActionFrame() { Action = actName, Frame = 0 };
+                            hairNode = FindActionFrameNode(this.Hair.Node, hairAction);
+                        }  
                     }
-                    else
-                    {
-                        partNode.Add(FindActionFrameNode(this.Hair.Node, bodyAction));
-                    }
+                    partNode.Add(hairNode);
                 }
                 //其他部件
                 for (int i = 4; i < 16; i++)
@@ -1194,6 +1202,55 @@ namespace WzComparerR2.Avatar
             }
 
             return actionNode;
+        }
+
+        private string GetHeadActionName(string bodyAction, bool? face)
+        {
+            if (bodyAction.StartsWith("PB") && (face ?? false) == false)
+            {
+                return null;
+            }
+
+            if (bodyAction.StartsWith("PVPA8"))
+            {
+                return null;
+            }
+
+            if (face != null)
+            {
+                return (face ?? false) ? "front" : "back";
+            }
+
+            return null;
+        }
+
+        private string GetHairActionName(string bodyAction, bool? face)
+        {
+            if (bodyAction == "hide" || bodyAction == "blink" || bodyAction.EndsWith("Blink"))
+            {
+                return null;
+            }
+            if (bodyAction.StartsWith("PB") && (face ?? false) == false)
+            {
+                return null;
+            }
+            if (bodyAction.StartsWith("create"))
+            {
+                return null;
+            }
+            if (bodyAction.EndsWith("prone") && (face ?? false))
+            {
+                return "prone";
+            }
+            if (bodyAction.EndsWith("proneStab") && (face ?? false))
+            {
+                return "proneStab";
+            }
+            if (face != null)
+            {
+                return face.Value ? "stand1" : "ladder";
+            }
+            return null;
         }
 
         #region parts
@@ -1375,7 +1432,6 @@ namespace WzComparerR2.Avatar
         };
 
         public static readonly ReadOnlyCollection<string> BaseActions = new ReadOnlyCollection<string>(baseActions);
-
         #endregion
 
         private class AvatarLayer
