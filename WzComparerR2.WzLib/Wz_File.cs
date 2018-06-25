@@ -91,11 +91,11 @@ namespace WzComparerR2.WzLib
         {
             this.fileStream.Position = 0;
             int filesize = (int)this.FileStream.Length;
-            if (filesize < 4) { return false; }
+            if (filesize < 4) { goto __failed; }
 
             string signature = new string(this.BReader.ReadChars(4));
-            if (signature != "PKG1") { return false; }
-            
+            if (signature != "PKG1") { goto __failed; }
+
             int datasize = (int)this.BReader.ReadInt64();
             int headersize = this.BReader.ReadInt32();
             string copyright = new string(this.BReader.ReadChars(headersize - (int)this.FileStream.Position));
@@ -103,6 +103,10 @@ namespace WzComparerR2.WzLib
 
             this.Header = new Wz_Header(signature, copyright, fileName, headersize, datasize, filesize, encver);
             return true;
+
+            __failed:
+            this.header = new Wz_Header(null, null, fileName, 0, 0, filesize, 0);
+            return false;
         }
 
         public int ReadInt32()

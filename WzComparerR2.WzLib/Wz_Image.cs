@@ -40,8 +40,8 @@ namespace WzComparerR2.WzLib
 
         public bool IsChecksumChecked
         {
-            get { return this.checEnc; }
-            internal set { this.checEnc = value; }
+            get { return this.chec; }
+            internal set { this.chec = value; }
         }
         public bool IsLuaImage
         {
