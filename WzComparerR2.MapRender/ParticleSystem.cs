@@ -259,10 +259,10 @@ namespace WzComparerR2.MapRender
                     }
                     else
                     {
-                        float alpha = color.A / 255.0f; ;
-                        color.R = (byte)(color.R * alpha);
-                        color.G = (byte)(color.G * alpha);
-                        color.B = (byte)(color.B * alpha);
+                        //float alpha = color.A / 255.0f; ;
+                        //color.R = (byte)(color.R * alpha);
+                        //color.G = (byte)(color.G * alpha);
+                        //color.B = (byte)(color.B * alpha);
                     }
                 }
 
@@ -318,7 +318,7 @@ namespace WzComparerR2.MapRender
             }
 
             var amount = (value - from) / (to - from);
-            return (byte)MathHelper.Lerp(int1, int2, amount);
+            return (int)MathHelper.Lerp(int1, int2, amount);
         }
 
         private struct AlphaPoint
