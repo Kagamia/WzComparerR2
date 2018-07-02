@@ -180,7 +180,8 @@ namespace WzComparerR2.WzLib
 
         public T GetValue<T>(T defaultValue)
         {
-            if (typeof(Wz_Image) == typeof(T))
+            var typeT = typeof(T);
+            if (typeof(Wz_Image) == typeT)
             {
                 if (this is Wz_Image.Wz_ImageNode)
                 {
@@ -201,7 +202,12 @@ namespace WzComparerR2.WzLib
             {
                 try
                 {
-                    T result = (T)iconvertible.ToType(typeof(T), null);
+                    if (typeT.IsGenericType && typeT.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    {
+                        typeT = typeT.GetGenericArguments()[0];
+                    }
+
+                    T result = (T)iconvertible.ToType(typeT, null);
                     return result;
                 }
                 catch
