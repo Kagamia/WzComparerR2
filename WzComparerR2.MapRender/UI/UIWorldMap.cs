@@ -25,18 +25,22 @@ namespace WzComparerR2.MapRender.UI
     class UIWorldMap : WindowEx
     {
         public static readonly DependencyProperty CurrentWorldMapProperty = DependencyProperty.Register("CurrentWorldMap", typeof(WorldMapInfo), typeof(UIWorldMap), new FrameworkPropertyMetadata(null));
-        public static readonly DependencyProperty CurrentMapIDProperty = DependencyProperty.Register("CurrentMapID", typeof(WorldMapInfo), typeof(int?), new FrameworkPropertyMetadata(null));
-        public static readonly DependencyProperty UseImageNameAsInfoNameProperty = DependencyProperty.Register("UseImageNameAsInfoName", typeof(WorldMapInfo), typeof(bool), new FrameworkPropertyMetadata(false));
+        public static readonly DependencyProperty CurrentMapIDProperty = DependencyProperty.Register("CurrentMapID", typeof(int?), typeof(UIWorldMap), new FrameworkPropertyMetadata(null));
+        public static readonly DependencyProperty UseImageNameAsInfoNameProperty = DependencyProperty.Register("UseImageNameAsInfoName", typeof(bool), typeof(UIWorldMap), new FrameworkPropertyMetadata(false));
+        public static readonly DependencyProperty SelectedQuestLimitIndexProperty = DependencyProperty.Register("SelectedQuestLimitIndex", typeof(int), typeof(UIWorldMap), new FrameworkPropertyMetadata(-1));
 
         public UIWorldMap() : base()
         {
             this.worldMaps = new ObservableCollection<WorldMapInfo>();
+
             this.CmbMaps.ItemsSource = this.worldMaps;
+
             //添加默认item样式
             var template = this.CmbMaps.FindResource(typeof(string)) as DataTemplate;
             if (template != null)
             {
                 this.CmbMaps.Resources.Add(typeof(WorldMapInfo), template);
+                this.CmbQuestList.Resources.Add(typeof(QuestLimitInfo), template);
             }
 
             //添加默认点击事件
@@ -45,6 +49,7 @@ namespace WzComparerR2.MapRender.UI
 
         public bool IsDataLoaded { get; private set; }
         public ComboBox CmbMaps { get; private set; }
+        public ComboBox CmbQuestList { get; private set; }
         public WorldMapArea MapArea { get; private set; }
 
         public event EventHandler<MapSpotEventArgs> MapSpotClick;
@@ -67,6 +72,12 @@ namespace WzComparerR2.MapRender.UI
         {
             get { return (bool)this.GetValue(UseImageNameAsInfoNameProperty); }
             set { this.SetValue(UseImageNameAsInfoNameProperty, value); }
+        }
+
+        public int SelectedQuestLimitIndex
+        {
+            get { return (int)this.GetValue(SelectedQuestLimitIndexProperty); }
+            set { this.SetValue(SelectedQuestLimitIndexProperty, value); }
         }
 
         protected override void InitializeComponents()
@@ -94,6 +105,15 @@ namespace WzComparerR2.MapRender.UI
             canvas.Children.Add(cmbMaps);
             this.CmbMaps = cmbMaps;
 
+            ComboBox cmbQuestList = new ComboBox();
+            cmbQuestList.Width = 100;
+            cmbQuestList.Height = 20;
+            Canvas.SetLeft(cmbQuestList, 250);
+            Canvas.SetTop(cmbQuestList, 23);
+            cmbQuestList.SetBinding(ComboBox.SelectedIndexProperty, new Binding(UIWorldMap.SelectedQuestLimitIndexProperty) { Source = this, Mode = BindingMode.TwoWay });
+            canvas.Children.Add(cmbQuestList);
+            this.CmbQuestList = cmbQuestList;
+
             WorldMapArea mapArea = new WorldMapArea();
             mapArea.Width = 640;
             mapArea.Height = 480;
@@ -103,6 +123,7 @@ namespace WzComparerR2.MapRender.UI
             canvas.Children.Add(mapArea);
             this.SetBinding(CurrentWorldMapProperty, new Binding(Control.DataContextProperty) { Source = mapArea, Mode = BindingMode.OneWayToSource });
             this.SetBinding(CurrentMapIDProperty, new Binding("CurrentMapID") { Source = mapArea, Mode = BindingMode.OneWayToSource });
+            this.SetBinding(SelectedQuestLimitIndexProperty, new Binding("SelectedQuestIndex") { Source = mapArea, Mode = BindingMode.OneWayToSource });
             this.MapArea = mapArea;
 
             Button btnBack = new Button();
@@ -125,6 +146,27 @@ namespace WzComparerR2.MapRender.UI
             this.Width = canvasBackTexture.Width;
             this.Height = canvasBackTexture.Height;
             base.InitializeComponents();
+        }
+
+        protected override void OnPropertyChanged(DependencyProperty property)
+        {
+            base.OnPropertyChanged(property);
+
+            if (property == CurrentWorldMapProperty)
+            {
+                if (this.CmbQuestList != null)
+                {
+                    try
+                    {
+                        var quests = this.CurrentWorldMap?.QuestLimit;
+                        this.CmbQuestList.ItemsSource = quests;
+                        this.CmbQuestList.Visibility = (quests?.Any() ?? false) ? Visibility.Visible : Visibility.Hidden;
+                    }
+                    catch //ignore exceptions on closing.
+                    {
+                    }
+                }
+            }
         }
 
         public void LoadWzResource()
@@ -189,8 +231,14 @@ namespace WzComparerR2.MapRender.UI
                     node = img.Node.Nodes["MapList"];
                     if (node != null)
                     {
-                        foreach (var spotNode in node.Nodes)
+                        for (int i = 0; ; i++)
                         {
+                            var spotNode = node.Nodes[i.ToString()];
+                            if (spotNode == null)
+                            {
+                                break;
+                            }
+
                             var spot = new MapSpot();
                             var location = spotNode.Nodes["spot"]?.GetValueEx<Wz_Vector>(null);
                             if (location != null)
@@ -247,6 +295,27 @@ namespace WzComparerR2.MapRender.UI
                         }
                     }
 
+                    //KMST1070 加载阶段大地图
+                    node = img.Node.Nodes["QuestLimit"];
+                    if (node != null)
+                    {
+                        var qlNode = node.Nodes["default"];
+                        if (qlNode != null)
+                        {
+                            worldMapInfo.QuestLimit.Add(this.LoadQuestLimit(qlNode));
+                        }
+                        for (int i = 0; ; i++)
+                        {
+                            qlNode = node.Nodes[i.ToString()];
+                            if (qlNode == null)
+                            {
+                                break;
+                            }
+
+                            worldMapInfo.QuestLimit.Add(this.LoadQuestLimit(qlNode));
+                        }
+                    }
+
                     this.worldMaps.Add(worldMapInfo);
                 }
             }
@@ -282,6 +351,57 @@ namespace WzComparerR2.MapRender.UI
 
             this.IsDataLoaded = true;
             this.JumpToCurrentMap();
+        }
+
+        private QuestLimitInfo LoadQuestLimit(Wz_Node node)
+        {
+            var questLimit = new QuestLimitInfo();
+            questLimit.Name = node.Text;
+
+            var baseImgNode = node.Nodes["0"];
+            if (baseImgNode != null)
+            {
+                questLimit.BaseImg = this.LoadTextureItem(baseImgNode);
+            }
+
+            var openMapNode = node.Nodes["openMap"];
+            if (openMapNode != null)
+            {
+                for (int i = 0; ; i++)
+                {
+                    var subNode = openMapNode.Nodes[i.ToString()];
+                    if (subNode == null)
+                    {
+                        break;
+                    }
+
+                    var spotIndex = subNode.GetValue<int>();
+                    questLimit.OpenMaps.Add(spotIndex);
+                }
+            }
+
+            var closeMapNode = node.Nodes["closeMap"];
+            if (closeMapNode != null)
+            {
+                for (int i = 0; ; i++)
+                {
+                    var subNode = closeMapNode.Nodes[i.ToString()];
+                    if (subNode == null)
+                    {
+                        break;
+                    }
+
+                    var spotIndex = subNode.GetValue<int>();
+                    questLimit.CloseMaps.Add(spotIndex);
+                }
+            }
+
+            questLimit.IsDefault = node.Nodes["default"].GetValueEx(0) != 0;
+            questLimit.Quest = node.Nodes["quest"].GetValueEx(0);
+            questLimit.State = node.Nodes["state"].GetValueEx(0);
+            questLimit.CloseMapImageType = node.Nodes["closeMapImageType"].GetValueEx<int?>(null);
+
+            return questLimit;
         }
 
         public void JumpToCurrentMap()
@@ -382,6 +502,7 @@ namespace WzComparerR2.MapRender.UI
 
             public WorldMapInfo WorldMap { get; set; }
             public int? CurrentMapID { get; set; }
+            public int SelectedQuestIndex { get; set; }
 
             private List<DrawItem> hitAreaCache;
 
@@ -429,6 +550,50 @@ namespace WzComparerR2.MapRender.UI
                     return;
                 }
 
+                TextureItem baseImg = curMap.BaseImg;
+                SpotState[] spotState = new SpotState[curMap.MapList.Count];
+
+                if (curMap.QuestLimit != null && this.SelectedQuestIndex > -1 && this.SelectedQuestIndex < curMap.QuestLimit.Count)
+                {
+                    for(int i = 0; i <= this.SelectedQuestIndex; i++)
+                    {
+                        var quest = curMap.QuestLimit[i];
+                        //重写底图
+                        if (quest.BaseImg != null)
+                        {
+                            baseImg = quest.BaseImg;
+                        }
+                        else if (quest.IsDefault)
+                        {
+                            baseImg = curMap.BaseImg;
+                        }
+                        //重写spot属性
+
+                        if (quest.IsDefault)
+                        {
+                            for (int j = 0; j < spotState.Length; j++)
+                            {
+                                spotState[j].IsOverride = true;
+                                spotState[j].IsVisible = false;
+                            }
+                        }
+                        foreach (var spotIndex in quest.CloseMaps)
+                        {
+                            spotState[spotIndex].IsOverride = true;
+                            spotState[spotIndex].IsVisible = true;
+                            spotState[spotIndex].IsOpen = false;
+                            spotState[spotIndex].ImgType = quest.CloseMapImageType ?? -1;
+                        }
+                        foreach (var spotIndex in quest.OpenMaps)
+                        {
+                            spotState[spotIndex].IsOverride = true;
+                            spotState[spotIndex].IsVisible = true;
+                            spotState[spotIndex].IsOpen = true;
+                            spotState[spotIndex].ImgType = -1;
+                        }
+                    }
+                }
+
                 var baseOrigin = new PointF((int)this.Width / 2, (int)this.Height / 2);
 
                 var drawOrder = new List<DrawItem>();
@@ -438,13 +603,13 @@ namespace WzComparerR2.MapRender.UI
                 });
 
                 //获取鼠标位置
-                var mousePos = EmptyKeys.UserInterface.Input.InputManager.Current.MouseDevice.GetPosition(this);
+                var mousePos = InputManager.Current.MouseDevice.GetPosition(this);
                 MapSpot curSpot = null;
 
                 //绘制底图
-                if (curMap.BaseImg != null)
+                if (baseImg != null)
                 {
-                    addItem(curMap.BaseImg, null);
+                    addItem(baseImg, null);
                 }
 
                 //绘制link
@@ -462,9 +627,26 @@ namespace WzComparerR2.MapRender.UI
                 }
 
                 //绘制地图点
-                foreach (var spot in curMap.MapList)
+                for (int i = 0, i0 = curMap.MapList.Count; i < i0; i++)
                 {
-                    var texture = this.FindResource("mapImage/" + spot.Type.ToString()) as TextureItem;
+                    var spot = curMap.MapList[i];
+                    int spotType = spot.Type;
+                    if (spotState[i].IsOverride) //重写判定
+                    {
+                        if (!spotState[i].IsVisible)
+                        {
+                            continue;
+                        }
+                        if (!spotState[i].IsOpen) //close
+                        {
+                            if (spotState[i].ImgType > -1)
+                            {
+                                spotType = spotState[i].ImgType;
+                            }
+                        }
+                    }
+
+                    var texture = this.FindResource("mapImage/" + spotType) as TextureItem;
                     if (texture != null)
                     {
                         var item = new TextureItem()
@@ -539,6 +721,14 @@ namespace WzComparerR2.MapRender.UI
                 public PointF Position;
                 public TextureItem TextureItem;
             }
+
+            private struct SpotState
+            {
+                public bool IsOverride;
+                public bool IsVisible;
+                public bool IsOpen;
+                public int ImgType;
+            }
         }
 
         public class WorldMapInfo
@@ -549,6 +739,7 @@ namespace WzComparerR2.MapRender.UI
             public TextureItem BaseImg { get; set; }
             public List<MapSpot> MapList { get; private set; } = new List<MapSpot>();
             public List<MapLink> MapLinks { get; private set; } = new List<MapLink>();
+            public List<QuestLimitInfo> QuestLimit { get; private set; } = new List<QuestLimitInfo>();
 
             //缓存数据
             public WorldMapInfo ParentMapInfo { get; set; }
@@ -582,6 +773,23 @@ namespace WzComparerR2.MapRender.UI
             public string Tooltip { get; set; }
             public string LinkMap { get; set; }
             public TextureItem LinkImg { get; set; }
+        }
+
+        public class QuestLimitInfo
+        {
+            public string Name { get; set; }
+            public TextureItem BaseImg { get; set; }
+            public List<int> OpenMaps { get; private set; } = new List<int>();
+            public List<int> CloseMaps { get; private set; } = new List<int>();
+            public int Quest { get; set; }
+            public int State { get; set; }
+            public int? CloseMapImageType { get; set; }
+            public bool IsDefault { get; set; }
+
+            public override string ToString()
+            {
+                return this.Name;
+            }
         }
 
         public class TextureItem
