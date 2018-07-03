@@ -159,8 +159,20 @@ namespace WzComparerR2.MapRender.UI
                     try
                     {
                         var quests = this.CurrentWorldMap?.QuestLimit;
-                        this.CmbQuestList.ItemsSource = quests;
-                        this.CmbQuestList.Visibility = (quests?.Any() ?? false) ? Visibility.Visible : Visibility.Hidden;
+                        if (quests == null || quests.Count <= 0)
+                        {
+                            this.CmbQuestList.ItemsSource = null;
+                            this.CmbQuestList.Visibility = Visibility.Hidden;
+                        }
+                        else
+                        {
+                            var dataSource = new List<object>();
+                            dataSource.AddRange(quests);
+                            dataSource.Add("(none)");
+                            this.CmbQuestList.ItemsSource = dataSource;
+                            this.CmbQuestList.SelectedIndex = 0;
+                            this.CmbQuestList.Visibility = Visibility.Visible;
+                        }
                     }
                     catch //ignore exceptions on closing.
                     {
