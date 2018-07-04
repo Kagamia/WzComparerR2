@@ -74,6 +74,7 @@
     <Compile Include="BuildInApngEncoder.cs" />
     <Compile Include="BuildInGifEncoder.cs" />
     <Compile Include="CharaSim\ExclusiveEquip.cs" />
+    <Compile Include="CharaSim\SetItemBonusByTime.cs" />
     <Compile Include="Controls\AnimationItemEventArgs.cs" />
     <Compile Include="Controls\AnimationRecoder.cs" />
     <Compile Include="Animation\Frame.cs" />

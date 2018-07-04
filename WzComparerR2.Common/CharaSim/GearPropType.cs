@@ -93,6 +93,8 @@ namespace WzComparerR2.CharaSim
         Option,
         OptionToMob,
         activeSkill,
+        bonusByTime,
+
         //特殊装备属性
         attackSpeed = 200,
         tuc,

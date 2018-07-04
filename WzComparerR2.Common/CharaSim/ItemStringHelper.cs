@@ -95,6 +95,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.knockback: return "直接攻击时" + value + "的比率发生后退现象。";
                 case GearPropType.incPVPDamage: return "大乱斗时追加攻击力" + sign + value;
                 case GearPropType.incPQEXPr: return "组队任务经验值增加" + value + "%";
+                case GearPropType.incEXPr: return "经验值增加" + value + "%";
                 case GearPropType.incBDR:
                 case GearPropType.bdR: return "攻击BOSS怪物时，伤害+" + value + "%";
                 case GearPropType.incIMDR:

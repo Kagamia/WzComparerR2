@@ -190,6 +190,41 @@ namespace WzComparerR2.CharaSim
                                         effect.Props.Add(GearPropType.activeSkill, activeSkillList);
                                         break;
 
+                                    case "bonusByTime":
+                                        var bonusByTimeList = new List<SetItemBonusByTime>();
+                                        for (int i = 0; ; i++)
+                                        {
+                                            Wz_Node optNode = propNode.FindNodeByPath(i.ToString());
+                                            if (optNode == null)
+                                            {
+                                                break;
+                                            }
+
+                                            var bonusByTime = new SetItemBonusByTime();
+                                            foreach (Wz_Node pNode in optNode.Nodes)
+                                            {
+                                                switch (pNode.Text)
+                                                {
+                                                    case "termStart":
+                                                        bonusByTime.TermStart = pNode.GetValue<int>();
+                                                        break;
+
+                                                    default:
+                                                        {
+                                                            GearPropType type;
+                                                            if (Enum.TryParse(pNode.Text, out type))
+                                                            {
+                                                                bonusByTime.Props.Add(type, pNode.GetValue<int>());
+                                                            }
+                                                        }
+                                                        break;
+                                                }
+                                            }
+                                            bonusByTimeList.Add(bonusByTime);
+                                        }
+                                        effect.Props.Add(GearPropType.bonusByTime, bonusByTimeList);
+                                        break;
+
                                     default:
                                         {
                                             GearPropType type;

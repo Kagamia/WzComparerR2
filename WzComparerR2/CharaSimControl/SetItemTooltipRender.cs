@@ -297,6 +297,19 @@ namespace WzComparerR2.CharaSimControl
                             GearGraphics.DrawPlainText(g, summary, GearGraphics.ItemDetailFont2, color, 10, 244, ref picHeight, 16);
                         }
                     }
+                    else if (prop.Key == GearPropType.bonusByTime)
+                    {
+                        var ops = (List<SetItemBonusByTime>)prop.Value;
+                        foreach (SetItemBonusByTime p in ops)
+                        {
+                            GearGraphics.DrawPlainText(g, $"{p.TermStart}小时后", GearGraphics.ItemDetailFont2, color, 10, 244, ref picHeight, 16);
+                            foreach (var bonusProp in p.Props)
+                            {
+                                var summary = ItemStringHelper.GetGearPropString(bonusProp.Key, Convert.ToInt32(bonusProp.Value));
+                                GearGraphics.DrawPlainText(g, summary, GearGraphics.ItemDetailFont2, color, 10, 244, ref picHeight, 16);
+                            }
+                        }
+                    }
                     else
                     {
                         var summary = ItemStringHelper.GetGearPropString(prop.Key, Convert.ToInt32(prop.Value));
