@@ -167,5 +167,6 @@ namespace WzComparerR2.CharaSim
         abilityTimeLimited,
         blockGoldHammer,
         exceptUpgrade,
+        colorvar,
     }
 }

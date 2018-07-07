@@ -130,6 +130,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.jokerToSetItem: return value == 0 ? null : " #c当前装备3个以上的所有套装道具中包含的幸运物品！#";
                 case GearPropType.abilityTimeLimited: return value == 0 ? null : "限期能力值";
                 case GearPropType.blockGoldHammer: return value == 0 ? null : "无法使用黄金锤";
+                case GearPropType.colorvar: return value == 0 ? null : "#c该装备可通过染色颜料来变更颜色.#";
 
                 case GearPropType.incMHP_incMMP: return "最大HP/最大MP：" + sign + value;
                 case GearPropType.incMHPr_incMMPr: return "最大HP/最大MP：" + sign + value + "%";

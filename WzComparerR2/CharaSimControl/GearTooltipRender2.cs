@@ -659,7 +659,9 @@ namespace WzComparerR2.CharaSimControl
             GearPropType[] descTypes = new GearPropType[]{
                 GearPropType.tradeAvailable,
                 GearPropType.accountShareTag,
-                GearPropType.jokerToSetItem };
+                GearPropType.jokerToSetItem,
+                GearPropType.colorvar,
+            };
             foreach (GearPropType type in descTypes)
             {
                 if (Gear.Props.TryGetValue(type, out value) && value != 0)
