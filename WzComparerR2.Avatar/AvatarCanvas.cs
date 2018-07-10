@@ -742,9 +742,10 @@ namespace WzComparerR2.Avatar
                         if (zNode != null)
                         {
                             var val = zNode.Value;
-                            if (val is int)
+                            var zIndex = zNode.GetValueEx<int?>(null);
+                            if (zIndex != null)
                             {
-                                skin.ZIndex = (int)val;
+                                skin.ZIndex = zIndex.Value;
                             }
                             else
                             {
