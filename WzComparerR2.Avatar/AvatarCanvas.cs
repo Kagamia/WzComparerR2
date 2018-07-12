@@ -1077,6 +1077,13 @@ namespace WzComparerR2.Avatar
                     }
                 }
 
+                //脸饰附加属性
+                bool invisibleFace = false;
+                if (this.FaceAccessory != null && this.FaceAccessory.Visible)
+                {
+                    invisibleFace = this.FaceAccessory.Node.FindNodeByPath(@"info\invisibleFace").GetValueEx(0) != 0;
+                }
+
                 //头部
                 var headNode = FindActionFrameNode(this.Head.Node, bodyAction);
                 if (headNode == null)
@@ -1093,7 +1100,7 @@ namespace WzComparerR2.Avatar
                 //脸
                 if (this.Face != null && this.Face.Visible && faceAction != null)
                 {
-                    if (face ?? true)
+                    if ((face ?? true) && !invisibleFace)
                     {
                         partNode.Add(FindActionFrameNode(this.Face.Node, faceAction));
                     }
@@ -1126,7 +1133,10 @@ namespace WzComparerR2.Avatar
                         }
                         else if (i == 14) //脸
                         {
-                            partNode.Add(FindActionFrameNode(part.Node, faceAction));
+                            if (face ?? true)
+                            {
+                                partNode.Add(FindActionFrameNode(part.Node, faceAction));
+                            }
                         }
                         else //其他部件
                         {
