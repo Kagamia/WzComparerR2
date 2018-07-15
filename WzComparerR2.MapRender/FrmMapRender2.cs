@@ -132,6 +132,9 @@ namespace WzComparerR2.MapRender
         List<IDisposable> attachedEvent = new List<IDisposable>();
         IMEHandler imeHelper;
 
+        bool isUnloaded;
+        bool isExiting;
+
         protected override void Initialize()
         {
             //init services
@@ -577,6 +580,7 @@ namespace WzComparerR2.MapRender
             base.LoadContent();
             this.ui.LoadContent(this.Content);
             this.renderEnv.Fonts.LoadContent(this.Content);
+            this.isUnloaded = false;
         }
 
         protected override void Update(GameTime gameTime)
@@ -806,18 +810,32 @@ namespace WzComparerR2.MapRender
         protected override void UnloadContent()
         {
             base.UnloadContent();
-            this.resLoader.Unload();
-            this.ui.UnloadContents();
-            this.Content.Unload();
-            this.imeHelper.Dispose();
-            this.bgm = null;
-            this.mapImg = null;
-            this.mapData = null;
+            if (!this.isUnloaded)
+            {
+                this.resLoader.Unload();
+                this.ui.UnloadContents();
+                this.Content.Unload();
+                this.imeHelper.Dispose();
+                this.bgm = null;
+                this.mapImg = null;
+                this.mapData = null;
+                this.isUnloaded = true;
+            }
         }
 
         protected override void OnExiting(object sender, EventArgs args)
         {
             base.OnExiting(sender, args);
+            this.OnExiting();
+        }
+
+        private void OnExiting()
+        {
+            if (this.isExiting)
+            {
+                return;
+            }
+
             this.batcher.Dispose();
             this.batcher = null;
             this.renderEnv.Dispose();
@@ -835,12 +853,15 @@ namespace WzComparerR2.MapRender
             GameExt.RemoveMouseStateCache();
             WcR2Engine.Unload();
             ServiceManager.Instance.RemoveService<IMEHandler>();
+            this.isExiting = true;
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
+                this.UnloadContent();
+                this.OnExiting();
                 GameExt.DisposeSwapChain(this.GraphicsDevice);
             }
             base.Dispose(disposing);

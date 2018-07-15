@@ -293,6 +293,7 @@ namespace WzComparerR2.MapRender
                     switch (particleSystem.BlendFuncDst)
                     {
                         case ParticleBlendFunc.ONE: //5,2
+                        case ParticleBlendFunc.DEST_ALPHA: //5,7
                             itemType = ItemType.Sprite_BlendAdditive;
                             break;
                         case ParticleBlendFunc.SRC_COLOR: //12,3
