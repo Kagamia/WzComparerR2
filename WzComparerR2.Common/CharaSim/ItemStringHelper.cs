@@ -69,10 +69,10 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incLUK: return "运气 : " + sign + value;
                 case GearPropType.incLUKr: return "运气 : " + sign + value + "%";
                 case GearPropType.incAllStat: return "所有属性 : " + sign + value;
-                case GearPropType.incMHP: return "最大HP : " + sign + value;
-                case GearPropType.incMHPr: return "最大HP : " + sign + value + "%";
-                case GearPropType.incMMP: return "最大MP : " + sign + value;
-                case GearPropType.incMMPr: return "最大MP : " + sign + value + "%";
+                case GearPropType.incMHP: return "最大血量： " + sign + value;
+                case GearPropType.incMHPr: return "最大血量： " + sign + value + "%";
+                case GearPropType.incMMP: return "最大魔量： " + sign + value;
+                case GearPropType.incMMPr: return "最大魔量： " + sign + value + "%";
                 case GearPropType.incMDF: return "MaxDF : " + sign + value;
                 case GearPropType.incPAD: return "攻击力 : " + sign + value;
                 case GearPropType.incPADr: return "攻击力 : " + sign + value + "%";
@@ -132,8 +132,8 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.blockGoldHammer: return value == 0 ? null : "无法使用黄金锤";
                 case GearPropType.colorvar: return value == 0 ? null : "#c该装备可通过染色颜料来变更颜色.#";
 
-                case GearPropType.incMHP_incMMP: return "最大HP/最大MP：" + sign + value;
-                case GearPropType.incMHPr_incMMPr: return "最大HP/最大MP：" + sign + value + "%";
+                case GearPropType.incMHP_incMMP: return "最大血量/最大魔量：" + sign + value;
+                case GearPropType.incMHPr_incMMPr: return "最大血量/最大魔量：" + sign + value + "%";
                 case GearPropType.incPAD_incMAD: return "攻击力/魔力：" + sign + value;
                 case GearPropType.incPDD_incMDD: return "物理/魔法防御力：" + sign + value;
                 case GearPropType.incACC_incEVA: return "命中值/回避值：" + sign + value;
