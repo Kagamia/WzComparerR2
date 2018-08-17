@@ -39,11 +39,11 @@ namespace WzComparerR2.CharaSim
                         string val;
                         if (this.Props.TryGetValue("prob", out val))
                         {
-                            sb.AppendFormat("爆击率{0}%\r\n", val);
+                            sb.AppendFormat("Critical Rate: +{0}%\r\n", val);
                         }
                         if (this.Props.TryGetValue("damage", out val))
                         {
-                            sb.AppendFormat("爆击伤害增加{0}%\r\n", val);
+                            sb.AppendFormat("Critical Damage: +{0}%\r\n", val);
                         }
                         if (sb.Length > 2)
                         {
@@ -58,65 +58,65 @@ namespace WzComparerR2.CharaSim
                         {
                             switch (v1[0])
                             {
-                                case 'I': elem = "冰"; break;
-                                case 'F': elem = "火"; break;
-                                case 'L': elem = "雷"; break;
+                                case 'I': elem = "Ice"; break;
+                                case 'F': elem = "Fire"; break;
+                                case 'L': elem = "Lightning"; break;
                                 default: elem = v1[0].ToString(); break;
                             }
-                            return elem + "属性效果强化" + v1.Substring(1) + "%";
+                            return elem + "-Type Attack Damage: +" + v1.Substring(1) + "%";
                         }
                     }
                     break;
                 case AdditionType.hpmpchange:
                     sb = new StringBuilder();
-                    sb.Append("每10秒恢复");
+                    sb.Append("Every 10 seconds, recover ");
                     {
                         string v1;
                         if (this.Props.TryGetValue("hpChangePerTime", out v1))
                         {
-                            sb.Append("HP " + v1);
+                            sb.Append(v1 + " HP");
                         }
                     }
                     return sb.ToString();
                 case AdditionType.mobcategory:
-                    return "攻击" + ItemStringHelper.GetMobCategoryName(Convert.ToInt32(this.Props["category"])) + "怪物时，造成" + this.Props["damage"] + "%额外伤害";
+                    return "When attacking " + ItemStringHelper.GetMobCategoryName(Convert.ToInt32(this.Props["category"])) + "type enemies, deals " + this.Props["damage"] + "% extra damage.";
                 case AdditionType.mobdie:
                     sb = new StringBuilder();
                     {
                         string v1;
                         if (this.Props.TryGetValue("hpIncOnMobDie", out v1))
                         {
-                            sb.AppendLine("怪物死亡时 HP恢复" + v1);
+                            sb.AppendLine("When you kill a monster, recover " + v1 + " HP");
                         }
                         if (this.Props.TryGetValue("hpIncRatioOnMobDie", out v1))
                         {
-                            sb.AppendLine("怪物死亡时 有" + Props["hpRatioProp"] + "%的几率 伤害的" + v1 + "%转换为HP (但不超过最大HP的10%。)");
+                            sb.AppendLine("When you kill a monster, you have " + Props["hpRatioProp"] + "% chance to recover HP equal to " + v1 + "% of the damage taken (cannot exceed 10% of Max HP.)");
                         }
                         if (this.Props.TryGetValue("mpIncOnMobDie", out v1))
                         {
-                            sb.AppendLine("怪物死亡时 HP恢复" + v1);
+                            sb.AppendLine("When you kill a monster, recover " + v1 + " MP");
                         }
                         if (this.Props.TryGetValue("mpIncRatioOnMobDie", out v1))
                         {
-                            sb.AppendLine("怪物死亡时 有" + Props["mpRatioProp"] + "%的几率 伤害的" + v1 + "%转换为MP (但不超过最大MP的10%。)");
+                            sb.AppendLine("When you kill a monster, you have " + Props["mpRatioProp"] + "% chance to recover MP equal to " + v1 + "% of the damage taken (cannot exceed 10% of Max MP.)");
                         }
                     }
                     if (sb.Length > 0)
                     {
-                        sb.Append("在部分地区功能可能会受到限制。");
+                        sb.Append("Function may be limited in some locations.");
                         return sb.ToString();
                     }
                     break;
                 case AdditionType.skill:
                     switch (Convert.ToInt32(this.Props["id"]))
                     {
-                        case 90000000: return "有一定几率增加必杀效果";
-                        case 90001001: return "有一定几率增加眩晕效果";
-                        case 90001002: return "有一定几率增加缓速术效果";
-                        case 90001003: return "有一定几率增加毒效果";
-                        case 90001004: return "有一定几率增加暗黑效果";
-                        case 90001005: return "有一定几率增加封印效果";
-                        case 90001006: return "有一定几率增加结冰效果";
+                        case 90000000: return "Has a chance to add: Instant Death effect";
+                        case 90001001: return "Has a chance to add: Knock Down effect";
+                        case 90001002: return "Has a chance to add: Slow effect";
+                        case 90001003: return "Has a chance to add: Poison effect";
+                        case 90001004: return "Has a chance to add: Darkness effect";
+                        case 90001005: return "Has a chance to add: Seal effect";
+                        case 90001006: return "Has a chance to add: Freeze effect";
                     }
                     break;
                 case AdditionType.statinc:
@@ -154,12 +154,12 @@ namespace WzComparerR2.CharaSim
                     {
                         reqJobs[i] = ItemStringHelper.GetJobName(this.ConValue[i]) ?? this.ConValue[i].ToString();
                     }
-                    return "职业为" + string.Join(" 或者 ", reqJobs) + "时";
+                    return "When your job is " + string.Join(" or ", reqJobs) + ".";
                 case GearPropType.reqLevel:
-                    return this.ConValue[0] + "级以上时";
+                    return "When your level is " + this.ConValue[0] + " or higher.";
                 case GearPropType.reqCraft:
                     int lastExp;
-                    return "手技经验值在" + this.ConValue[0] + "(" + getPersonalityLevel(this.ConValue[0], out lastExp) + "级" + lastExp + "点)以上时";
+                    return "When Diligence EXP is " + this.ConValue[0] + " (Lv. " + getPersonalityLevel(this.ConValue[0], out lastExp) + " " + lastExp + " Points) or higher";
                 case GearPropType.reqWeekDay:
                     string[] weekdays = new string[this.ConValue.Count];
                     for (int i = 0; i < this.ConValue.Count; i++)
@@ -222,14 +222,14 @@ namespace WzComparerR2.CharaSim
         {
             switch (weekDay)
             {
-                case 0: return "周日";
-                case 1: return "周一";
-                case 2: return "周二";
-                case 3: return "周三";
-                case 4: return "周四";
-                case 5: return "周五";
-                case 6: return "周六";
-                default: return "周" + weekDay; //这怎么可能...
+                case 0: return "Sunday";
+                case 1: return "Monday";
+                case 2: return "Tuesday";
+                case 3: return "Wednesday";
+                case 4: return "Thursday";
+                case 5: return "Friday";
+                case 6: return "Saturday";
+                default: return "When it's " + weekDay; //这怎么可能...
             }
         }
 

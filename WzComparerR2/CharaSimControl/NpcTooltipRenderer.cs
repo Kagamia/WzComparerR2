@@ -49,7 +49,7 @@ namespace WzComparerR2.CharaSimControl
                 titleBlocks.Add(block);
             }
 
-            propBlocks.Add(PrepareText(g, "出没地区：", GearGraphics.ItemDetailFont, GearGraphics.GearNameBrushG, 0, 0));
+            propBlocks.Add(PrepareText(g, "Location(s)：", GearGraphics.ItemDetailFont, GearGraphics.GearNameBrushG, 0, 0));
             if (NpcInfo.ID != null)
             {
                 var locNode = PluginBase.PluginManager.FindWz("Etc\\NpcLocation.img\\" + NpcInfo.ID.ToString());
@@ -72,7 +72,7 @@ namespace WzComparerR2.CharaSimControl
 
             if (propBlocks.Count == 1) //获取地区失败
             {
-                propBlocks.Add(PrepareText(g, " 不明", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+                propBlocks.Add(PrepareText(g, " Unknown", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             }
 
             //计算大小

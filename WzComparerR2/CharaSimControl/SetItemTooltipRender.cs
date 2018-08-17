@@ -89,7 +89,7 @@ namespace WzComparerR2.CharaSimControl
 
                 if (string.IsNullOrEmpty(typeName) && SetItem.Parts)
                 {
-                    typeName = "特殊";
+                    typeName = "Special";
                 }
 
                 ItemBase itemBase = null;
@@ -158,7 +158,7 @@ namespace WzComparerR2.CharaSimControl
                                 {
                                     if (itemID / 10000 == 500)
                                     {
-                                        typeName = "特殊";
+                                        typeName = "Pet";
                                     }
                                     else
                                     {
@@ -175,7 +175,7 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 itemName = itemName ?? string.Empty;
-                typeName = typeName ?? "装备";
+                typeName = typeName ?? "Equipment";
 
                 if (!Regex.IsMatch(typeName, @"^(\(.*\)|（.*）)$"))
                 {
@@ -255,7 +255,7 @@ namespace WzComparerR2.CharaSimControl
                 }
                 else
                 {
-                    effTitle = effect.Key + "套装效果";
+                    effTitle = effect.Key + " Set Items Equipped";
                 }
                 g.DrawString(effTitle, GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 8, picHeight);
                 picHeight += 16;
@@ -293,7 +293,7 @@ namespace WzComparerR2.CharaSimControl
                                 sr = new StringResult();
                                 sr.Name = p.SkillID.ToString();
                             }
-                            string summary = $"可以使用<{sr.Name}>技能";
+                            string summary = $"Able to use the skill <{sr.Name}>";
                             GearGraphics.DrawPlainText(g, summary, GearGraphics.ItemDetailFont2, color, 10, 244, ref picHeight, 16);
                         }
                     }

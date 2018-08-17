@@ -95,7 +95,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                g.DrawString("要求等级 : " + value, GearGraphics.ItemReqLevelFont, Brushes.White, 92, picHeight);
+                g.DrawString("REQ LEV : " + value, GearGraphics.ItemReqLevelFont, Brushes.White, 92, picHeight);
                 picHeight += 15;
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
             }

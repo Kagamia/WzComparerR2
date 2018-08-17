@@ -29,6 +29,6 @@ namespace WzComparerR2.CharaSim
         /// <summary>
         /// (特殊物品)
         /// </summary>
-        Special=5,
+        Special = 5,
     }
 }

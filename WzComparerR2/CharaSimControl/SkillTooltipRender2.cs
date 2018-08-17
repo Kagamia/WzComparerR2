@@ -92,7 +92,7 @@ namespace WzComparerR2.CharaSimControl
             //绘制desc
             picH = 35;
             if (!Skill.PreBBSkill)
-                GearGraphics.DrawString(g, "[最高等级：" + Skill.MaxLevel + "]", GearGraphics.ItemDetailFont2, 90, 270, ref picH, 16);
+                GearGraphics.DrawString(g, "[Master Level: " + Skill.MaxLevel + "]", GearGraphics.ItemDetailFont2, 90, 270, ref picH, 16);
 
             if (sr.Desc != null)
             {
@@ -102,7 +102,7 @@ namespace WzComparerR2.CharaSimControl
             }
             if (Skill.ReqLevel > 0)
             {
-                GearGraphics.DrawString(g, "#c[要求等级：" + Skill.ReqLevel.ToString() + "]#", GearGraphics.ItemDetailFont2, 90, 270, ref picH, 16);
+                GearGraphics.DrawString(g, "#c[Required Level：" + Skill.ReqLevel.ToString() + "]#", GearGraphics.ItemDetailFont2, 90, 270, ref picH, 16);
             }
             if (Skill.ReqAmount > 0)
             {
@@ -117,7 +117,7 @@ namespace WzComparerR2.CharaSimControl
             if (Skill.Level > 0)
             {
                 string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default);
-                GearGraphics.DrawString(g, "[现在等级 " + Skill.Level + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
+                GearGraphics.DrawString(g, "[Current Level " + Skill.Level + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
                 if (hStr != null)
                 {
                     GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, 8, 272, ref picH, 16);
@@ -127,7 +127,7 @@ namespace WzComparerR2.CharaSimControl
             if (Skill.Level < Skill.MaxLevel)
             {
                 string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level + 1, sr, SummaryParams.Default);
-                GearGraphics.DrawString(g, "[下次等级 " + (Skill.Level + 1) + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
+                GearGraphics.DrawString(g, "[Next Level " + (Skill.Level + 1) + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
                 if (hStr != null)
                 {
                     GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, 8, 272, ref picH, 16);
@@ -141,23 +141,23 @@ namespace WzComparerR2.CharaSimControl
                 List<string> attr = new List<string>();
                 if (Skill.Invisible)
                 {
-                    attr.Add("隐藏技能");
+                    attr.Add("[Hidden Skill]");
                 }
                 if (Skill.Hyper != HyperSkillType.None)
                 {
-                    attr.Add("超级技能:" + Skill.Hyper);
+                    attr.Add("[Hyper Skill: " + Skill.Hyper + "]");
                 }
                 if (Skill.CombatOrders)
                 {
-                    attr.Add("战斗命令加成");
+                    attr.Add("[Can pass Master Level with Combat Orders]");
                 }
                 if (Skill.NotRemoved)
                 {
-                    attr.Add("无法被移除");
+                    attr.Add("[Cannot be canceled]");
                 }
                 if (Skill.MasterLevel > 0 && Skill.MasterLevel < Skill.MaxLevel)
                 {
-                    attr.Add("初始掌握:Lv." + Skill.MasterLevel);
+                    attr.Add("[Requires Mastery Book to pass Lv. " + Skill.MasterLevel + "]");
                 }
 
                 if (attr.Count > 0)
@@ -170,7 +170,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 foreach (string action in Skill.Action)
                 {
-                    skillDescEx.Add("#c[技能延时] " + action + ": " + CharaSimLoader.GetActionDelay(action) + " ms#");
+                    skillDescEx.Add("#c[Skill Delay] " + action + ": " + CharaSimLoader.GetActionDelay(action) + " ms#");
                 }
             }
 
@@ -187,7 +187,7 @@ namespace WzComparerR2.CharaSimControl
                     {
                         skillName = kv.Key.ToString();
                     }
-                    skillDescEx.Add("#c[前置技能] " + skillName + ": " + kv.Value + " 级#");
+                    skillDescEx.Add("#c[Required Skill]: " + skillName + ": " + kv.Value + " #");
                 }
             }
 

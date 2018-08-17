@@ -229,3 +229,4 @@ namespace WzComparerR2.CharaSim
         }
     }
 }
+

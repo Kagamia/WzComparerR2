@@ -14,8 +14,8 @@ namespace WzComparerR2.CharaSimControl
         public AfrmTooltip()
         {
             this.menu = new ContextMenuStrip();
-            this.menu.Items.Add(new ToolStripMenuItem("复制(&C)", null, tsmiCopy_Click));
-            this.menu.Items.Add(new ToolStripMenuItem("保存(&S)", null, tsmiSave_Click));
+            this.menu.Items.Add(new ToolStripMenuItem("Copy (&C)", null, tsmiCopy_Click));
+            this.menu.Items.Add(new ToolStripMenuItem("Save (&S)", null, tsmiSave_Click));
             this.ContextMenuStrip = this.menu;
 
             this.Size = new Size(1, 1);

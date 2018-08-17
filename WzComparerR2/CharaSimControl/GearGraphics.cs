@@ -32,16 +32,16 @@ namespace WzComparerR2.CharaSimControl
             TBrushes["w"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_w, WrapMode.Tile);
             TBrushes["nw"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_nw, WrapMode.Clamp);
             TBrushes["c"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_c, WrapMode.Tile);
-            SetFontFamily("宋体");
+            SetFontFamily("Arial");
         }
 
         public static readonly Dictionary<string, TextureBrush> TBrushes;
-        public static readonly Font ItemNameFont = new Font("宋体", 14f, FontStyle.Bold, GraphicsUnit.Pixel);
-        public static readonly Font ItemDetailFont = new Font("宋体", 12f, GraphicsUnit.Pixel);
-        public static readonly Font EpicGearDetailFont = new Font("宋体", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static readonly Font ItemNameFont = new Font("Arial", 14f, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static readonly Font ItemDetailFont = new Font("Arial", 12f, GraphicsUnit.Pixel);
+        public static readonly Font EpicGearDetailFont = new Font("Arial", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
         public static readonly Font TahomaFont = new Font("Tahoma", 12f, GraphicsUnit.Pixel);
-        public static readonly Font SetItemPropFont = new Font("宋体", 12f, GraphicsUnit.Pixel);
-        public static readonly Font ItemReqLevelFont = new Font("宋体", 11f, GraphicsUnit.Pixel);
+        public static readonly Font SetItemPropFont = new Font("Arial", 12f, GraphicsUnit.Pixel);
+        public static readonly Font ItemReqLevelFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
 
         public static Font ItemNameFont2 { get; private set; }
         public static Font ItemDetailFont2 { get; private set; }

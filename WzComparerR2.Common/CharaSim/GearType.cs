@@ -13,340 +13,340 @@ namespace WzComparerR2.CharaSim
         hair2 = 4,
 
         /// <summary>
-        /// 脸饰 101
+        /// Face Accessory 101
         /// </summary>
         faceAccessory = 101,
         /// <summary>
-        /// 眼饰 102
+        /// Eye Accessory 102
         /// </summary>
         eyeAccessory = 102,
         /// <summary>
-        /// 耳环 103
+        /// Earrings 103
         /// </summary>
         earrings = 103,
         /// <summary>
-        /// 坠子 112
+        /// Pendant 112
         /// </summary>
         pendant = 112,
         /// <summary>
-        /// 腰带 113
+        /// Belt 113
         /// </summary>
         belt = 113,
         /// <summary>
-        /// 勋章 114
+        /// Medal 114
         /// </summary>
         medal = 114,
         /// <summary>
-        /// 肩饰 115
+        /// Shoulder 115
         /// </summary>
         shoulderPad = 115,
         /// <summary>
-        /// 头盔 100
+        /// Hat 100
         /// </summary>
         cap = 100,
         /// <summary>
-        /// 披风 110
+        /// Cape 110
         /// </summary>
         cape = 110,
         /// <summary>
-        /// 上衣 104
+        /// Top 104
         /// </summary>
         coat = 104,
         /// <summary>
-        /// 龙神帽子 194
+        /// Dragon Hat 194
         /// </summary>
         dragonMask = 194,
         /// <summary>
-        /// 龙神吊坠 195
+        /// Dragon Pendant 195
         /// </summary>
         dragonPendant = 195,
         /// <summary>
-        /// 龙神翅膀 196
+        /// Dragon Wing Accessory 196
         /// </summary>
         dragonWings = 196,
         /// <summary>
-        /// 龙神尾巴 197
+        /// Dragon Tail Accessory 197
         /// </summary>
         dragonTail = 197,
         /// <summary>
-        /// 手套 108
+        /// Gloves 108
         /// </summary>
         glove = 108,
         /// <summary>
-        /// 套服 105
+        /// Overall 105
         /// </summary>
         longcoat = 105,
         /// <summary>
-        /// 机甲引擎 161
+        /// Mechanic Engine 161
         /// </summary>
         machineEngine = 161,
         /// <summary>
-        /// 机甲机械臂 162
+        /// Mechanic Arm 162
         /// </summary>
         machineArms = 162,
         /// <summary>
-        /// 机甲机械腿 163
+        /// Mechanic Leg 163
         /// </summary>
         machineLegs = 163,
         /// <summary>
-        /// 机甲机身材质 164
+        /// Mechanic Frame 164
         /// </summary>
         machineBody = 164,
         /// <summary>
-        /// 机甲晶体管 165
+        /// Mechanic Transistor 165
         /// </summary>
         machineTransistors = 165,
         /// <summary>
-        /// 安卓 166
+        /// Android 166
         /// </summary>
         android = 166,
         /// <summary>
-        /// 心脏 167
+        /// Mechanical Heart 167
         /// </summary>
         machineHeart = 167,
         /// <summary>
-        /// 口袋物品 116
+        /// Pocket Item 116
         /// </summary>
         pocket = 116,
         /// <summary>
-        /// 徽章 118
+        /// Badge 118
         /// </summary>
         badge = 118,
         /// <summary>
-        /// 纹章 119
+        /// Emblem 119
         /// </summary>
         emblem = 119,
         powerSource = 119020,
         /// <summary>
-        /// 裤/裙 106
+        /// Bottom 106
         /// </summary>
         pants = 106,
         /// <summary>
-        /// 戒指 111
+        /// Ring 111
         /// </summary>
         ring = 111,
         /// <summary>
-        /// 盾牌 109
+        /// Shield 109
         /// </summary>
         shield = 109,
         /// <summary>
-        /// 灵魂盾 1098xxx
+        /// Soul Shield 1098xxx
         /// </summary>
         soulShield = 1098,
         /// <summary>
-        /// 精气盾 1099xxx
+        /// Demon Aegis 1099xxx
         /// </summary>
         demonShield = 1099,
         /// <summary>
-        /// 鞋子 107
+        /// Shoes 107
         /// </summary>
         shoes = 107,
         /// <summary>
-        /// 双头杖 121
+        /// Shining Rod 121
         /// </summary>
         shiningRod = 121,
         /// <summary>
-        /// 灵魂手铳 122
+        /// Soul Shooter 122
         /// </summary>
         soulShooter = 122,
         /// <summary>
-        /// 亡命剑 123
+        /// Desperado 123
         /// </summary>
         desperado = 123,
         /// <summary>
-        /// 能量剑 124
+        /// Whip Blade 124
         /// </summary>
         energySword = 124,
         /// <summary>
-        /// 驯兽魔法棒 125
+        /// Scepter 125
         /// </summary>
         magicStick = 125,
         /// <summary>
-        /// ESP限制器
+        /// Psy-limiter 126
         /// </summary>
         espLimiter = 126,
         /// <summary>
-        /// 锁链 127
+        /// Chain 127
         /// </summary>
         chain2 = 127,
         /// <summary>
-        /// 魔力手套 128
+        /// Lucent Gauntlet 128
         /// </summary>
         magicGauntlet = 128,
         /// <summary>
-        /// 单手剑 130
+        /// One-Handed Sword 130
         /// </summary>
         ohSword = 130,
         /// <summary>
-        /// 单手斧 131
+        /// One-Handed Axe 131
         /// </summary>
         ohAxe = 131,
         /// <summary>
-        /// 单手钝器 132
+        /// One-Handed Mace 132
         /// </summary>
         ohBlunt = 132,
         /// <summary>
-        /// 短刀 133
+        /// Dagger 133
         /// </summary>
         dagger = 133,
         /// <summary>
-        /// 刀 134
+        /// Katara 134
         /// </summary>
         katara = 134,
         /// <summary>
-        /// 魔法箭矢 135_00
+        /// Magic Arrow 135_00
         /// </summary>
         magicArrow = 135200,
         /// <summary>
-        /// 卡片 135_10
+        /// Card 135_10
         /// </summary>
         card = 135210,
         /// <summary>
-        /// 吊坠 135_20
+        /// Medallions 135_20
         /// </summary>
         heroMedal = 135220,
         /// <summary>
-        /// 念珠 135_21
+        /// Rosary 135_21
         /// </summary>
         rosario = 135221,
         /// <summary>
-        /// 铁链 135_22
+        /// Iron Chain 135_22
         /// </summary>
         chain = 135222,
         /// <summary>
-        /// 魔导书(火毒) 135_23
+        /// Magic Book 135_23
         /// </summary>
         book1 = 135223,
         /// <summary>
-        /// 魔导书(冰雷) 135_24
+        /// Magic Book 135_24
         /// </summary>
         book2 = 135224,
         /// <summary>
-        /// 魔导书(牧师) 135_25
+        /// Magic Book 135_25
         /// </summary>
         book3 = 135225,
         /// <summary>
-        /// 箭羽 135_26
+        /// Arrow Fletching 135_26
         /// </summary>
         bowMasterFeather = 135226,
         /// <summary>
-        /// 扳指 135_27
+        /// Bow Thimble 135_27
         /// </summary>
         crossBowThimble = 135227,
         /// <summary>
-        /// 短剑剑鞘 135_28
+        /// Dagger Scabbard 135_28
         /// </summary>
         shadowerSheath = 135228,
         /// <summary>
-        /// 护身符 135_29
+        /// Charm 135_29
         /// </summary>
         nightLordPoutch = 135229,
         /// <summary>
-        /// 宝盒 135_30
+        /// Core 135_30
         /// </summary>
         box = 135230,
         /// <summary>
-        /// 宝珠 135_40
+        /// Orb 135_40
         /// </summary>
         orb = 135240,
         /// <summary>
-        /// 龙之精髓 135_50
+        /// Dragon Essence 135_50
         /// </summary>
         novaMarrow = 135250,
         /// <summary>
-        /// 灵魂戒指 135_60
+        /// Soul Ring 135_60
         /// </summary>
         soulBangle = 135260,
         /// <summary>
-        /// 麦林 135_70
+        /// Magnum 135_70
         /// </summary>
         mailin = 135270,
         /// <summary>
-        /// 小太刀 135_80
+        /// Kodachi 135_80
         /// </summary>
         katana2 = 135280,
         /// <summary>
-        /// 哨子 135_81
+        /// Whistle 135_81
         /// </summary>
         whistle = 135281,
         /// <summary>
-        /// 拳爪 135_82
+        /// Fist 135_82
         /// </summary>
         boxingClaw = 135282,
         /// <summary>
-        /// 手腕护带 135_90
+        /// Wrist Band 135_90
         /// </summary>
         viperWristband = 135290,
         /// <summary>
-        /// 望远镜 135_91
+        /// Far Sight 135_91
         /// </summary>
         captainSight = 135291,
         /// <summary>
-        /// 火药桶 135_92
+        /// Powder Keg 135_92
         /// </summary>
         connonGunPowder = 135292,
         /// <summary>
-        /// 砝码 135_93
+        /// Mass 135_93
         /// </summary>
         aranPendulum = 135293,
         /// <summary>
-        /// 文件 135_94
+        /// Document 135_94
         /// </summary>
         evanPaper = 135294,
         /// <summary>
-        /// 魔法球 135_95
+        /// Magic Marble 135_95
         /// </summary>
         battlemageBall = 135295,
         /// <summary>
-        /// 箭轴 135_96
+        /// Arrowhead 135_96
         /// </summary>
         wildHunterArrowHead = 135296,
         /// <summary>
-        /// 珠宝 135_97
+        /// Jewel 135_97
         /// </summary>
         cygnusGem = 135297,
         /// <summary>
-        /// 火药桶 135_98
+        /// Powder Keg 135_98
         /// </summary>
         connonGunPowder2 = 135298,
         /// <summary>
-        /// 控制器 135300
+        /// Controller 135300
         /// </summary>
         controller = 135300,
         /// <summary>
-        /// 狐狸珠 135310
+        /// Fox Marble 135310
         /// </summary>
         foxPearl = 135310,
         /// <summary>
-        /// 棋子 135320
+        /// Chess Piece 135320
         /// </summary>
         chess = 135320,
         /// <summary>
-        /// 武器传送装置 135330
+        /// Warp Forge 135330
         /// </summary>
         transmitter = 135330,
         /// <summary>
-        /// 装弹 135340
+        /// Charge 135340
         /// </summary>
         ExplosivePill = 135340,
         /// <summary>
-        /// 魔力翅膀 135350
+        /// Lucent Wings 135350
         /// </summary>
         magicWing = 135350,
         /// <summary>
-        /// 精气珠 135360
+        /// Abyssal Path 135360
         /// </summary>
         pathOfAbyss = 135360,
         /// <summary>
-        /// 手杖
+        /// Cane
         /// </summary>
         cane = 136,
         /// <summary>
-        /// 短杖 137
+        /// Wand 137
         /// </summary>
         wand = 137,
         /// <summary>
-        /// 长杖 138
+        /// Staff 138
         /// </summary>
         staff = 138,
         /// <summary>
@@ -354,55 +354,55 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         barehand = 139,
         /// <summary>
-        /// 双手剑 140
+        /// Two-Handed Sword 140
         /// </summary>
         thSword = 140,
         /// <summary>
-        /// 双手斧 141
+        /// Two-Handed Axe 141
         /// </summary>
         thAxe = 141,
         /// <summary>
-        /// 双手钝器 142
+        /// Two-Handed Mace 142
         /// </summary>
         thBlunt = 142,
         /// <summary>
-        /// 枪 143
+        /// Spear 143
         /// </summary>
         spear = 143,
         /// <summary>
-        /// 矛 144
+        /// Pole Arm 144
         /// </summary>
         polearm = 144,
         /// <summary>
-        /// 弓 145
+        /// Bow 145
         /// </summary>
         bow = 145,
         /// <summary>
-        /// 弩 146
+        /// Crossbow 146
         /// </summary>
         crossbow = 146,
         /// <summary>
-        /// 拳套 147
+        /// Claw 147
         /// </summary>
         throwingGlove = 147,
         /// <summary>
-        /// 指节 148
+        /// Knuckle 148
         /// </summary>
         knuckle = 148,
         /// <summary>
-        /// 短枪 149
+        /// Gun 149
         /// </summary>
         gun = 149,
         /// <summary>
-        /// 采药工具 150
+        /// Herbalism Tool 150
         /// </summary>
         shovel = 150,
         /// <summary>
-        /// 采矿工具 151
+        /// Mining Tool 151
         /// </summary>
         pickaxe = 151,
         /// <summary>
-        /// 双弓 152
+        /// Dual Bowguns 152
         /// </summary>
         dualBow = 152,
         /// <summary>
