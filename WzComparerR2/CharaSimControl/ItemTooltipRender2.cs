@@ -285,7 +285,7 @@ namespace WzComparerR2.CharaSimControl
             else if (item.Props.TryGetValue(ItemPropType.life, out value) && value > 0)
             {
                 DateTime time = DateTime.Now.AddDays(value);
-                expireTime = time.ToString("魔法时间：到 yyyy年 M月 d日 H时");
+                expireTime = time.ToString("USABLE UNTIL M-d-yyyy AT H:m");
             }
             if (!string.IsNullOrEmpty(expireTime))
             {
@@ -303,7 +303,7 @@ namespace WzComparerR2.CharaSimControl
             if (item.TimeLimited)
             {
                 DateTime time = DateTime.Now.AddDays(7d);
-                string expireStr = time.ToString("到yyyy年 M月 d日 H时 m分可以用");
+                string expireStr = time.ToString("USABLE UNTIL M-d-yyyy AT H:m");
                 g.DrawString(expireStr, GearGraphics.ItemDetailFont, Brushes.White, tooltip.Width / 2, picH, format);
                 picH += 21;
             }
@@ -342,7 +342,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                g.DrawString("要求等级 :" + value, GearGraphics.ItemReqLevelFont, Brushes.White, 97, picH);
+                g.DrawString("REQ LEV :" + value, GearGraphics.ItemReqLevelFont, Brushes.White, 97, picH);
                 picH += 15;
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
             }
@@ -375,11 +375,11 @@ namespace WzComparerR2.CharaSimControl
             }
             if (item.Specs.TryGetValue(ItemSpecType.recipeValidDay, out value) && value > 0)
             {
-                GearGraphics.DrawString(g, "(可制作时间：" + value + "天)", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                GearGraphics.DrawString(g, "(Use Within " + value + " day(s))", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
             }
             if (item.Specs.TryGetValue(ItemSpecType.recipeUseCount, out value) && value > 0)
             {
-                GearGraphics.DrawString(g, "(可制作次数：" + value + "次)", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
+                GearGraphics.DrawString(g, "(Craftable " + value + " time(s)", GearGraphics.ItemDetailFont, 100, right, ref picH, 16);
             }
 
             picH += 3;
@@ -437,7 +437,7 @@ namespace WzComparerR2.CharaSimControl
                 picH = Math.Max(picH, iconY + 107);
                 g.DrawLine(Pens.White, 6, picH, 283, picH);//分割线
                 picH += 10;
-                g.DrawString("<使用限制条件>", GearGraphics.ItemDetailFont, GearGraphics.SetItemNameBrush, 8, picH);
+                g.DrawString("<Requirements>", GearGraphics.ItemDetailFont, GearGraphics.SetItemNameBrush, 8, picH);
                 picH += 17;
 
                 //技能标题
@@ -446,7 +446,7 @@ namespace WzComparerR2.CharaSimControl
                     sr = new StringResult();
                     sr.Name = "(null)";
                 }
-                g.DrawString(string.Format("· {0}{1}级以上", sr.Name, reqSkillLevel), GearGraphics.ItemDetailFont, GearGraphics.SetItemNameBrush, 13, picH);
+                g.DrawString(string.Format("· {0} Lv. {1}", sr.Name, reqSkillLevel), GearGraphics.ItemDetailFont, GearGraphics.SetItemNameBrush, 13, picH);
                 picH += 16;
                 picH += 6;
             }

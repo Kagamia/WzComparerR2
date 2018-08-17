@@ -115,11 +115,11 @@
             this.superTabControl1.Location = new System.Drawing.Point(0, 0);
             this.superTabControl1.Name = "superTabControl1";
             this.superTabControl1.ReorderTabsEnabled = true;
-            this.superTabControl1.SelectedTabFont = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold);
+            this.superTabControl1.SelectedTabFont = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold);
             this.superTabControl1.SelectedTabIndex = 0;
             this.superTabControl1.Size = new System.Drawing.Size(304, 171);
             this.superTabControl1.TabAlignment = DevComponents.DotNetBar.eTabStripAlignment.Left;
-            this.superTabControl1.TabFont = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.superTabControl1.TabFont = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.superTabControl1.TabIndex = 4;
             this.superTabControl1.Tabs.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.superTabItem1});
@@ -153,7 +153,7 @@
             this.chkAutoCheckExtFiles.Size = new System.Drawing.Size(193, 18);
             this.chkAutoCheckExtFiles.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkAutoCheckExtFiles.TabIndex = 4;
-            this.chkAutoCheckExtFiles.Text = "自动检测扩展wz文件(map2...)";
+            this.chkAutoCheckExtFiles.Text = "Automatic detection of extended wz files (Map2...)";
             // 
             // cmbWzEncoding
             // 
@@ -180,7 +180,7 @@
             this.labelX1.Name = "labelX1";
             this.labelX1.Size = new System.Drawing.Size(68, 18);
             this.labelX1.TabIndex = 2;
-            this.labelX1.Text = "wz默认编码";
+            this.labelX1.Text = "WZ default encoding";
             // 
             // chkWzAutoSort
             // 
@@ -195,7 +195,7 @@
             this.chkWzAutoSort.Size = new System.Drawing.Size(125, 18);
             this.chkWzAutoSort.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkWzAutoSort.TabIndex = 0;
-            this.chkWzAutoSort.Text = "Wz加载时自动排序";
+            this.chkWzAutoSort.Text = "Automatic sorting when WZ loads";
             // 
             // superTabItem1
             // 
@@ -232,7 +232,7 @@
             this.chkImgCheckDisabled.Size = new System.Drawing.Size(132, 18);
             this.chkImgCheckDisabled.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkImgCheckDisabled.TabIndex = 6;
-            this.chkImgCheckDisabled.Text = "跳过img校验和检测";
+            this.chkImgCheckDisabled.Text = "Skip img checksum detection";
             // 
             // FrmOptions
             // 
@@ -246,7 +246,7 @@
             this.MaximizeBox = false;
             this.Name = "FrmOptions";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "通用设置";
+            this.Text = "General Settings";
             this.panelEx1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).EndInit();
             this.superTabControl1.ResumeLayout(false);

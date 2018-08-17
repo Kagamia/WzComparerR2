@@ -378,7 +378,7 @@
             this.DoubleBuffered = true;
             this.IsMdiContainer = true;
             this.Name = "FrmConsole";
-            this.Text = "Lua控制台";
+            this.Text = "LuaConsole";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmConsole_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FrmConsole_FormClosed);
             this.MdiChildActivate += new System.EventHandler(this.FrmConsole_MdiChildActivate);

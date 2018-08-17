@@ -531,11 +531,11 @@
             // 
             // comboItem14
             // 
-            this.comboItem14.Text = "宋体";
+            this.comboItem14.Text = "Arial";
             // 
             // comboItem15
             // 
-            this.comboItem15.Text = "微软雅黑";
+            this.comboItem15.Text = "Microsoft YaHei";
             // 
             // comboItem16
             // 
@@ -543,11 +543,11 @@
             // 
             // comboItem17
             // 
-            this.comboItem17.Text = "굴림체";
+            this.comboItem17.Text = "Lorraine";
             // 
             // comboItem18
             // 
-            this.comboItem18.Text = "돋움";
+            this.comboItem18.Text = "Dotum";
             // 
             // itemContainer25
             // 
@@ -592,7 +592,7 @@
             this.buttonItemAutoQuickView.AutoCheckOnClick = true;
             this.buttonItemAutoQuickView.Name = "buttonItemAutoQuickView";
             this.buttonItemAutoQuickView.Text = "AutoQuickView";
-            this.buttonItemAutoQuickView.Tooltip = "开启/关闭自动预览机能";
+            this.buttonItemAutoQuickView.Tooltip = "Turn Auto Preview on/off";
             this.buttonItemAutoQuickView.Click += new System.EventHandler(this.buttonItemAutoQuickView_Click);
             // 
             // buttonItemQuickViewSetting
@@ -679,7 +679,7 @@
             this.buttonItemCharItem.AutoCheckOnClick = true;
             this.buttonItemCharItem.Name = "buttonItemCharItem";
             this.buttonItemCharItem.Text = "Item";
-            this.buttonItemCharItem.Tooltip = "开启/关闭道具栏";
+            this.buttonItemCharItem.Tooltip = "Open/Close the Props Bar";
             this.buttonItemCharItem.CheckedChanged += new System.EventHandler(this.buttonItemCharItem_CheckedChanged);
             // 
             // itemContainer30
@@ -701,7 +701,7 @@
             this.buttonItemCharaStat.AutoCheckOnClick = true;
             this.buttonItemCharaStat.Name = "buttonItemCharaStat";
             this.buttonItemCharaStat.Text = "Stat";
-            this.buttonItemCharaStat.Tooltip = "开启/关闭状态栏";
+            this.buttonItemCharaStat.Tooltip = "Turn the Status Bar on/off";
             this.buttonItemCharaStat.CheckedChanged += new System.EventHandler(this.buttonItemCharaStat_CheckedChanged);
             // 
             // itemContainer31
@@ -723,7 +723,7 @@
             this.buttonItemCharaEquip.AutoCheckOnClick = true;
             this.buttonItemCharaEquip.Name = "buttonItemCharaEquip";
             this.buttonItemCharaEquip.Text = "Equip";
-            this.buttonItemCharaEquip.Tooltip = "开启/关闭装备栏";
+            this.buttonItemCharaEquip.Tooltip = "Open/close Equipment Column";
             this.buttonItemCharaEquip.CheckedChanged += new System.EventHandler(this.buttonItemCharaEquip_CheckedChanged);
             // 
             // itemContainer32
@@ -761,7 +761,7 @@
             // 
             this.buttonItemAddItem.Name = "buttonItemAddItem";
             this.buttonItemAddItem.Text = "AddItem";
-            this.buttonItemAddItem.Tooltip = "把最后预览的装备或道具添加至背包";
+            this.buttonItemAddItem.Tooltip = "Add the last viewed item to Inventory";
             this.buttonItemAddItem.Click += new System.EventHandler(this.buttonItemAddItem_Click);
             // 
             // itemContainer34
@@ -1393,7 +1393,7 @@
             this.ribbonBar11.Size = new System.Drawing.Size(69, 91);
             this.ribbonBar11.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.ribbonBar11.TabIndex = 2;
-            this.ribbonBar11.Text = "测试用";
+            this.ribbonBar11.Text = "Test Case";
             // 
             // 
             // 
@@ -1804,10 +1804,10 @@
             this.superTabControl1.Location = new System.Drawing.Point(0, 0);
             this.superTabControl1.Name = "superTabControl1";
             this.superTabControl1.ReorderTabsEnabled = true;
-            this.superTabControl1.SelectedTabFont = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold);
+            this.superTabControl1.SelectedTabFont = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold);
             this.superTabControl1.SelectedTabIndex = 0;
             this.superTabControl1.Size = new System.Drawing.Size(530, 228);
-            this.superTabControl1.TabFont = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.superTabControl1.TabFont = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.superTabControl1.TabIndex = 0;
             this.superTabControl1.Tabs.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.btnNodeBack,
@@ -2750,7 +2750,7 @@
             this.bar1.CanDockTop = false;
             this.bar1.CloseSingleTab = true;
             this.bar1.Controls.Add(this.panelDockContainer1);
-            this.bar1.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.bar1.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.bar1.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Caption;
             this.bar1.IsMaximized = false;
             this.bar1.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
@@ -2763,7 +2763,7 @@
             this.bar1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar1.TabIndex = 0;
             this.bar1.TabStop = false;
-            this.bar1.Text = "搜索结果";
+            this.bar1.Text = "Search Results";
             // 
             // panelDockContainer1
             // 
@@ -2784,7 +2784,7 @@
             // 
             this.dockContainerItem1.Control = this.panelDockContainer1;
             this.dockContainerItem1.Name = "dockContainerItem1";
-            this.dockContainerItem1.Text = "搜索结果";
+            this.dockContainerItem1.Text = "Search Results";
             // 
             // dockSite1
             // 

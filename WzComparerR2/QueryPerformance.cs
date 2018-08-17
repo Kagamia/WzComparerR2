@@ -12,7 +12,7 @@ namespace WzComparerR2
             counter = 0;
             IsSupposed = QueryPerformanceFrequency(ref counter);
             if (!IsSupposed)
-                throw new Exception("QueryPerformance无法初始化。");
+                throw new Exception("QueryPerformance unable to initialize.");
         }
 
         [DllImport("kernel32.dll")]

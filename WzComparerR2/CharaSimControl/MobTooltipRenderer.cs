@@ -52,37 +52,49 @@ namespace WzComparerR2.CharaSimControl
             int picY = 0;
 
             StringBuilder sbExt = new StringBuilder();
-            if (MobInfo.Boss)
+            if (MobInfo.Boss && MobInfo.PartyBonusMob)
             {
-                sbExt.Append("Boss ");
+                sbExt.Append("[Mini-Boss] ");
+            }
+            if (MobInfo.Boss && !MobInfo.PartyBonusMob)
+            {
+                sbExt.Append("[Boss] ");
             }
             if (MobInfo.Undead)
             {
-                sbExt.Append("不死系 ");
+                sbExt.Append("[Undead] ");
             }
             if (MobInfo.FirstAttack)
             {
-                sbExt.Append("主动攻击 ");
+                sbExt.Append("[Auto-aggressive] ");
             }
             if (!MobInfo.BodyAttack)
             {
-                sbExt.Append("无触碰伤害 ");
+                sbExt.Append("[No Touch Damage] ");
             }
             if (MobInfo.DamagedByMob)
             {
-                sbExt.Append("只受怪物伤害 ");
+                sbExt.Append("[Ally Mob] ");
             }
             if (MobInfo.Invincible)
             {
-                sbExt.Append("无敌 ");
+                sbExt.Append("[Invincible] ");
             }
             if (MobInfo.NotAttack)
             {
-                sbExt.Append("无法攻击 ");
+                sbExt.Append("[Cannot Attack] ");
+            }
+            if (MobInfo.IgnoreMoveImpact)
+            {
+                sbExt.Append("[Cannot Be Rushed] ");
+            }
+            if (MobInfo.IgnoreMovable)
+            {
+                sbExt.Append("[Cannot Be Stunned/Binded] ");
             }
             if (MobInfo.FixedDamage > 0)
             {
-                sbExt.Append("固定伤害" + MobInfo.FixedDamage + " ");
+                sbExt.Append("[Fixed Damage: " + MobInfo.FixedDamage + "] ");
             }
 
             if (sbExt.Length > 1)
@@ -94,23 +106,23 @@ namespace WzComparerR2.CharaSimControl
 
             if (MobInfo.RemoveAfter > 0)
             {
-                propBlocks.Add(PrepareText(g, "出生" + MobInfo.RemoveAfter + "秒后自动消失", GearGraphics.ItemDetailFont, Brushes.GreenYellow, 0, picY));
+                propBlocks.Add(PrepareText(g, "[After " + MobInfo.RemoveAfter + " seconds, dies automatically] ", GearGraphics.ItemDetailFont, Brushes.GreenYellow, 0, picY));
                 picY += 16;
             }
-
-            propBlocks.Add(PrepareText(g, "Level: " + MobInfo.Level, GearGraphics.ItemDetailFont, Brushes.White, 0, picY));
+            
+            propBlocks.Add(PrepareText(g, "LEVEL: " + MobInfo.Level, GearGraphics.ItemDetailFont, Brushes.White, 0, picY));
             string hpNum = !string.IsNullOrEmpty(MobInfo.FinalMaxHP) ? this.AddCommaSeparators(MobInfo.FinalMaxHP) : MobInfo.MaxHP.ToString("N0");
             propBlocks.Add(PrepareText(g, "HP: " + hpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             string mpNum = !string.IsNullOrEmpty(MobInfo.FinalMaxMP) ? this.AddCommaSeparators(MobInfo.FinalMaxMP) : MobInfo.MaxMP.ToString("N0");
             propBlocks.Add(PrepareText(g, "MP: " + mpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "PAD: " + MobInfo.PADamage, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "MAD: " + MobInfo.MADamage, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "PDr: " + MobInfo.PDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "MDr: " + MobInfo.MDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "Acc: " + MobInfo.Acc, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "Eva: " + MobInfo.Eva, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "KB: " + MobInfo.Pushed.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "Exp: " + MobInfo.Exp.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "PDEF: " + MobInfo.PDDamage, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "MDEF: " + MobInfo.MDDamage, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "PDR: " + MobInfo.PDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "MDR: " + MobInfo.MDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "ACC: " + MobInfo.Acc, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "EXP: " + MobInfo.Exp, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, GetElemAttrString(MobInfo.ElemAttr), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             picY += 28;
 
@@ -125,7 +137,7 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 StringBuilder sb = new StringBuilder();
-                sb.Append("死后召唤 ");
+                sb.Append("Summons upon death: ");
                 int rowCount = 0;
                 foreach (var kv in reviveCounts)
                 {
@@ -137,7 +149,7 @@ namespace WzComparerR2.CharaSimControl
                     sb.AppendFormat("{0}({1:D7})", mobName, kv.Key);
                     if (kv.Value > 1)
                     {
-                        sb.Append("*" + kv.Value);
+                        sb.Append(" * " + kv.Value);
                     }
                 }
 
@@ -228,7 +240,7 @@ namespace WzComparerR2.CharaSimControl
             StringBuilder sb1 = new StringBuilder(),
                 sb2 = new StringBuilder();
 
-            sb1.Append("冰雷火毒圣暗物");
+            sb1.Append("ILFSHDP");
             sb2.Append(GetElemAttrResistString(elemAttr.I));
             sb2.Append(GetElemAttrResistString(elemAttr.L));
             sb2.Append(GetElemAttrResistString(elemAttr.F));
@@ -245,10 +257,10 @@ namespace WzComparerR2.CharaSimControl
             string e = null;
             switch (resist)
             {
-                case ElemResistance.Immune: e = "×"; break;
-                case ElemResistance.Resist: e = "△"; break;
-                case ElemResistance.Normal: e = "○"; break;
-                case ElemResistance.Weak: e = "◎"; break;
+                case ElemResistance.Immune: e = "1"; break;
+                case ElemResistance.Resist: e = "2"; break;
+                case ElemResistance.Normal: e = "0"; break;
+                case ElemResistance.Weak: e = "3"; break;
             }
             return e ?? "  ";
         }

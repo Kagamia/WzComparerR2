@@ -29,13 +29,13 @@ namespace WzComparerR2.CharaSim
             {
                 mobStr = Mobs[0].ToString();
             }
-            sb.AppendFormat("攻击{0}时，", mobStr);
+            sb.AppendFormat("When attacking {0}，", mobStr);
 
             foreach (var kv in this.Props)
             {
                 if (kv.Key == GearPropType.damR)
                 {
-                    sb.AppendFormat("伤害增加{0}%，", kv.Value);
+                    sb.AppendFormat("Damage: +{0}%，", kv.Value);
                 }
                 else
                 {

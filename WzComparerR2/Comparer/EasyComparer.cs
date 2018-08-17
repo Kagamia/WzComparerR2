@@ -59,7 +59,7 @@ namespace WzComparerR2.Comparer
 
         public void EasyCompareWzFiles(Wz_File fileNew, Wz_File fileOld, string outputDir)
         {
-            StateInfo = "正在对比wz概况...";
+            StateInfo = "Comparison in progress...";
            
             if (fileNew.Type == Wz_Type.Base || fileOld.Type == Wz_Type.Base) //至少有一个base 拆分对比
             {
@@ -180,8 +180,8 @@ namespace WzComparerR2.Comparer
 
             FileStream htmlFile = null;
             StreamWriter sw = null;
-            StateInfo = "正在努力对比文件..." + type;
-            StateDetail = "正在构造输出文件";
+            StateInfo = "Progress: " + type;
+            StateDetail = "The output file is being created.";
             try
             {
                 htmlFile = new FileStream(htmlFilePath, FileMode.Create, FileAccess.Write);
@@ -222,7 +222,7 @@ namespace WzComparerR2.Comparer
                 //输出目录
                 StringBuilder[] sb = { new StringBuilder(), new StringBuilder(), new StringBuilder() };
                 int[] count = new int[6];
-                string[] diffStr = { "修改", "新增", "移除" };
+                string[] diffStr = { "Modify", "Add", "Remove" };
                 foreach (CompareDifference diff in diffLst)
                 {
                     int idx = -1;
@@ -263,7 +263,7 @@ namespace WzComparerR2.Comparer
                     sb[idx].AppendLine("</td></tr>");
                     count[idx]++;
                 }
-                StateDetail = "正在输出目录";
+                StateDetail = "Output Directory";
                 Array.Copy(count, 0, count, 3, 3);
                 for (int i = 0; i < sb.Length; i++)
                 {
@@ -351,14 +351,14 @@ namespace WzComparerR2.Comparer
 
         private void CompareImg(Wz_Image imgNew, Wz_Image imgOld, string imgName, string anchorName, string menuAnchorName, string outputDir, StreamWriter sw)
         {
-            StateDetail = "正在解压img";
+            StateDetail = "Unpacking img";
             if (!imgNew.TryExtract() || !imgOld.TryExtract())
                 return;
-            StateDetail = "正在对比img";
+            StateDetail = "Unpacking img";
             List<CompareDifference> diffList = new List<CompareDifference>(Comparer.Compare(imgNew.Node, imgOld.Node));
             StringBuilder sb = new StringBuilder();
             int[] count = new int[3];
-            StateDetail = "正在统计概况并输出资源文件...变动项共" + diffList.Count;
+            StateDetail = "Changes are being summarized and resource files are being output. Total changes: " + diffList.Count;
             foreach (var diff in diffList)
             {
                 int idx = -1;
@@ -385,7 +385,7 @@ namespace WzComparerR2.Comparer
                 sb.AppendLine("</tr>");
                 count[idx]++;
             }
-            StateDetail = "正在输出对比报告";
+            StateDetail = "Outputting comparison report";
             bool noChange = diffList.Count <= 0;
             sw.WriteLine("<table class=\"img{0}\">", noChange ? " noChange" : "");
             sw.WriteLine("<tr><th colspan=\"3\"><a name=\"{1}\">{0}</a> 修改:{2} 新增:{3} 移除:{4}</th></tr>",
@@ -400,7 +400,7 @@ namespace WzComparerR2.Comparer
 
         private void OutputImg(Wz_Image img, DifferenceType diffType, string imgName, string anchorName, string menuAnchorName, string outputDir, StreamWriter sw)
         {
-            StateDetail = "正在解压img";
+            StateDetail = "Extracting img";
             if (!img.TryExtract())
                 return;
 
@@ -438,7 +438,7 @@ namespace WzComparerR2.Comparer
                 }
             };
 
-            StateDetail = "正在输出完整img结构";
+            StateDetail = "Outputting the complete img structure";
             sw.WriteLine("<table class=\"img\">");
             sw.WriteLine("<tr><th colspan=\"2\"><a name=\"{1}\">wz_image: {0}</a></th></tr>", imgName, anchorName);
             fnOutput(img.Node);
