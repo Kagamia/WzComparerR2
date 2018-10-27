@@ -235,17 +235,19 @@ namespace WzComparerR2.CharaSimControl
             if (Gear.TimeLimited)
             {
                 DateTime time = DateTime.Now.AddDays(7d);
-                string expireStr = time.ToString("USABLE UNTIL M-d-yyyy AT H:m");
+                string expireStr = time.ToString("USABLE UNTIL M-d-yyyy AT HH:mm");
                 g.DrawString(expireStr, GearGraphics.ItemDetailFont, Brushes.White, 130, picH, format);
                 picH += 15;
             }
             else if (Gear.GetBooleanValue(GearPropType.abilityTimeLimited))
             {
+                string timeLimitedStats = "EFFECTS LAST UNTIL ";
                 DateTime time = DateTime.Now.AddDays(7d);
-                string expireStr = time.ToString("USABLE UNTIL M-d-yyyy AT H:m");
+                string expireStr = timeLimitedStats + time.ToString("M-d-yyyy AT HH:mm");
                 g.DrawString(expireStr, GearGraphics.ItemDetailFont, Brushes.White, 130, picH, format);
                 picH += 15;
             }
+
 
             //分割线1号
             picH += 7;
