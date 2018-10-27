@@ -115,20 +115,14 @@ namespace WzComparerR2.CharaSimControl
             propBlocks.Add(PrepareText(g, "HP: " + hpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             string mpNum = !string.IsNullOrEmpty(MobInfo.FinalMaxMP) ? this.AddCommaSeparators(MobInfo.FinalMaxMP) : MobInfo.MaxMP.ToString("N0");
             propBlocks.Add(PrepareText(g, "MP: " + mpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            string padNum = this.AddCommaSeparators(MobInfo.PADamage.ToString("N0"));
-            propBlocks.Add(PrepareText(g, "PAD: " + padNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            string madNum = this.AddCommaSeparators(MobInfo.MADamage.ToString("N0"));
-            propBlocks.Add(PrepareText(g, "MAD: " + madNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            string pddNum = this.AddCommaSeparators(MobInfo.MDDamage.ToString("N0"));
-            propBlocks.Add(PrepareText(g, "PDEF: " + pddNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            string mddNum = this.AddCommaSeparators(MobInfo.MDDamage.ToString("N0"));
-            propBlocks.Add(PrepareText(g, "MDEF: " + mddNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "PAD: " + MobInfo.PADamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "MAD: " + MobInfo.MADamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "PDEF: " + MobInfo.PDDamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "MDEF: " + MobInfo.MDDamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "PDR: " + MobInfo.PDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "MDR: " + MobInfo.MDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            string accNum = this.AddCommaSeparators(MobInfo.Acc.ToString("N0"));
-            propBlocks.Add(PrepareText(g, "ACC: " + accNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            string expNum = this.AddCommaSeparators(MobInfo.Exp.ToString("N0"));
-            propBlocks.Add(PrepareText(g, "EXP: " + expNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "ACC: " + MobInfo.Acc.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "Exp: " + MobInfo.Exp.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, GetElemAttrString(MobInfo.ElemAttr), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             picY += 28;
 
