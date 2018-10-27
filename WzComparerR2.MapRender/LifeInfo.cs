@@ -13,7 +13,7 @@ namespace WzComparerR2.MapRender
         }
 
         public int level;
-        public int maxHP;
+        public long maxHP;
         public int maxMP;
         public int speed;
         public int PADamage;
@@ -66,7 +66,7 @@ namespace WzComparerR2.MapRender
                     switch (node.Text)
                     {
                         case "level": lifeInfo.level = node.GetValueEx<int>(0); break;
-                        case "maxHP": lifeInfo.maxHP = node.GetValueEx<int>(0); break;
+                        case "maxHP": lifeInfo.maxHP = node.GetValueEx<long>(0); break;
                         case "maxMP": lifeInfo.maxMP = node.GetValueEx<int>(0); break;
                         case "speed": lifeInfo.speed = node.GetValueEx<int>(0); break;
                         case "PADamage": lifeInfo.PADamage = node.GetValueEx<int>(0); break;
