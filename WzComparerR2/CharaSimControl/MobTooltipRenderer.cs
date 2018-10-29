@@ -66,11 +66,15 @@ namespace WzComparerR2.CharaSimControl
             }
             if (MobInfo.FirstAttack)
             {
-                sbExt.Append("[Auto-aggressive] ");
+                sbExt.Append("[Auto-Aggressive] ");
             }
             if (!MobInfo.BodyAttack)
             {
                 sbExt.Append("[No Touch Damage] ");
+            }
+            if (MobInfo.FixedBodyAttackDamageR > 0)
+            {
+                sbExt.Append("[Fixed Touch Damage: " + MobInfo.FixedBodyAttackDamageR + "%] ");
             }
             if (MobInfo.DamagedByMob)
             {
@@ -86,11 +90,11 @@ namespace WzComparerR2.CharaSimControl
             }
             if (MobInfo.IgnoreMoveImpact)
             {
-                sbExt.Append("[Cannot Be Rushed] ");
+                sbExt.Append("[Immune to Rush] ");
             }
             if (MobInfo.IgnoreMovable)
             {
-                sbExt.Append("[Cannot Be Stunned/Binded] ");
+                sbExt.Append("[Immune to Stun/Bind] ");
             }
             if (MobInfo.FixedDamage > 0)
             {
@@ -115,15 +119,19 @@ namespace WzComparerR2.CharaSimControl
             propBlocks.Add(PrepareText(g, "HP: " + hpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             string mpNum = !string.IsNullOrEmpty(MobInfo.FinalMaxMP) ? this.AddCommaSeparators(MobInfo.FinalMaxMP) : MobInfo.MaxMP.ToString("N0");
             propBlocks.Add(PrepareText(g, "MP: " + mpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "PAD: " + MobInfo.PADamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "MAD: " + MobInfo.MADamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "PDEF: " + MobInfo.PDDamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "MDEF: " + MobInfo.MDDamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "PDR: " + MobInfo.PDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "MDR: " + MobInfo.MDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "ACC: " + MobInfo.Acc.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, "Exp: " + MobInfo.Exp.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
-            propBlocks.Add(PrepareText(g, GetElemAttrString(MobInfo.ElemAttr), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "Physical Damage: " + MobInfo.PADamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "Magic Damage: " + MobInfo.MADamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "Physical Defense: " + MobInfo.PDDamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "Magic Defense: " + MobInfo.MDDamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "PDRate: " + MobInfo.PDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "MDRate: " + MobInfo.MDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "Accuracy: " + MobInfo.Acc.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            propBlocks.Add(PrepareText(g, "EXP: " + MobInfo.Exp.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            if (GetElemAttrString(MobInfo.ElemAttr) != "")
+            {
+                propBlocks.Add(PrepareText(g, "Elements: " + GetElemAttrString(MobInfo.ElemAttr), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            }
+
             picY += 28;
 
             if (MobInfo.Revive.Count > 0)
@@ -237,19 +245,25 @@ namespace WzComparerR2.CharaSimControl
 
         private string GetElemAttrString(MobElemAttr elemAttr)
         {
-            StringBuilder sb1 = new StringBuilder(),
-                sb2 = new StringBuilder();
-
-            sb1.Append("ILFSHDP");
-            sb2.Append(GetElemAttrResistString(elemAttr.I));
-            sb2.Append(GetElemAttrResistString(elemAttr.L));
-            sb2.Append(GetElemAttrResistString(elemAttr.F));
-            sb2.Append(GetElemAttrResistString(elemAttr.S));
-            sb2.Append(GetElemAttrResistString(elemAttr.H));
-            sb2.Append(GetElemAttrResistString(elemAttr.D));
-            sb2.Append(GetElemAttrResistString(elemAttr.P));
-            sb1.AppendLine().Append(sb2.ToString());
-            return sb1.ToString();
+            StringBuilder sb1 = new StringBuilder();
+            var elems = new[]
+            {
+                new {name = "Physical", attr =  elemAttr.P },
+                new {name = "Holy", attr =  elemAttr.H },
+                new {name = "Fire", attr = elemAttr.F },
+                new {name = "Ice", attr = elemAttr.I },
+                new {name = "Poison", attr =  elemAttr.S },
+                new {name = "Lightning", attr =  elemAttr.L },
+                new {name = "Dark", attr =  elemAttr.D },
+            };
+            foreach (var item in elems)
+            {
+                if (item.attr != ElemResistance.Normal)
+                {
+                    sb1.Append($"{item.name} {GetElemAttrResistString(item.attr)}, ");
+                }
+            }
+            return sb1.ToString().TrimEnd().TrimEnd(',');
         }
 
         private string GetElemAttrResistString(ElemResistance resist)
@@ -257,10 +271,10 @@ namespace WzComparerR2.CharaSimControl
             string e = null;
             switch (resist)
             {
-                case ElemResistance.Immune: e = "1"; break;
-                case ElemResistance.Resist: e = "2"; break;
-                case ElemResistance.Normal: e = "0"; break;
-                case ElemResistance.Weak: e = "3"; break;
+                case ElemResistance.Immune: e = "immune"; break;
+                case ElemResistance.Resist: e = "strong"; break;
+                case ElemResistance.Normal: e = "neutral"; break;
+                case ElemResistance.Weak: e = "weak"; break;
             }
             return e ?? "  ";
         }

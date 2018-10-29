@@ -53,6 +53,7 @@ namespace WzComparerR2.CharaSim
         public bool Invincible { get; set; }
         public bool NotAttack { get; set; }
         public int FixedDamage { get; set; }
+        public int FixedBodyAttackDamageR { get; set; }
         public bool IgnoreMoveImpact { get; set; }
         public bool IgnoreMovable { get; set; }
         public MobElemAttr ElemAttr { get; set; }
@@ -118,6 +119,7 @@ namespace WzComparerR2.CharaSim
                         case "invincible": mobInfo.Invincible = propNode.GetValueEx<int>(0) != 0; break;
                         case "notAttack": mobInfo.NotAttack = propNode.GetValueEx<int>(0) != 0; break;
                         case "fixedDamage": mobInfo.FixedDamage = propNode.GetValueEx<int>(0); break;
+                        case "fixedBodyAttackDamageR": mobInfo.FixedBodyAttackDamageR = propNode.GetValueEx<int>(0); break;
                         case "ignoreMoveImpact": mobInfo.IgnoreMoveImpact = propNode.GetValueEx<int>(0) != 0; break;
                         case "ignoreMovable": mobInfo.IgnoreMovable = propNode.GetValueEx<int>(0) != 0; break;
                         case "elemAttr": mobInfo.ElemAttr = new MobElemAttr(propNode.GetValueEx<string>(null)); break;
