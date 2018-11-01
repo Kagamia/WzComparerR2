@@ -113,7 +113,7 @@ namespace WzComparerR2.CharaSimControl
                 propBlocks.Add(PrepareText(g, "[After " + MobInfo.RemoveAfter + " seconds, dies automatically] ", GearGraphics.ItemDetailFont, Brushes.GreenYellow, 0, picY));
                 picY += 16;
             }
-            
+
             propBlocks.Add(PrepareText(g, "LEVEL: " + MobInfo.Level, GearGraphics.ItemDetailFont, Brushes.White, 0, picY));
             string hpNum = !string.IsNullOrEmpty(MobInfo.FinalMaxHP) ? this.AddCommaSeparators(MobInfo.FinalMaxHP) : MobInfo.MaxHP.ToString("N0");
             propBlocks.Add(PrepareText(g, "HP: " + hpNum, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
@@ -125,12 +125,49 @@ namespace WzComparerR2.CharaSimControl
             propBlocks.Add(PrepareText(g, "Magic Defense: " + MobInfo.MDDamage.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "PDRate: " + MobInfo.PDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "MDRate: " + MobInfo.MDRate + "%", GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            if (MobInfo.HPRecovery > 0)
+            {
+                propBlocks.Add(PrepareText(g, "HP Recovery (periodically): " + MobInfo.HPRecovery.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            }
+            if (MobInfo.MPRecovery > 0)
+            {
+                propBlocks.Add(PrepareText(g, "MP Recovery (periodically): " + MobInfo.MPRecovery.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            }
             propBlocks.Add(PrepareText(g, "Accuracy: " + MobInfo.Acc.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             propBlocks.Add(PrepareText(g, "EXP: " + MobInfo.Exp.ToString("N0"), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            if (MobInfo.CharismaEXP > 0)
+            {
+                propBlocks.Add(PrepareText(g, "Ambition EXP: " + MobInfo.CharismaEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            }
+            if (MobInfo.SenseEXP > 0)
+            {
+                propBlocks.Add(PrepareText(g, "Empathy EXP: " + MobInfo.SenseEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            }
+            if (MobInfo.InsightEXP > 0)
+            {
+                propBlocks.Add(PrepareText(g, "Insight EXP: " + MobInfo.InsightEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            }
+            if (MobInfo.WillEXP > 0)
+            {
+                propBlocks.Add(PrepareText(g, "Willpower EXP: " + MobInfo.WillEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            }
+            if (MobInfo.CraftEXP > 0)
+            {
+                propBlocks.Add(PrepareText(g, "Diligence EXP: " + MobInfo.CraftEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            }
+            if (MobInfo.CharmEXP > 0)
+            {
+                propBlocks.Add(PrepareText(g, "Charm EXP: " + MobInfo.CharmEXP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            }
+            if (MobInfo.WP > 0)
+            {
+                propBlocks.Add(PrepareText(g, "Weapon Points (for Zero): " + MobInfo.WP, GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
+            }
             if (GetElemAttrString(MobInfo.ElemAttr) != "")
             {
                 propBlocks.Add(PrepareText(g, "Elements: " + GetElemAttrString(MobInfo.ElemAttr), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
             }
+            propBlocks.Add(PrepareText(g, "Category: " + GetMobCategoryName(MobInfo.Category), GearGraphics.ItemDetailFont, Brushes.White, 0, picY += 16));
 
             picY += 28;
 
@@ -264,6 +301,23 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
             return sb1.ToString().TrimEnd().TrimEnd(',');
+        }
+
+        public static string GetMobCategoryName(int category)
+        {
+            switch (category)
+            {
+                case 0: return "None";
+                case 1: return "Mammal";
+                case 2: return "Plant";
+                case 3: return "Fish";
+                case 4: return "Reptile";
+                case 5: return "Spirit";
+                case 6: return "Devil";
+                case 7: return "Immortal";
+                case 8: return "Enchanted";
+                default: return null;
+            }
         }
 
         private string GetElemAttrResistString(ElemResistance resist)

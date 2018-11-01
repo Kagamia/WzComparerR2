@@ -59,6 +59,10 @@ namespace WzComparerR2.CharaSim
         public bool CombatOrders { get; set; }
         public bool NotRemoved { get; set; }
         public bool VSkill { get; set; }
+        public bool NotIncBuffDuration { get; set; }
+        public bool NotCooltimeReset { get; set; }
+        public bool IsUsableKaiserDragon { get; set; }
+        public bool CanJobRidingUse { get; set; }
         public int MasterLevel { get; set; }
         public Dictionary<int, int> ReqSkill { get; private set; }
         public List<string> Action { get; private set; }
@@ -148,6 +152,18 @@ namespace WzComparerR2.CharaSim
                         break;
                     case "vSkill":
                         skill.VSkill = childNode.GetValue<int>() != 0;
+                        break;
+                    case "notIncBuffDuration":
+                        skill.NotIncBuffDuration = childNode.GetValue<int>() != 0;
+                        break;
+                    case "notCooltimeReset":
+                        skill.NotCooltimeReset = childNode.GetValue<int>() != 0;
+                        break;
+                    case "isUsableKaiserDragon":
+                        skill.IsUsableKaiserDragon = childNode.GetValue<int>() != 0;
+                        break;
+                    case "canJobRidingUse":
+                        skill.CanJobRidingUse = childNode.GetValue<int>() != 0;
                         break;
                     case "masterLevel":
                         skill.MasterLevel = childNode.GetValue<int>();

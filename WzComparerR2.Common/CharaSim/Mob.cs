@@ -11,6 +11,8 @@ namespace WzComparerR2.CharaSim
         public Mob()
         {
             this.ID = -1;
+            this.Speed = 0;
+            this.FlySpeed = 0;
             this.ElemAttr = new MobElemAttr(null);
             this.Revive = new List<int>();
             //this.Animates = new LifeAnimateCollection();
@@ -42,6 +44,14 @@ namespace WzComparerR2.CharaSim
         public int MDDamage { get; set; }
         public int Acc { get; set; }
         public int Exp { get; set; }
+        public int CharismaEXP { get; set; }
+        public int SenseEXP { get; set; }
+        public int InsightEXP { get; set; }
+        public int WillEXP { get; set; }
+        public int CraftEXP { get; set; }
+        public int CharmEXP { get; set; }
+        public int WP { get; set; }
+
         public bool Boss { get; set; }
         public bool PartyBonusMob { get; set; }
         public bool Undead { get; set; }
@@ -107,6 +117,13 @@ namespace WzComparerR2.CharaSim
                         case "MDDamage": mobInfo.MDDamage = propNode.GetValueEx<int>(0); break;
                         case "acc": mobInfo.Acc = propNode.GetValueEx<int>(0); break;
                         case "exp": mobInfo.Exp = propNode.GetValueEx<int>(0); break;
+                        case "charismaEXP": mobInfo.CharismaEXP = propNode.GetValueEx<int>(0); break;
+                        case "senseEXP": mobInfo.SenseEXP = propNode.GetValueEx<int>(0); break;
+                        case "insightEXP": mobInfo.InsightEXP = propNode.GetValueEx<int>(0); break;
+                        case "willEXP": mobInfo.WillEXP = propNode.GetValueEx<int>(0); break;
+                        case "craftEXP": mobInfo.CraftEXP = propNode.GetValueEx<int>(0); break;
+                        case "charmEXP": mobInfo.CharmEXP = propNode.GetValueEx<int>(0); break;
+                        case "wp": mobInfo.WP = propNode.GetValueEx<int>(0); break;
 
                         case "boss": mobInfo.Boss = propNode.GetValueEx<int>(0) != 0; break;
                         case "partyBonusMob": mobInfo.PartyBonusMob = propNode.GetValueEx<int>(0) != 0; break;
