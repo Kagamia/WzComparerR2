@@ -190,26 +190,26 @@ namespace WzComparerR2.Comparer
                 sw.WriteLine("<html>");
                 sw.WriteLine("<head>");
                 sw.WriteLine("<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">");
-                sw.WriteLine("<title>{0} {1}←{2}</title>", type, fileNew[0].Header.WzVersion, fileOld[0].Header.WzVersion);
+                sw.WriteLine("<title>{0} {2}→{1}</title>", type, fileNew[0].Header.WzVersion, fileOld[0].Header.WzVersion);
                 sw.WriteLine("<link type=\"text/css\" rel=\"stylesheet\" href=\"style.css\" />");
                 sw.WriteLine("</head>");
                 sw.WriteLine("<body>");
                 //输出概况
                 sw.WriteLine("<p class=\"wzf\">");
                 sw.WriteLine("<table>");
-                sw.WriteLine("<tr><th>&nbsp;</th><th>文件名</th><th>文件大小</th><th>文件版本</th></tr>");
-                sw.WriteLine("<tr><td>新文件</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
+                sw.WriteLine("<tr><th>&nbsp;</th><th>File Path</th><th>File Size</th><th>File Version</th></tr>");
+                sw.WriteLine("<tr><td>New File</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
                     string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileName).ToArray()),
                     string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileSize.ToString("N0")).ToArray()),
                     string.Join("<br/>", fileNew.Select(wzf => wzf.Header.WzVersion.ToString()).ToArray())
                     );
-                sw.WriteLine("<tr><td>旧文件</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
+                sw.WriteLine("<tr><td>Old File</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
                     string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileName).ToArray()),
                     string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileSize.ToString("N0")).ToArray()),
                     string.Join("<br/>", fileOld.Select(wzf => wzf.Header.WzVersion.ToString()).ToArray())
                     );
-                sw.WriteLine("<tr><td>对比时间</td><td colspan='3'>{0:yyyy-MM-dd HH:mm:ss.fff}</td></tr>", DateTime.Now);
-                sw.WriteLine("<tr><td>参数</td><td colspan='3'>{0}</td></tr>", string.Join("<br/>", new[] {
+                sw.WriteLine("<tr><td>Time of Comparison</td><td colspan='3'>{0:yyyy-MM-dd HH:mm:ss.fff}</td></tr>", DateTime.Now);
+                sw.WriteLine("<tr><td>Parameters</td><td colspan='3'>{0}</td></tr>", string.Join("<br/>", new[] {
                     this.OutputPng ? "-OutputPng" : null,
                     this.OutputAddedImg ? "-OutputAddedImg" : null,
                     this.OutputRemovedImg ? "-OutputRemovedImg" : null,
@@ -222,7 +222,7 @@ namespace WzComparerR2.Comparer
                 //输出目录
                 StringBuilder[] sb = { new StringBuilder(), new StringBuilder(), new StringBuilder() };
                 int[] count = new int[6];
-                string[] diffStr = { "Modify", "Add", "Remove" };
+                string[] diffStr = { "Modified", "Added", "Removed" };
                 foreach (CompareDifference diff in diffLst)
                 {
                     int idx = -1;
@@ -268,7 +268,7 @@ namespace WzComparerR2.Comparer
                 for (int i = 0; i < sb.Length; i++)
                 {
                     sw.WriteLine("<table class=\"lst{0}\">", i);
-                    sw.WriteLine("<tr><th>{0}共{1}项</th></tr>", diffStr[i], count[i]);
+                    sw.WriteLine("<tr><th>{0}: {1} Items</th></tr>", diffStr[i], count[i]);
                     sw.Write(sb[i].ToString());
                     sw.WriteLine("</table>");
                     sb[i] = null;
@@ -281,7 +281,7 @@ namespace WzComparerR2.Comparer
                     {
                         case DifferenceType.Changed:
                             {
-                                StateInfo = string.Format("{0}/{1}正在对比{2}", count[0], count[3], diff.NodeNew.FullPath);
+                                StateInfo = string.Format("Modified Files: Progress: {0}/{1}; Current File: {2}", count[0], count[3], diff.NodeNew.FullPath);
                                 Wz_Image imgNew, imgOld;
                                 if ((imgNew = diff.ValueNew as Wz_Image) != null
                                     && ((imgOld = diff.ValueOld as Wz_Image) != null))
@@ -297,7 +297,7 @@ namespace WzComparerR2.Comparer
                         case DifferenceType.Append:
                             if (this.OutputAddedImg)
                             {
-                                StateInfo = string.Format("{0}/{1}正在输出新增{2}", count[1], count[4], diff.NodeNew.FullPath);
+                                StateInfo = string.Format("Added Files: Progress: {0}/{1}; Current File: {2}", count[1], count[4], diff.NodeNew.FullPath);
                                 Wz_Image imgNew = diff.ValueNew as Wz_Image;
                                 if (imgNew != null)
                                 {
@@ -312,7 +312,7 @@ namespace WzComparerR2.Comparer
                         case DifferenceType.Remove:
                             if (this.OutputRemovedImg)
                             {
-                                StateInfo = string.Format("{0}/{1}正在输出删除{2}", count[2], count[5], diff.NodeOld.FullPath);
+                                StateInfo = string.Format("Removed Files: Progress: {0}/{1}; Current File: {2}", count[2], count[5], diff.NodeOld.FullPath);
                                 Wz_Image imgOld = diff.ValueOld as Wz_Image;
                                 if (imgOld != null)
                                 {
@@ -388,10 +388,10 @@ namespace WzComparerR2.Comparer
             StateDetail = "Outputting comparison report";
             bool noChange = diffList.Count <= 0;
             sw.WriteLine("<table class=\"img{0}\">", noChange ? " noChange" : "");
-            sw.WriteLine("<tr><th colspan=\"3\"><a name=\"{1}\">{0}</a> 修改:{2} 新增:{3} 移除:{4}</th></tr>",
+            sw.WriteLine("<tr><th colspan=\"3\"><a name=\"{1}\">{0}</a>: {2} Modified Attributes; {3} Added Attributes; {4} Removed Attributes</th></tr>",
                 imgName, anchorName, count[0], count[1], count[2]);
             sw.WriteLine(sb.ToString());
-            sw.WriteLine("<tr><td colspan=\"3\"><a href=\"#{1}\">{0}</a></td></tr>", "回到目录", menuAnchorName);
+            sw.WriteLine("<tr><td colspan=\"3\"><a href=\"#{1}\">{0}</a></td></tr>", "Back to Top", menuAnchorName);
             sw.WriteLine("</table>");
             imgNew.Unextract();
             imgOld.Unextract();
@@ -442,7 +442,7 @@ namespace WzComparerR2.Comparer
             sw.WriteLine("<table class=\"img\">");
             sw.WriteLine("<tr><th colspan=\"2\"><a name=\"{1}\">wz_image: {0}</a></th></tr>", imgName, anchorName);
             fnOutput(img.Node);
-            sw.WriteLine("<tr><td colspan=\"2\"><a href=\"#{1}\">{0}</a></td></tr>", "回到目录", menuAnchorName);
+            sw.WriteLine("<tr><td colspan=\"2\"><a href=\"#{1}\">{0}</a></td></tr>", "Back to Top", menuAnchorName);
             sw.WriteLine("</table>");
             img.Unextract();
         }

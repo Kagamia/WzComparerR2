@@ -76,7 +76,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 sbExt.Append("[Fixed Touch Damage: " + MobInfo.FixedBodyAttackDamageR + "%] ");
             }
-            if (MobInfo.DamagedByMob)
+            if (MobInfo.DamagedByMob || MobInfo.AllyMob)
             {
                 sbExt.Append("[Ally Mob] ");
             }
@@ -99,6 +99,10 @@ namespace WzComparerR2.CharaSimControl
             if (MobInfo.FixedDamage > 0)
             {
                 sbExt.Append("[Fixed Damage: " + MobInfo.FixedDamage + "] ");
+            }
+            if (MobInfo.ChangeableMob)
+            {
+                sbExt.Append("[Level/Stats Scale to Average Level] ");
             }
 
             if (sbExt.Length > 1)

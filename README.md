@@ -1,4 +1,4 @@
-*<s>使用前先大喊 niconiconi! poi! duang!以减少bug发生率</s>*  
+﻿*<s>使用前先大喊 niconiconi! poi! duang!以减少bug发生率</s>*  
 
 # WzComparerR2
 这是一个用C#6.0/.Net4.0组装的冒险岛提取器...  
@@ -38,3 +38,4 @@ links: [\[更新日志\]](https://github.com/Kagamia/WzComparerR2/tree/master/Up
 - **[@KENNYSOFT](https://github.com/KENNYSOFT)** and his WcR2-KMS version.
 - **[@Spadow](https://github.com/Sunaries)** and his WcR2-GMS version.
 - All testers from CMST tester group.
+Test

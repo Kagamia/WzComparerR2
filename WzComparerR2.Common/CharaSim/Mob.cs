@@ -60,6 +60,8 @@ namespace WzComparerR2.CharaSim
         public bool BodyAttack { get; set; }
         public int RemoveAfter { get; set; }
         public bool DamagedByMob { get; set; }
+        public bool AllyMob { get; set; }
+        public bool ChangeableMob { get; set; }
         public bool Invincible { get; set; }
         public bool NotAttack { get; set; }
         public int FixedDamage { get; set; }
@@ -133,6 +135,8 @@ namespace WzComparerR2.CharaSim
                         case "category": mobInfo.Category = propNode.GetValueEx<int>(0); break;
                         case "removeAfter": mobInfo.RemoveAfter = propNode.GetValueEx<int>(0); break;
                         case "damagedByMob": mobInfo.DamagedByMob = propNode.GetValueEx<int>(0) != 0; break;
+                        case "allyMob": mobInfo.AllyMob = propNode.GetValueEx<int>(0) != 0; break;
+                        case "changeableMob": mobInfo.ChangeableMob = propNode.GetValueEx<int>(0) != 0; break;
                         case "invincible": mobInfo.Invincible = propNode.GetValueEx<int>(0) != 0; break;
                         case "notAttack": mobInfo.NotAttack = propNode.GetValueEx<int>(0) != 0; break;
                         case "fixedDamage": mobInfo.FixedDamage = propNode.GetValueEx<int>(0); break;
