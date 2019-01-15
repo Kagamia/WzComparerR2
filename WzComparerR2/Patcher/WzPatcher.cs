@@ -51,7 +51,7 @@ namespace WzComparerR2.Patcher
             patchBlock.Seek(8, SeekOrigin.Begin);
             int ver = r.ReadInt32();
             uint checkSum0 = r.ReadUInt32();
-            uint checkSum1 = CheckSum.ComputeHash(patchBlock, (int)patchBlock.Length - 0x10);
+            uint checkSum1 = CheckSum.ComputeHash(patchBlock, patchBlock.Length - 0x10);
             VerifyCheckSum(checkSum0, checkSum1, "PatchFile", "0");
 
             patchBlock.Seek(16, SeekOrigin.Begin);
@@ -76,12 +76,12 @@ namespace WzComparerR2.Patcher
                 if (check == 0xf2f7fbf3)
                 {
                     metaStream.Seek(-12, SeekOrigin.End);
-                    int patchBlockLength = r.ReadInt32();
-                    int noticeLength = r.ReadInt32();
+                    long patchBlockLength = r.ReadUInt32();
+                    long noticeLength = r.ReadUInt32();
                     metaStream.Seek(-12 - noticeLength - patchBlockLength, SeekOrigin.End);
                     patchBlock = new PartialStream(metaStream, metaStream.Position, patchBlockLength);
                     metaStream.Seek(patchBlockLength, SeekOrigin.Current);
-                    noticeText = Encoding.Default.GetString(r.ReadBytes(noticeLength));
+                    noticeText = Encoding.Default.GetString(r.ReadBytes((int)noticeLength));
                 }
                 else //兼容TMS的patch.exe
                 {
