@@ -115,7 +115,7 @@ namespace WzComparerR2.Patcher.Builder
             return crc;
         }
 
-        public static uint ComputeHash(Stream stream, int length)
+        public static uint ComputeHash(Stream stream, long length)
         {
             FileStream fs = stream as FileStream;
             if (fs != null && fs.IsAsync)
@@ -128,19 +128,19 @@ namespace WzComparerR2.Patcher.Builder
             }
         }
 
-        public static uint ComputeHashAsync(FileStream stream, int length, uint crc)
+        public static uint ComputeHashAsync(FileStream stream, long length, uint crc)
         {
             var hash = new AsyncFileHash(stream, length);
             crc = hash.Compute(crc);
             return crc;
         }
 
-        public static unsafe uint ComputeHash(Stream stream, int length, uint crc)
+        public static unsafe uint ComputeHash(Stream stream, long length, uint crc)
         {
             byte[] buffer = new byte[0x8000];
             while (length > 0)
             {
-                int count = stream.Read(buffer, 0, Math.Min(buffer.Length, length));
+                int count = stream.Read(buffer, 0, (int)Math.Min(buffer.Length, length));
                 if (count == 0)
                 {
                     break;
@@ -191,7 +191,7 @@ namespace WzComparerR2.Patcher.Builder
 
         private class AsyncFileHash
         {
-            public AsyncFileHash(FileStream fs, int length)
+            public AsyncFileHash(FileStream fs, long length)
             {
                 this.fs = fs;
                 this.length = length;
@@ -202,7 +202,7 @@ namespace WzComparerR2.Patcher.Builder
             }
 
             FileStream fs;
-            int length;
+            long length;
             AutoResetEvent evCheckSum;
             AutoResetEvent evCallBack;
             uint crc;
@@ -219,7 +219,7 @@ namespace WzComparerR2.Patcher.Builder
 
             private void Begin(byte[] buffer)
             {
-                IAsyncResult ir = fs.BeginRead(buffer, 0, Math.Min(length, buffer.Length), CallBack, buffer);
+                IAsyncResult ir = fs.BeginRead(buffer, 0, (int)Math.Min(length, buffer.Length), CallBack, buffer);
             }
 
             private void CallBack(IAsyncResult ir)
