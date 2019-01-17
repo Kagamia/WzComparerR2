@@ -167,15 +167,6 @@ namespace WzComparerR2.CharaSimControl
                 {
                     attr.Add("[Not affected by Cooldown reductions/resets]");
                 }
-                if (Skill.IsUsableKaiserDragon)
-                {
-                    attr.Add("[Can be used with Kaiser's Final Form skill]");
-                }
-                if (Skill.CanJobRidingUse)
-                {
-                    attr.Add("[Can be used with the following Riding skills:\nJaguar Rider (Wild Hunter)\nHumanoid Mech and Tank Mech (Mechanic)\nSylvidia's Flight (Mercedes)]");
-                }
-
                 if (attr.Count > 0)
                 {
                     skillDescEx.Add("#c" + string.Join("\n", attr.ToArray()) + "#");

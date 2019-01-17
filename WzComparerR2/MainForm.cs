@@ -2804,7 +2804,7 @@ namespace WzComparerR2
 
                         while (true)
                         {
-                            string txt = string.Format("WZ files to compare: \r\n\r\n  new : {0} (ver:{1})\r\n  old : {2} (ver:{3})\r\n\r\nTo proceed with comparison, please select Yes. To switch the order of the files, please select No.",
+                            string txt = string.Format("WZ files to compare: \r\n\r\n  New : {0} (ver:{1})\r\n  Old : {2} (ver:{3})\r\n\r\nTo proceed with comparison, please select Yes. To switch the order of the files, please select No.",
                                 fileNew.Header.FileName,
                                 fileNew.Header.WzVersion,
                                 fileOld.Header.FileName,

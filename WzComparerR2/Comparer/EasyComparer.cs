@@ -198,15 +198,15 @@ namespace WzComparerR2.Comparer
                 sw.WriteLine("<p class=\"wzf\">");
                 sw.WriteLine("<table>");
                 sw.WriteLine("<tr><th>&nbsp;</th><th>File Path</th><th>File Size</th><th>File Version</th></tr>");
-                sw.WriteLine("<tr><td>New File</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
-                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileName).ToArray()),
-                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileSize.ToString("N0")).ToArray()),
-                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.WzVersion.ToString()).ToArray())
-                    );
                 sw.WriteLine("<tr><td>Old File</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
                     string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileName).ToArray()),
                     string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileSize.ToString("N0")).ToArray()),
                     string.Join("<br/>", fileOld.Select(wzf => wzf.Header.WzVersion.ToString()).ToArray())
+                    );
+                sw.WriteLine("<tr><td>New File</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
+                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileName).ToArray()),
+                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileSize.ToString("N0")).ToArray()),
+                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.WzVersion.ToString()).ToArray())
                     );
                 sw.WriteLine("<tr><td>Time of Comparison</td><td colspan='3'>{0:yyyy-MM-dd HH:mm:ss.fff}</td></tr>", DateTime.Now);
                 sw.WriteLine("<tr><td>Parameters</td><td colspan='3'>{0}</td></tr>", string.Join("<br/>", new[] {
@@ -380,8 +380,8 @@ namespace WzComparerR2.Comparer
                 }
                 sb.AppendFormat("<tr class=\"r{0}\">", idx);
                 sb.AppendFormat("<td>{0}</td>", col0 ?? " ");
-                sb.AppendFormat("<td>{0}</td>", OutputNodeValue(col0, diff.ValueNew, 0, outputDir) ?? " ");
                 sb.AppendFormat("<td>{0}</td>", OutputNodeValue(col0, diff.ValueOld, 1, outputDir) ?? " ");
+                sb.AppendFormat("<td>{0}</td>", OutputNodeValue(col0, diff.ValueNew, 0, outputDir) ?? " ");
                 sb.AppendLine("</tr>");
                 count[idx]++;
             }

@@ -104,6 +104,14 @@ namespace WzComparerR2.CharaSimControl
             {
                 sbExt.Append("[Level/Stats Scale to Average Level] ");
             }
+            if (MobInfo.OnlyNormalAttack)
+            {
+                sbExt.Append("[Only Damaged by Basic Attacks] ");
+            }
+            if (MobInfo.OnlyHittedByCommonAttack)
+            {
+                sbExt.Append("[Only Hit by Basic Attacks] ");
+            }
 
             if (sbExt.Length > 1)
             {
@@ -311,7 +319,6 @@ namespace WzComparerR2.CharaSimControl
         {
             switch (category)
             {
-                case 0: return "None";
                 case 1: return "Mammal";
                 case 2: return "Plant";
                 case 3: return "Fish";
@@ -320,7 +327,7 @@ namespace WzComparerR2.CharaSimControl
                 case 6: return "Devil";
                 case 7: return "Immortal";
                 case 8: return "Enchanted";
-                default: return null;
+                default: return "None";
             }
         }
 
