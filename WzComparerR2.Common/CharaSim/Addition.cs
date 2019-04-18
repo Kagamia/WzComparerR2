@@ -25,12 +25,12 @@ namespace WzComparerR2.CharaSim
             {
                 case AdditionType.boss:
                     sb = new StringBuilder();
-                    sb.Append("攻击BOSS时，");
+                    sb.Append("Has a ");
                     {
                         string v1;
                         if (this.Props.TryGetValue("prob", out v1))
-                            sb.Append("有" + v1 + "的几率");
-                        sb.Append("造成" + Props["damage"] + "%的额外伤害");
+                            sb.Append(v1 + "% chance to deal ");
+                        sb.Append(Props["damage"] + "% extra damage on boss monsters.");
                     }
                     return sb.ToString();
                 case AdditionType.critical:
@@ -166,7 +166,7 @@ namespace WzComparerR2.CharaSim
                     {
                         weekdays[i] = GetWeekDayString(this.ConValue[i]);
                     }
-                    return string.Join(", ", weekdays) + "时";
+                    return "When it's " + string.Join(", ", weekdays) + ":";
                 default:
                     return null;
             }

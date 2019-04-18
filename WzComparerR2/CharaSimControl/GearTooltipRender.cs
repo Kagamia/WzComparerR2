@@ -341,11 +341,11 @@ namespace WzComparerR2.CharaSimControl
                     picHeight += 16;
                 }
                 picHeight += 2;
-                g.DrawString("Hammers Applied", GearGraphics.ItemDetailFont, GearGraphics.GoldHammerBrush, 8, picHeight);
+                g.DrawString("Hammers Applied: 0", GearGraphics.ItemDetailFont, GearGraphics.GoldHammerBrush, 8, picHeight);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
                 g.DrawString(": " + gear.Hammer.ToString() + (gear.Hammer == 2 ? "(MAX)" : null), GearGraphics.TahomaFont, GearGraphics.GoldHammerBrush, 140, picHeight - 2);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
-                picHeight += 14;
+                picHeight += 15;
                 hasPart2 = true;
             }
                

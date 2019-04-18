@@ -362,7 +362,7 @@ namespace WzComparerR2.CharaSimControl
             if (Gear.Props.TryGetValue(GearPropType.level, out value) && !Gear.FixLevel)
             {
                 bool max = (Gear.Levels != null && value >= Gear.Levels.Count);
-                g.DrawString("Growth Level: " + (max ? "MAX" : value.ToString()), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
+                g.DrawString("Item Level: " + (max ? "MAX" : value.ToString()), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
                 picH += 16;
                 g.DrawString("Growth EXP: " + (max ? "MAX" : "0%"), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
                 picH += 16;
@@ -391,11 +391,11 @@ namespace WzComparerR2.CharaSimControl
             {
                 if (isWeapon)
                 {
-                    typeStr = "Weapon Type : " + typeStr;
+                    typeStr = "Type : " + typeStr;
                 }
                 else
                 {
-                    typeStr = "Equipment Type : " + typeStr;
+                    typeStr = "Type : " + typeStr;
                 }
 
                 if (Gear.IsLeftWeapon(Gear.type) || Gear.type == GearType.katara)
@@ -480,7 +480,7 @@ namespace WzComparerR2.CharaSimControl
             bool hasTuc = Gear.HasTuc && Gear.Props.TryGetValue(GearPropType.tuc, out value);
             if (Gear.GetBooleanValue(GearPropType.exceptUpgrade))
             {
-                g.DrawString("Cannot be enhanced", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
+                g.DrawString("Unable to enhance", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
                 picH += 16;
             }
             else if (hasTuc)
@@ -765,7 +765,7 @@ namespace WzComparerR2.CharaSimControl
                     string exclusiveEquip;
                     if (!string.IsNullOrEmpty(kv.Value.Info))
                     {
-                        exclusiveEquip = "#c" + kv.Value.Info + "类道具无法重复使用。#";
+                        exclusiveEquip = "#cCannot equip multiple " + kv.Value.Info + " items.#";
                     }
                     else
                     {
@@ -780,7 +780,7 @@ namespace WzComparerR2.CharaSimControl
                             }
                             itemNames.Add(sr2.Name);
                         }
-                        exclusiveEquip = "#c无法重复装备" + string.Join(", ", itemNames) + ".#";
+                        exclusiveEquip = "#cThe following items cannot be equipped\r\nsimultaneously.\r\n\r\n-------<Equipment>------\r\n" + string.Join(", ", itemNames) + ".#";
                     }
                     GearGraphics.DrawString(g, exclusiveEquip, GearGraphics.ItemDetailFont, 11, 246, ref picH, 16);
                     break;

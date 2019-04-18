@@ -406,28 +406,28 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         dualBow = 152,
         /// <summary>
-        /// 手持火炮 153
+        /// Hand Cannon 153
         /// </summary>
         handCannon = 153,
         /// <summary>
-        /// 太刀 154
+        /// Katana 154
         /// </summary>
         katana = 154,
         /// <summary>
-        /// 扇 155
+        /// Fan 155
         /// </summary>
         fan = 155,
 
         /// <summary>
-        /// 大剑 156
+        /// Heavy Sword 156
         /// </summary>
         swordZB = 156,
         /// <summary>
-        /// 太刀 157
+        /// Long Sword 157
         /// </summary>
         swordZL = 157,
         /// <summary>
-        /// 机甲手枪 158
+        /// Arm Cannon 158
         /// </summary>
         GauntletBuster = 158,
         /// <summary>

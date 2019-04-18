@@ -925,7 +925,7 @@ namespace WzComparerR2.Avatar.UI
 
         private void btnMale_Click(object sender, EventArgs e)
         {
-            if (MessageBoxEx.Show("初始化为男性角色？", "提示") == DialogResult.OK)
+            if (MessageBoxEx.Show("Would you like to generate a Male Character?", "Prompt") == DialogResult.OK)
             {
                 LoadCode("2000,12000,20000,30000,1040036,1060026", 0);
             }
@@ -933,7 +933,7 @@ namespace WzComparerR2.Avatar.UI
 
         private void btnFemale_Click(object sender, EventArgs e)
         {
-            if (MessageBoxEx.Show("初始化为女性角色？", "提示") == DialogResult.OK)
+            if (MessageBoxEx.Show("Would you like to generate a Female Character?", "Prompt") == DialogResult.OK)
             {
                 LoadCode("2000,12000,21000,31000,1041046,1061039", 0);
             }
@@ -951,21 +951,21 @@ namespace WzComparerR2.Avatar.UI
             var matches = Regex.Matches(code, @"(\d+)([,\s]|$)");
             if (matches.Count <= 0)
             {
-                MessageBoxEx.Show("无法解析的装备代码。", "错误");
+                MessageBoxEx.Show("Unable to parse the equipment code.", "Prompt");
                 return;
             }
 
             var characWz = PluginManager.FindWz(Wz_Type.Character);
             if (characWz == null)
             {
-                MessageBoxEx.Show("没有打开Character.Wz。", "错误");
+                MessageBoxEx.Show("Please manually specify a Character.wz file.", "Prompt");
                 return;
             }
 
             //试图初始化
             if (!this.inited && !this.AvatarInit())
             {
-                MessageBoxEx.Show("Avatar初始化失败。", "错误");
+                MessageBoxEx.Show("Character generation failed.", "Prompt");
                 return;
             }
 
@@ -1002,12 +1002,12 @@ namespace WzComparerR2.Avatar.UI
             if (failList.Count > 0)
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine("以下部件没有找到：");
+                sb.AppendLine("The following parts were not found: ");
                 foreach (var gearID in failList)
                 {
                     sb.Append("  ").AppendLine(gearID.ToString("D8"));
                 }
-                MessageBoxEx.Show(sb.ToString(), "嗯..");
+                MessageBoxEx.Show(sb.ToString(), "OK");
             }
 
         }
