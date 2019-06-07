@@ -329,9 +329,13 @@ namespace WzComparerR2.MapRender
         private Frame LoadFrame(Wz_Node node)
         {
             //处理uol
-            while (node.Value is Wz_Uol)
+            while (node?.Value is Wz_Uol uol)
             {
-                node = ((Wz_Uol)node.Value).HandleUol(node);
+                node = uol.HandleUol(node);
+            }
+            if (node == null)
+            {
+                return new Frame();
             }
             //寻找link
             var linkNode = node.GetLinkedSourceNode(PluginManager.FindWz);
