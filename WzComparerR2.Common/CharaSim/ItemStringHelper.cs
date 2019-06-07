@@ -327,6 +327,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicWing: return "魔力翅膀";
                 case GearType.pathOfAbyss: return "深渊精气珠";
 
+                case GearType.relic: return "遗物";
+                case GearType.ancientBow: return "远古弓";
+
                 default: return null;
             }
         }
@@ -392,6 +395,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.connonGunPowder2: return "火炮手职业群可以装备";
                 case GearType.box:
                 case GearType.boxingClaw: return "龙的传人可以装备";
+                case GearType.relic: return "古迹猎人职业群可穿戴";
 
                 //1xxx
                 case GearType.cygnusGem: return "冒险骑士团可以装备";
