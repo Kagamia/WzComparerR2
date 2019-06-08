@@ -319,6 +319,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicWing: return "Lucent Wings";
                 case GearType.pathOfAbyss: return "Abyssal Path";
 
+                case GearType.relic: return "遗物";
+                case GearType.ancientBow: return "远古弓";
+
                 default: return null;
             }
         }
@@ -384,6 +387,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.connonGunPowder2: return "Cannoneers Only";
                 case GearType.box:
                 case GearType.boxingClaw: return "Jett Only";
+                case GearType.relic: return "古迹猎人职业群可穿戴";
 
                 //1xxx
                 case GearType.cygnusGem: return "Cygnus Knights Only";

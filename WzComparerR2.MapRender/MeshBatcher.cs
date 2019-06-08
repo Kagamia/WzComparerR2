@@ -109,6 +109,11 @@ namespace WzComparerR2.MapRender
 
         private void DrawItem(MeshItem mesh, Frame frame)
         {
+            if (frame == null || frame.Texture == null)
+            {
+                return;
+            }
+
             var origin = mesh.FlipX ? new Vector2(frame.Rectangle.Width - frame.Origin.X, frame.Origin.Y) : frame.Origin.ToVector2();
             var eff = mesh.FlipX ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 

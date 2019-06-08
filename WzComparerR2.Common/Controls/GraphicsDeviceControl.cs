@@ -35,7 +35,7 @@ namespace WzComparerR2.Controls
         // However many GraphicsDeviceControl instances you have, they all share
         // the same underlying GraphicsDevice, managed by this helper service.
         GraphicsDeviceService graphicsDeviceService;
-
+        SwapChainRenderTarget swapChainRT;
 
         #endregion
 
@@ -77,9 +77,13 @@ namespace WzComparerR2.Controls
             // Don't initialize the graphics device if we are running in the designer.
             if (!DesignMode)
             {
-                graphicsDeviceService = GraphicsDeviceService.AddRef(Handle,
+                this.graphicsDeviceService = GraphicsDeviceService.AddRef(Handle,
                                                                      ClientSize.Width,
                                                                      ClientSize.Height);
+                this.swapChainRT = new SwapChainRenderTarget(graphicsDeviceService.GraphicsDevice,
+                    this.Handle,
+                    ClientSize.Width,
+                    ClientSize.Height);
 
                 // Register the service, so components like ContentManager can find it.
                 services.AddService<IGraphicsDeviceService>(graphicsDeviceService);
@@ -97,10 +101,16 @@ namespace WzComparerR2.Controls
         /// </summary>
         protected override void Dispose(bool disposing)
         {
-            if (graphicsDeviceService != null)
+            if (this.swapChainRT != null && !this.swapChainRT.IsDisposed)
             {
-                graphicsDeviceService.Release(disposing);
-                graphicsDeviceService = null;
+                this.swapChainRT.Dispose();
+                this.swapChainRT = null;
+            }
+
+            if (this.graphicsDeviceService != null)
+            {
+                this.graphicsDeviceService.Release(disposing);
+                this.graphicsDeviceService = null;
             }
 
             base.Dispose(disposing);
@@ -117,21 +127,35 @@ namespace WzComparerR2.Controls
         /// </summary>
         protected override void OnPaint(PaintEventArgs e)
         {
-            string beginDrawError = BeginDraw();
+            try
+            {
+                if (!DesignMode)
+                {
+                    System.Threading.Monitor.Enter(this.GraphicsDevice);
+                }
 
-            if (string.IsNullOrEmpty(beginDrawError))
-            {
-                // Draw the control using the GraphicsDevice.
-                Draw();
-                EndDraw();
+                string beginDrawError = this.BeginDraw();
+
+                if (string.IsNullOrEmpty(beginDrawError))
+                {
+                    // Draw the control using the GraphicsDevice.
+                    Draw();
+                    EndDraw();
+                }
+                else
+                {
+                    // If BeginDraw failed, show an error message using System.Drawing.
+                    PaintUsingSystemDrawing(e.Graphics, beginDrawError);
+                }
             }
-            else
+            finally
             {
-                // If BeginDraw failed, show an error message using System.Drawing.
-                PaintUsingSystemDrawing(e.Graphics, beginDrawError);
+                if (!DesignMode)
+                {
+                    System.Threading.Monitor.Exit(this.GraphicsDevice);
+                }
             }
         }
-
 
         /// <summary>
         /// Attempts to begin drawing the control. Returns an error message string
@@ -153,6 +177,9 @@ namespace WzComparerR2.Controls
             {
                 return deviceResetError;
             }
+
+            //设置当前rt
+            GraphicsDevice.SetRenderTarget(swapChainRT);
 
             // Many GraphicsDeviceControl instances can be sharing the same
             // GraphicsDevice. The device backbuffer will be resized to fit the
@@ -190,7 +217,8 @@ namespace WzComparerR2.Controls
                                                                 ClientSize.Height);
 
                 //GraphicsDevice.Present(sourceRectangle, null, this.Handle);
-                GraphicsDevice.Present();
+                this.swapChainRT.Present();
+                GraphicsDevice.SetRenderTarget(null);
             }
             catch
             {
@@ -210,6 +238,7 @@ namespace WzComparerR2.Controls
         string HandleDeviceReset()
         {
             bool deviceNeedsReset = false;
+            var clientSize = this.ClientSize;
 
             switch (GraphicsDevice.GraphicsDeviceStatus)
             {
@@ -226,8 +255,8 @@ namespace WzComparerR2.Controls
                     // If the device state is ok, check whether it is big enough.
                     PresentationParameters pp = GraphicsDevice.PresentationParameters;
 
-                    deviceNeedsReset = (ClientSize.Width != pp.BackBufferWidth) ||
-                                       (ClientSize.Height != pp.BackBufferHeight);
+                    deviceNeedsReset = (clientSize.Width != pp.BackBufferWidth) ||
+                                       (clientSize.Height != pp.BackBufferHeight);
                     break;
             }
 
@@ -236,8 +265,12 @@ namespace WzComparerR2.Controls
             {
                 try
                 {
-                    graphicsDeviceService.ResetDevice(ClientSize.Width,
-                                                      ClientSize.Height);
+                    this.swapChainRT.Dispose();
+                    this.swapChainRT = new SwapChainRenderTarget(
+                        this.graphicsDeviceService.GraphicsDevice,
+                        this.Handle,
+                        clientSize.Width,
+                        clientSize.Height);
                 }
                 catch (Exception e)
                 {

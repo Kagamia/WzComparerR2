@@ -338,7 +338,11 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         pathOfAbyss = 135360,
         /// <summary>
-        /// Cane
+        /// Relic 135360
+        /// </summary>
+        relic = 135370,
+        /// <summary>
+        /// Cane 136
         /// </summary>
         cane = 136,
         /// <summary>
@@ -430,6 +434,10 @@ namespace WzComparerR2.CharaSim
         /// Arm Cannon 158
         /// </summary>
         GauntletBuster = 158,
+        /// <summary>
+        /// Ancient Bow 159
+        /// </summary>
+        ancientBow = 159,
         /// <summary>
         /// 拼图 168
         /// </summary>

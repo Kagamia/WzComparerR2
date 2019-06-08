@@ -78,8 +78,7 @@ namespace WzComparerR2.Controls
             {
                 // If this is the first control to start using the
                 // device, we must create the singleton instance.
-                singletonInstance = new GraphicsDeviceService(windowHandle,
-                                                              width, height);
+                singletonInstance = new GraphicsDeviceService(IntPtr.Zero, 1, 1);
             }
 
             return singletonInstance;
