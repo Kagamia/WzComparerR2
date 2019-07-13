@@ -264,7 +264,11 @@ namespace WzComparerR2.CharaSim
         /// <summary>
         /// Kodachi 135_80
         /// </summary>
-        katana2 = 135280,
+        kodachi = 135280,
+        /// <summary>
+        /// Kodachi 135_83
+        /// </summary>
+        kodachi2 = 135283,
         /// <summary>
         /// Whistle 135_81
         /// </summary>

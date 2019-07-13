@@ -307,7 +307,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicStick: return "Beast Tamer Scepter";
                 case GearType.whistle: return "Whistle";
                 case GearType.boxingClaw: return "Fist";
-                case GearType.katana2: return "Kodachi";
+                case GearType.kodachi:
+                case GearType.kodachi2: return "Kodachi";
                 case GearType.espLimiter: return "Psy-limiter";
 
                 case GearType.GauntletBuster: return "Arm Cannon";
@@ -319,8 +320,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicWing: return "Lucent Wings";
                 case GearType.pathOfAbyss: return "Abyssal Path";
 
-                case GearType.relic: return "遗物";
-                case GearType.ancientBow: return "远古弓";
+                case GearType.relic: return "Relic";
+                case GearType.ancientBow: return "Ancient Bow";
 
                 default: return null;
             }
@@ -387,7 +388,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.connonGunPowder2: return "Cannoneers Only";
                 case GearType.box:
                 case GearType.boxingClaw: return "Jett Only";
-                case GearType.relic: return "古迹猎人职业群可穿戴";
+                case GearType.relic: return "Can be equipped by the Pathfinder.";
 
                 //1xxx
                 case GearType.cygnusGem: return "Cygnus Knights Only";
@@ -414,7 +415,8 @@ namespace WzComparerR2.CharaSim
 
                 //4xxx
                 case GearType.katana:
-                case GearType.katana2: return GetExtraJobReqString(41);
+                case GearType.kodachi:
+                case GearType.kodachi2: return GetExtraJobReqString(41);
                 case GearType.fan: return GetExtraJobReqString(42);
 
                 //5xxx
@@ -544,6 +546,7 @@ namespace WzComparerR2.CharaSim
                 case 232: return "Bishop";
                 case 233: return "Bishop (5th)";
                 case 300: return "Archer";
+                case 301: return "Archer (Pathfinder)";
                 case 310: return "Hunter";
                 case 311: return "Ranger";
                 case 312: return "Bowmaster";
@@ -552,6 +555,10 @@ namespace WzComparerR2.CharaSim
                 case 321: return "Sniper";
                 case 322: return "Marksman";
                 case 323: return "Marksman (5th)";
+                case 330: return "Ancient Archer";
+                case 331: return "Soulchaser";
+                case 332: return "Pathfinder";
+                case 333: return "Pathfinder (5th)";
                 case 400: return "Rogue";
                 case 410: return "Assassin";
                 case 411: return "Hermit";
@@ -750,13 +757,12 @@ namespace WzComparerR2.CharaSim
                 case 14213: return "Kinesis (5th)";
 
                 case 15000: return "Illium";
+                case 15001: return "Ark";
                 case 15200: return "Illium (1st)";
                 case 15210: return "Illium (2nd)";
                 case 15211: return "Illium (3rd)";
                 case 15212: return "Illium (4th)";
                 case 15213: return "Illium (5th)";
-
-                case 15001: return "Ark";
                 case 15500: return "Ark (1st)";
                 case 15510: return "Ark (2nd)";
                 case 15511: return "Ark (3rd)";

@@ -273,7 +273,7 @@
             this.cmbWeaponIdx.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbWeaponIdx.FormattingEnabled = true;
             this.cmbWeaponIdx.ItemHeight = 15;
-            this.cmbWeaponIdx.Location = new System.Drawing.Point(89, 103);
+            this.cmbWeaponIdx.Location = new System.Drawing.Point(100, 103);
             this.cmbWeaponIdx.Name = "cmbWeaponIdx";
             this.cmbWeaponIdx.Size = new System.Drawing.Size(50, 21);
             this.cmbWeaponIdx.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -287,7 +287,7 @@
             this.cmbWeaponType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbWeaponType.FormattingEnabled = true;
             this.cmbWeaponType.ItemHeight = 15;
-            this.cmbWeaponType.Location = new System.Drawing.Point(35, 103);
+            this.cmbWeaponType.Location = new System.Drawing.Point(46, 103);
             this.cmbWeaponType.Name = "cmbWeaponType";
             this.cmbWeaponType.Size = new System.Drawing.Size(50, 21);
             this.cmbWeaponType.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -503,7 +503,7 @@
             // 
             // 
             this.chkHairShade.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkHairShade.Location = new System.Drawing.Point(82, 84);
+            this.chkHairShade.Location = new System.Drawing.Point(72, 84);
             this.chkHairShade.Name = "chkHairShade";
             this.chkHairShade.Size = new System.Drawing.Size(85, 19);
             this.chkHairShade.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -681,12 +681,12 @@
             // 
             // 
             this.labelX5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX5.Location = new System.Drawing.Point(139, 106);
+            this.labelX5.Location = new System.Drawing.Point(145, 85);
             this.labelX5.Name = "labelX5";
             this.labelX5.Size = new System.Drawing.Size(25, 16);
             this.labelX5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.labelX5.TabIndex = 14;
-            this.labelX5.Text = "ear";
+            this.labelX5.Text = "Ear";
             // 
             // cmbEar
             // 
@@ -695,7 +695,7 @@
             this.cmbEar.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbEar.FormattingEnabled = true;
             this.cmbEar.ItemHeight = 15;
-            this.cmbEar.Location = new System.Drawing.Point(163, 103);
+            this.cmbEar.Location = new System.Drawing.Point(163, 82);
             this.cmbEar.Name = "cmbEar";
             this.cmbEar.Size = new System.Drawing.Size(39, 21);
             this.cmbEar.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
