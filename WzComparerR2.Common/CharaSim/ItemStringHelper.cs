@@ -80,6 +80,10 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incMADr: return "Magic Attack: " + sign + value + "%";
                 case GearPropType.incPDD: return "Defense : " + sign + value;
                 case GearPropType.incPDDr: return "Defense : " + sign + value + "%";
+                case GearPropType.incACC: return "Accuracy : " + sign + value;
+                case GearPropType.incACCr: return "Accuracy : " + sign + value + "%";
+                case GearPropType.incEVA: return "Avoidability : " + sign + value;
+                case GearPropType.incEVAr: return "Avoidability : " + sign + value + "%";
                 case GearPropType.incSpeed: return "Speed: " + sign + value;
                 case GearPropType.incJump: return "Jump: " + sign + value;
                 case GearPropType.incCraft: return "Diligence: " + sign + value;
@@ -129,7 +133,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incMHPr_incMMPr: return "MaxHP / MaxMP : " + sign + value + "%";
                 case GearPropType.incPAD_incMAD: return "Attack Power & Magic ATT: " + sign + value;
                 case GearPropType.incPDD_incMDD: return "Defense: " + sign + value;
-
+                case GearPropType.incACC_incEVA: return "Accuracy / Avoidability：" + sign + value;
                 case GearPropType.incARC: return "ARC : " + sign + value;
                 default: return null;
             }
