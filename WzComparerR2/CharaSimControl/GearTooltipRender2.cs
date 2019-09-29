@@ -1036,7 +1036,15 @@ namespace WzComparerR2.CharaSimControl
             }
             if (Gear.Props.TryGetValue(GearPropType.accountSharable, out value) && value != 0)
             {
-                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.accountSharable, value));
+                int value2;
+                if (Gear.Props.TryGetValue(GearPropType.sharableOnce, out value2) && value2 != 0)
+                {
+                    tags.Add(ItemStringHelper.GetGearPropString(GearPropType.sharableOnce, value2));
+                }
+                else
+                {
+                    tags.Add(ItemStringHelper.GetGearPropString(GearPropType.accountSharable, value));
+                }
             }
             if (Gear.Props.TryGetValue(GearPropType.blockGoldHammer, out value) && value != 0)
             {

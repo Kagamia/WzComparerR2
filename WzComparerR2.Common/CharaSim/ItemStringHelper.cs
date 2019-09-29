@@ -80,6 +80,8 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incMADr: return "Magic Attack: " + sign + value + "%";
                 case GearPropType.incPDD: return "Defense : " + sign + value;
                 case GearPropType.incPDDr: return "Defense : " + sign + value + "%";
+                case GearPropType.incMDD: return "Magic Defense : " + sign + value;
+                case GearPropType.incMDDr: return "Magic Defense : " + sign + value + "%";
                 case GearPropType.incACC: return "Accuracy : " + sign + value;
                 case GearPropType.incACCr: return "Accuracy : " + sign + value + "%";
                 case GearPropType.incEVA: return "Avoidability : " + sign + value;
@@ -105,6 +107,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.tradeBlock: return value == 0 ? null : "Untradeable";
                 case GearPropType.equipTradeBlock: return value == 0 ? null : "Untradeable Once Equipped";
                 case GearPropType.accountSharable: return value == 0 ? null : "Tradeable within account";
+                case GearPropType.sharableOnce: return value == 0 ? null : "Tradeable within account once";
                 case GearPropType.onlyEquip: return value == 0 ? null : "Unique Equipped Item";
                 case GearPropType.notExtend: return value == 0 ? null : "Time Limit extension is not possible.";
                 case GearPropType.tradeAvailable:

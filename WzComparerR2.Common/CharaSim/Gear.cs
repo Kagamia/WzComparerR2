@@ -239,13 +239,26 @@ namespace WzComparerR2.CharaSim
             {
                 switch (type)
                 {
+                    case GearPropType.incSTR:
+                    case GearPropType.incDEX:
+                    case GearPropType.incINT:
+                    case GearPropType.incLUK:
+                    case GearPropType.incPAD:
+                    case GearPropType.incMAD:
+                    case GearPropType.incSpeed:
+                    case GearPropType.incJump:
+                        return 1;
                     case GearPropType.incMHP:
                     case GearPropType.incMMP:
-                    case GearPropType.incACC:
-                    case GearPropType.incEVA:
+                        return 100;
+                    case GearPropType.incPDD_incMDD:
+                    case GearPropType.incPDD:
                         return 10;
+                    case GearPropType.incPAD_incMAD:
+                        return 2;
+                    case GearPropType.incMHP_incMMP:
+                        return 200;
                 }
-                return 1;
             }
             return int.MaxValue;
         }
