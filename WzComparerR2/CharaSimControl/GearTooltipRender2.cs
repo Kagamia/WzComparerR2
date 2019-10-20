@@ -886,12 +886,15 @@ namespace WzComparerR2.CharaSimControl
                         GearLevelInfo.Range range = kv.Value;
 
                         string propString = ItemStringHelper.GetGearPropString(kv.Key, kv.Value.Min);
-                        if (range.Max != range.Min)
+                        if (propString != null)
                         {
-                            propString += " ~ " + kv.Value.Max + (propString.EndsWith("%") ? "%" : null);
+                            if (range.Max != range.Min)
+                            {
+                                propString += " ~ " + kv.Value.Max + (propString.EndsWith("%") ? "%" : null);
+                            }
+                            g.DrawString(propString, GearGraphics.ItemDetailFont, Brushes.White, 10, picHeight);
+                            picHeight += 16;
                         }
-                        g.DrawString(propString, GearGraphics.ItemDetailFont, Brushes.White, 10, picHeight);
-                        picHeight += 16;
                     }
                     if (info.Skills.Count > 0)
                     {
