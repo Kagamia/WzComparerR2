@@ -128,6 +128,10 @@ namespace WzComparerR2.MapRender
                 var bgmNode = PluginManager.FindWz(string.Join("\\", path));
                 if (bgmNode != null)
                 {
+                    while (bgmNode.Value is Wz_Uol uol)
+                    {
+                        bgmNode = uol.HandleUol(bgmNode);
+                    }
                     var bgm = resLoader.Load<Music>(bgmNode);
                     bgm.IsLoop = true;
                     return bgm;
