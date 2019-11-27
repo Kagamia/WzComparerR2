@@ -305,7 +305,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.energySword: return "Whip Blade";
                 case GearType.desperado: return "Desperado";
                 case GearType.magicStick: return "Beast Tamer Scepter";
-                case GearType.whistle: return "Whistle";
+                case GearType.whistle:
+                case GearType.whistle2: return "Whistle";
                 case GearType.boxingClaw: return "Fist";
                 case GearType.kodachi:
                 case GearType.kodachi2: return "Kodachi";
@@ -322,6 +323,9 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.relic: return "Relic";
                 case GearType.ancientBow: return "Ancient Bow";
+
+                case GearType.handFan: return "Ritual Fan";
+                case GearType.fanTassel: return "Fan Tassel";
 
                 default: return null;
             }
@@ -434,6 +438,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.swordZL: return GetExtraJobReqString(101);
 
                 case GearType.whistle:
+                case GearType.whistle2:
                 case GearType.magicStick: return GetExtraJobReqString(112);
 
                 case GearType.espLimiter:
@@ -443,6 +448,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicWing: return GetExtraJobReqString(152);
 
                 case GearType.pathOfAbyss: return GetExtraJobReqString(155);
+
+                case GearType.fanTassel: return GetExtraJobReqString(164);
 
                 default: return null;
             }
@@ -477,6 +484,7 @@ namespace WzComparerR2.CharaSim
                 case 142: return "Kinesis only";
                 case 152: return "Illium Only";
                 case 155: return "Ark Only";
+                case 164: return "Hoyoung Only";
                 default: return null;
             }
         }
@@ -768,6 +776,13 @@ namespace WzComparerR2.CharaSim
                 case 15511: return "Ark (3rd)";
                 case 15512: return "Ark (4th)";
                 case 15513: return "Ark (5th)";
+
+                case 16000: return "Hoyoung";
+                case 16400: return "Hoyoung (1st)";
+                case 16410: return "Hoyoung (2nd)";
+                case 16411: return "Hoyoung (3rd)";
+                case 16412: return "Hoyoung (4th)";
+                case 16413: return "Hoyoung (5th)";
             }
             return null;
         }

@@ -174,6 +174,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         magicGauntlet = 128,
         /// <summary>
+        /// Ritual Fan 128
+        /// </summary>
+        handFan = 129,
+        /// <summary>
         /// One-Handed Sword 130
         /// </summary>
         ohSword = 130,
@@ -274,6 +278,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         whistle = 135281,
         /// <summary>
+        /// Whistle 135_84
+        /// </summary>
+        whistle2 = 135284,
+        /// <summary>
         /// Fist 135_82
         /// </summary>
         boxingClaw = 135282,
@@ -342,9 +350,13 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         pathOfAbyss = 135360,
         /// <summary>
-        /// Relic 135360
+        /// Relic 135370
         /// </summary>
         relic = 135370,
+        /// <summary>
+        /// Fan Tassel 135380
+        /// </summary>
+        fanTassel = 135380,
         /// <summary>
         /// Cane 136
         /// </summary>
