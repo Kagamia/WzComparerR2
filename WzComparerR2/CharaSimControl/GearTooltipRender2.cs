@@ -483,8 +483,7 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (hasTuc)
             {
-                g.DrawString("可升级次数 : " + value + "回", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
-                picH += 16;
+                GearGraphics.DrawString(g, "可升级次数 : " + value + "回 #c（可修复次数：0）#", GearGraphics.ItemDetailFont, 13, 256, ref picH, 16);
                 hasPart2 = true;
             }
 

@@ -330,6 +330,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.relic: return "遗物";
                 case GearType.ancientBow: return "远古弓";
 
+                case GearType.handFan: return "扇子";
+                case GearType.fanTassel: return "扇坠";
+
                 default: return null;
             }
         }
@@ -449,7 +452,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicWing: return GetExtraJobReqString(152);
 
                 case GearType.pathOfAbyss: return GetExtraJobReqString(155);
-
+                case GearType.fanTassel: return GetExtraJobReqString(164);
                 default: return null;
             }
         }
@@ -483,6 +486,7 @@ namespace WzComparerR2.CharaSim
                 case 142: return "超能力者可以装备";
                 case 152: return "圣晶使徒职业可用";
                 case 155: return "影魂异人可装备";
+                case 164: return "虎影职业群可用";
                 default: return null;
             }
         }
