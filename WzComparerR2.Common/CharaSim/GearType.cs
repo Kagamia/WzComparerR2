@@ -142,9 +142,9 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         shoes = 107,
         /// <summary>
-        /// Shining Rod 121
+        /// Shining Rod 1212
         /// </summary>
-        shiningRod = 121,
+        shiningRod = 1212,
         /// <summary>
         /// Soul Shooter 122
         /// </summary>

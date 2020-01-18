@@ -35,6 +35,7 @@ namespace WzComparerR2.CharaSim
         public int Hammer { get; set; }
         public bool HasTuc { get; internal set; }
         public bool CanPotential { get; internal set; }
+        public string EpicHs { get; internal set; }
 
         public bool FixLevel { get; internal set; }
         public List<GearLevelInfo> Levels { get; internal set; }
@@ -682,6 +683,35 @@ namespace WzComparerR2.CharaSim
                             }
                             break;
 
+                        case "onlyUpgrade":
+                            gear.Props.Add(GearPropType.onlyUpgrade, Convert.ToInt32(subNode.Nodes["0"]?.Value));
+                            break;
+
+                        case "epic":
+                            Wz_Node hsNode = subNode.Nodes["hs"];
+                            if (hsNode != null)
+                            {
+                                gear.EpicHs = Convert.ToString(hsNode.Value);
+                            }
+                            break;
+
+                        case "gatherTool":
+                            foreach (Wz_Node gatherNode in subNode.Nodes)
+                            {
+                                GearPropType type;
+                                if (Enum.TryParse(subNode.Text + "_" + gatherNode.Text, out type))
+                                {
+                                    try
+                                    {
+                                        gear.Props.Add(type, Convert.ToInt32(gatherNode.Value));
+                                    }
+                                    finally
+                                    {
+                                    }
+                                }
+                            }
+                            break;
+
                         default:
                             {
                                 GearPropType type;
@@ -716,7 +746,14 @@ namespace WzComparerR2.CharaSim
             //读取默认gearGrade
             if (gear.Props.TryGetValue(GearPropType.fixedGrade, out value))
             {
-                gear.Grade = (GearGrade)(value - 1);
+                switch (value)
+                {
+                    case 2: gear.Grade = GearGrade.B; break;
+                    case 3: gear.Grade = GearGrade.A; break;
+                    case 5: gear.Grade = GearGrade.S; break;
+                    case 7: gear.Grade = GearGrade.SS; break;
+                    default: gear.Grade = (GearGrade)(value - 1); break;
+                }
             }
 
             //自动填充Grade
