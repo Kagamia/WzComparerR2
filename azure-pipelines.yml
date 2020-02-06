@@ -27,6 +27,7 @@ variables:
   buildConfiguration: 'Release'
   outputDir_anycpu: 'WzComparerR2/WzComparerR2/bin/release'
   outputDir_x86: 'WzComparerR2/WzComparerR2/bin/x86/release'
+  outputFileName: 'WcR2_With_Plguins_$(Date:yyyyMMdd)_$(Rev:r)'
 
 steps:
 - checkout: WzComparerR2
@@ -47,6 +48,8 @@ steps:
 - task: CmdLine@2
   inputs:
     script: |
+      move "$(outputDir_anycpu)\*.dll" "$(outputDir_anycpu)\Lib"
+      del "$(outputDir_anycpu)\*.pdb"
       rename "$(outputDir_anycpu)\WzComparerR2.exe" "WzComparerR2.anycpu.exe"
       rename "$(outputDir_anycpu)\WzComparerR2.exe.config" "WzComparerR2.anycpu.exe.config"
       copy /y "$(outputDir_x86)\WzComparerR2.exe" "$(outputDir_anycpu)"
@@ -58,11 +61,19 @@ steps:
     rootFolderOrFile: '$(outputDir_anycpu)'
     includeRootFolder: false
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(outputFileName).zip'
     replaceExistingArchive: true
 
-- task: PublishBuildArtifacts@1
+- task: GitHubRelease@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    gitHubConnection: Kagamia
+    repositoryName: '$(Build.Repository.Name)'
+    action: 'edit'
+    target: '$(Build.SourceVersion)'
+    tag: 'ci-build'
+    title: 'CI-Build'
+    releaseNotesSource: 'inline'
+    releaseNotesInline: 'Auto generated from azure-pipeline.'
+    isPreRelease: true
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'
