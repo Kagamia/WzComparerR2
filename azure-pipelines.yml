@@ -68,6 +68,13 @@ steps:
   inputs:
     gitHubConnection: 'Kagamia'
     repositoryName: '$(Build.Repository.Name)'
+    action: 'delete'
+    tag: 'ci-build'
+
+- task: GitHubRelease@1
+  inputs:
+    gitHubConnection: 'Kagamia'
+    repositoryName: '$(Build.Repository.Name)'
     action: 'create'
     target: '$(Build.SourceVersion)'
     tag: 'ci-build'
