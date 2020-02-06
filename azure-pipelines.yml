@@ -32,12 +32,6 @@ steps:
 - checkout: WzComparerR2
 - checkout: CharaSimResource
 
-- task: NuGetToolInstaller@1
-
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
-
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
@@ -57,7 +51,6 @@ steps:
       rename "$(outputDir_anycpu)\WzComparerR2.exe.config" "WzComparerR2.anycpu.exe.config"
       copy /y "$(outputDir_x86)\WzComparerR2.exe" "$(outputDir_anycpu)"
       copy /y "$(outputDir_x86)\WzComparerR2.exe.config" "$(outputDir_anycpu)"
-    workingDirectory: '$(Agent.BuildDirectory)'
     failOnStderr: true
 
 - task: ArchiveFiles@2
