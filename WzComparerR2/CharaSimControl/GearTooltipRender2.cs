@@ -500,22 +500,6 @@ namespace WzComparerR2.CharaSimControl
                     g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.superiorEqp, value), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 11, picH);
                     picH += 16;
                 }
-
-                if (!Gear.GetBooleanValue(GearPropType.exceptUpgrade))
-                {
-                    int maxStar = Gear.GetMaxStar();
-
-                    if (Gear.Star > 0) //星星
-                    {
-                        g.DrawString("适用" + Gear.Star + "星强化(最高" + maxStar + "星)", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
-                        picH += 16;
-                    }
-                    else
-                    {
-                        g.DrawString("最高可强化到" + maxStar + "星", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
-                        picH += 16;
-                    }
-                }
             }
 
             if (Gear.Props.TryGetValue(GearPropType.limitBreak, out value) && value > 0) //突破上限
