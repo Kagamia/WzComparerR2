@@ -11,9 +11,11 @@ resources:
    - repository: WzComparerR2
      type: github
      name: kagamia/WzComparerR2
+     endpoint: Kagamia
    - repository: CharaSimResource
      type: github
      name: kagamia/CharaSimResource
+     endpoint: Kagamia
 
 pool:
   vmImage: 'windows-latest'
