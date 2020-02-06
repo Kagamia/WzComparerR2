@@ -66,14 +66,13 @@ steps:
 
 - task: GitHubRelease@1
   inputs:
-    gitHubConnection: Kagamia
+    gitHubConnection: 'Kagamia'
     repositoryName: '$(Build.Repository.Name)'
-    action: 'edit'
+    action: 'create'
     target: '$(Build.SourceVersion)'
     tag: 'ci-build'
     title: 'CI-Build'
     releaseNotesSource: 'inline'
-    releaseNotesInline: 'Auto generated from azure-pipeline.'
+    releaseNotesInline: 'Automation build from azure-pipeline.'
     isPreRelease: true
-    changeLogCompareToRelease: 'lastFullRelease'
-    changeLogType: 'commitBased'
+    addChangeLog: false
