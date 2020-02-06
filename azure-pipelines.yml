@@ -1,0 +1,73 @@
+# .NET Desktop
+# Build and run tests for .NET Desktop or Windows classic desktop solutions.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+
+trigger:
+- master
+
+resources:
+ repositories:
+   - repository: WzComparerR2
+     type: github
+     name: kagamia/WzComparerR2
+   - repository: CharaSimResource
+     type: github
+     name: kagamia/CharaSimResource
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: 'WzComparerR2/WzComparerR2.sln'
+  buildPlatform_anycpu: 'Any CPU'
+  buildPlatform_x86: 'x86'
+  buildConfiguration: 'Release'
+  outputDir_anycpu: 'WzComparerR2/WzComparerR2/bin/release'
+  outputDir_x86: 'WzComparerR2/WzComparerR2/bin/x86/release'
+
+steps:
+- checkout: WzComparerR2
+- checkout: CharaSimResource
+
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform_anycpu)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform_x86)'
+    configuration: '$(buildConfiguration)'
+
+- task: CmdLine@2
+  inputs:
+    script: |
+      rename "$(outputDir_anycpu)\WzComparerR2.exe" "WzComparerR2.anycpu.exe"
+      rename "$(outputDir_anycpu)\WzComparerR2.exe.config" "WzComparerR2.anycpu.exe.config"
+      copy /y "$(outputDir_x86)\WzComparerR2.exe" "$(outputDir_anycpu)"
+      copy /y "$(outputDir_x86)\WzComparerR2.exe.config" "$(outputDir_anycpu)"
+    workingDirectory: '$(Agent.BuildDirectory)'
+    failOnStderr: true
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(outputDir_anycpu)'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    replaceExistingArchive: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
