@@ -27,7 +27,7 @@ variables:
   buildConfiguration: 'Release'
   outputDir_anycpu: 'WzComparerR2/WzComparerR2/bin/release'
   outputDir_x86: 'WzComparerR2/WzComparerR2/bin/x86/release'
-  outputFileName: 'WcR2_With_Plguins_$(Date:yyyyMMdd)_$(Rev:r)'
+  outputFileName: 'WcR2_With_Plguins_$(Build.BuildNumber)'
 
 steps:
 - checkout: WzComparerR2
