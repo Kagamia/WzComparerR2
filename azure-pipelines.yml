@@ -66,6 +66,7 @@ steps:
     replaceExistingArchive: true
 
 - task: GitHubRelease@1
+  continueOnError: true
   displayName: Delete last build.
   inputs:
     gitHubConnection: 'Kagamia'
@@ -74,6 +75,7 @@ steps:
     tag: 'ci-build'
 
 - task: CmdLine@2
+  continueOnError: true
   displayName: Delete ci-build tag.
   inputs:
     script: 'git push --delete origin ci-build'
