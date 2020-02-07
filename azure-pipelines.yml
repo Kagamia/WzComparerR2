@@ -80,7 +80,7 @@ steps:
   inputs:
     script: 'git push --delete origin ci-build'
     workingDirectory: '$(Build.SourcesDirectory)\WzComparerR2'
-    failOnStderr: true
+    failOnStderr: false
 
 - task: GitHubRelease@1
   inputs:
