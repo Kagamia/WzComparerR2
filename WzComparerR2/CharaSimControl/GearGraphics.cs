@@ -202,12 +202,12 @@ namespace WzComparerR2.CharaSimControl
         {
             switch (grade)
             {
-                default:
-                case GearGrade.B: return GearPropChangeBrush;
+                case GearGrade.B: return GearNameBrushD;
                 case GearGrade.A: return GearNameBrushE;
                 case GearGrade.S: return GearNameBrushF;
                 case GearGrade.SS: return GreenBrush2;
             }
+            return null;
         }
 
         /// <summary>
