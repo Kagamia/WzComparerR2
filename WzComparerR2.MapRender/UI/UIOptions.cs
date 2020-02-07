@@ -82,7 +82,7 @@ namespace WzComparerR2.MapRender.UI
             TextBlock lblHint = new TextBlock();
             lblHint.Foreground = Brushes.Yellow;
             lblHint.VerticalAlignment = VerticalAlignment.Center;
-            lblHint.Text = "* 某些选项需要重启MapRender才能生效。";
+            lblHint.Text = "*某些選項需要重啟MapRender才能生效。";
             lblHint.Margin = new Thickness(20, 0, 0, 0);
             grid.Children.Add(lblHint);
             Grid.SetRow(lblHint, 2);
@@ -149,15 +149,15 @@ namespace WzComparerR2.MapRender.UI
 
             TextBlock lbl1 = new TextBlock();
             lbl1.VerticalAlignment = VerticalAlignment.Center;
-            lbl1.Text = "背景音乐";
+            lbl1.Text = "背景音樂";
             lbl1.Foreground = Brushes.Yellow;
             Grid.SetRow(lbl1, 0);
             Grid.SetColumn(lbl1, 0);
             grid.Children.Add(lbl1);
 
             CheckBox chk1 = new CheckBox();
-            chk1.Content = "不在最前时自动静音";
-            chk1.Margin = new Thickness(18, 0, 0, 0);
+            chk1.Content = "不在最前時自動靜音";
+            chk1.Margin = new Thickness(10, 0, 0, 0);
             chk1.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.MuteOnLeaveFocus)));
             Grid.SetRow(chk1, 1);
             Grid.SetColumn(chk1, 0);
@@ -175,7 +175,7 @@ namespace WzComparerR2.MapRender.UI
             lbl2.TextAlignment = TextAlignment.Center;
             lbl2.HorizontalAlignment = HorizontalAlignment.Center;
             lbl2.VerticalAlignment = VerticalAlignment.Center;
-            lbl2.Padding = new Thickness(24, 0, 0, 0);
+            lbl2.Padding = new Thickness(22, 0, 0, 0);
             lbl2.Text = "音量";
             pnl1.Children.Add(lbl2);
 
@@ -190,7 +190,7 @@ namespace WzComparerR2.MapRender.UI
             lblVol.TextAlignment = TextAlignment.Center;
             lblVol.HorizontalAlignment = HorizontalAlignment.Left;
             lblVol.VerticalAlignment = VerticalAlignment.Center;
-            lblVol.Padding = new Thickness(12, 0, 0, 0);
+            lblVol.Padding = new Thickness(6, 0, 0, 0);
             lblVol.SetBinding(TextBlock.TextProperty, new Binding(Slider.ValueProperty)
             {
                 Source = slider1,
@@ -200,7 +200,7 @@ namespace WzComparerR2.MapRender.UI
 
             TextBlock lbl3 = new TextBlock();
             lbl3.VerticalAlignment = VerticalAlignment.Center;
-            lbl3.Text = "默认字体";
+            lbl3.Text = "默認字體";
             lbl3.Foreground = Brushes.Yellow;
             Grid.SetRow(lbl3, 3);
             Grid.SetColumn(lbl3, 0);
@@ -215,15 +215,15 @@ namespace WzComparerR2.MapRender.UI
 
             TextBlock lbl4 = new TextBlock();
             lbl4.VerticalAlignment = VerticalAlignment.Center;
-            lbl4.Text = "地图视窗";
+            lbl4.Text = "地圖視窗";
             lbl4.Foreground = Brushes.Yellow;
             Grid.SetRow(lbl4, 4);
             Grid.SetColumn(lbl4, 0);
             grid.Children.Add(lbl4);
 
             CheckBox chk2 = new CheckBox();
-            chk2.Content = "限制地图范围";
-            chk2.Margin = new Thickness(18, 0, 0, 0);
+            chk2.Content = "限制地圖範圍";
+            chk2.Margin = new Thickness(10, 0, 0, 0);
             chk2.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.ClipMapRegion)));
             Grid.SetRow(chk2, 5);
             Grid.SetColumn(chk2, 0);
@@ -239,8 +239,8 @@ namespace WzComparerR2.MapRender.UI
             grid.Children.Add(lbl5);
 
             CheckBox chk3 = new CheckBox();
-            chk3.Content = "使用D2D绘制";
-            chk3.Margin = new Thickness(18, 0, 0, 0);
+            chk3.Content = "使用D2D繪製";
+            chk3.Margin = new Thickness(10, 0, 0, 0);
             chk3.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.UseD2dRenderer)));
             Grid.SetRow(chk3, 7);
             Grid.SetColumn(chk3, 0);
@@ -248,8 +248,8 @@ namespace WzComparerR2.MapRender.UI
             grid.Children.Add(chk3);
 
             CheckBox chk4 = new CheckBox();
-            chk4.Content = "显示Npc名称";
-            chk4.Margin = new Thickness(18, 0, 0, 0);
+            chk4.Content = "顯示Npc名稱";
+            chk4.Margin = new Thickness(10, 0, 0, 0);
             chk4.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.NpcNameVisible)));
             Grid.SetRow(chk4, 8);
             Grid.SetColumn(chk4, 0);
@@ -257,8 +257,8 @@ namespace WzComparerR2.MapRender.UI
             grid.Children.Add(chk4);
 
             CheckBox chk5 = new CheckBox();
-            chk5.Content = "显示Mob名称";
-            chk5.Margin = new Thickness(18, 0, 0, 0);
+            chk5.Content = "顯示Mob名稱";
+            chk5.Margin = new Thickness(10, 0, 0, 0);
             chk5.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.MobNameVisible)));
             Grid.SetRow(chk5, 9);
             Grid.SetColumn(chk5, 0);
@@ -278,7 +278,7 @@ namespace WzComparerR2.MapRender.UI
             grid.ColumnDefinitions.Add(new ColumnDefinition());
 
             CheckBox chk1 = new CheckBox();
-            chk1.Content = "开启TopBar";
+            chk1.Content = "開啟TopBar";
             chk1.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.TopBarVisible)));
             Grid.SetRow(chk1, 0);
             Grid.SetColumn(chk1, 0);
@@ -296,7 +296,7 @@ namespace WzComparerR2.MapRender.UI
             grid.ColumnDefinitions.Add(new ColumnDefinition());
 
             CheckBox chk1 = new CheckBox();
-            chk1.Content = "显示可视区域";
+            chk1.Content = "顯示可視區域";
             chk1.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.Minimap_CameraRegionVisible)));
             Grid.SetRow(chk1, 0);
             Grid.SetColumn(chk1, 0);
@@ -314,7 +314,7 @@ namespace WzComparerR2.MapRender.UI
             grid.ColumnDefinitions.Add(new ColumnDefinition());
 
             CheckBox chk1 = new CheckBox();
-            chk1.Content = "以Image名称作为Name";
+            chk1.Content = "以Image名稱作為Name";
             chk1.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(UIOptionsDataModel.WorldMap_UseImageNameAsInfoName)));
             Grid.SetRow(chk1, 0);
             Grid.SetColumn(chk1, 0);
@@ -331,16 +331,16 @@ namespace WzComparerR2.MapRender.UI
             
             var tips = new[]
             {
-                 "快捷键指示：",
+                 "快捷鍵指示：",
                  "",
-                 "M 小地图",
-                 "W 大地图",
-                 "Esc 设置",
-                 "Ctrl+1~9 开关图层",
-                 "Ctrl+U 解除地图范围锁定",
-                 "~ 开关控制台",
-                 "Alt+Enter 切换分辨率",
-                 "ScrollLock 截图",
+                 "M 小地圖",
+                 "W 大地圖",
+                 "Esc 設置",
+                 "Ctrl+1~0 開關圖層",
+                 "Ctrl+U 解除地圖範圍鎖定",
+                 "~ 開關控制台",
+                 "Alt+Enter 切换解析度",
+                 "ScrollLock 截圖",
             };
 
             foreach (var tip in tips)

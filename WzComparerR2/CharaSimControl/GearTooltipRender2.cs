@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using Resource = CharaSimResource.Resource;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
@@ -159,7 +160,7 @@ namespace WzComparerR2.CharaSimControl
             Graphics g = Graphics.FromImage(bitmap);
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
             StringFormat format = (StringFormat)StringFormat.GenericTypographic.Clone();
-            int value;
+            int value, value2;
 
             picH = 13;
             DrawStar2(g, ref picH); //绘制星星
@@ -172,12 +173,12 @@ namespace WzComparerR2.CharaSimControl
                 sr.Name = "(null)";
             }
             string gearName = sr.Name;
-            string nameAdd = Gear.ScrollUp > 0 ? ("+" + Gear.ScrollUp) : null;
             switch (Gear.GetGender(Gear.ItemID))
             {
-                case 0: nameAdd += "男"; break;
-                case 1: nameAdd += "女"; break;
+                case 0: gearName += " (男)"; break;
+                case 1: gearName += " (女)"; break;
             }
+            string nameAdd = Gear.ScrollUp > 0 ? ("+" + Gear.ScrollUp) : null;
             if (!string.IsNullOrEmpty(nameAdd))
             {
                 gearName += " (" + nameAdd + ")";
@@ -194,13 +195,35 @@ namespace WzComparerR2.CharaSimControl
             {
                 rankStr = ItemStringHelper.GetGearGradeString(GearGrade.Special);
             }
-            else if (!Gear.Cash) //T98后C级物品依然显示
+            else if (!Gear.Cash) //T98后C級物品依然显示
             {
                 rankStr = ItemStringHelper.GetGearGradeString(Gear.Grade);
             }
             if (rankStr != null)
             {
                 g.DrawString(rankStr, GearGraphics.ItemDetailFont, Brushes.White, 130, picH, format);
+                picH += 15;
+            }
+
+            if (Gear.Props.TryGetValue(GearPropType.royalSpecial, out value) && value > 0)
+            {
+                switch (value)
+                {
+                    case 1:
+                        TextRenderer.DrawText(g, "S標籤", GearGraphics.EquipDetailFont, new Point(261, picH), ((SolidBrush)GearGraphics.GearNameBrushA).Color, TextFormatFlags.HorizontalCenter);
+                        break;
+                    case 2:
+                        TextRenderer.DrawText(g, "R標籤", GearGraphics.EquipDetailFont, new Point(261, picH), ((SolidBrush)GearGraphics.GearNameBrushH).Color, TextFormatFlags.HorizontalCenter);
+                        break;
+                    case 3:
+                        TextRenderer.DrawText(g, "B標籤", GearGraphics.EquipDetailFont, new Point(261, picH), ((SolidBrush)GearGraphics.GearNameBrushF).Color, TextFormatFlags.HorizontalCenter);
+                        break;
+                }
+                picH += 15;
+            }
+            else if (Gear.Props.TryGetValue(GearPropType.masterSpecial, out value) && value > 0)
+            {
+                TextRenderer.DrawText(g, "M標籤", GearGraphics.EquipDetailFont, new Point(261, picH), ((SolidBrush)GearGraphics.BlueBrush).Color, TextFormatFlags.HorizontalCenter);
                 picH += 15;
             }
 
@@ -235,16 +258,24 @@ namespace WzComparerR2.CharaSimControl
             if (Gear.TimeLimited)
             {
                 DateTime time = DateTime.Now.AddDays(7d);
-                string expireStr = time.ToString("到yyyy年 M月 d日 H时 m分可以用");
+                string expireStr = time.ToString("到yyyy年 M月 d日 H時 m分可以用");
                 g.DrawString(expireStr, GearGraphics.ItemDetailFont, Brushes.White, 130, picH, format);
-                picH += 15;
+                picH += 16;
             }
             else if (Gear.GetBooleanValue(GearPropType.abilityTimeLimited))
             {
                 DateTime time = DateTime.Now.AddDays(7d);
-                string expireStr = time.ToString("效果持续到yyyy年M月d日H点m分");
+                string expireStr;
+                if (!Gear.Cash)
+                {
+                    expireStr = time.ToString("效果持續到yyyy年M月d日H點m分為止");
+                }
+                else
+                {
+                    expireStr = time.ToString("yyyy年M月d日HH時可以用");
+                }
                 g.DrawString(expireStr, GearGraphics.ItemDetailFont, Brushes.White, 130, picH, format);
-                picH += 15;
+                picH += 16;
             }
 
             //分割线1号
@@ -290,19 +321,23 @@ namespace WzComparerR2.CharaSimControl
             }
             if (Gear.Cash) //绘制cash标识
             {
-                /* not installed since CMST136
-                 * 
+                Bitmap cashImg = null;
+
                 if (Gear.Props.TryGetValue(GearPropType.royalSpecial, out value) && value > 0)
-                    g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_label_0),
-                        18 + 68 - 26,
-                        picH + 15 + 68 - 26);
+                {
+                    string resKey = $"CashShop_img_CashItem_label_{value - 1}";
+                    cashImg = Resource.ResourceManager.GetObject(resKey) as Bitmap;
+                }
                 else if (Gear.Props.TryGetValue(GearPropType.masterSpecial, out value) && value > 0)
-                    g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_label_3),
-                        18 + 68 - 26,
-                        picH + 15 + 68 - 26);
-                else
-                */
-                g.DrawImage(GearGraphics.EnlargeBitmap(Resource.CashItem_0),
+                {
+                    cashImg = Resource.CashItem_label_3;
+                }
+                if (cashImg == null) //default cashImg
+                {
+                   cashImg = Resource.CashItem_0;
+                }
+
+                g.DrawImage(GearGraphics.EnlargeBitmap(cashImg),
                     18 + 68 - 26,
                     picH + 15 + 68 - 26);
             }
@@ -319,16 +354,17 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
 
-            g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, 16, picH + 14); //绘制左上角cover
+			g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_old, 14 - 2 + 5, picH + 9 + 5);
+			g.DrawImage(Resource.UIToolTip_img_Item_ItemIcon_cover, 16, picH + 14); //绘制左上角cover
 
             //绘制攻击力变化
             format.Alignment = StringAlignment.Far;
-            g.DrawString("攻击力提升", GearGraphics.ItemDetailFont, GearGraphics.GrayBrush2, 251, picH + 10, format);
+            g.DrawString("攻擊力增加量", GearGraphics.ItemDetailFont, GearGraphics.GrayBrush2, 251, picH + 10, format);
             g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_incline_0, 249 - 19, picH + 27); //暂时画个0
 
             //绘制属性需求
             DrawGearReq(g, 97, picH + 58);
-            picH += 93;
+            picH += 94;
 
             //绘制属性变化
             DrawPropDiffEx(g, 12, picH);
@@ -341,13 +377,13 @@ namespace WzComparerR2.CharaSimControl
             g.DrawImage(res["dotline"].Image, 0, picH);
             picH += 8;
 
-            bool hasPart2 = false;
+            bool hasPart2 = Gear.Cash;
             format.Alignment = StringAlignment.Center;
 
             //绘制属性
             if (Gear.Props.TryGetValue(GearPropType.superiorEqp, out value) && value > 0)
             {
-                g.DrawString("极真", GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 130, picH, format);
+                g.DrawString("尊貴", GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 130, picH, format);
                 picH += 16;
             }
             if (Gear.Props.TryGetValue(GearPropType.limitBreak, out value) && value > 0)
@@ -356,22 +392,30 @@ namespace WzComparerR2.CharaSimControl
                 picH += 16;
             }
 
-            //绘制装备升级
+            //绘制装备升級
             if (Gear.Props.TryGetValue(GearPropType.level, out value) && !Gear.FixLevel)
             {
                 bool max = (Gear.Levels != null && value >= Gear.Levels.Count);
-                g.DrawString("成长等级: " + (max ? "MAX" : value.ToString()), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
+                g.DrawString("成長等級: " + (max ? "MAX" : value.ToString()), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
                 picH += 16;
-                g.DrawString("成长经验值: " + (max ? "MAX" : "0%"), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
+                g.DrawString("成長經驗值" + (max ? ": MAX" : " : 0%"), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
                 picH += 16;
             }
+            else if (Gear.ItemID / 10000 == 171)
+            {
+                TextRenderer.DrawText(g, "成長等級 : 1", GearGraphics.ItemDetailFont, new Point(13, picH), ((SolidBrush)GearGraphics.OrangeBrush3).Color, TextFormatFlags.NoPadding);
+                picH += 15;
+                TextRenderer.DrawText(g, "成長值 : 1 / 12 ( 8% )", GearGraphics.ItemDetailFont, new Point(13, picH), ((SolidBrush)GearGraphics.OrangeBrush3).Color, TextFormatFlags.NoPadding);
+                picH += 15;
+            }
+
 
             if (Gear.Props.TryGetValue(GearPropType.@sealed, out value))
             {
                 bool max = (Gear.Seals != null && value >= Gear.Seals.Count);
-                g.DrawString("封印解除阶段 : " + (max ? "MAX" : value.ToString()), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
+                g.DrawString("封印解除階段 : " + (max ? "MAX" : value.ToString()), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
                 picH += 16;
-                g.DrawString("封印解除经验值 : " + (max ? "MAX" : "0%"), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
+                g.DrawString("封印解除經驗值 : " + (max ? "MAX" : "0%"), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
                 picH += 16;
             }
 
@@ -389,20 +433,20 @@ namespace WzComparerR2.CharaSimControl
             {
                 if (isWeapon)
                 {
-                    typeStr = "武器分类 : " + typeStr;
+                    typeStr = "武器分類 : " + typeStr;
                 }
                 else
                 {
-                    typeStr = "装备分类 : " + typeStr;
+                    typeStr = "裝備分類 : " + typeStr;
                 }
 
-                if (Gear.IsLeftWeapon(Gear.type) || Gear.type == GearType.katara)
+                if (!Gear.Cash && (Gear.IsLeftWeapon(Gear.type) || Gear.type == GearType.katara))
                 {
-                    typeStr += " (单手武器)";
+                    typeStr += " (單手武器)";
                 }
-                else if (Gear.IsDoubleHandWeapon(Gear.type))
+                else if (!Gear.Cash && Gear.IsDoubleHandWeapon(Gear.type))
                 {
-                    typeStr += " (双手武器)";
+                    typeStr += " (雙手武器)";
                 }
                 g.DrawString(typeStr, GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
                 picH += 16;
@@ -415,17 +459,17 @@ namespace WzComparerR2.CharaSimControl
                 value = 6; //给予默认速度
             }
             //  if (gear.Props.TryGetValue(GearPropType.attackSpeed, out value) && value > 0)
-            if (value > 0)
+            if (!Gear.Cash && value > 0)
             {
-                g.DrawString("攻击速度 : " + ItemStringHelper.GetAttackSpeedString(value) + (ShowSpeed ? (" (" + value + ")") : null),
+                g.DrawString("攻擊速度 : " + ItemStringHelper.GetAttackSpeedString(value) + (ShowSpeed ? (" (" + value + ")") : null),
                     GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
                 picH += 16;
                 hasPart2 = true;
             }
-            //机器人等级
+            //機器人等級
             if (Gear.Props.TryGetValue(GearPropType.grade, out value) && value > 0)
             {
-                g.DrawString("等级 : " + value, GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
+                g.DrawString("等級 : " + value, GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
                 picH += 16;
                 hasPart2 = true;
             }
@@ -438,6 +482,11 @@ namespace WzComparerR2.CharaSimControl
                 if ((int)p.Key < 100 && p.Value != 0)
                     props.Add(p.Key);
             }
+            foreach (KeyValuePair<GearPropType, int> p in Gear.AbilityTimeLimited)
+            {
+                if ((int)p.Key < 100 && p.Value != 0 && !props.Contains(p.Key))
+                    props.Add(p.Key);
+            }
             props.Sort();
             //bool epic = Gear.Props.TryGetValue(GearPropType.epicItem, out value) && value > 0;
             foreach (GearPropType type in props)
@@ -448,9 +497,12 @@ namespace WzComparerR2.CharaSimControl
 
                 //绘制属性变化
                 Gear.StandardProps.TryGetValue(type, out value); //standard value
-                var propStr = ItemStringHelper.GetGearPropDiffString(type, Gear.Props[type], value);
-                GearGraphics.DrawString(g, propStr, GearGraphics.ItemDetailFont, 13, 256, ref picH, 16);
-                hasPart2 = true;
+                if (value > 0 || Gear.Props[type] > 0)
+                {
+                    var propStr = ItemStringHelper.GetGearPropDiffString(type, Gear.Props[type], value);
+                    GearGraphics.DrawString(g, propStr, GearGraphics.ItemDetailFont, 13, 244, ref picH, 16);
+                    hasPart2 = true;
+                }
             }
 
             //戒指特殊潜能
@@ -478,21 +530,21 @@ namespace WzComparerR2.CharaSimControl
             bool hasTuc = Gear.HasTuc && Gear.Props.TryGetValue(GearPropType.tuc, out value);
             if (Gear.GetBooleanValue(GearPropType.exceptUpgrade))
             {
-                g.DrawString("无法强化", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
+                g.DrawString("無法強化", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
                 picH += 16;
             }
             else if (hasTuc)
             {
-                GearGraphics.DrawString(g, "可升级次数 : " + value + "回 #c（可修复次数：0）#", GearGraphics.ItemDetailFont, 13, 256, ref picH, 16);
+                GearGraphics.DrawString(g, "可使用卷軸次數：" + value + " #c (可恢復次數: 0) #", GearGraphics.ItemDetailFont, 13, 256, ref picH, 16);
                 hasPart2 = true;
             }
 
             //星星锤子
-            if (hasTuc && Gear.Hammer > -1)
+            if (hasTuc && Gear.Hammer > -1 && Gear.GetMaxStar() > 0)
             {
-                if (Gear.Hammer == 2)
+                if (Gear.Hammer >= 1)
                 {
-                    g.DrawString("黄金锤提炼完成", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
+                    g.DrawString("黃金鐵槌提煉完成", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
                     picH += 16;
                 }
                 if (Gear.Props.TryGetValue(GearPropType.superiorEqp, out value) && value > 0) //极真
@@ -509,16 +561,16 @@ namespace WzComparerR2.CharaSimControl
                 hasPart2 = true;
             }
 
-            if (hasTuc && Gear.Hammer > -1)
+            /*if (hasTuc && Gear.Hammer > -1)
             {
                 picH += 2;
-                g.DrawString("金锤子已提高的强化次数", GearGraphics.ItemDetailFont, GearGraphics.GoldHammerBrush, 11, picH);
+                g.DrawString("黃金鐵槌已提高的強化次數", GearGraphics.ItemDetailFont, GearGraphics.GoldHammerBrush, 11, picH);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
                 g.DrawString(": " + Gear.Hammer.ToString() + (Gear.Hammer == 2 ? "(MAX)" : null), GearGraphics.TahomaFont, GearGraphics.GoldHammerBrush, 145, picH - 2);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
                 picH += 16;
                 hasPart2 = true;
-            }
+            }*/
 
             picH += 5;
 
@@ -536,7 +588,7 @@ namespace WzComparerR2.CharaSimControl
                 {
                     int reqLvl;
                     Gear.Props.TryGetValue(GearPropType.reqLevel, out reqLvl);
-                    g.DrawString("增加各角色等级能力值(" + reqLvl + "Lv为止)", GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 130, picH, format);
+                    g.DrawString("增加各角色等級能力值(" + reqLvl + "Lv為止)", GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 130, picH, format);
                     picH += 20;
 
                     int reduceLvl;
@@ -558,7 +610,7 @@ namespace WzComparerR2.CharaSimControl
 
                     if (hasReduce)
                     {
-                        g.DrawString("升级及强化时，视做" + reqLvl + "Lv武器", GearGraphics.ItemDetailFont, GearGraphics.GrayBrush2, 12, picH, StringFormat.GenericTypographic);
+                        g.DrawString("升級及強化時，視做" + reqLvl + "Lv武器", GearGraphics.ItemDetailFont, GearGraphics.GrayBrush2, 12, picH, StringFormat.GenericTypographic);
                         picH += 16;
                     }
                 }
@@ -583,7 +635,7 @@ namespace WzComparerR2.CharaSimControl
                     picH += 8;
                 }
                 g.DrawImage(GetAdditionalOptionIcon(Gear.Grade), 9, picH - 1);
-                g.DrawString("潜在属性", GearGraphics.ItemDetailFont, GearGraphics.GetPotentialTextBrush(Gear.Grade), 25, picH);
+                g.DrawString("潛在屬性", GearGraphics.ItemDetailFont, GearGraphics.GetPotentialTextBrush(Gear.Grade), 25, picH);
                 picH += 17;
                 foreach (Potential potential in Gear.Options)
                 {
@@ -623,7 +675,7 @@ namespace WzComparerR2.CharaSimControl
                     picH += 8;
                 }
                 g.DrawImage(GetAdditionalOptionIcon(Gear.AdditionGrade), 8, picH - 1);
-                g.DrawString("附加潜能", GearGraphics.ItemDetailFont, GearGraphics.GetPotentialTextBrush(Gear.AdditionGrade), 26, picH);
+                g.DrawString("附加潛能", GearGraphics.ItemDetailFont, GearGraphics.GetPotentialTextBrush(Gear.AdditionGrade), 26, picH);
                 picH += 17;
 
                 foreach (Potential potential in Gear.AdditionalOptions)
@@ -649,8 +701,13 @@ namespace WzComparerR2.CharaSimControl
             {
                 if (Gear.Props.TryGetValue(type, out value) && value != 0)
                 {
-                    desc.Add(ItemStringHelper.GetGearPropString(type, value));
+                    desc.Add(" " + ItemStringHelper.GetGearPropString(type, value));
                 }
+            }
+            
+            if (!string.IsNullOrEmpty(Gear.EpicHs) && sr[Gear.EpicHs] != null)
+            {
+                desc.Add(sr[Gear.EpicHs].Replace("#", " #"));
             }
 
             //绘制倾向
@@ -659,26 +716,66 @@ namespace WzComparerR2.CharaSimControl
                 string incline = null;
                 GearPropType[] inclineTypes = new GearPropType[]{
                     GearPropType.charismaEXP,
-                    GearPropType.senseEXP,
                     GearPropType.insightEXP,
                     GearPropType.willEXP,
                     GearPropType.craftEXP,
+                    GearPropType.senseEXP,
                     GearPropType.charmEXP };
 
                 string[] inclineString = new string[]{
-                    "领导力","感性","洞察力","意志","手技","魅力"};
+                    "領導力","洞察力","意志","手藝","感性","魅力"};
 
                 for (int i = 0; i < inclineTypes.Length; i++)
                 {
-                    if (Gear.Props.TryGetValue(inclineTypes[i], out value) && value > 0)
+                    bool success = Gear.Props.TryGetValue(inclineTypes[i], out value);
+
+                    if (inclineTypes[i] == GearPropType.charmEXP && Gear.Cash)
                     {
-                        incline += "，" + inclineString[i] + value;
+                        success = true;
+                        switch (Gear.type)
+                        {
+                            case GearType.cashWeapon: value = 60; break;
+                            case GearType.cap: value = 50; break;
+                            case GearType.cape: value = 30; break;
+                            case GearType.longcoat: value = 60; break;
+                            case GearType.coat: value = 30; break;
+                            case GearType.pants: value = 30; break;
+                            case GearType.shoes: value = 40; break;
+                            case GearType.glove: value = 40; break;
+                            case GearType.earrings: value = 40; break;
+                            case GearType.faceAccessory: value = 40; break;
+                            case GearType.eyeAccessory: value = 40; break;
+                            default: success = false; break;
+                        }
+
+                        if (Gear.Props.TryGetValue(GearPropType.cashForceCharmExp, out value2))
+                        {
+                            success = true;
+                            value = value2;
+                        }
+                    }
+
+                    if (success && value > 0)
+                    {
+                        incline += "， " + inclineString[i] + " " + value;
                     }
                 }
 
+                desc.Add("");
+                
                 if (!string.IsNullOrEmpty(incline))
                 {
-                    desc.Add("\n #c装备时可以获得" + incline.Substring(1) + "的经验值，仅限1次。#");
+                    desc.Add("\n #c裝備時可獲得僅限1次" + incline.Substring(2) + "的經驗值。#");
+                }
+
+                if (Gear.type != GearType.pickaxe && Gear.type != GearType.shovel && PluginBase.PluginManager.FindWz(string.Format("Effect/ItemEff.img/{0}/effect", Gear.ItemID)) != null)
+                {
+                    desc.Add(" #c這是角色資料窗等，部份狀況是不會顯示的道具。#");
+                }
+
+                if (desc.Last() == "")
+                {
+                    desc.RemoveAt(desc.Count - 1);
                 }
             }
 
@@ -720,7 +817,7 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (!string.IsNullOrEmpty(sr.Desc))
                 {
-                    GearGraphics.DrawString(g, sr.Desc, GearGraphics.ItemDetailFont2, 11, 245, ref picH, 16);
+                    GearGraphics.DrawString(g, sr.Desc.Replace("#", " #"), GearGraphics.ItemDetailFont2, 11, 245, ref picH, 16);
                 }
                 if (!string.IsNullOrEmpty(levelDesc))
                 {
@@ -746,7 +843,7 @@ namespace WzComparerR2.CharaSimControl
                     string exclusiveEquip;
                     if (!string.IsNullOrEmpty(kv.Value.Info))
                     {
-                        exclusiveEquip = "#c" + kv.Value.Info + "类道具无法重复使用。#";
+                        exclusiveEquip = "#c" + kv.Value.Info + "該道具無法重複使用。#";
                     }
                     else
                     {
@@ -759,9 +856,13 @@ namespace WzComparerR2.CharaSimControl
                                 sr2 = new StringResult();
                                 sr2.Name = "(null)";
                             }
-                            itemNames.Add(sr2.Name);
+                            if (!itemNames.Contains(sr2.Name))
+                            {
+                                itemNames.Add(sr2.Name);
+                            }
                         }
-                        exclusiveEquip = "#c无法重复装备" + string.Join(", ", itemNames) + "。#";
+
+                        exclusiveEquip = "#c無法重複裝備" + string.Join(", ", itemNames) + "。#";
                     }
                     GearGraphics.DrawString(g, exclusiveEquip, GearGraphics.ItemDetailFont, 11, 246, ref picH, 16);
                     break;
@@ -849,18 +950,18 @@ namespace WzComparerR2.CharaSimControl
                     g = Graphics.FromImage(levelOrSealed);
                 }
                 picHeight += 13;
-                g.DrawString("装备成长属性", GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 130, picHeight, format);
+                g.DrawString("裝備成長屬性", GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 130, picHeight, format);
                 picHeight += 16;
                 if (Gear.FixLevel)
                 {
-                    g.DrawString("[装备获取时固定等级]", GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush, 130, picHeight, format);
+                    g.DrawString("[裝備獲取時固定等級]", GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush, 130, picHeight, format);
                     picHeight += 16;
                 }
 
                 for (int i = 0; i < Gear.Levels.Count; i++)
                 {
                     var info = Gear.Levels[i];
-                    g.DrawString("等级 " + info.Level + (i >= Gear.Levels.Count - 1 ? "(MAX)" : null), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 10, picHeight);
+                    g.DrawString("等級 " + info.Level + (i >= Gear.Levels.Count - 1 ? "(MAX)" : null), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 10, picHeight);
                     picHeight += 16;
                     foreach (var kv in info.BonusProps)
                     {
@@ -876,7 +977,7 @@ namespace WzComparerR2.CharaSimControl
                     }
                     if (info.Skills.Count > 0)
                     {
-                        string title = string.Format("有 {2:P2}({0}/{1}) 的几率获得技能 :", info.Prob, info.ProbTotal, info.Prob * 1.0 / info.ProbTotal);
+                        string title = string.Format("有 {2:P2}({0}/{1}) 的機率獲得技能 :", info.Prob, info.ProbTotal, info.Prob * 1.0 / info.ProbTotal);
                         g.DrawString(title, GearGraphics.ItemDetailFont, Brushes.White, 10, picHeight);
                         picHeight += 16;
                         foreach (var kv in info.Skills)
@@ -896,11 +997,11 @@ namespace WzComparerR2.CharaSimControl
                         string title;
                         if (info.Prob < info.ProbTotal)
                         {
-                            title = string.Format("有 {2:P2}({0}/{1}) 的几率装备时获得技能 :", info.Prob, info.ProbTotal, info.Prob * 1.0 / info.ProbTotal);
+                            title = string.Format("有 {2:P2}({0}/{1}) 的機率裝備時獲得技能 :", info.Prob, info.ProbTotal, info.Prob * 1.0 / info.ProbTotal);
                         }
                         else
                         {
-                            title = "装备时获得技能 :";
+                            title = "裝備時獲得技能 :";
                         }
                         g.DrawString(title, GearGraphics.ItemDetailFont, Brushes.White, 10, picHeight);
                         picHeight += 16;
@@ -918,7 +1019,7 @@ namespace WzComparerR2.CharaSimControl
                     }
                     if (info.Exp > 0)
                     {
-                        g.DrawString("经验成长率 : " + info.Exp + "%", GearGraphics.ItemDetailFont, Brushes.White, 10, picHeight);
+                        g.DrawString("經驗成長率 : " + info.Exp + "%", GearGraphics.ItemDetailFont, Brushes.White, 10, picHeight);
                         picHeight += 16;
                     }
 
@@ -940,7 +1041,7 @@ namespace WzComparerR2.CharaSimControl
                 {
                     var info = Gear.Seals[i];
 
-                    g.DrawString("等级 " + info.Level + (i >= Gear.Seals.Count - 1 ? "(MAX)" : null), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 10, picHeight);
+                    g.DrawString("等級 " + info.Level + (i >= Gear.Seals.Count - 1 ? "(MAX)" : null), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 10, picHeight);
                     picHeight += 16;
                     var props = this.IsCombineProperties ? Gear.CombineProperties(info.BonusProps) : info.BonusProps;
                     foreach (var kv in props)
@@ -954,14 +1055,14 @@ namespace WzComparerR2.CharaSimControl
                         Bitmap icon = info.Icon.Bitmap ?? info.IconRaw.Bitmap;
                         if (icon != null)
                         {
-                            g.DrawString("图标 : ", GearGraphics.ItemDetailFont, Brushes.White, 10, picHeight + icon.Height / 2 - 6);
+                            g.DrawString("圖標 : ", GearGraphics.ItemDetailFont, Brushes.White, 10, picHeight + icon.Height / 2 - 6);
                             g.DrawImage(icon, 52, picHeight);
                             picHeight += icon.Height;
                         }
                     }
                     if (info.Exp > 0)
                     {
-                        g.DrawString("经验成长率 : " + info.Exp + "%", GearGraphics.ItemDetailFont, Brushes.White, 10, picHeight);
+                        g.DrawString("經驗成長率 : " + info.Exp + "%", GearGraphics.ItemDetailFont, Brushes.White, 10, picHeight);
                         picHeight += 16;
                     }
                     picHeight += 2;
@@ -998,9 +1099,14 @@ namespace WzComparerR2.CharaSimControl
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.tradeBlock, value));
             }
+            if (Gear.Props.TryGetValue(GearPropType.onlyEquip, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.onlyEquip, value));
+            }
             if (Gear.Props.TryGetValue(GearPropType.abilityTimeLimited, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.abilityTimeLimited, value));
+                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.notExtend, value));
             }
             if (Gear.Props.TryGetValue(GearPropType.equipTradeBlock, out value) && value != 0)
             {
@@ -1017,23 +1123,27 @@ namespace WzComparerR2.CharaSimControl
             }
             if (Gear.Props.TryGetValue(GearPropType.accountSharable, out value) && value != 0)
             {
-                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.accountSharable, value));
+                int value2;
+                if (Gear.Props.TryGetValue(GearPropType.sharableOnce, out value2) && value2 != 0)
+                {
+                    tags.Add(ItemStringHelper.GetGearPropString(GearPropType.sharableOnce, value2));
+                }
+                else
+                {
+                    tags.Add(ItemStringHelper.GetGearPropString(GearPropType.accountSharable, value));
+                }
             }
             if (Gear.Props.TryGetValue(GearPropType.blockGoldHammer, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.blockGoldHammer, value));
             }
-            if (Gear.Props.TryGetValue(GearPropType.noPotential, out value) && value != 0)
-            {
-                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.noPotential, value));
-            }
-            if (Gear.Props.TryGetValue(GearPropType.fixedPotential, out value) && value != 0)
+            if ((Gear.Props.TryGetValue(GearPropType.fixedPotential, out value) && value != 0) || (Gear.Props.TryGetValue(GearPropType.fixedGrade, out value) && value != 0))
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.fixedPotential, value));
             }
-            if (Gear.Props.TryGetValue(GearPropType.onlyEquip, out value) && value != 0)
+            if (Gear.Props.TryGetValue(GearPropType.noPotential, out value) && value != 0)
             {
-                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.onlyEquip, value));
+                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.noPotential, value));
             }
             if (Gear.Props.TryGetValue(GearPropType.notExtend, out value) && value != 0)
             {
@@ -1075,7 +1185,7 @@ namespace WzComparerR2.CharaSimControl
             bool can;
             NumberType type;
             Size size;
-            //需求等级
+            //需求等級
             this.Gear.Props.TryGetValue(GearPropType.reqLevel, out value);
             {
                 int reduceReq;
@@ -1089,7 +1199,7 @@ namespace WzComparerR2.CharaSimControl
             g.DrawImage(FindReqImage(type, "reqLEV", out size), x, y);
             DrawReqNum(g, value.ToString().PadLeft(3), (type == NumberType.Can ? NumberType.YellowNumber : type), x + 54, y, StringAlignment.Near);
 
-            //需求人气
+            //需求人氣
             this.Gear.Props.TryGetValue(GearPropType.reqPOP, out value);
             can = this.charStat == null || this.charStat.Pop >= value;
             type = GetReqType(can, value);
@@ -1109,7 +1219,7 @@ namespace WzComparerR2.CharaSimControl
             DrawReqNum(g, value.ToString("D3"), type, x + 54, y, StringAlignment.Near);
 
 
-            //需求运气
+            //需求幸運
             this.Gear.Props.TryGetValue(GearPropType.reqLUK, out value);
             can = this.charStat == null || this.charStat.Luck.GetSum() >= value;
             type = GetReqType(can, value);
@@ -1155,7 +1265,7 @@ namespace WzComparerR2.CharaSimControl
             numValue = (value > 0 ? "+ " : null) + value + " % ";
             DrawReqNum(g, numValue, NumberType.LookAhead, x - 5 + 3, y + 6, StringAlignment.Far);
 
-            //无视防御
+            //無視防禦
             g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_icon_igpddr, x, y);
             x += 62;
             this.Gear.Props.TryGetValue(GearPropType.imdR, out value);
@@ -1173,8 +1283,8 @@ namespace WzComparerR2.CharaSimControl
 
             int reqJob;
             Gear.Props.TryGetValue(GearPropType.reqJob, out reqJob);
-            int[] origin = new int[] { 9, 4, 42, 4, 78, 5, 124, 4, 165, 5, 200, 5 };
-            int[] origin2 = new int[] { 10, 6, 44, 6, 79, 6, 126, 6, 166, 6, 201, 6 };
+            int[] origin = new int[] { 7, 5, 54, 5, 89, 5, 124, 4, 170, 4, 205, 5 };
+            int[] origin2 = new int[] { 6, 5, 53, 5, 79, 6, 126, 6, 166, 6, 201, 6 };
             for (int i = 0; i <= 5; i++)
             {
                 bool enable;
@@ -1242,7 +1352,7 @@ namespace WzComparerR2.CharaSimControl
 
         private void DrawStar2(Graphics g, ref int picH)
         {
-            int maxStar = Gear.GetMaxStar();
+            int maxStar = Math.Max(Gear.GetMaxStar(), Gear.Star);
             if (maxStar > 0)
             {
                 for (int i = 0; i < maxStar; i += 15)

@@ -23,6 +23,7 @@ namespace WzComparerR2.MapRender.Patches2
         public int ScreenMode { get; set; }
         public bool Flip { get; set; }
         public bool IsFront { get; set; }
+        public List<Tuple<int, int>> Quest { get; set; }
 
         
         public ItemView View { get; set; }
@@ -49,6 +50,15 @@ namespace WzComparerR2.MapRender.Patches2
                 Flip = node.Nodes["f"].GetValueEx(false),
                 IsFront = node.Nodes["front"].GetValueEx(false),
             };
+            item.Quest = new List<Tuple<int, int>>();
+            if (node.Nodes["backTags"] != null)
+            {
+                int questID;
+                if (int.TryParse(node.Nodes["backTags"].GetValueEx<string>(null), out questID))
+                {
+                    item.Quest.Add(new Tuple<int, int>(questID, 1));
+                }
+            }
             return item;
         }
 

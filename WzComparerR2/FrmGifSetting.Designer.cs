@@ -91,7 +91,7 @@
             this.labelX1.Name = "labelX1";
             this.labelX1.Size = new System.Drawing.Size(99, 16);
             this.labelX1.TabIndex = 0;
-            this.labelX1.Text = "BackGroundColor";
+            this.labelX1.Text = "背景顏色";
             // 
             // checkBoxX1
             // 
@@ -105,7 +105,7 @@
             this.checkBoxX1.Size = new System.Drawing.Size(163, 16);
             this.checkBoxX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX1.TabIndex = 2;
-            this.checkBoxX1.Text = "Background &Transparent";
+            this.checkBoxX1.Text = "背景透明";
             // 
             // buttonX1
             // 
@@ -143,7 +143,7 @@
             this.labelX2.Name = "labelX2";
             this.labelX2.Size = new System.Drawing.Size(56, 16);
             this.labelX2.TabIndex = 5;
-            this.labelX2.Text = "FileName";
+            this.labelX2.Text = "檔案名稱";
             // 
             // comboBoxEx1
             // 
@@ -164,15 +164,15 @@
             // 
             // comboItem1
             // 
-            this.comboItem1.Text = "BuildIn";
+            this.comboItem1.Text = "內置";
             // 
             // comboItem2
             // 
-            this.comboItem2.Text = "Index Gif Encoder";
+            this.comboItem2.Text = "Index Gif 編碼";
             // 
             // comboItem6
             // 
-            this.comboItem6.Text = "Apng Encoder";
+            this.comboItem6.Text = "Apng 編碼";
             // 
             // labelX3
             // 
@@ -185,7 +185,7 @@
             this.labelX3.Name = "labelX3";
             this.labelX3.Size = new System.Drawing.Size(87, 16);
             this.labelX3.TabIndex = 3;
-            this.labelX3.Text = "MinAlphaMixed";
+            this.labelX3.Text = "Alpha混合";
             // 
             // slider1
             // 
@@ -216,7 +216,7 @@
             this.labelX4.Name = "labelX4";
             this.labelX4.Size = new System.Drawing.Size(68, 16);
             this.labelX4.TabIndex = 0;
-            this.labelX4.Text = "BackGround";
+            this.labelX4.Text = "背景";
             // 
             // rdoMosaic
             // 
@@ -230,9 +230,9 @@
             this.rdoMosaic.Name = "rdoMosaic";
             this.rdoMosaic.Size = new System.Drawing.Size(64, 16);
             this.rdoMosaic.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.rdoMosaic, new DevComponents.DotNetBar.SuperTooltipInfo("", "", "使用马赛克晶格作为背景生成Gif动画", null, null, DevComponents.DotNetBar.eTooltipColor.System));
+            this.superTooltip1.SetSuperTooltip(this.rdoMosaic, new DevComponents.DotNetBar.SuperTooltipInfo("", "", "使用馬賽克晶格作為背景生成Gif動畫", null, null, DevComponents.DotNetBar.eTooltipColor.System));
             this.rdoMosaic.TabIndex = 3;
-            this.rdoMosaic.Text = "Mosaic";
+            this.rdoMosaic.Text = "馬賽克";
             this.rdoMosaic.CheckedChanged += new System.EventHandler(this.rdoMosaic_CheckedChanged);
             // 
             // panelExMosaic
@@ -270,7 +270,7 @@
             this.labelX7.Name = "labelX7";
             this.labelX7.Size = new System.Drawing.Size(62, 16);
             this.labelX7.TabIndex = 4;
-            this.labelX7.Text = "BlockSize";
+            this.labelX7.Text = "拼塊大小";
             // 
             // labelX6
             // 
@@ -283,7 +283,7 @@
             this.labelX6.Name = "labelX6";
             this.labelX6.Size = new System.Drawing.Size(44, 16);
             this.labelX6.TabIndex = 2;
-            this.labelX6.Text = "Color1";
+            this.labelX6.Text = "顏色1";
             // 
             // labelX5
             // 
@@ -296,7 +296,7 @@
             this.labelX5.Name = "labelX5";
             this.labelX5.Size = new System.Drawing.Size(44, 16);
             this.labelX5.TabIndex = 0;
-            this.labelX5.Text = "Color0";
+            this.labelX5.Text = "顏色0";
             // 
             // slider2
             // 
@@ -378,9 +378,9 @@
             this.rdoColor.Name = "rdoColor";
             this.rdoColor.Size = new System.Drawing.Size(57, 16);
             this.rdoColor.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.rdoColor, new DevComponents.DotNetBar.SuperTooltipInfo("", "", "使用透明或纯色背景生成Gif动画。", null, null, DevComponents.DotNetBar.eTooltipColor.System));
+            this.superTooltip1.SetSuperTooltip(this.rdoColor, new DevComponents.DotNetBar.SuperTooltipInfo("", "", "使用透明或純色背景生成Gif動畫。", null, null, DevComponents.DotNetBar.eTooltipColor.System));
             this.rdoColor.TabIndex = 1;
-            this.rdoColor.Text = "Color";
+            this.rdoColor.Text = "顏色";
             this.rdoColor.CheckedChanged += new System.EventHandler(this.rdoColor_CheckedChanged);
             // 
             // superTooltip1
@@ -399,7 +399,7 @@
             this.checkBoxX2.Size = new System.Drawing.Size(144, 16);
             this.checkBoxX2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX2.TabIndex = 8;
-            this.checkBoxX2.Text = "Save Frames As .png";
+            this.checkBoxX2.Text = "儲存為 .png";
             // 
             // labelX8
             // 
@@ -412,7 +412,7 @@
             this.labelX8.Name = "labelX8";
             this.labelX8.Size = new System.Drawing.Size(37, 16);
             this.labelX8.TabIndex = 8;
-            this.labelX8.Text = "Delay";
+            this.labelX8.Text = "延遲";
             // 
             // integerInput1
             // 
@@ -443,7 +443,7 @@
             this.labelX9.Name = "labelX9";
             this.labelX9.Size = new System.Drawing.Size(50, 16);
             this.labelX9.TabIndex = 16;
-            this.labelX9.Text = "Encoder";
+            this.labelX9.Text = "編碼";
             // 
             // comboBoxEx2
             // 
@@ -464,15 +464,15 @@
             // 
             // comboItem3
             // 
-            this.comboItem3.Text = "Default";
+            this.comboItem3.Text = "預設";
             // 
             // comboItem4
             // 
-            this.comboItem4.Text = "PathToImage";
+            this.comboItem4.Text = "圖像路徑";
             // 
             // comboItem5
             // 
-            this.comboItem5.Text = "PathToWz";
+            this.comboItem5.Text = "Wz路徑";
             // 
             // checkBoxX3
             // 
@@ -486,7 +486,7 @@
             this.checkBoxX3.Size = new System.Drawing.Size(76, 16);
             this.checkBoxX3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX3.TabIndex = 23;
-            this.checkBoxX3.Text = "Optimize";
+            this.checkBoxX3.Text = "最佳化";
             // 
             // FrmGifSetting
             // 
@@ -513,7 +513,7 @@
             this.MinimizeBox = false;
             this.Name = "FrmGifSetting";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Gif输出设置";
+            this.Text = "Gif輸出設置";
             this.panelExMosaic.ResumeLayout(false);
             this.panelExMosaic.PerformLayout();
             this.panelExColor.ResumeLayout(false);

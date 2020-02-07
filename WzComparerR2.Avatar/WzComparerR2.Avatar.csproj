@@ -48,6 +48,8 @@
   <ItemGroup>
     <Compile Include="Action.cs" />
     <Compile Include="ActionFrame.cs" />
+    <Compile Include="EffectStruction.cs" />
+    <Compile Include="MixHairInfo.cs" />
     <Compile Include="UI\AvatarCodeForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -83,6 +85,12 @@
     <Compile Include="UI\AvatarPartButtonItem.Designer.cs">
       <DependentUpon>AvatarPartButtonItem.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\EffectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\EffectForm.Designer.cs">
+      <DependentUpon>EffectForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="UI\AvatarCodeForm.resx">
@@ -94,9 +102,13 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\AvatarPartButtonItem.resx">
       <DependentUpon>AvatarPartButtonItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\EffectForm.resx">
+      <DependentUpon>EffectForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +139,16 @@
       <Name>WzComparerR2.WzLib</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2\WzComparerR2.csproj">
+      <Project>{5e883be2-2009-4517-8026-4b90deb83884}</Project>
+      <Name>WzComparerR2</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\export.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

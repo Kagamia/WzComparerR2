@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using DevComponents.DotNetBar;
 using DevComponents.AdvTree;
 using System.IO;
+using System.Linq;
 
 using System.Threading;
 using WzComparerR2.WzLib;
@@ -48,6 +49,7 @@ namespace WzComparerR2
                 cmbComparePng.Items.Add(comp);
             }
             cmbComparePng.SelectedItem = WzPngComparison.SizeAndDataLength;
+            typedParts = Enum.GetValues(typeof(Wz_Type)).Cast<Wz_Type>().ToDictionary(type => type, type => new List<PatchPartContext>());
         }
 
         Thread patchThread;
@@ -100,16 +102,16 @@ namespace WzComparerR2
                 item.GetFileLength();
                 if (item.FileLength > 0)
                 {
-                    MessageBoxEx.Show(string.Format("文件大小：{0:N0} bytes, 更新时间：{1:yyyy-MM-dd HH:mm:ss}", item.FileLength, item.LastModified));
+                    MessageBoxEx.Show(string.Format("檔案大小：{0:N0} bytes, 更新時間：{1:yyyy-MM-dd HH:mm:ss}", item.FileLength, item.LastModified));
                 }
                 else
                 {
-                    MessageBoxEx.Show("文件不存在");
+                    MessageBoxEx.Show("檔案不存在");
                 }
             }
             catch (Exception ex)
             {
-                MessageBoxEx.Show("出现错误：" + ex.Message);
+                MessageBoxEx.Show("出現錯誤：" + ex.Message);
             }
         }
 
@@ -139,7 +141,7 @@ namespace WzComparerR2
         private void buttonXOpen1_Click(object sender, EventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Title = "请选择补丁文件路径";
+            dlg.Title = "請選擇更新檔案路徑";
             dlg.Filter = "*.patch;*.exe|*.patch;*.exe";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -150,7 +152,7 @@ namespace WzComparerR2
         private void buttonXOpen2_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
-            dlg.Description = "请选择冒险岛文件夹路径";
+            dlg.Description = "請選擇楓之谷資料夾路徑";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 txtMSFolder.Text = dlg.SelectedPath;
@@ -169,7 +171,7 @@ namespace WzComparerR2
                 }
                 else
                 {
-                    MessageBoxEx.Show("已经开始了一个补丁进程...");
+                    MessageBoxEx.Show("已經開始了一個更新程式...");
                     return;
                 }
             }
@@ -177,7 +179,7 @@ namespace WzComparerR2
             if (chkCompare.Checked)
             {
                 FolderBrowserDialog dlg = new FolderBrowserDialog();
-                dlg.Description = "请选择对比报告输出文件夹";
+                dlg.Description = "請選擇比對報告輸出資料夾";
                 if (dlg.ShowDialog() != DialogResult.OK)
                 {
                     return;
@@ -204,6 +206,10 @@ namespace WzComparerR2
         string compareFolder;
         bool prePatch ;
         bool deadPatch;
+        string htmlFilePath;
+        FileStream htmlFile;
+        StreamWriter sw;
+        Dictionary<Wz_Type, List<PatchPartContext>> typedParts;
 
         private void ExecutePatch(string patchFile, string msFolder, bool prePatch)
         {
@@ -215,26 +221,28 @@ namespace WzComparerR2
             {
                 patcher = new WzPatcher(patchFile);
                 patcher.PatchingStateChanged += new EventHandler<PatchingEventArgs>(patcher_PatchingStateChanged);
-                AppendStateText("正在检查补丁...");
+                AppendStateText("正在檢查更新...");
                 patcher.OpenDecompress();
                 AppendStateText("成功\r\n");
+                AppendStateText("正在預讀更新...\r\n");
+                long decompressedSize = patcher.PrePatch();
+                AppendStateText("成功\r\n");
+                AppendStateText(string.Format("更新大小: {0:N0} bytes...\r\n", decompressedSize));
+                AppendStateText(string.Format("檔案變動: {0} 个...\r\n",
+                    patcher.PatchParts == null ? -1 : patcher.PatchParts.Count));
+                txtNotice.Text = patcher.NoticeText;
+                foreach (PatchPartContext part in patcher.PatchParts)
+                {
+                    advTreePatchFiles.Nodes.Add(CreateFileNode(part));
+                    advTreePatchFiles.Nodes[advTreePatchFiles.Nodes.Count - 1].Enabled = prePatch;
+                }
                 if (prePatch)
                 {
-                    AppendStateText("正在预读补丁...\r\n");
-                    long decompressedSize = patcher.PrePatch();
-                    AppendStateText(string.Format("补丁大小: {0:N0} bytes...\r\n", decompressedSize));
-                    AppendStateText(string.Format("文件变动: {0} 个...\r\n",
-                        patcher.PatchParts == null ? -1 : patcher.PatchParts.Count));
-                    txtNotice.Text = patcher.NoticeText;
-                    foreach (PatchPartContext part in patcher.PatchParts)
-                    {
-                        advTreePatchFiles.Nodes.Add(CreateFileNode(part));
-                    }
-                    advTreePatchFiles.Enabled = true;
-                    AppendStateText("等待调整更新顺序...\r\n");
+                    //advTreePatchFiles.Enabled = true;
+                    AppendStateText("等待調整更新順序...\r\n");
                     waiting = true;
                     waitHandle.WaitOne();
-                    advTreePatchFiles.Enabled = false;
+                    //advTreePatchFiles.Enabled = false;
                     patcher.PatchParts.Clear();
                     for (int i = 0, j = advTreePatchFiles.Nodes.Count; i < j; i++)
                     {
@@ -242,17 +250,40 @@ namespace WzComparerR2
                         {
                             patcher.PatchParts.Add(advTreePatchFiles.Nodes[i].Tag as PatchPartContext);
                         }
+                        advTreePatchFiles.Nodes[i].Enabled = false;
                     }
+                    patcher.PatchParts.Sort((part1, part2) => part1.Offset.CompareTo(part2.Offset));
                 }
-                AppendStateText("开始更新\r\n");
+                AppendStateText("開始更新\r\n");
                 DateTime time = DateTime.Now;
                 patcher.Patch(msFolder);
+                if (!string.IsNullOrEmpty(this.compareFolder))
+                {
+                    sw.WriteLine("</table>");
+                    sw.WriteLine("</p>");
+
+                    //html结束
+                    sw.WriteLine("</body>");
+                    sw.WriteLine("</html>");
+
+                    try
+                    {
+                        if (sw != null)
+                        {
+                            sw.Flush();
+                            sw.Close();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
                 TimeSpan interval = DateTime.Now - time;
-                MessageBoxEx.Show(this, "补丁结束，用时" + interval.ToString(), "Patcher");
+                MessageBoxEx.Show(this, "更新結束，用時" + interval.ToString(), "Patcher");
             }
             catch (ThreadAbortException)
             {
-                MessageBoxEx.Show("补丁中止。", "Patcher");
+                MessageBoxEx.Show("更新中止。", "Patcher");
             }
             catch (Exception ex)
             {
@@ -260,6 +291,18 @@ namespace WzComparerR2
             }
             finally
             {
+                try
+                {
+                    if (sw != null)
+                    {
+                        sw.Flush();
+                        sw.Close();
+                    }
+                }
+                catch
+                {
+                }
+
                 if (patcher != null)
                 {
                     patcher.Close();
@@ -279,22 +322,22 @@ namespace WzComparerR2
             switch (e.State)
             {
                 case PatchingState.PatchStart:
-                    AppendStateText("开始更新" + e.Part.FileName + "\r\n");
+                    AppendStateText("開始更新" + e.Part.FileName + "\r\n");
                     break;
                 case PatchingState.VerifyOldChecksumBegin:
-                    AppendStateText("  检查旧文件checksum...");
+                    AppendStateText("  檢查舊檔案校驗...");
                     break;
                 case PatchingState.VerifyOldChecksumEnd:
-                    AppendStateText("  结束\r\n");
+                    AppendStateText("  結束\r\n");
                     break;
                 case PatchingState.VerifyNewChecksumBegin:
-                    AppendStateText("  检查新文件checksum...");
+                    AppendStateText("  檢查新檔案校驗...");
                     break;
                 case PatchingState.VerifyNewChecksumEnd:
-                    AppendStateText("  结束\r\n");
+                    AppendStateText("  結束\r\n");
                     break;
                 case PatchingState.TempFileCreated:
-                    AppendStateText("  创建临时文件...\r\n");
+                    AppendStateText("  建立暫存檔案...\r\n");
                     progressBarX1.Maximum = e.Part.NewFileLength;
                     break;
                 case PatchingState.TempFileBuildProcessChanged:
@@ -302,30 +345,58 @@ namespace WzComparerR2
                     progressBarX1.Text = string.Format("{0:N0}/{1:N0}", e.CurrentFileLength, e.Part.NewFileLength);
                     break;
                 case PatchingState.TempFileClosed:
-                    AppendStateText("  关闭临时文件...\r\n");
+                    AppendStateText("  關閉暫存檔案...\r\n");
                     progressBarX1.Value = 0;
                     progressBarX1.Maximum = 0;
                     progressBarX1.Text = string.Empty;
 
+                    typedParts[e.Part.WzType].Add(e.Part);
+
                     if (!string.IsNullOrEmpty(this.compareFolder)
-                        && e.Part.Type == 1
+                        //&& e.Part.Type == 1
                         && Path.GetExtension(e.Part.FileName).Equals(".wz", StringComparison.OrdinalIgnoreCase)
-                        && !Path.GetFileName(e.Part.FileName).Equals("list.wz", StringComparison.OrdinalIgnoreCase))
+                        && !Path.GetFileName(e.Part.FileName).Equals("list.wz", StringComparison.OrdinalIgnoreCase)
+                        && typedParts[e.Part.WzType].Count == ((WzPatcher)sender).PatchParts.Where(part => part.WzType == e.Part.WzType).Count())
                     {
                         Wz_Structure wznew = new Wz_Structure();
                         Wz_Structure wzold = new Wz_Structure();
                         try
                         {
-                            AppendStateText("  (comparer)正在对比文件...\r\n");
+                            AppendStateText("  正在比對檔案...\r\n");
                             EasyComparer comparer = new EasyComparer();
                             comparer.OutputPng = chkOutputPng.Checked;
                             comparer.OutputAddedImg = chkOutputAddedImg.Checked;
                             comparer.OutputRemovedImg = chkOutputRemovedImg.Checked;
                             comparer.Comparer.PngComparison = (WzPngComparison)cmbComparePng.SelectedItem;
                             comparer.Comparer.ResolvePngLink = chkResolvePngLink.Checked;
-                            wznew.Load(e.Part.TempFilePath, false);
-                            wzold.Load(e.Part.OldFilePath, false);
-                            comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], this.compareFolder);
+                            //wznew.Load(e.Part.TempFilePath, false);
+                            //wzold.Load(e.Part.OldFilePath, false);
+                            //comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], this.compareFolder);
+                            foreach (PatchPartContext part in typedParts[e.Part.WzType])
+                            {
+                                wznew.Load(part.TempFilePath, false);
+                                wzold.Load(part.OldFilePath, false);
+                            }
+                            if (htmlFilePath == null)
+                            {
+                                htmlFilePath = Path.Combine(this.compareFolder, "index.html");
+
+                                htmlFile = new FileStream(htmlFilePath, FileMode.Create, FileAccess.Write);
+                                sw = new StreamWriter(htmlFile, Encoding.UTF8);
+                                sw.WriteLine("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
+                                sw.WriteLine("<html>");
+                                sw.WriteLine("<head>");
+                                sw.WriteLine("<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">");
+                                sw.WriteLine("<title>Index {0}←{1}</title>", wznew.wz_files.Where(wz_file => wz_file != null).First().Header.WzVersion, wzold.wz_files.Where(wz_file => wz_file != null).First().Header.WzVersion);
+                                sw.WriteLine("<link type=\"text/css\" rel=\"stylesheet\" href=\"style.css\" />");
+                                sw.WriteLine("</head>");
+                                sw.WriteLine("<body>");
+                                //输出概况
+                                sw.WriteLine("<p class=\"wzf\">");
+                                sw.WriteLine("<table>");
+                                sw.WriteLine("<tr><th>檔案名</th><th>新版本容量</th><th>舊版本容量</th><th>修改</th><th>新增</th><th>移除</th></tr>");
+                            }
+                            comparer.EasyCompareWzStructures(wznew, wzold, this.compareFolder, sw);
                         }
                         catch (Exception ex)
                         {
@@ -337,12 +408,21 @@ namespace WzComparerR2
                             wzold.Clear();
                             GC.Collect();
                         }
+
+                        if (this.deadPatch && typedParts[e.Part.WzType].Count == ((WzPatcher)sender).PatchParts.Where(part => part.WzType == e.Part.WzType).Count())
+                        {
+                            foreach (PatchPartContext part in typedParts[e.Part.WzType].Where(part => part.Type == 1))
+                            {
+                                ((WzPatcher)sender).SafeMove(part.TempFilePath, part.OldFilePath);
+                            }
+                            AppendStateText("  (deadpatch)正在應用檔案...\r\n");
+                        }
                     }
 
-                    if (this.deadPatch && e.Part.Type == 1)
+                    if (string.IsNullOrEmpty(this.compareFolder) && this.deadPatch && e.Part.Type == 1)
                     {
                         ((WzPatcher)sender).SafeMove(e.Part.TempFilePath, e.Part.OldFilePath);
-                        AppendStateText("  (deadpatch)正在应用文件...\r\n");
+                        AppendStateText("  (deadpatch)正在應用檔案...\r\n");
                     }
                     break;
             }
@@ -358,7 +438,13 @@ namespace WzComparerR2
             Node node = new Node(part.FileName) { CheckBoxVisible = true, Checked = true };
             ElementStyle style = new ElementStyle();
             style.TextAlignment = eStyleTextAlignment.Far;
-            node.Cells.Add(new Cell(part.Type.ToString(), style));
+            switch (part.Type)
+            {
+                case 0: node.Cells.Add(new Cell("新增", style)); break;
+                case 1: node.Cells.Add(new Cell("修改", style)); break;
+                case 2: node.Cells.Add(new Cell("移除", style)); break;
+                default: node.Cells.Add(new Cell(part.Type.ToString(), style)); break;
+            }
             node.Cells.Add(new Cell(part.NewFileLength.ToString("n0"), style));
             node.Cells.Add(new Cell(part.NewChecksum.ToString("x8"), style));
             node.Cells.Add(new Cell(part.OldChecksum.ToString("x8"), style));
@@ -395,7 +481,7 @@ namespace WzComparerR2
         private void buttonXOpen3_Click(object sender, EventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Title = "请选择补丁文件路径";
+            dlg.Title = "請選擇更新檔案路徑";
             dlg.Filter = "*.patch;*.exe|*.patch;*.exe";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -406,7 +492,7 @@ namespace WzComparerR2
         private void buttonXOpen4_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
-            dlg.Description = "请选择冒险岛文件夹路径";
+            dlg.Description = "請選擇楓之谷資料夾路径";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 txtMSFolder2.Text = dlg.SelectedPath;
@@ -416,14 +502,14 @@ namespace WzComparerR2
         private void buttonXCreate_Click(object sender, EventArgs e)
         {
             MessageBoxEx.Show(@"> 这是一个测试功能...
-> 还没完成 所以请选择patch文件  exe补丁暂时懒得分离
+> 还没完成 所以请选择patch檔案  exe补丁暂时懒得分离
 > 没有检查原客户端版本 为了正确执行请预先确认
-> 暂时不提供文件块的筛选或文件缺失提示
-> 没优化 于是可能生成文件体积较大 但是几乎可以保证完整性", "声明");
+> 暂时不提供檔案块的筛选或檔案缺失提示
+> 没优化 于是可能生成檔案体积较大 但是几乎可以保证完整性", "声明");
 
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.Filter = "*.patch|*.patch";
-            dlg.Title = "选择输出文件";
+            dlg.Title = "選擇輸出檔案";
             dlg.CheckFileExists = false;
             dlg.InitialDirectory = Path.GetDirectoryName(txtPatchFile2.Text);
             dlg.FileName = Path.GetFileNameWithoutExtension(txtPatchFile2.Text) + "_reverse.patch";

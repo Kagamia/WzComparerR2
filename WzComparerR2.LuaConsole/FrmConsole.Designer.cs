@@ -109,7 +109,7 @@
             this.bar2.AutoSyncBarCaption = true;
             this.bar2.CloseSingleTab = true;
             this.bar2.Controls.Add(this.panelDockContainer1);
-            this.bar2.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.bar2.Font = new System.Drawing.Font("宋體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.bar2.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Caption;
             this.bar2.IsMaximized = false;
             this.bar2.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
@@ -122,7 +122,7 @@
             this.bar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar2.TabIndex = 0;
             this.bar2.TabStop = false;
-            this.bar2.Text = "输出";
+            this.bar2.Text = "輸出";
             // 
             // panelDockContainer1
             // 
@@ -153,13 +153,13 @@
             this.textBoxX2.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxX2.Size = new System.Drawing.Size(482, 69);
             this.textBoxX2.TabIndex = 1;
-            this.textBoxX2.Text = "--调用env:Help() 获取帮助\r\n";
+            this.textBoxX2.Text = "--調用env:Help() 獲取幫助\r\n";
             // 
             // dockContainerItem1
             // 
             this.dockContainerItem1.Control = this.panelDockContainer1;
             this.dockContainerItem1.Name = "dockContainerItem1";
-            this.dockContainerItem1.Text = "输出";
+            this.dockContainerItem1.Text = "輸出";
             // 
             // dockSite9
             // 
@@ -263,7 +263,7 @@
             this.menuOpen,
             this.menuSave,
             this.menuExit});
-            this.menuFile.Text = "文件(&F)";
+            this.menuFile.Text = "檔案(&F)";
             // 
             // menuNew
             // 
@@ -276,7 +276,7 @@
             // 
             this.menuOpen.Name = "menuOpen";
             this.menuOpen.Shortcuts.Add(DevComponents.DotNetBar.eShortcut.CtrlO);
-            this.menuOpen.Text = "打开";
+            this.menuOpen.Text = "打開";
             this.menuOpen.Click += new System.EventHandler(this.menuOpen_Click);
             // 
             // menuSave
@@ -301,7 +301,7 @@
             this.menuReset,
             this.menuRun,
             this.menuStopRun});
-            this.menuDebug.Text = "调试(&D)";
+            this.menuDebug.Text = "調式(&D)";
             // 
             // menuReset
             // 
@@ -314,7 +314,7 @@
             this.menuRun.BeginGroup = true;
             this.menuRun.Name = "menuRun";
             this.menuRun.Shortcuts.Add(DevComponents.DotNetBar.eShortcut.F5);
-            this.menuRun.Text = "运行";
+            this.menuRun.Text = "運行";
             this.menuRun.Tooltip = "F5";
             this.menuRun.Click += new System.EventHandler(this.menuRun_Click);
             // 
@@ -322,7 +322,7 @@
             // 
             this.menuStopRun.Name = "menuStopRun";
             this.menuStopRun.Shortcuts.Add(DevComponents.DotNetBar.eShortcut.ShiftF5);
-            this.menuStopRun.Text = "停止运行";
+            this.menuStopRun.Text = "停止運行";
             this.menuStopRun.Tooltip = "Shift+F5";
             // 
             // dockSite3
@@ -352,7 +352,7 @@
             this.tabStrip1.MdiTabbedDocuments = true;
             this.tabStrip1.Name = "tabStrip1";
             this.tabStrip1.SelectedTab = null;
-            this.tabStrip1.SelectedTabFont = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold);
+            this.tabStrip1.SelectedTabFont = new System.Drawing.Font("宋體", 9F, System.Drawing.FontStyle.Bold);
             this.tabStrip1.Size = new System.Drawing.Size(488, 23);
             this.tabStrip1.Style = DevComponents.DotNetBar.eTabStripStyle.Office2007Document;
             this.tabStrip1.TabAlignment = DevComponents.DotNetBar.eTabStripAlignment.Top;

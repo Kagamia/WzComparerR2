@@ -34,7 +34,7 @@
             // btnItemShow
             // 
             this.btnItemShow.Name = "btnItemShow";
-            this.btnItemShow.Text = "显示/隐藏";
+            this.btnItemShow.Text = "顯示/隱藏";
             // 
             // btnItemDel
             // 

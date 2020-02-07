@@ -24,6 +24,7 @@ namespace WzComparerR2.MapRender
         }
 
         public IServiceProvider Services { get; protected set; }
+        public PatchVisibility PatchVisibility { get; set; }
 
         protected Dictionary<string, ResourceHolder> loadedItems;
         protected Dictionary<string, object> loadedAnimationData;

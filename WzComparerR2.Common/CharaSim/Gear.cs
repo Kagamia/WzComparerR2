@@ -24,7 +24,10 @@ namespace WzComparerR2.CharaSim
         public GearType type;
         public GearState State { get; set; }
 
-        public int diff;
+        public int diff
+        {
+            get { return Compare(this); }
+        }
 
         public Potential[] Options { get; private set; }
         public Potential[] AdditionalOptions { get; private set; }
@@ -35,6 +38,7 @@ namespace WzComparerR2.CharaSim
         public int Hammer { get; set; }
         public bool HasTuc { get; internal set; }
         public bool CanPotential { get; internal set; }
+        public string EpicHs { get; internal set; }
 
         public bool FixLevel { get; internal set; }
         public List<GearLevelInfo> Levels { get; internal set; }
@@ -83,6 +87,18 @@ namespace WzComparerR2.CharaSim
         public int GetMaxStar()
         {
             if (!this.HasTuc)
+            {
+                return 0;
+            }
+            if (this.Cash)
+            {
+                return 0;
+            }
+            if (this.GetBooleanValue(GearPropType.onlyUpgrade))
+            {
+                return 0;
+            }
+            if (this.type == GearType.machineEngine || this.type == GearType.machineArms || this.type == GearType.machineLegs || this.type == GearType.machineBody || this.type == GearType.machineTransistors || this.type == GearType.dragonMask || this.type == GearType.dragonPendant || this.type == GearType.dragonWings || this.type == GearType.dragonTail)
             {
                 return 0;
             }
@@ -137,7 +153,7 @@ namespace WzComparerR2.CharaSim
             {
                 foreach(var kv in AbilityTimeLimited)
                 {
-                    this.Props[kv.Key] = kv.Value;
+                    this.Props[kv.Key] = this.Props[kv.Key] + kv.Value;
                 }
                 this.Props[GearPropType.abilityTimeLimited] = 1;
             }
@@ -168,7 +184,12 @@ namespace WzComparerR2.CharaSim
         /// <returns></returns>
         public static bool IsLeftWeapon(GearType type)
         {
-            return (int)type >= 121 && (int)type <= 139 && type != GearType.katara;
+            int _type = (int)type;
+            if (type == GearType.shiningRod || type == GearType.tuner)
+            {
+                _type = (int)type / 10;
+            }
+            return _type >= 121 && _type <= 139 && type != GearType.katara;
         }
 
         public static bool IsSubWeapon(GearType type)
@@ -221,13 +242,32 @@ namespace WzComparerR2.CharaSim
             foreach (KeyValuePair<GearPropType, int> prop in gear.Props)
             {
                 originGear.Props.TryGetValue(prop.Key, out tempValue);//在原装备中寻找属性 若没有找到 视为0
-                diff += (prop.Value - tempValue) / GetPropTypeWeight(prop.Key);
+                diff += (int)Math.Round((prop.Value - tempValue) / (double)GetPropTypeWeight(prop.Key));
             }
             foreach (KeyValuePair<GearPropType, int> prop in originGear.Props)
             {
                 if (!gear.Props.TryGetValue(prop.Key, out tempValue))//寻找装备原属性里新装备没有的
                 {
-                    diff -= prop.Value / GetPropTypeWeight(prop.Key);
+                    diff -= (int)Math.Round(prop.Value / (double)GetPropTypeWeight(prop.Key));
+                }
+            }
+            return diff;
+        }
+
+        public static int Compare(Gear gear)
+        {
+            int diff = 0;
+            int tempValue;
+            foreach (KeyValuePair<GearPropType, int> prop in gear.Props)
+            {
+                gear.StandardProps.TryGetValue(prop.Key, out tempValue);//在原装备中寻找属性 若没有找到 视为0
+                diff += (int)Math.Round((prop.Value - tempValue) / (double)GetPropTypeWeight(prop.Key));
+            }
+            foreach (KeyValuePair<GearPropType, int> prop in gear.StandardProps)
+            {
+                if (!gear.Props.TryGetValue(prop.Key, out tempValue))//寻找装备原属性里新装备没有的
+                {
+                    diff -= (int)Math.Round(prop.Value / (double)GetPropTypeWeight(prop.Key));
                 }
             }
             return diff;
@@ -239,13 +279,27 @@ namespace WzComparerR2.CharaSim
             {
                 switch (type)
                 {
+                    case GearPropType.incSTR:
+                    case GearPropType.incDEX:
+                    case GearPropType.incINT:
+                    case GearPropType.incLUK:
+                    case GearPropType.incPAD:
+                    case GearPropType.incMAD:
+                    case GearPropType.incSpeed:
+                    case GearPropType.incJump:
+                        return 1;
                     case GearPropType.incMHP:
                     case GearPropType.incMMP:
-                    case GearPropType.incACC:
-                    case GearPropType.incEVA:
+                        return 100;
+                    case GearPropType.incPDD_incMDD:
+                    case GearPropType.incPDD:
                         return 10;
+                    case GearPropType.incPAD_incMAD:
+                    case GearPropType.incAD:
+                        return 2;
+                    case GearPropType.incMHP_incMMP:
+                        return 200;
                 }
-                return 1;
             }
             return int.MaxValue;
         }
@@ -317,6 +371,15 @@ namespace WzComparerR2.CharaSim
                         return (GearType)(code / 10);
                 }
             }
+            if (code / 10000 == 121)
+            {
+                switch (code / 1000)
+                {
+                    case 1212:
+                    case 1213:
+                        return (GearType)(code / 1000);
+                }
+            }
             return (GearType)(code / 10000);
         }
 
@@ -326,6 +389,7 @@ namespace WzComparerR2.CharaSim
             switch (type)
             {
                 case GearType.emblem:
+                case GearType.powerSource:
                 case GearType.bit:
                 case (GearType)3: //发型
                     return 2;
@@ -474,14 +538,14 @@ namespace WzComparerR2.CharaSim
                     switch (subNode.Text)
                     {
                         case "icon":
-                            if (subNode.Value is Wz_Png)
+                            if (subNode.Value is Wz_Png || subNode.Value is Wz_Uol)
                             {
                                 gear.Icon = BitmapOrigin.CreateFromNode(subNode, findNode);
                             }
                             break;
 
                         case "iconRaw":
-                            if (subNode.Value is Wz_Png)
+                            if (subNode.Value is Wz_Png || subNode.Value is Wz_Uol)
                             {
                                 gear.IconRaw = BitmapOrigin.CreateFromNode(subNode, findNode);
                             }
@@ -669,6 +733,35 @@ namespace WzComparerR2.CharaSim
                             }
                             break;
 
+                        case "onlyUpgrade":
+                            gear.Props.Add(GearPropType.onlyUpgrade, Convert.ToInt32(subNode.Nodes["0"]?.Value));
+                            break;
+
+                        case "epic":
+                            Wz_Node hsNode = subNode.Nodes["hs"];
+                            if (hsNode != null)
+                            {
+                                gear.EpicHs = Convert.ToString(hsNode.Value);
+                            }
+                            break;
+
+                        case "gatherTool":
+                            foreach (Wz_Node gatherNode in subNode.Nodes)
+                            {
+                                GearPropType type;
+                                if (Enum.TryParse(subNode.Text + "_" + gatherNode.Text, out type))
+                                {
+                                    try
+                                    {
+                                        gear.Props.Add(type, Convert.ToInt32(gatherNode.Value));
+                                    }
+                                    finally
+                                    {
+                                    }
+                                }
+                            }
+                            break;
+
                         default:
                             {
                                 GearPropType type;
@@ -703,7 +796,15 @@ namespace WzComparerR2.CharaSim
             //读取默认gearGrade
             if (gear.Props.TryGetValue(GearPropType.fixedGrade, out value))
             {
-                gear.Grade = (GearGrade)(value - 1);
+                //gear.Grade = (GearGrade)(value - 1);
+                switch (value)
+                {
+                    case 2: gear.Grade = GearGrade.B; break;
+                    case 3: gear.Grade = GearGrade.A; break;
+                    case 5: gear.Grade = GearGrade.S; break;
+                    case 7: gear.Grade = GearGrade.SS; break;
+                    default: gear.Grade = (GearGrade)(value - 1); break;
+                }
             }
 
             //自动填充Grade
@@ -739,6 +840,22 @@ namespace WzComparerR2.CharaSim
 
             //追加限时属性
             gear.MakeTimeLimitedPropAvailable();
+
+            if (gear.type == GearType.face || gear.type == GearType.face2)
+            {
+                gear.Icon = BitmapOrigin.CreateFromNode(findNode(@"Item\Install\0380.img\03801284\info\icon"), findNode);
+                gear.IconRaw = BitmapOrigin.CreateFromNode(findNode(@"Item\Install\0380.img\03801284\info\iconRaw"), findNode);
+            }
+            if (gear.type == GearType.hair || gear.type == GearType.hair2)
+            {
+                gear.Icon = BitmapOrigin.CreateFromNode(findNode(@"Item\Install\0380.img\03801283\info\icon"), findNode);
+                gear.IconRaw = BitmapOrigin.CreateFromNode(findNode(@"Item\Install\0380.img\03801283\info\iconRaw"), findNode);
+            }
+
+            if (gear.Props.TryGetValue(GearPropType.incCHUC, out value))
+            {
+                gear.Star = value;
+            }
 
             return gear;
         }

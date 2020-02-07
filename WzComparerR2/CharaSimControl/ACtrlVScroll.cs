@@ -103,6 +103,26 @@ namespace WzComparerR2.CharaSimControl
             get { return !(this.minimum == this.maximum); }
         }
 
+        private Point? scrollableLocation;
+        private Size? scrollableSize;
+
+        public Point? ScrollableLocation
+        {
+            get { return scrollableLocation; }
+            set { scrollableLocation = value; }
+        }
+
+        public Size? ScrollableSize
+        {
+            get { return scrollableSize; }
+            set { scrollableSize = value; }
+        }
+
+        public Rectangle ScrollableRectangle
+        {
+            get { return new Rectangle(this.scrollableLocation ?? this.Location, this.scrollableSize ?? this.Size); }
+        }
+
         public override void OnMouseMove(MouseEventArgs e)
         {
             if (!this.Enabled)
@@ -204,7 +224,7 @@ namespace WzComparerR2.CharaSimControl
                 setAllState(ButtonState.Disabled);
                 return;
             }
-            if (this.IsMouseContains(e.Location))
+            if (this.IsScrollableMouseContains(e.Location))
             {
                 if (e.Delta > 0)
                 {
@@ -217,6 +237,11 @@ namespace WzComparerR2.CharaSimControl
             }
 
             base.OnMouseWheel(e);
+        }
+
+        private bool IsScrollableMouseContains(Point mouseLocation)
+        {
+            return this.Visible && this.ScrollableRectangle.Contains(mouseLocation);
         }
 
         private void btnPrev_MouseClick(object sender, MouseEventArgs e)

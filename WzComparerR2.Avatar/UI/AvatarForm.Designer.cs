@@ -39,6 +39,7 @@
             this.dockContainerItem1 = new DevComponents.DotNetBar.DockContainerItem();
             this.bar2 = new DevComponents.DotNetBar.Bar();
             this.panelDockContainer2 = new DevComponents.DotNetBar.PanelDockContainer();
+            this.cmbEar = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbWeaponIdx = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cmbWeaponType = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.labelX4 = new DevComponents.DotNetBar.LabelX();
@@ -56,6 +57,7 @@
             this.cmbActionBody = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.chkHairShade = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkHairCover = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.labelX5 = new DevComponents.DotNetBar.LabelX();
             this.dockContainerItem2 = new DevComponents.DotNetBar.DockContainerItem();
             this.dockSite8 = new DevComponents.DotNetBar.DockSite();
             this.dockSite5 = new DevComponents.DotNetBar.DockSite();
@@ -69,11 +71,12 @@
             this.btnReset = new DevComponents.DotNetBar.ButtonItem();
             this.btnLock = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItem1 = new DevComponents.DotNetBar.ButtonItem();
+            this.btnSave = new DevComponents.DotNetBar.ButtonItem();
+            this.btnEffect = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.effectTimer = new System.Windows.Forms.Timer(this.components);
             this.avatarContainer1 = new WzComparerR2.Avatar.UI.AvatarContainer();
-            this.labelX5 = new DevComponents.DotNetBar.LabelX();
-            this.cmbEar = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.dockSite2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bar1)).BeginInit();
             this.bar1.SuspendLayout();
@@ -154,7 +157,7 @@
             this.bar1.AutoSyncBarCaption = true;
             this.bar1.CloseSingleTab = true;
             this.bar1.Controls.Add(this.panelDockContainer1);
-            this.bar1.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.bar1.Font = new System.Drawing.Font("宋體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.bar1.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Caption;
             this.bar1.IsMaximized = false;
             this.bar1.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
@@ -183,6 +186,7 @@
             this.panelDockContainer1.Style.ForeColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.ItemText;
             this.panelDockContainer1.Style.GradientAngle = 90;
             this.panelDockContainer1.TabIndex = 0;
+            this.panelDockContainer1.Visible = true;
             // 
             // itemPanel1
             // 
@@ -217,7 +221,7 @@
             this.bar2.AutoSyncBarCaption = true;
             this.bar2.CloseSingleTab = true;
             this.bar2.Controls.Add(this.panelDockContainer2);
-            this.bar2.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.bar2.Font = new System.Drawing.Font("宋體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.bar2.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Caption;
             this.bar2.IsMaximized = false;
             this.bar2.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
@@ -230,7 +234,7 @@
             this.bar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar2.TabIndex = 1;
             this.bar2.TabStop = false;
-            this.bar2.Text = "动作";
+            this.bar2.Text = "動作";
             // 
             // panelDockContainer2
             // 
@@ -265,12 +269,29 @@
             this.panelDockContainer2.Style.ForeColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.ItemText;
             this.panelDockContainer2.Style.GradientAngle = 90;
             this.panelDockContainer2.TabIndex = 0;
+            this.panelDockContainer2.Visible = true;
+            // 
+            // cmbEar
+            // 
+            this.cmbEar.DisplayMember = "Text";
+            this.cmbEar.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cmbEar.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbEar.FormattingEnabled = true;
+            this.cmbEar.ItemHeight = 15;
+            this.cmbEar.Location = new System.Drawing.Point(163, 103);
+            this.cmbEar.Name = "cmbEar";
+            this.cmbEar.Size = new System.Drawing.Size(39, 21);
+            this.cmbEar.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.cmbEar.TabIndex = 15;
+            this.cmbEar.SelectedIndexChanged += new System.EventHandler(this.cmbEar_SelectedIndexChanged);
             // 
             // cmbWeaponIdx
             // 
             this.cmbWeaponIdx.DisplayMember = "Text";
             this.cmbWeaponIdx.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbWeaponIdx.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbWeaponIdx.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbWeaponIdx.FormattingEnabled = true;
             this.cmbWeaponIdx.ItemHeight = 15;
             this.cmbWeaponIdx.Location = new System.Drawing.Point(89, 103);
@@ -285,6 +306,7 @@
             this.cmbWeaponType.DisplayMember = "Text";
             this.cmbWeaponType.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbWeaponType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbWeaponType.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbWeaponType.FormattingEnabled = true;
             this.cmbWeaponType.ItemHeight = 15;
             this.cmbWeaponType.Location = new System.Drawing.Point(35, 103);
@@ -363,6 +385,7 @@
             this.cmbTamingFrame.DisplayMember = "Text";
             this.cmbTamingFrame.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbTamingFrame.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbTamingFrame.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbTamingFrame.FormattingEnabled = true;
             this.cmbTamingFrame.ItemHeight = 15;
             this.cmbTamingFrame.Location = new System.Drawing.Point(128, 57);
@@ -378,6 +401,7 @@
             this.cmbEmotionFrame.DisplayMember = "Text";
             this.cmbEmotionFrame.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbEmotionFrame.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEmotionFrame.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbEmotionFrame.FormattingEnabled = true;
             this.cmbEmotionFrame.ItemHeight = 15;
             this.cmbEmotionFrame.Location = new System.Drawing.Point(128, 30);
@@ -393,6 +417,7 @@
             this.cmbBodyFrame.DisplayMember = "Text";
             this.cmbBodyFrame.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbBodyFrame.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbBodyFrame.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbBodyFrame.FormattingEnabled = true;
             this.cmbBodyFrame.ItemHeight = 15;
             this.cmbBodyFrame.Location = new System.Drawing.Point(128, 3);
@@ -409,6 +434,7 @@
             this.cmbActionTaming.DisplayMember = "Text";
             this.cmbActionTaming.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbActionTaming.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbActionTaming.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbActionTaming.FormattingEnabled = true;
             this.cmbActionTaming.ItemHeight = 15;
             this.cmbActionTaming.Location = new System.Drawing.Point(35, 57);
@@ -425,6 +451,7 @@
             this.cmbEmotion.DisplayMember = "Text";
             this.cmbEmotion.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbEmotion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEmotion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbEmotion.FormattingEnabled = true;
             this.cmbEmotion.ItemHeight = 15;
             this.cmbEmotion.Location = new System.Drawing.Point(35, 30);
@@ -447,7 +474,7 @@
             this.labelX3.Size = new System.Drawing.Size(31, 18);
             this.labelX3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.labelX3.TabIndex = 3;
-            this.labelX3.Text = "骑兽";
+            this.labelX3.Text = "騎寵";
             // 
             // labelX2
             // 
@@ -477,7 +504,7 @@
             this.labelX1.Size = new System.Drawing.Size(31, 18);
             this.labelX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.labelX1.TabIndex = 1;
-            this.labelX1.Text = "身体";
+            this.labelX1.Text = "身體";
             // 
             // cmbActionBody
             // 
@@ -486,6 +513,7 @@
             this.cmbActionBody.DisplayMember = "Text";
             this.cmbActionBody.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cmbActionBody.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbActionBody.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmbActionBody.FormattingEnabled = true;
             this.cmbActionBody.ItemHeight = 15;
             this.cmbActionBody.Location = new System.Drawing.Point(35, 3);
@@ -505,7 +533,7 @@
             this.chkHairShade.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.chkHairShade.Location = new System.Drawing.Point(82, 84);
             this.chkHairShade.Name = "chkHairShade";
-            this.chkHairShade.Size = new System.Drawing.Size(85, 19);
+            this.chkHairShade.Size = new System.Drawing.Size(88, 18);
             this.chkHairShade.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkHairShade.TabIndex = 10;
             this.chkHairShade.Text = "hairShade";
@@ -521,17 +549,32 @@
             this.chkHairCover.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.chkHairCover.Location = new System.Drawing.Point(5, 84);
             this.chkHairCover.Name = "chkHairCover";
-            this.chkHairCover.Size = new System.Drawing.Size(83, 19);
+            this.chkHairCover.Size = new System.Drawing.Size(76, 20);
             this.chkHairCover.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkHairCover.TabIndex = 9;
-            this.chkHairCover.Text = "hairCover";
+            this.chkHairCover.Text = "掩蓋頭髮";
             this.chkHairCover.CheckedChanged += new System.EventHandler(this.chkHairCover_CheckedChanged);
+            // 
+            // labelX5
+            // 
+            this.labelX5.AutoSize = true;
+            this.labelX5.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX5.Location = new System.Drawing.Point(139, 106);
+            this.labelX5.Name = "labelX5";
+            this.labelX5.Size = new System.Drawing.Size(19, 18);
+            this.labelX5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.labelX5.TabIndex = 14;
+            this.labelX5.Text = "耳";
             // 
             // dockContainerItem2
             // 
             this.dockContainerItem2.Control = this.panelDockContainer2;
             this.dockContainerItem2.Name = "dockContainerItem2";
-            this.dockContainerItem2.Text = "动作";
+            this.dockContainerItem2.Text = "動作";
             // 
             // dockSite8
             // 
@@ -579,7 +622,6 @@
             this.bar3.AccessibleDescription = "DotNetBar Bar (bar3)";
             this.bar3.AccessibleName = "DotNetBar Bar";
             this.bar3.AccessibleRole = System.Windows.Forms.AccessibleRole.ToolBar;
-            this.bar3.CanCustomize = false;
             this.bar3.DockSide = DevComponents.DotNetBar.eDockSide.Top;
             this.bar3.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
             this.bar3.GrabHandleStyle = DevComponents.DotNetBar.eGrabHandleStyle.Office2003;
@@ -589,10 +631,12 @@
             this.btnCharac,
             this.btnReset,
             this.btnLock,
-            this.buttonItem1});
+            this.buttonItem1,
+            this.btnSave,
+            this.btnEffect});
             this.bar3.Location = new System.Drawing.Point(0, 0);
             this.bar3.Name = "bar3";
-            this.bar3.Size = new System.Drawing.Size(203, 26);
+            this.bar3.Size = new System.Drawing.Size(255, 27);
             this.bar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar3.TabIndex = 0;
             this.bar3.TabStop = false;
@@ -602,7 +646,7 @@
             // 
             this.btnCode.Image = global::WzComparerR2.Avatar.Properties.Resources.script_code;
             this.btnCode.Name = "btnCode";
-            this.btnCode.Tooltip = "代码";
+            this.btnCode.Tooltip = "代碼";
             this.btnCode.Click += new System.EventHandler(this.btnCode_Click);
             // 
             // btnCharac
@@ -631,7 +675,7 @@
             // 
             this.btnReset.Image = global::WzComparerR2.Avatar.Properties.Resources.arrow_in;
             this.btnReset.Name = "btnReset";
-            this.btnReset.Tooltip = "坐标重置";
+            this.btnReset.Tooltip = "座標重置";
             this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
             // 
             // btnLock
@@ -639,13 +683,27 @@
             this.btnLock.AutoCheckOnClick = true;
             this.btnLock.Image = global::WzComparerR2.Avatar.Properties.Resources._lock;
             this.btnLock.Name = "btnLock";
-            this.btnLock.Tooltip = "锁定";
+            this.btnLock.Tooltip = "鎖定";
             // 
             // buttonItem1
             // 
             this.buttonItem1.Name = "buttonItem1";
             this.buttonItem1.Text = "buttonItem1";
             this.buttonItem1.Click += new System.EventHandler(this.buttonItem1_Click_1);
+            // 
+            // btnSave
+            // 
+            this.btnSave.Image = global::WzComparerR2.Avatar.Properties.Resources.save;
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Tooltip = "儲存";
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // btnEffect
+            // 
+            this.btnEffect.Name = "btnEffect";
+            this.btnEffect.Tooltip = "效果管理/混染";
+            this.btnEffect.Text = "效果/混染";
+            this.btnEffect.Click += new System.EventHandler(this.btnEffect_Click);
             // 
             // dockSite3
             // 
@@ -661,6 +719,7 @@
             // timer1
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.effectTimer.Tick += new System.EventHandler(this.effectTimer_Tick);
             // 
             // avatarContainer1
             // 
@@ -672,35 +731,6 @@
             this.avatarContainer1.Size = new System.Drawing.Size(368, 385);
             this.avatarContainer1.TabIndex = 8;
             this.avatarContainer1.Text = "avatarContainer1";
-            // 
-            // labelX5
-            // 
-            this.labelX5.AutoSize = true;
-            this.labelX5.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
-            this.labelX5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX5.Location = new System.Drawing.Point(139, 106);
-            this.labelX5.Name = "labelX5";
-            this.labelX5.Size = new System.Drawing.Size(25, 16);
-            this.labelX5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.labelX5.TabIndex = 14;
-            this.labelX5.Text = "ear";
-            // 
-            // cmbEar
-            // 
-            this.cmbEar.DisplayMember = "Text";
-            this.cmbEar.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.cmbEar.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbEar.FormattingEnabled = true;
-            this.cmbEar.ItemHeight = 15;
-            this.cmbEar.Location = new System.Drawing.Point(163, 103);
-            this.cmbEar.Name = "cmbEar";
-            this.cmbEar.Size = new System.Drawing.Size(39, 21);
-            this.cmbEar.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.cmbEar.TabIndex = 15;
-            this.cmbEar.SelectedIndexChanged += new System.EventHandler(this.cmbEar_SelectedIndexChanged);
             // 
             // AvatarForm
             // 
@@ -762,6 +792,7 @@
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbEmotionFrame;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbBodyFrame;
         private System.Windows.Forms.Timer timer1;
+        public System.Windows.Forms.Timer effectTimer;
         private AvatarContainer avatarContainer1;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHairCover;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbWeaponIdx;
@@ -778,5 +809,7 @@
         private DevComponents.DotNetBar.ButtonItem buttonItem1;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbEar;
         private DevComponents.DotNetBar.LabelX labelX5;
+        private DevComponents.DotNetBar.ButtonItem btnSave;
+        private DevComponents.DotNetBar.ButtonItem btnEffect;
     }
 }

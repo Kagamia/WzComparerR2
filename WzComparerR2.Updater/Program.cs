@@ -31,7 +31,7 @@ namespace WzComparerR2.Updater
                 }
                 else
                 {
-                    MessageBox.Show("Updater程序只能同时运行一个的说...");
+                    MessageBox.Show("Updater程式只能同時運行一個...");
                 }
             }
             if (onExit != null)

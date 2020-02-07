@@ -32,7 +32,7 @@ namespace WzComparerR2.CharaSim
         private int level;
         private int hp;
         private int mp;
-        private int exp;
+        private long exp;
         private int ap;
         private int pop;
 
@@ -54,11 +54,16 @@ namespace WzComparerR2.CharaSim
         private CharaProp crit = null;
         private CharaProp move = null;
         private CharaProp jump = null;
-        private CharaProp critDamMax = null;
-        private CharaProp critDamMin = null;
+        //private CharaProp critDamMax = null;
+        //private CharaProp critDamMin = null;
+        private CharaProp critDam = null;
         private CharaProp mastery = null;
         private CharaProp damR = null;
         private CharaProp bossDamR = null;
+        private CharaProp finalDamR = null;
+        private CharaProp ignoreMobDefR = null;
+        private CharaProp statusRes = null;
+        private CharaProp knockbackRes = null;
 
         #region 基础属性
         /// <summary>
@@ -116,7 +121,7 @@ namespace WzComparerR2.CharaSim
         /// <summary>
         /// 获取或设置角色的当前经验值。
         /// </summary>
-        public int Exp
+        public long Exp
         {
             get { exp = (Exptnl == -1) ? -1 : Math.Max(0, Math.Min(Exptnl - 1, exp)); return exp; }
             set { value = (Exptnl == -1) ? -1 : Math.Max(0, Math.Min(Exptnl - 1, value)); exp = value; }
@@ -125,7 +130,7 @@ namespace WzComparerR2.CharaSim
         /// <summary>
         /// 获取角色当前升级经验值。
         /// </summary>
-        public int Exptnl
+        public long Exptnl
         {
             get { return Character.ExpToNextLevel(this.level); }
         }
@@ -173,7 +178,7 @@ namespace WzComparerR2.CharaSim
         }
 
         /// <summary>
-        /// 获取角色的运气值。
+        /// 获取角色的幸運值。
         /// </summary>
         public CharaProp Luck
         {
@@ -270,7 +275,7 @@ namespace WzComparerR2.CharaSim
             get { return jump; }
         }
         
-        /// <summary>
+        /*/// <summary>
         /// 获取角色的暴击最大伤害，这是一个隐藏的百分比属性。
         /// </summary>
         public CharaProp CriticalDamageMax
@@ -284,8 +289,16 @@ namespace WzComparerR2.CharaSim
         public CharaProp CriticalDamageMin
         {
             get { return critDamMin; }
+        }*/
+
+        /// <summary>
+        /// 获取角色的暴击伤害，这是一个隐藏的百分比属性。
+        /// </summary>
+        public CharaProp CriticalDamage
+        {
+            get { return critDam; }
         }
-        
+
         /// <summary>
         /// 获取角色的攻击熟练度，这是一个隐藏的百分比属性。
         /// </summary>
@@ -308,6 +321,26 @@ namespace WzComparerR2.CharaSim
         public CharaProp BossDamageRate
         {
             get { return bossDamR; }
+        }
+
+        public CharaProp FinalDamageRate
+        {
+            get { return finalDamR; }
+        }
+
+        public CharaProp IgnoreMobDefenceRate
+        {
+            get { return ignoreMobDefR; }
+        }
+
+        public CharaProp StatusResistance
+        {
+            get { return statusRes; }
+        }
+
+        public CharaProp KnockbackResistance
+        {
+            get { return knockbackRes; }
         }
         #endregion
     }

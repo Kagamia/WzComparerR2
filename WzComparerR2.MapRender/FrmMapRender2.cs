@@ -148,6 +148,7 @@ namespace WzComparerR2.MapRender
             this.renderEnv = new RenderEnv(this, this.graphics);
             this.batcher = new MeshBatcher(this.GraphicsDevice) { CullingEnabled = true };
             this.resLoader = new ResourceLoader(this.Services);
+            this.resLoader.PatchVisibility = this.patchVisibility;
             this.ui = new MapRenderUIRoot();
             this.BindingUIInput();
             this.tooltip = new Tooltip2(this.Content);
@@ -249,6 +250,7 @@ namespace WzComparerR2.MapRender
                 }
             }), KeyCode.D8, ModifierKeys.Control));
             this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.patchVisibility.FrontVisible = !this.patchVisibility.FrontVisible), KeyCode.D9, ModifierKeys.Control));
+            this.ui.InputBindings.Add(new KeyBinding(new RelayCommand(_ => this.patchVisibility.EffectVisible = !this.patchVisibility.EffectVisible), KeyCode.D0, ModifierKeys.Control));
 
             //移动操作
             #region 移动操作
@@ -472,7 +474,8 @@ namespace WzComparerR2.MapRender
 
             StringResult sr = null;
             this.StringLinker?.StringMap.TryGetValue(mapID, out sr);
-            var message = string.Format("是否传送到地图\r\n{0} ({1})？", sr?.Name ?? "null", mapID);
+            string mapName = sr?["mapName"] ?? "(null)";
+            var message = string.Format("是否傳送到地圖\r\n{0} ({1})？", sr?.Name ?? "null", mapID);
             MessageBox.Show(message, "提示", MessageBoxButton.OKCancel, callback, false);
         }
 
@@ -503,11 +506,13 @@ namespace WzComparerR2.MapRender
             {
                 case "/help":
                 case "/?":
-                    this.ui.ChatBox.AppendTextHelp(@"/help 显示帮助。");
-                    this.ui.ChatBox.AppendTextHelp(@"/map (mapID) 跳转地图。");
-                    this.ui.ChatBox.AppendTextHelp(@"/back 回到上一地图。");
+                    this.ui.ChatBox.AppendTextHelp(@"/help 顯示幫助。");
+                    this.ui.ChatBox.AppendTextHelp(@"/map (mapID) 跳轉地圖。");
+                    this.ui.ChatBox.AppendTextHelp(@"/back 回到上一地圖。");
                     this.ui.ChatBox.AppendTextHelp(@"/home 回城。");
-                    this.ui.ChatBox.AppendTextHelp(@"/history [maxCount] 查看历史地图。");
+                    this.ui.ChatBox.AppendTextHelp(@"/history [maxCount] 查看歷史地圖。");
+                    this.ui.ChatBox.AppendTextHelp(@"/questlist 觀看相關任務目錄");
+                    this.ui.ChatBox.AppendTextHelp(@"/questset (questID) (questState) 該當任務的狀態設定");
                     break;
 
                 case "/map":
@@ -518,7 +523,7 @@ namespace WzComparerR2.MapRender
                     }
                     else
                     {
-                        this.ui.ChatBox.AppendTextSystem($"缺少地图ID。");
+                        this.ui.ChatBox.AppendTextSystem($"缺少地圖ID。");
                     }
                     break;
 
@@ -529,7 +534,7 @@ namespace WzComparerR2.MapRender
                     }
                     else
                     {
-                        this.ui.ChatBox.AppendTextSystem($"前面没有地图。");
+                        this.ui.ChatBox.AppendTextSystem($"前面沒有地圖。");
                     }
                     break;
 
@@ -537,7 +542,7 @@ namespace WzComparerR2.MapRender
                     var retMapID = this.mapData?.ReturnMap;
                     if (retMapID == null || retMapID == 999999999)
                     {
-                        this.ui.ChatBox.AppendTextSystem($"回不到那里去。");
+                        this.ui.ChatBox.AppendTextSystem($"回不到那裡去。");
                     }
                     else
                     {
@@ -553,7 +558,7 @@ namespace WzComparerR2.MapRender
                     {
                         historyCount = 5;
                     }
-                    this.ui.ChatBox.AppendTextHelp($"历史地图：({this.viewHistory.Count})");
+                    this.ui.ChatBox.AppendTextHelp($"歷史地圖：({this.viewHistory.Count})");
                     var node = this.viewHistory.Last;
                     while (node != null && historyCount > 0)
                     {
@@ -568,9 +573,32 @@ namespace WzComparerR2.MapRender
                         historyCount--;
                     }
                     break;
+                    
+                case "/questlist":
+                    List<Tuple<int, int>> questList = this?.mapData.Scene.Back.Slots.SelectMany(item => ((BackItem)item).Quest).Union(this?.mapData.Scene.Layers.Nodes.SelectMany(l => ((LayerNode)l).Obj.Slots.SelectMany(item => ((ObjItem)item).Quest))).Union(this?.mapData.Scene.Npcs.SelectMany(item => item.Quest)).Union(this?.mapData.Scene.Front.Slots.SelectMany(item => ((BackItem)item).Quest)).Union(this?.mapData.Scene.Effect.Slots.Where(item => item is ParticleItem).SelectMany(item => ((ParticleItem)item).Quest)).Union(this?.mapData.Scene.Effect.Slots.Where(item => item is ParticleItem).SelectMany(item => ((ParticleItem)item).SubItems).SelectMany(item => item.Quest)).Distinct().ToList();
+                    this.ui.ChatBox.AppendTextHelp($"相關任務數量: ({questList.Count()})");
+                    foreach (Tuple<int, int> item in questList)
+                    {
+                        Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{item.Item1}");
+                        string questName = questInfoNode?.Nodes["name"].GetValueEx<string>(null) ?? "null";
+                        this.ui.ChatBox.AppendTextHelp($"  {questName}({item.Item1}) / {item.Item2}");
+                    }
+                    break;
 
-                default:
-                    this.ui.ChatBox.AppendTextSystem($"不支持{arguments[0]}命令。");
+                case "/questset":
+                    int questID, questState;
+                    if (arguments.Length > 2 && Int32.TryParse(arguments[1], out questID) && questID > -1 && Int32.TryParse(arguments[2], out questState) && questState >= -1 && questState <= 2)
+                    {
+                        this.patchVisibility.SetVisible(questID, questState);
+                        this.mapData.PreloadResource(resLoader);
+                        Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{questID}");
+                        string questName = questInfoNode?.Nodes["name"].GetValueEx<string>(null) ?? "null";
+                        this.ui.ChatBox.AppendTextSystem($"{questName}({questID})的狀態 {questState}已變更。");
+                    }
+                    else
+                    {
+                        this.ui.ChatBox.AppendTextSystem($"請輸入正確的任務狀態。");
+                    }
                     break;
             }
         }

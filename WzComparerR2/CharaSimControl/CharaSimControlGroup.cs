@@ -6,6 +6,7 @@ using System.Text;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
 using WzComparerR2.Controls;
+using WzComparerR2.WzLib;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -51,6 +52,8 @@ namespace WzComparerR2.CharaSimControl
                 {
                     frmStat = new AfrmStat();
                     frmStat.KeyDown += new KeyEventHandler(afrm_KeyDown);
+                    frmStat.ObjectMouseMove += new ObjectMouseEventHandler(frmStat_ObjectMouseMove);
+                    frmStat.ObjectMouseLeave += new EventHandler(frmStat_ObjectMouseLeave);
                     frmStat.Character = this.character;
                 }
                 return frmStat;
@@ -124,6 +127,15 @@ namespace WzComparerR2.CharaSimControl
                     break;
                 case Keys.Right:
                     frm.Left += 1;
+                    break;
+                case Keys.I:
+                    frmItem.Visible = !frmItem.Visible;
+                    break;
+                case Keys.S:
+                    frmStat.Visible = !frmStat.Visible;
+                    break;
+                case Keys.E:
+                    frmEquip.Visible = !frmEquip.Visible;
                     break;
             }
         }
@@ -230,6 +242,34 @@ namespace WzComparerR2.CharaSimControl
         }
 
         private void frmItem_ItemMouseLeave(object sender, EventArgs e)
+        {
+            tooltip.Visible = false;
+        }
+
+        private void frmStat_ObjectMouseMove(object sender, ObjectMouseEventArgs e)
+        {
+            if (e.Obj is Skill && !this.stringLinker.HasValues)
+            {
+                this.stringLinker.Load(PluginBase.PluginManager.FindWz(Wz_Type.String).GetValueEx<Wz_File>(null), PluginBase.PluginManager.FindWz(Wz_Type.Item).GetValueEx<Wz_File>(null), PluginBase.PluginManager.FindWz(Wz_Type.Etc).GetValueEx<Wz_File>(null));
+            }
+            if (e.Obj == null)
+            {
+                tooltip.Visible = false;
+                return;
+            }
+            if (e.Obj != tooltip.TargetItem)
+            {
+                tooltip.TargetItem = e.Obj;
+                tooltip.Refresh();
+            }
+            Point pos = frmStat.PointToScreen(e.Location);
+            pos.Offset(5, 5);
+            tooltip.Location = pos;
+            tooltip.Visible = true;
+            tooltip.BringToFront();
+        }
+
+        private void frmStat_ObjectMouseLeave(object sender, EventArgs e)
         {
             tooltip.Visible = false;
         }

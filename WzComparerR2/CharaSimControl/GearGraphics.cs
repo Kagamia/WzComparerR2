@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using CharaSimResource;
 using WzComparerR2.CharaSim;
 using TR = System.Windows.Forms.TextRenderer;
@@ -32,19 +33,21 @@ namespace WzComparerR2.CharaSimControl
             TBrushes["w"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_w, WrapMode.Tile);
             TBrushes["nw"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_nw, WrapMode.Clamp);
             TBrushes["c"] = new TextureBrush(Resource.UIToolTip_img_Item_Frame2_c, WrapMode.Tile);
-            SetFontFamily("宋体");
+            SetFontFamily("宋體");
         }
 
         public static readonly Dictionary<string, TextureBrush> TBrushes;
-        public static readonly Font ItemNameFont = new Font("宋体", 14f, FontStyle.Bold, GraphicsUnit.Pixel);
-        public static readonly Font ItemDetailFont = new Font("宋体", 12f, GraphicsUnit.Pixel);
-        public static readonly Font EpicGearDetailFont = new Font("宋体", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static readonly Font ItemNameFont = new Font("宋體", 14f, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static readonly Font ItemDetailFont = new Font("宋體", 12f, GraphicsUnit.Pixel);
+        public static readonly Font EquipDetailFont = new Font("宋體", 11f, GraphicsUnit.Pixel);
+        public static readonly Font EpicGearDetailFont = new Font("宋體", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
         public static readonly Font TahomaFont = new Font("Tahoma", 12f, GraphicsUnit.Pixel);
-        public static readonly Font SetItemPropFont = new Font("宋体", 12f, GraphicsUnit.Pixel);
-        public static readonly Font ItemReqLevelFont = new Font("宋体", 11f, GraphicsUnit.Pixel);
+        public static readonly Font SetItemPropFont = new Font("宋體", 12f, GraphicsUnit.Pixel);
+        public static readonly Font ItemReqLevelFont = new Font("宋體", 11f, GraphicsUnit.Pixel);
 
         public static Font ItemNameFont2 { get; private set; }
         public static Font ItemDetailFont2 { get; private set; }
+        public static Font EquipDetailFont2 { get; private set; }
 
         public static void SetFontFamily(string fontName)
         {
@@ -90,6 +93,7 @@ namespace WzComparerR2.CharaSimControl
         /// 表示装备职业额外说明中使用的橙黄色画刷。
         /// </summary>
         public static readonly Brush OrangeBrush3 = new SolidBrush(Color.FromArgb(255, 204, 0));
+        public static readonly Brush OrangeBrush4 = new SolidBrush(Color.FromArgb(255, 136, 17));
         /// <summary>
         /// 表示装备属性额外说明中使用的绿色画刷。
         /// </summary>
@@ -122,23 +126,23 @@ namespace WzComparerR2.CharaSimControl
         /// <summary>
         /// 表示橙色品质的装备名字画刷，额外属性为0~5，并且已经附加卷轴。
         /// </summary>
-        public static readonly Brush GearNameBrushC = new SolidBrush(Color.FromArgb(255, 136, 17));
-        private static Color gearBlueColor = Color.FromArgb(85, 170, 255);
+        public static readonly Brush GearNameBrushC = new SolidBrush(Color.FromArgb(255, 170, 0));
+        private static Color gearBlueColor = Color.FromArgb(102, 255, 255);
         /// <summary>
         /// 表示蓝色品质的装备名字画刷，额外属性为6~22。
         /// </summary>
         public static readonly Brush GearNameBrushD = new SolidBrush(gearBlueColor);
-        private static Color gearPurpleColor = Color.FromArgb(204, 102, 255);
+        private static Color gearPurpleColor = Color.FromArgb(153, 102, 255);
         /// <summary>
         /// 表示紫色品质的装备名字画刷，额外属性为23~39。
         /// </summary>
         public static readonly Brush GearNameBrushE = new SolidBrush(gearPurpleColor);
-        private static Color gearGoldColor = Color.FromArgb(255, 255, 17);
+        private static Color gearGoldColor = Color.FromArgb(255, 205, 0);
         /// <summary>
         /// 表示金色品质的装备名字画刷，额外属性为40~54。
         /// </summary>
         public static readonly Brush GearNameBrushF = new SolidBrush(gearGoldColor);
-        private static Color gearGreenColor = Color.FromArgb(51, 255, 0);
+        private static Color gearGreenColor = Color.FromArgb(204, 255, 0);
         /// <summary>
         /// 表示绿色品质的装备名字画刷，额外属性为55~69。
         /// </summary>
@@ -146,19 +150,25 @@ namespace WzComparerR2.CharaSimControl
         /// <summary>
         /// 表示红色品质的装备名字画刷，额外属性为70以上。
         /// </summary>
-        public static readonly Brush GearNameBrushH = new SolidBrush(Color.FromArgb(255, 0, 119));
+        public static readonly Brush GearNameBrushH = new SolidBrush(Color.FromArgb(255, 0, 102));
+        public static readonly Brush BlueBrush = new SolidBrush(Color.FromArgb(0, 204, 255));
 
         public static readonly Color gearCyanColor = Color.FromArgb(102, 255, 255);
         /// <summary>
         /// 表示装备属性变化的青色画刷。
         /// </summary>
         public static readonly Brush GearPropChangeBrush = new SolidBrush(gearCyanColor);
+        public static readonly Color skillYellowColor = Color.FromArgb(244, 244, 68);
+        public static readonly Color itemPinkColor = Color.FromArgb(255, 102, 204);
+        public static readonly Color itemPurpleColor = Color.FromArgb(187, 119, 255);
 
-        public static Brush GetGearNameBrush(int diff, bool up)
+        public static Brush GetGearNameBrush(int diff, bool up, bool cash = false, bool petEquip = false)
         {
+            if (cash && !petEquip)
+                return GearNameBrushB;
             if (diff < 0)
                 return GearNameBrushA;
-            if (diff < 6)
+            if (diff < 6 || petEquip)
             {
                 if (!up)
                     return GearNameBrushB;
@@ -219,7 +229,7 @@ namespace WzComparerR2.CharaSimControl
         /// <param Name="x">起始的x坐标。</param>
         /// <param Name="X1">每行终止的x坐标。</param>
         /// <param Name="y">起始行的y坐标。</param>
-        public static void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height)
+        public static void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height, Color? orangeColor = null)
         {
             if (s == null)
                 return;
@@ -227,8 +237,8 @@ namespace WzComparerR2.CharaSimControl
             using (var r = new FormattedTextRenderer())
             {
                 r.WordWrapEnabled = false;
-                r.UseGDIRenderer = false;
-                r.DrawString(g, s, font, x, x1, ref y, height);
+                r.UseGDIRenderer = true;
+                r.DrawString(g, s, font, x, x1, ref y, height, orangeColor);
             }
         }
 
@@ -240,7 +250,7 @@ namespace WzComparerR2.CharaSimControl
             using (var r = new FormattedTextRenderer())
             {
                 r.WordWrapEnabled = false;
-                r.UseGDIRenderer = false;
+                r.UseGDIRenderer = true;
                 r.DrawPlainText(g, s, font, color, x, x1, ref y, height);
             }
         }
@@ -447,6 +457,7 @@ namespace WzComparerR2.CharaSimControl
             //测试宽度
             var font = GearGraphics.ItemDetailFont2;
             var fmt = StringFormat.GenericTypographic;
+            //int width = string.IsNullOrEmpty(tagName) ? 0 : (int)Math.Ceiling(g.MeasureString(tagName, font, 261, fmt).Width);
             int width = string.IsNullOrEmpty(tagName) ? 0 : (int)Math.Ceiling(g.MeasureString(tagName, font, 261, fmt).Width);
             int left = picW / 2 - width / 2;
             int right = left + width;
@@ -509,13 +520,22 @@ namespace WzComparerR2.CharaSimControl
             RectangleF infinityRect;
             int drawX;
             Color defaultColor;
+            Color orangeColor;
 
-            public void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height)
+            public void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height, Color? orangeColor = null)
             {
                 //初始化环境
                 this.g = g;
                 this.drawX = x;
                 this.defaultColor = Color.White;
+                if (orangeColor != null)
+                {
+                    this.orangeColor = (Color)orangeColor;
+                }
+                else
+                {
+                    this.orangeColor = GearGraphics.OrangeBrushColor;
+                }
                 float fontLineHeight = GetFontLineHeight(font);
                 this.infinityRect = new RectangleF(0, 0, ushort.MaxValue, fontLineHeight);
 
@@ -531,7 +551,16 @@ namespace WzComparerR2.CharaSimControl
                 float fontLineHeight = GetFontLineHeight(font);
                 this.infinityRect = new RectangleF(0, 0, ushort.MaxValue, fontLineHeight);
 
-                base.DrawPlainText(s, font, x1 - x, ref y, height);
+                //base.DrawPlainText(s, font, x1 - x, ref y, height);
+                if (TextRenderer.MeasureText(g, s, font, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width <= x1 - x)
+                {
+                    TextRenderer.DrawText(g, s, font, new Point(x, y), color, TextFormatFlags.NoPadding);
+                    y += height;
+                }
+                else
+                {
+                    base.DrawPlainText(s, font, x1 - x, ref y, height);
+                }
             }
 
             private float GetFontLineHeight(Font font)
@@ -585,10 +614,15 @@ namespace WzComparerR2.CharaSimControl
                     var regions = g.MeasureCharacterRanges(text, font, infinityRect, fmt);
                     for (int i = 0; i < runs.Count; i++)
                     {
-                        var layout = regions[i].GetBounds(g);
+                        var layout = new RectangleF();
+                        if (this.UseGDIRenderer)
+                            layout = new RectangleF(new Point(TR.MeasureText(g, text.Substring(0, runs[i].StartIndex), font, Size.Round(infinityRect.Size), TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix).Width, 0), TR.MeasureText(g, text.Substring(runs[i].StartIndex, runs[i].Length), font, Size.Round(infinityRect.Size), TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix));
+                        else
+                            layout = regions[i].GetBounds(g);
                         runs[i].X = (int)Math.Round(layout.Left);
                         runs[i].Width = (int)Math.Round(layout.Width);
-                        regions[i].Dispose();
+                        if (i < regions.Length)
+                            regions[i].Dispose();
                     }
                 }
             }
@@ -608,7 +642,11 @@ namespace WzComparerR2.CharaSimControl
                     var regions = g.MeasureCharacterRanges(word, font, infinityRect, fmt);
                     for (int i1 = 0; i1 < regions.Length; i1++)
                     {
-                        var rect = regions[i1].GetBounds(g);
+                        var rect = new RectangleF();
+                        if (this.UseGDIRenderer)
+                            rect = new RectangleF(new Point(0, 0), TR.MeasureText(g, "" + word[i + i1], font, Size.Round(infinityRect.Size), TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix));
+                        else
+                            rect = regions[i1].GetBounds(g);
                         rects[i + i1] = new Rectangle(
                             (int)Math.Round(rect.Left),
                             (int)Math.Round(rect.Top),
@@ -644,7 +682,7 @@ namespace WzComparerR2.CharaSimControl
                 Color color;
                 switch (colorID)
                 {
-                    case "c": color = GearGraphics.OrangeBrushColor; break;
+                    case "c": color = this.orangeColor; break;
                     case "g": color = GearGraphics.gearGreenColor; break;
                     case "$": color = GearGraphics.gearCyanColor; break;
                     default: color = this.defaultColor; break;

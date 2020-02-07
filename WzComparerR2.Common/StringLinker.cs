@@ -16,11 +16,12 @@ namespace WzComparerR2.Common
             stringNpc = new Dictionary<int, StringResult>();
             stringSkill = new Dictionary<int, StringResult>();
             stringSkill2 = new Dictionary<string, StringResult>();
+            stringSetItem = new Dictionary<int, StringResult>();
         }
 
-        public bool Load(Wz_File stringWz)
+        public bool Load(Wz_File stringWz, Wz_File itemWz, Wz_File etcWz)
         {
-            if (stringWz == null || stringWz.Node == null)
+            if (stringWz == null || stringWz.Node == null || itemWz == null || itemWz.Node == null || etcWz == null || etcWz.Node == null)
                 return false;
             this.Clear();
             int id;
@@ -181,6 +182,57 @@ namespace WzComparerR2.Common
                 }
             }
 
+            foreach (Wz_Node node in itemWz.Node.FindNodeByPath("Special").Nodes)
+            {
+                Wz_Image image = node.Value as Wz_Image;
+                if (image == null)
+                    continue;
+                switch (node.Text)
+                {
+                    case "0910.img":
+                        if (!image.TryExtract()) break;
+                        foreach (Wz_Node tree in image.Node.Nodes)
+                        {
+                            if (Int32.TryParse(tree.Text, out id))
+                            {
+                                StringResult strResult = new StringResult();
+                                strResult.Name = GetDefaultString(tree, "name");
+                                strResult.Desc = GetDefaultString(tree, "desc");
+                                strResult.FullPath = tree.FullPath;
+
+                                AddAllValue(strResult, tree);
+                                stringItem[id] = strResult;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            foreach (Wz_Node node in etcWz.Node.Nodes)
+            {
+                Wz_Image image = node.Value as Wz_Image;
+                if (image == null)
+                    continue;
+                switch (node.Text)
+                {
+                    case "SetItemInfo.img":
+                        if (!image.TryExtract()) break;
+                        foreach (Wz_Node tree in image.Node.Nodes)
+                        {
+                            if (Int32.TryParse(tree.Text, out id))
+                            {
+                                StringResult strResult = new StringResult();
+                                strResult.Name = GetDefaultString(tree, "setItemName");
+                                strResult.FullPath = tree.FullPath;
+
+                                AddAllValue(strResult, tree);
+                                stringSetItem[id] = strResult;
+                            }
+                        }
+                        break;
+                }
+            }
+
             return this.HasValues;
         }
 
@@ -193,6 +245,7 @@ namespace WzComparerR2.Common
             stringNpc.Clear();
             stringSkill.Clear();
             stringSkill2.Clear();
+            stringSetItem.Clear();
         }
 
         public bool HasValues
@@ -200,7 +253,7 @@ namespace WzComparerR2.Common
             get
             {
                 return (stringEqp.Count + stringItem.Count + stringMap.Count +
-                    stringMob.Count + stringNpc.Count + stringSkill.Count > 0);
+                    stringMob.Count + stringNpc.Count + stringSkill.Count + stringSetItem.Count > 0);
             }
         }
 
@@ -211,6 +264,7 @@ namespace WzComparerR2.Common
         private Dictionary<int, StringResult> stringNpc;
         private Dictionary<int, StringResult> stringSkill;
         private Dictionary<string, StringResult> stringSkill2;
+        private Dictionary<int, StringResult> stringSetItem;
 
         private string GetDefaultString(Wz_Node node, string searchNodeText)
         {
@@ -262,6 +316,11 @@ namespace WzComparerR2.Common
         public Dictionary<string, StringResult> StringSkill2
         {
             get { return stringSkill2; }
+        }
+
+        public Dictionary<int, StringResult> StringSetItem
+        {
+            get { return stringSetItem; }
         }
 
     }

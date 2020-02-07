@@ -19,6 +19,8 @@ namespace WzComparerR2.MapRender.Patches2
         public int Cy { get; set; }
         public int Rx0 { get; set; }
         public int Rx1 { get; set; }
+        public List<Tuple<int, int>> Quest { get; set; }
+        public List<Tuple<long, long>> Date { get; set; }
 
         public ItemView View { get; set; }
 
@@ -40,6 +42,35 @@ namespace WzComparerR2.MapRender.Patches2
                 Rx0 = node.Nodes["rx0"].GetValueEx(0),
                 Rx1 = node.Nodes["rx1"].GetValueEx(0)
             };
+            item.Quest = new List<Tuple<int, int>>();
+            item.Date = new List<Tuple<long, long>>();
+            if (item.Type == LifeType.Npc)
+            {
+                string path = $@"Npc\{item.ID:D7}.img";
+                var npcNode = PluginBase.PluginManager.FindWz(path);
+
+                int? npcLink = npcNode?.FindNodeByPath(@"info\link").GetValueEx<int>();
+                if (npcLink != null)
+                {
+                    path = $@"Npc\{npcLink.Value:D7}.img";
+                    npcNode = PluginBase.PluginManager.FindWz(path);
+                }
+
+                if (npcNode != null)
+                {
+                    foreach (Wz_Node conditionNode in npcNode.Nodes.Where(n => n.Text.StartsWith("condition")))
+                    {
+                        foreach (Wz_Node questNode in conditionNode.Nodes.Where(n => n.Text.All(char.IsDigit)))
+                        {
+                            item.Quest.Add(new Tuple<int, int>(int.Parse(questNode.Text), Convert.ToInt32(questNode.Value)));
+                        }
+                        if (conditionNode.Nodes["dateStart"] != null || conditionNode.Nodes["dateEnd"] != null)
+                        {
+                            item.Date.Add(new Tuple<long, long>(conditionNode.Nodes["dateStart"].GetValueEx<long>(0), conditionNode.Nodes["dateEnd"].GetValueEx<long>(0)));
+                        }
+                    }
+                }
+            }
             return item;
         }
 

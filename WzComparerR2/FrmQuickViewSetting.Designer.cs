@@ -102,11 +102,11 @@
             this.superTabControl1.Location = new System.Drawing.Point(0, 0);
             this.superTabControl1.Name = "superTabControl1";
             this.superTabControl1.ReorderTabsEnabled = true;
-            this.superTabControl1.SelectedTabFont = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold);
+            this.superTabControl1.SelectedTabFont = new System.Drawing.Font("宋體", 9F, System.Drawing.FontStyle.Bold);
             this.superTabControl1.SelectedTabIndex = 0;
             this.superTabControl1.Size = new System.Drawing.Size(304, 171);
             this.superTabControl1.TabAlignment = DevComponents.DotNetBar.eTabStripAlignment.Left;
-            this.superTabControl1.TabFont = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.superTabControl1.TabFont = new System.Drawing.Font("宋體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.superTabControl1.TabIndex = 0;
             this.superTabControl1.Tabs.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.superTabItem1,
@@ -145,7 +145,7 @@
             this.checkBoxX10.Size = new System.Drawing.Size(125, 18);
             this.checkBoxX10.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX10.TabIndex = 7;
-            this.checkBoxX10.Text = "显示技能扩展属性";
+            this.checkBoxX10.Text = "顯示技能擴展屬性";
             // 
             // labelX3
             // 
@@ -160,7 +160,7 @@
             this.labelX3.Name = "labelX3";
             this.labelX3.Size = new System.Drawing.Size(142, 30);
             this.labelX3.TabIndex = 6;
-            this.labelX3.Text = "对tooltip窗口为焦点，<br/>\r\n使用 <b>- + [ ]</b> 键调整等级";
+            this.labelX3.Text = "對tooltip窗口為焦點，<br/>\r\n使用 <b>- + [ ]</b> 鍵調整等級";
             // 
             // comboBoxEx2
             // 
@@ -218,7 +218,7 @@
             this.labelX2.Name = "labelX2";
             this.labelX2.Size = new System.Drawing.Size(81, 18);
             this.labelX2.TabIndex = 4;
-            this.labelX2.Text = "调整等级间隔";
+            this.labelX2.Text = "調整等級間隔";
             // 
             // labelX1
             // 
@@ -232,7 +232,7 @@
             this.labelX1.Name = "labelX1";
             this.labelX1.Size = new System.Drawing.Size(81, 18);
             this.labelX1.TabIndex = 3;
-            this.labelX1.Text = "默认技能等级";
+            this.labelX1.Text = "默認技能等級";
             // 
             // comboBoxEx1
             // 
@@ -281,7 +281,7 @@
             this.checkBoxX2.Size = new System.Drawing.Size(125, 18);
             this.checkBoxX2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX2.TabIndex = 1;
-            this.checkBoxX2.Text = "显示技能动作延时";
+            this.checkBoxX2.Text = "顯示技能動作延遲";
             // 
             // checkBoxX1
             // 
@@ -296,7 +296,7 @@
             this.checkBoxX1.Size = new System.Drawing.Size(101, 18);
             this.checkBoxX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX1.TabIndex = 0;
-            this.checkBoxX1.Text = "显示技能代码";
+            this.checkBoxX1.Text = "顯示技能代碼";
             // 
             // superTabItem1
             // 
@@ -309,9 +309,9 @@
             // 
             this.superTabControlPanel4.Controls.Add(this.checkBoxX7);
             this.superTabControlPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.superTabControlPanel4.Location = new System.Drawing.Point(63, 0);
+            this.superTabControlPanel4.Location = new System.Drawing.Point(62, 0);
             this.superTabControlPanel4.Name = "superTabControlPanel4";
-            this.superTabControlPanel4.Size = new System.Drawing.Size(241, 171);
+            this.superTabControlPanel4.Size = new System.Drawing.Size(242, 171);
             this.superTabControlPanel4.TabIndex = 0;
             this.superTabControlPanel4.TabItem = this.superTabItem4;
             // 
@@ -328,7 +328,7 @@
             this.checkBoxX7.Size = new System.Drawing.Size(101, 18);
             this.checkBoxX7.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX7.TabIndex = 3;
-            this.checkBoxX7.Text = "显示制造代码";
+            this.checkBoxX7.Text = "顯示製造代碼";
             // 
             // superTabItem4
             // 
@@ -363,7 +363,7 @@
             this.checkBoxX12.Size = new System.Drawing.Size(101, 18);
             this.checkBoxX12.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX12.TabIndex = 5;
-            this.checkBoxX12.Text = "显示称号样式";
+            this.checkBoxX12.Text = "顯示稱號樣式";
             // 
             // checkBoxX9
             // 
@@ -378,7 +378,7 @@
             this.checkBoxX9.Size = new System.Drawing.Size(101, 18);
             this.checkBoxX9.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX9.TabIndex = 4;
-            this.checkBoxX9.Text = "图纸联动道具";
+            this.checkBoxX9.Text = "圖紙連動道具";
             // 
             // checkBoxX8
             // 
@@ -393,7 +393,7 @@
             this.checkBoxX8.Size = new System.Drawing.Size(101, 18);
             this.checkBoxX8.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX8.TabIndex = 3;
-            this.checkBoxX8.Text = "图纸联动配方";
+            this.checkBoxX8.Text = "圖紙連動配方";
             // 
             // checkBoxX5
             // 
@@ -408,7 +408,7 @@
             this.checkBoxX5.Size = new System.Drawing.Size(101, 18);
             this.checkBoxX5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX5.TabIndex = 2;
-            this.checkBoxX5.Text = "显示物品代码";
+            this.checkBoxX5.Text = "顯示物品代碼";
             // 
             // superTabItem3
             // 
@@ -443,7 +443,7 @@
             this.checkBoxX6.Size = new System.Drawing.Size(125, 18);
             this.checkBoxX6.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX6.TabIndex = 3;
-            this.checkBoxX6.Text = "显示装备成长信息";
+            this.checkBoxX6.Text = "顯示裝備成長資訊";
             // 
             // checkBoxX4
             // 
@@ -458,7 +458,7 @@
             this.checkBoxX4.Size = new System.Drawing.Size(101, 18);
             this.checkBoxX4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX4.TabIndex = 2;
-            this.checkBoxX4.Text = "显示武器攻速";
+            this.checkBoxX4.Text = "顯示武器攻速";
             // 
             // checkBoxX3
             // 
@@ -473,7 +473,7 @@
             this.checkBoxX3.Size = new System.Drawing.Size(101, 18);
             this.checkBoxX3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX3.TabIndex = 1;
-            this.checkBoxX3.Text = "显示装备代码";
+            this.checkBoxX3.Text = "顯示裝備代碼";
             // 
             // superTabItem2
             // 
@@ -524,7 +524,7 @@
             this.buttonX1.Size = new System.Drawing.Size(60, 23);
             this.buttonX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.buttonX1.TabIndex = 0;
-            this.buttonX1.Text = "确定";
+            this.buttonX1.Text = "確定";
             // 
             // checkBoxX11
             // 
@@ -539,7 +539,7 @@
             this.checkBoxX11.Size = new System.Drawing.Size(101, 18);
             this.checkBoxX11.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX11.TabIndex = 4;
-            this.checkBoxX11.Text = "显示勋章样式";
+            this.checkBoxX11.Text = "顯示勳章樣式";
             // 
             // FrmQuickViewSetting
             // 
@@ -553,7 +553,7 @@
             this.MaximizeBox = false;
             this.Name = "FrmQuickViewSetting";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "快速预览设置";
+            this.Text = "快速預覽設置";
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).EndInit();
             this.superTabControl1.ResumeLayout(false);
             this.superTabControlPanel1.ResumeLayout(false);

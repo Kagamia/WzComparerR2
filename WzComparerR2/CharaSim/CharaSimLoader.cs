@@ -13,10 +13,14 @@ namespace WzComparerR2.CharaSim
         {
             LoadedSetItems = new Dictionary<int, SetItem>();
             LoadedExclusiveEquips = new Dictionary<int, ExclusiveEquip>();
+            LoadedCommoditiesBySN = new Dictionary<int, Commodity>();
+            LoadedCommoditiesByItemId = new Dictionary<int, Commodity>();
         }
 
         public static Dictionary<int, SetItem> LoadedSetItems { get; private set; }
         public static Dictionary<int, ExclusiveEquip> LoadedExclusiveEquips { get; private set; }
+        public static Dictionary<int, Commodity> LoadedCommoditiesBySN { get; private set; }
+        public static Dictionary<int, Commodity> LoadedCommoditiesByItemId { get; private set; }
 
         public static void LoadSetItemsIfEmpty()
         {
@@ -80,6 +84,38 @@ namespace WzComparerR2.CharaSim
                     ExclusiveEquip exclusiveEquip = ExclusiveEquip.CreateFromNode(node);
                     if (exclusiveEquip != null)
                         LoadedExclusiveEquips[exclusiveEquipIndex] = exclusiveEquip;
+                }
+            }
+        }
+
+        public static void LoadCommoditiesIfEmpty()
+        {
+            if (LoadedCommoditiesBySN.Count == 0 && LoadedCommoditiesByItemId.Count == 0)
+            {
+                LoadCommodities();
+            }
+        }
+
+        public static void LoadCommodities()
+        {
+            Wz_Node commodityNode = PluginManager.FindWz("Etc/Commodity.img");
+            if (commodityNode == null)
+                return;
+
+            LoadedCommoditiesBySN.Clear();
+            LoadedCommoditiesByItemId.Clear();
+            foreach (Wz_Node node in commodityNode.Nodes)
+            {
+                int commodityIndex;
+                if (Int32.TryParse(node.Text, out commodityIndex))
+                {
+                    Commodity commodity = Commodity.CreateFromNode(node);
+                    if (commodity != null)
+                    {
+                        LoadedCommoditiesBySN[commodity.SN] = commodity;
+                        if (commodity.ItemId / 10000 == 910)
+                            LoadedCommoditiesByItemId[commodity.ItemId] = commodity;
+                    }
                 }
             }
         }

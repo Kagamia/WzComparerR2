@@ -98,6 +98,10 @@ namespace WzComparerR2.Controls
                     {
                         _graphics.Draw((SpineAnimator)animation, world);
                     }
+                    else if (animation is MultiFrameAnimator)
+                    {
+                        _graphics.Draw((MultiFrameAnimator)animation, world);
+                    }
                 }
             }
 

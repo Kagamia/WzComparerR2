@@ -20,11 +20,11 @@ namespace WzComparerR2.MapRender
 
         }
 
-        #if MapRenderV1
+#if MapRenderV1
         private RibbonBar bar;
         private ButtonItem btnItemMapRender;
         private FrmMapRender mapRenderGame1;
-        #endif
+#endif
 
         private RibbonBar bar2;
         private ButtonItem btnItemMapRenderV2;
@@ -32,12 +32,12 @@ namespace WzComparerR2.MapRender
 
         protected override void OnLoad()
         {
-            #if MapRenderV1
+#if MapRenderV1
             this.bar = Context.AddRibbonBar("Modules", "MapRender");
             btnItemMapRender = new ButtonItem("", "MapRender");
             btnItemMapRender.Click += btnItem_Click;
             bar.Items.Add(btnItemMapRender);
-            #endif
+#endif
 
             this.bar2 = Context.AddRibbonBar("Modules", "MapRender2");
             btnItemMapRenderV2 = new ButtonItem("", "MapRenderV2");
@@ -59,7 +59,7 @@ namespace WzComparerR2.MapRender
                 {
                     if (wzFile == null || wzFile.Type != Wz_Type.Map)
                     {
-                        if (MessageBoxEx.Show("所选Img不属于Map.wz，是否继续？", "提示", MessageBoxButtons.OKCancel) != DialogResult.OK)
+                        if (MessageBoxEx.Show("所選Img不屬於Map.wz，是否繼續？", "提示", MessageBoxButtons.OKCancel) != DialogResult.OK)
                         {
                             goto exit;
                         }
@@ -69,7 +69,7 @@ namespace WzComparerR2.MapRender
                     if (!sl.HasValues) //生成默认stringLinker
                     {
                         sl = new StringLinker();
-                        sl.Load(PluginManager.FindWz(Wz_Type.String).GetValueEx<Wz_File>(null));
+                        sl.Load(PluginManager.FindWz(Wz_Type.String).GetValueEx<Wz_File>(null), PluginManager.FindWz(Wz_Type.Item).GetValueEx<Wz_File>(null), PluginManager.FindWz(Wz_Type.Etc).GetValueEx<Wz_File>(null));
                     }
 
                     //开始绘制
@@ -136,7 +136,7 @@ namespace WzComparerR2.MapRender
                 }
             }
 
-            MessageBoxEx.Show("没有选择一个map的img", "MapRender");
+            MessageBoxEx.Show("沒有選擇一個map的img", "MapRender");
 
             exit:
             return;

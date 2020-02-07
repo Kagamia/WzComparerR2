@@ -26,6 +26,7 @@ namespace WzComparerR2.Avatar
             var tabCtrl = f.GetTabPanel();
             Context.AddTab(f.Text, tabCtrl);
             Context.SelectedNode1Changed += f.OnSelectedNode1Changed;
+            Context.SelectedNode2Changed += f.OnSelectedNode2Changed;
             Context.WzClosing += f.OnWzClosing;
             this.Tab = tabCtrl.TabItem;
         }
@@ -59,14 +60,15 @@ namespace WzComparerR2.Avatar
             }*/
 
             canvas.ActionName = "stand1";
-            canvas.EmotionName = "shine";
+            canvas.EmotionName = "default";
             canvas.TamingActionName = "stand1";
             AddPart(canvas, "Character\\00002000.img");
             AddPart(canvas, "Character\\00012000.img");
-            AddPart(canvas, "Character\\Face\\00020000.img");
-            AddPart(canvas, "Character\\Hair\\00030000.img");
-            AddPart(canvas, "Character\\Coat\\01040036.img");
-            AddPart(canvas, "Character\\Pants\\01060026.img");
+            AddPart(canvas, "Character\\Face\\00024016.img");
+            AddPart(canvas, "Character\\Hair\\00037860.img");
+            AddPart(canvas, "Character\\Coat\\01041046.img");
+            AddPart(canvas, "Character\\Longcoat\\01053136.img");
+            AddPart(canvas, "Character\\Pants\\01061039.img");
             //AddPart(canvas, "Character\\Weapon\\01442000.img");
             //AddPart(canvas, "Character\\Weapon\\01382007.img");
             //AddPart(canvas, "Character\\Weapon\\01332000.img");

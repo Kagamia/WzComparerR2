@@ -54,7 +54,7 @@
             this.labelX1.Name = "labelX1";
             this.labelX1.Size = new System.Drawing.Size(68, 18);
             this.labelX1.TabIndex = 0;
-            this.labelX1.Text = "程序版本：";
+            this.labelX1.Text = "程式版本：";
             // 
             // labelX2
             // 
@@ -67,7 +67,7 @@
             this.labelX2.Name = "labelX2";
             this.labelX2.Size = new System.Drawing.Size(68, 18);
             this.labelX2.TabIndex = 1;
-            this.labelX2.Text = "文件版本：";
+            this.labelX2.Text = "檔案版本：";
             // 
             // labelX3
             // 
@@ -80,7 +80,7 @@
             this.labelX3.Name = "labelX3";
             this.labelX3.Size = new System.Drawing.Size(68, 18);
             this.labelX3.TabIndex = 2;
-            this.labelX3.Text = "版权所有：";
+            this.labelX3.Text = "版權所有：";
             // 
             // lblAsmVer
             // 
@@ -124,7 +124,7 @@
             // buttonX1
             // 
             this.buttonX1.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
-            this.buttonX1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.buttonX1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonX1.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
             this.buttonX1.DialogResult = System.Windows.Forms.DialogResult.OK;
@@ -133,13 +133,13 @@
             this.buttonX1.Size = new System.Drawing.Size(75, 23);
             this.buttonX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.buttonX1.TabIndex = 8;
-            this.buttonX1.Text = "关掉我";
+            this.buttonX1.Text = "關閉";
             // 
             // advTree1
             // 
             this.advTree1.AccessibleRole = System.Windows.Forms.AccessibleRole.Outline;
             this.advTree1.AllowDrop = true;
-            this.advTree1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.advTree1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.advTree1.BackColor = System.Drawing.SystemColors.Window;
             // 
@@ -217,7 +217,7 @@
             this.MinimizeBox = false;
             this.Name = "FrmAbout";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "关于";
+            this.Text = "關於";
             ((System.ComponentModel.ISupportInitialize)(this.advTree1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -23,8 +23,9 @@ namespace WzComparerR2.CharaSim
             this.status.CriticalRate.BaseVal = 5;
             this.status.MoveSpeed.BaseVal = 100;
             this.status.Jump.BaseVal = 100;
-            this.status.CriticalDamageMax.BaseVal = 150;
-            this.status.CriticalDamageMin.BaseVal = 120;
+            //this.status.CriticalDamageMax.BaseVal = 150;
+            //this.status.CriticalDamageMin.BaseVal = 120;
+            this.status.CriticalDamage.BaseVal = 0;
 
             this.itemSlots = new ItemBase[5][];
             for (int i = 0; i < this.itemSlots.Length; i++)
@@ -100,8 +101,9 @@ namespace WzComparerR2.CharaSim
             status.MoveSpeed.ResetAdd();
             status.Jump.ResetAdd();
             status.CriticalRate.ResetAdd();
-            status.CriticalDamageMax.ResetAdd();
-            status.CriticalDamageMin.ResetAdd();
+            //status.CriticalDamageMax.ResetAdd();
+            //status.CriticalDamageMin.ResetAdd();
+            status.CriticalDamage.ResetAdd();
             status.DamageRate.ResetAll();
 
             //foreach (Buff buff in buffs)
@@ -233,8 +235,9 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incSpeed: status.MoveSpeed.GearAdd += value; break;
                 case GearPropType.incJump: status.Jump.GearAdd += value; break;
 
-                case GearPropType.incCriticaldamageMax: status.CriticalDamageMax.GearAdd += value; break;
-                case GearPropType.incCriticaldamageMin: status.CriticalDamageMin.GearAdd += value; break;
+                //case GearPropType.incCriticaldamageMax: status.CriticalDamageMax.GearAdd += value; break;
+                //case GearPropType.incCriticaldamageMin: status.CriticalDamageMin.GearAdd += value; break;
+                case GearPropType.incCriticaldamage: status.CriticalDamage.GearAdd += value; break;
             }
         }
 
@@ -304,7 +307,7 @@ namespace WzComparerR2.CharaSim
                 }
                 setItem.currentCount = 0;
             }
-            //验证有效装备
+            //验证有效裝備
             int setItemID;
             foreach (Gear gear in equip.GearsEquiped)
             {
@@ -337,7 +340,7 @@ namespace WzComparerR2.CharaSim
             int newGearIndex = Array.IndexOf<ItemBase>(itemTab, newGear);
             if (newGearIndex < 0 || newGear.State != GearState.itemList)
             {
-                throw new InvalidOperationException("未知错误：装备不在背包。");
+                throw new InvalidOperationException("未知錯誤：裝備不在背包。");
             }
 
             int onlyEquip;
@@ -347,7 +350,7 @@ namespace WzComparerR2.CharaSim
                 {
                     if (gear.ItemID == newGear.ItemID)
                     {
-                        throw new InvalidOperationException("该道具只能同时装备一个。");
+                        throw new InvalidOperationException("該道具只能同時裝備一個。");
                     }
                 }
             }
@@ -361,7 +364,7 @@ namespace WzComparerR2.CharaSim
             Gear[] removedGear;
             if (!this.equip.AddGear(newGear, out removedGear))
             {
-                throw new InvalidOperationException("未知错误：添加装备失败。");
+                throw new InvalidOperationException("未知錯誤：添加裝備失敗。");
             }
 
             CheckGearEnabled();
@@ -393,15 +396,15 @@ namespace WzComparerR2.CharaSim
                 }
                 else
                 {
-                    errorString = "背包已满。";
+                    errorString = "背包已滿。";
                 }
             }
             else
             {
-                errorString = "能力值不足，无法装备道具。";
+                errorString = "能力值不足，無法裝備道具。";
             }
 
-            //还原装备
+            //还原裝備
             foreach (Gear gear in removedGear)
             {
                 Gear[] arg;
@@ -415,38 +418,38 @@ namespace WzComparerR2.CharaSim
         {
             if (Gear.IsMechanicGear(gear.type) && status.Job / 100 != 35)
             {
-                errorMessage = "只有机械师才能装备。";
+                errorMessage = "只有機甲戰神才能裝備。";
                 return false;
             }
             if (Gear.IsDragonGear(gear.type) && status.Job / 100 != 22)
             {
-                errorMessage = "只有龙神才能装备。";
+                errorMessage = "只有龍魔導士才能裝備。";
                 return false;
             }
             if (gear.type == GearType.katara && status.Job / 10 != 43)
             {
-                errorMessage = "只有暗影双刀才能装备。";
+                errorMessage = "只有影武者才能裝備。";
                 return false;
             }
             if (gear.type == GearType.shield &&
                 (status.Job / 10 == 43 || status.Job / 100 == 23 || status.Job / 100 == 31))
             {
-                errorMessage = "该职业无法装备盾牌。";
+                errorMessage = "該職業無法裝備盾牌。";
                 return false;
             }
             if (gear.type == GearType.magicArrow && status.Job / 100 != 23)
             {
-                errorMessage = "只有双弩精灵职业才能装备。";
+                errorMessage = "只有精靈遊俠職業才能裝備。";
                 return false;
             }
             if (gear.type == GearType.demonShield && status.Job / 100 != 31)
             {
-                errorMessage = "只有恶魔猎手职业才能装备。";
+                errorMessage = "只有惡魔殺手職業才能裝備。";
                 return false;
             }
             if (!checkGearPropReq(gear))
             {
-                errorMessage = "能力值不足，无法装备道具。";
+                errorMessage = "能力值不足，無法裝備道具。";
                 return false;
             }
             errorMessage = null;
@@ -490,7 +493,7 @@ namespace WzComparerR2.CharaSim
         /// 检查指定的职业ID是否归属于标准职业。
         /// </summary>
         /// <param name="jobID">要检查的职业ID。</param>
-        /// <param name="baseJob">标准职业代码。0-新手 1-战士 2-法师 3-弓手 4-飞侠 5-海盗</param>
+        /// <param name="baseJob">标准职业代码。0-新手 1-战士 2-法師 3-弓手 4-飞侠 5-海盗</param>
         /// <returns></returns>
         public static bool CheckJobReq(int jobID, int baseJob)
         {
@@ -516,7 +519,7 @@ namespace WzComparerR2.CharaSim
             while (true)
             {
                 bool reset = false;
-                //逐个装备判定装备要求
+                //逐个裝備判定裝備要求
                 foreach (Gear gear in gearsEquip)
                 {
                     if (gear.State == GearState.enable)
@@ -524,14 +527,14 @@ namespace WzComparerR2.CharaSim
                         gear.State = GearState.disable;
                         UpdateProps();
 
-                        //判定装备要求
+                        //判定裝備要求
                         if (!checkGearPropReq(gear))
                         {
-                            reset = true; //如果不符合 无效化装备 进行下一轮判断
+                            reset = true; //如果不符合 无效化裝備 进行下一轮判断
                             break;
                         }
 
-                        //恢复有效性
+                        //恢復有效性
                         gear.State = GearState.enable;
                     }
                 }
@@ -541,7 +544,7 @@ namespace WzComparerR2.CharaSim
 
             for (int i = 0; i < gearsEquip.Count; i++)
             {
-                if (gearsEquip[i].State != oldStates[i]) //装备状态变化
+                if (gearsEquip[i].State != oldStates[i]) //裝備状态变化
                 {
                     return true;
                 }
@@ -622,95 +625,223 @@ namespace WzComparerR2.CharaSim
             return 0;
         }
 
-        private static int[] _exptnl = new int[]
+        private static long[] _exptnl = new long[]
         {
             15,34,57,92,
             135,372,560,840,
-            1242,19136,479143,10063200
+            1242,2207026470,271970512164
         };
 
-        public static int ExpToNextLevel(int level)
+        public static long ExpToNextLevel(int level)
         {
-            int exp;
-            if (level < 1 || level > 200)
+            long exp;
+            if (level < 1 || level > 275)
                 return -1;
             if (level < 10)
                 return _exptnl[level - 1];
             if (level >= 10 && level <= 14)
-                return _exptnl[8];
+                return ExpToNextLevel(9);
             if (level >= 15 && level <= 29)
             {
-                exp = _exptnl[8]; //level 10
+                exp = ExpToNextLevel(14);
                 while (level > 14)
                 {
-                    exp = (int)Math.Round(exp * 1.2, MidpointRounding.AwayFromZero);
+                    exp = (long)(exp * 1.2);
                     level -= 1;
                 }
                 return exp;
             }
             if (level >= 30 && level <= 34)
-            {
-                return _exptnl[9];//level 30
-            }
+                return ExpToNextLevel(29);
             if (level >= 35 && level <= 39)
             {
                 exp = ExpToNextLevel(34);
                 while (level > 34)
                 {
-                    exp = (int)Math.Round(exp * 1.2, MidpointRounding.AwayFromZero);
+                    exp = (long)(exp * 1.2);
                     level -= 1;
                 }
                 return exp;
             }
-            if (level >= 40 && level <= 69)
+            if (level >= 40 && level <= 59)
             {
                 exp = ExpToNextLevel(39);
                 while (level > 39)
                 {
-                    exp = (int)Math.Round(exp * 1.08, MidpointRounding.AwayFromZero);
+                    exp = (long)(exp * 1.08);
                     level -= 1;
                 }
                 return exp;
             }
-            if (level >= 70 && level <= 74)
+            if (level >= 60 && level <= 64)
+                return ExpToNextLevel(59);
+            if (level >= 65 && level <= 74)
             {
-                return _exptnl[10];//level 70
+                exp = ExpToNextLevel(64);
+                while (level > 64)
+                {
+                    exp = (long)(exp * 1.075);
+                    level -= 1;
+                }
+                return exp;
             }
-            if (level >= 75 && level <= 119)
+            if (level >= 75 && level <= 89)
             {
                 exp = ExpToNextLevel(74);
                 while (level > 74)
                 {
-                    exp = (int)Math.Round(exp * 1.07, MidpointRounding.AwayFromZero);
+                    exp = (long)(exp * 1.07);
                     level -= 1;
                 }
                 return exp;
             }
-            if (level >= 120 && level <= 124)
+            if (level >= 90 && level <= 99)
             {
-                return _exptnl[11];//level 120
-            }
-            if (level >= 125 && level <= 159)
-            {
-                exp = _exptnl[11];
-                while (level > 124)
+                exp = ExpToNextLevel(89);
+                while (level > 89)
                 {
-                    exp = (int)Math.Round(exp * 1.07, MidpointRounding.AwayFromZero);
+                    exp = (long)(exp * 1.065);
                     level -= 1;
                 }
                 return exp;
             }
-            if (level >= 160 && level <= 199)
+            if (level >= 100 && level <= 104)
+                return ExpToNextLevel(99);
+            if (level >= 105 && level <= 139)
             {
-                exp = ExpToNextLevel(159);
-                while (level > 159)
+                exp = ExpToNextLevel(104);
+                while (level > 104)
                 {
-                    exp = (int)Math.Round(exp * 1.06, MidpointRounding.AwayFromZero);
+                    exp = (long)(exp * 1.065);
                     level -= 1;
                 }
                 return exp;
             }
-            return -1;
+            if (level >= 140 && level <= 169)
+            {
+                exp = ExpToNextLevel(139);
+                while (level > 139)
+                {
+                    exp = (long)(exp * 1.0625);
+                    level -= 1;
+                }
+                return exp;
+            }
+            if (level >= 170 && level <= 199)
+            {
+                exp = ExpToNextLevel(169);
+                while (level > 169)
+                {
+                    exp = (long)(exp * 1.05);
+                    level -= 1;
+                }
+                return exp;
+            }
+            if (level == 200)
+                return _exptnl[9];
+            if (level >= 201 && level <= 209)
+            {
+                exp = ExpToNextLevel(200);
+                while (level > 200)
+                {
+                    exp = (long)(exp * 1.12);
+                    level -= 1;
+                }
+                return exp;
+            }
+            if (level >= 210 && level <= 219)
+            {
+                exp = (long)(ExpToNextLevel(209) * 2.75);
+                while (level > 210)
+                {
+                    exp = (long)(exp * 1.08);
+                    level -= 1;
+                }
+                return exp;
+            }
+            if (level >= 220 && level <= 224)
+            {
+                double exp2 = ExpToNextLevel(219) * 1.7;
+                while (level > 220)
+                {
+                    exp2 = exp2 * 1.05;
+                    level -= 1;
+                }
+                return (long)(exp2 + 0.5);
+            }
+            if (level >= 225 && level <= 229)
+            {
+                double exp2 = ExpToNextLevel(219) * 1.7 * 1.05 * 1.05 * 1.05 * 1.05 * 1.35;
+                while (level > 225)
+                {
+                    exp2 = exp2 * 1.03;
+                    level -= 1;
+                }
+                return (long)(exp2 + 0.5);
+            }
+            if (level >= 230 && level <= 234)
+            {
+                double exp2 = ExpToNextLevel(219) * 1.7 * 1.05 * 1.05 * 1.05 * 1.05 * 1.35 * 1.03 * 1.03 * 1.03 * 1.03 * 1.65;
+                while (level > 230)
+                {
+                    exp2 = exp2 * 1.02;
+                    level -= 1;
+                }
+                return (long)(exp2 + 0.5);
+            }
+            if (level == 235)
+                return _exptnl[10];
+            if (level >= 236 && level <= 239)
+            {
+                exp = ExpToNextLevel(235);
+                while (level > 235)
+                {
+                    exp = (long)(exp * 1.02);
+                    level -= 1;
+                }
+                return exp;
+            }
+            if (level >= 240 && level <= 249)
+            {
+                exp = ExpToNextLevel(239) * 2;
+                while (level > 239)
+                {
+                    exp = (long)(exp * 1.01);
+                    level -= 1;
+                }
+                return exp;
+            }
+            if (level >= 250 && level <= 259)
+            {
+                exp = ExpToNextLevel(249) * 2;
+                while (level > 249)
+                {
+                    exp = (long)(exp * 1.01);
+                    level -= 1;
+                }
+                return exp;
+            }
+            if (level >= 260 && level <= 269)
+            {
+                exp = ExpToNextLevel(259) * 2;
+                while (level > 259)
+                {
+                    exp = (long)(exp * 1.01);
+                    level -= 1;
+                }
+                return exp;
+            }
+            if (level >= 270 && level <= 274)
+            {
+                exp = ExpToNextLevel(269) * 2;
+                while (level > 269)
+                {
+                    exp = (long)(exp * 1.01);
+                    level -= 1;
+                }
+                return exp;
+            }
+            return 0;
         }
     }
 }

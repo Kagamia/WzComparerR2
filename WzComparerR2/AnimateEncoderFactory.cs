@@ -25,7 +25,7 @@ namespace WzComparerR2
                         ID = 0,
                         EncoderType = typeof(BuildInGifEncoder),
                         FileExtension = ".gif",
-                        FileDescription = "Gif图片",
+                        FileDescription = "Gif圖片",
                         SupportAlphaChannel = false,
                     };
 
@@ -33,9 +33,9 @@ namespace WzComparerR2
                     return new AnimateEncoderParams()
                     {
                         ID = 1,
-                        EncoderType = typeof(BuildInGifEncoder),
+                        EncoderType = typeof(IndexGifEncoder),
                         FileExtension = ".gif",
-                        FileDescription = "Gif图片",
+                        FileDescription = "Gif圖片",
                         SupportAlphaChannel = false,
                     };
 
@@ -43,9 +43,9 @@ namespace WzComparerR2
                     return new AnimateEncoderParams()
                     {
                         ID = 2,
-                        EncoderType = typeof(BuildInGifEncoder),
+                        EncoderType = typeof(BuildInApngEncoder),
                         FileExtension = ".png",
-                        FileDescription = "APng图片",
+                        FileDescription = "APng圖片",
                         SupportAlphaChannel = true,
                     };
             }

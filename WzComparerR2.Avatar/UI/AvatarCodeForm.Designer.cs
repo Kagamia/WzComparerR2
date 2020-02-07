@@ -47,7 +47,7 @@
             this.buttonX1.Size = new System.Drawing.Size(75, 23);
             this.buttonX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.buttonX1.TabIndex = 0;
-            this.buttonX1.Text = "确定";
+            this.buttonX1.Text = "確定";
             // 
             // buttonX2
             // 
@@ -97,7 +97,7 @@
             this.checkBoxX1.Size = new System.Drawing.Size(51, 18);
             this.checkBoxX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX1.TabIndex = 3;
-            this.checkBoxX1.Text = "覆盖";
+            this.checkBoxX1.Text = "覆蓋";
             // 
             // checkBoxX2
             // 
@@ -112,7 +112,7 @@
             this.checkBoxX2.Size = new System.Drawing.Size(51, 18);
             this.checkBoxX2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX2.TabIndex = 4;
-            this.checkBoxX2.Text = "合并";
+            this.checkBoxX2.Text = "合併";
             // 
             // labelX1
             // 
@@ -125,7 +125,7 @@
             this.labelX1.Name = "labelX1";
             this.labelX1.Size = new System.Drawing.Size(56, 18);
             this.labelX1.TabIndex = 5;
-            this.labelX1.Text = "加载方式";
+            this.labelX1.Text = "加載方式";
             // 
             // AvatarCodeForm
             // 
@@ -142,7 +142,7 @@
             this.MinimizeBox = false;
             this.Name = "AvatarCodeForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "读取代码";
+            this.Text = "讀取代碼";
             this.ResumeLayout(false);
             this.PerformLayout();
 

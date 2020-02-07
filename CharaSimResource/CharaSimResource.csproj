@@ -1,0 +1,1590 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{54797F38-A12C-4202-92A4-1A3DDCE914B7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CharaSimResource</RootNamespace>
+    <AssemblyName>CharaSimResource</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resource.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.backgrnd2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.backgrnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtDragon.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtDragon.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtDragon.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtDragon.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtMechanic.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtMechanic.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtMechanic.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtMechanic.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.disabled.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.backgrnd2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.backgrnd3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.backgrnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtUp.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtUp.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtUp.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtUp.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.BtHpUp.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.BtHpUp.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.BtHpUp.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.BtHpUp.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Tab.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Tab.disabled.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Tab.disabled.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Tab.disabled.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Tab.disabled.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Tab.enabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Tab.enabled.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Tab.enabled.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Tab.enabled.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Tab.enabled.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.none.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.reqDEX.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.reqINT.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.reqLEV.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.reqLUK.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.reqPOP.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.reqSTR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.none.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.reqDEX.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.reqINT.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.reqLEV.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.reqLUK.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.reqPOP.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.reqSTR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthDisabled.itemEXP.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthDisabled.itemLEV.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthDisabled.none.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.shadow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Star.Star.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Quality.5.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Quality.0.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Quality.1.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Quality.2.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Quality.3.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.Quality.4.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.mechanic.backgrnd2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.mechanic.backgrnd3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.mechanic.backgrnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\IconBase.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BtClose3.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtAuto.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtAuto.normal.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.itemLEV.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.itemEXP.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.max.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.percent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.durability.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Can.percent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.GrowthEnabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.percent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Cannot.durability.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VSObject_Enum.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.charmPocket.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.backgrnd3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.magicArrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.Star.Star2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CashItem.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.enabled.prev0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.enabled.prev1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.enabled.prev2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.enabled.next0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.enabled.next1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.enabled.base.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.enabled.next2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.enabled.thumb0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.enabled.thumb1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.enabled.thumb2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.disabled.prev.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.disabled.next.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VScr9.disabled.base.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.FullBackgrnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.FullBackgrnd2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.FullBackgrnd3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtFull.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtFull.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtSmall.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtSmall.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtSmall.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtSmall.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtFull.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtFull.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtGather.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtGather.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtGather.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtSort.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtSort.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtSort.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtSort.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtGather.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BtClose3.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BtClose3.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BtClose3.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtDetailOpen.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtDetailOpen.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtDetailClose.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtDetailClose.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtDetailClose.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtDetailClose.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtDetailOpen.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtDetailOpen.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtAuto.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtAuto.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.Android.backgrnd2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.Android.backgrnd3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.dragon.backgrnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.dragon.backgrnd2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.dragon.backgrnd3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.pet.backgrnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.pet.backgrnd2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.pet.backgrnd3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtAndroid.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtAndroid.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtAndroid.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtAndroid.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtPet.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtPet.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtPet.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.BtPet.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.character.cashPendant.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.totem.backgrnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Equip.Android.backgrnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.backgrnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.backgrnd2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.backgrnd3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.backgrnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.backgrnd2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.Disabled.DEX.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.Disabled.INT.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.Disabled.LUK.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.Disabled.STR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AdditionalOptionTooltip.epic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AdditionalOptionTooltip.legendary.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AdditionalOptionTooltip.rare.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AdditionalOptionTooltip.unique.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame2.c.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame2.cover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame2.e.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame2.n.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame2.ne.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame2.nw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame2.s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame2.se.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame2.sw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame2.w.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.AddOption.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.AddOption.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.AddOption.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.AddOption.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.AddOption.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.AddOption.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.none.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.reqDEX.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.reqINT.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.reqLEV.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.reqLUK.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.reqPOP.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.reqSTR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.minus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.none.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.percent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.reqDEX.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.reqINT.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.reqLEV.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.reqLUK.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.reqPOP.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Cannot.reqSTR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.minus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.none.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.percent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.reqDEX.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.reqINT.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.reqLEV.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.reqLUK.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.reqPOP.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Disabled.reqSTR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.disable.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.disable.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.disable.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.disable.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.disable.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.disable.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.enable.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.enable.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.enable.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.enable.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.enable.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.enable.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.expand.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Job.normal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Summary.icon.bdr.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Summary.icon.igpddr.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Summary.icon.mdd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Summary.icon.pdd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Summary.incline.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame.bottom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame.cover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame.dotline.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame.line.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Frame.top.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.ItemIcon.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.ItemIcon.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.ItemIcon.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.ItemIcon.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.ItemIcon.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.ItemIcon.base.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.ItemIcon.cover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.ItemIcon.new.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.ItemIcon.old.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.ItemIcon.shade.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.%25.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.-.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.+.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.LookAhead.none.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.%25.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.-.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.+.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.YellowNumber.none.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.%25.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.-.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Can.+.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMap.c.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMap.e.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMap.n.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMap.ne.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMap.nw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMap.nw2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMap.s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMap.se.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMap.sw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMap.w.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Star.Star1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Star.Star.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIToolTip.img.Item.Equip.Star.Star0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.AlienStone.Empty.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.AlienStone.Epic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.AlienStone.Legendary.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.AlienStone.Normal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.AlienStone.Rare.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToolTip.Equip.AlienStone.Unique.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CashShop.img.CashItem_label.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CashShop.img.CashItem_label.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CashShop.img.CashItem_label.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CashShop.img.CashItem_label.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CashShop.img.CashItem_label.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CashShop.img.CashItem_label.6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CashShop.img.CashItem_label.7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CashShop.img.CashItem_label.8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CashShop.img.CashItem_label.9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.backgrnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.bonus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.e.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.Line.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.total.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CSDiscount.w.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.backgrnd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.backgrnd2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.backgrnd3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.BtReduce.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.BtReduce.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.BtReduce.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.BtReduce.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000400.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000401.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000402.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000403.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000404.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000405.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000406.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000407.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000408.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000409.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000410.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000412.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000413.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000414.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000415.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000416.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000417.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000418.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000419.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000420.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HyperStat.Window.statList.80000421.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtAppraise3.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtAppraise3.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtAppraise3.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtAppraise3.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtAppraise4.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtAppraise4.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtAppraise4.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtAppraise4.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtBits3.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtBits3.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtBits3.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtBits3.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtBits4.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtBits4.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtBits4.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtBits4.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtCashshop.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtCashshop.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtCashshop.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtCashshop.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtCoin3.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtCoin3.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtCoin3.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtCoin3.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtCoin4.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtCoin4.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtCoin4.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtCoin4.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtDisassemble3.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtDisassemble3.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtDisassemble3.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtDisassemble3.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtDisassemble4.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtDisassemble4.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtDisassemble4.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtDisassemble4.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtExtract3.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtExtract3.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtExtract3.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtExtract3.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtExtract4.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtExtract4.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtExtract4.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtExtract4.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtPoint.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtPoint.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtPoint.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtPoint.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtPot3.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtPot3.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtPot3.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtPot3.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtPot4.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtPot4.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtPot4.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtPot4.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtToad3.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtToad3.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtToad3.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtToad3.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtToad4.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtToad4.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtToad4.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtToad4.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtUpgrade3.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtUpgrade3.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtUpgrade3.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtUpgrade3.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtUpgrade4.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtUpgrade4.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtUpgrade4.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.BtUpgrade4.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.monsterCollection.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Item.timeLimit.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ItemProtector.Icon.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.abilityTitle.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.backgrnd3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.backgrnd4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.BtAbility.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.BtAbility.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.BtAbility.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.BtAbility.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.metierLine.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.detail.metierLine.disabled.1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtHyperStatClose.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtHyperStatClose.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtHyperStatClose.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtHyperStatClose.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtHyperStatOpen.disabled.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtHyperStatOpen.mouseOver.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtHyperStatOpen.normal.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Stat.main.BtHyperStatOpen.pressed.0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMapMirror.c.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMapMirror.e.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMapMirror.n.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMapMirror.ne.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMapMirror.nw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMapMirror.nw2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMapMirror.s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMapMirror.se.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMapMirror.sw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\UIWindow2.img.MiniMap.MaxMapMirror.w.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

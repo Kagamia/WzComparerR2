@@ -43,8 +43,10 @@ namespace WzComparerR2.MapRender
 
             fonts["default"] = content.Load<IWcR2Font>(GetFontResourceKey(familyName, 12f, FontStyle.Regular));
             fonts["npcName"] = fonts["default"];
+            fonts["npcDesc"] = content.Load<IWcR2Font>(GetFontResourceKey(familyName, 13f, FontStyle.Regular));
             fonts["mobName"] = fonts["default"];
             fonts["mobLevel"] = content.Load<IWcR2Font>(GetFontResourceKey("Tahoma", 9f, FontStyle.Regular));
+            fonts["mapBarrier"] = content.Load<IWcR2Font>(GetFontResourceKey(familyName, 11f, FontStyle.Regular));
             fonts["tooltipTitle"] = content.Load<IWcR2Font>(GetFontResourceKey(familyName, 14f, FontStyle.Bold));
             fonts["tooltipContent"] = fonts["default"];
         }
@@ -69,6 +71,11 @@ namespace WzComparerR2.MapRender
             get { return this["npcName"]; }
         }
 
+        public IWcR2Font NpcDescFont
+        {
+            get { return this["npcDesc"]; }
+        }
+
         public IWcR2Font MobNameFont
         {
             get { return this["mobName"]; }
@@ -77,6 +84,11 @@ namespace WzComparerR2.MapRender
         public IWcR2Font MobLevelFont
         {
             get { return this["mobLevel"]; }
+        }
+
+        public IWcR2Font MapBarrierFont
+        {
+            get { return this["mapBarrier"]; }
         }
 
         public IWcR2Font MapNameFont

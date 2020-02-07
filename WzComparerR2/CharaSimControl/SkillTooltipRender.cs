@@ -77,7 +77,7 @@ namespace WzComparerR2.CharaSimControl
 
             //绘制desc
             picH = 35;
-            GearGraphics.DrawString(g, "[最高等级：" + skill.MaxLevel + "]", GearGraphics.ItemDetailFont, 90, 270, ref picH, 16);
+            GearGraphics.DrawString(g, "[最高等級：" + skill.MaxLevel + "]", GearGraphics.ItemDetailFont, 90, 270, ref picH, 16);
             if (sr.Desc != null)
             {
                 GearGraphics.DrawString(g, sr.Desc, GearGraphics.ItemDetailFont, 90, 270, ref picH, 16);
@@ -106,7 +106,7 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 picH += 4;
-                GearGraphics.DrawString(g, "[现在等级 " + skill.Level + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
+                GearGraphics.DrawString(g, "[現在等級 " + skill.Level + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
                 GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
             }
 
@@ -129,7 +129,7 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 picH += 4;
-                GearGraphics.DrawString(g, "[下次等级 " + (skill.Level + 1) + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
+                GearGraphics.DrawString(g, "[下次等級 " + (skill.Level + 1) + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
                 GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
             }
             picH += 9;

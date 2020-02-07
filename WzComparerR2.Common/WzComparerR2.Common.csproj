@@ -73,8 +73,11 @@
     <Compile Include="Animation\KeyFrame.cs" />
     <Compile Include="BuildInApngEncoder.cs" />
     <Compile Include="BuildInGifEncoder.cs" />
+    <Compile Include="CharaSim\CashPackage.cs" />
+    <Compile Include="CharaSim\Commodity.cs" />
     <Compile Include="CharaSim\ExclusiveEquip.cs" />
     <Compile Include="CharaSim\SetItemBonusByTime.cs" />
+    <Compile Include="CharaSim\TooltipHelp.cs" />
     <Compile Include="Controls\AnimationItemEventArgs.cs" />
     <Compile Include="Controls\AnimationRecoder.cs" />
     <Compile Include="Animation\Frame.cs" />
@@ -84,6 +87,8 @@
     <Compile Include="Animation\SpineAnimator.cs" />
     <Compile Include="Animation\SpineAnimationData.cs" />
     <Compile Include="Animation\WzSpineTextureLoader.cs" />
+    <Compile Include="Animation\MultiFrameAnimator.cs" />
+    <Compile Include="Animation\MultiFrameAnimationData.cs" />
     <Compile Include="CharaSim\MobElemAttr.cs" />
     <Compile Include="CharaSim\Mob.cs" />
     <Compile Include="CharaSim\Npc.cs" />
@@ -149,6 +154,7 @@
     <Compile Include="Gif.cs" />
     <Compile Include="IndexGifEncoder.cs" />
     <Compile Include="GifFrame.cs" />
+    <Compile Include="ProgressDialog.cs" />
     <Compile Include="Rendering\AnimationGraphics.cs" />
     <Compile Include="Rendering\BlendEx.cs" />
     <Compile Include="Rendering\D2DContext.cs" />

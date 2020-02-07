@@ -14,8 +14,8 @@ namespace WzComparerR2.CharaSimControl
         public AfrmTooltip()
         {
             this.menu = new ContextMenuStrip();
-            this.menu.Items.Add(new ToolStripMenuItem("复制(&C)", null, tsmiCopy_Click));
-            this.menu.Items.Add(new ToolStripMenuItem("保存(&S)", null, tsmiSave_Click));
+            this.menu.Items.Add(new ToolStripMenuItem("複製(&C)", null, tsmiCopy_Click));
+            this.menu.Items.Add(new ToolStripMenuItem("儲存(&S)", null, tsmiSave_Click));
             this.ContextMenuStrip = this.menu;
 
             this.Size = new Size(1, 1);
@@ -26,6 +26,8 @@ namespace WzComparerR2.CharaSimControl
             this.RecipeRender = new RecipeTooltipRender();
             this.MobRender = new MobTooltipRenderer();
             this.NpcRender = new NpcTooltipRenderer();
+            this.SetItemRender = new SetItemTooltipRender();
+            this.HelpRender = new HelpTooltipRender();
             this.SizeChanged += AfrmTooltip_SizeChanged;
 
             this.MouseClick += AfrmTooltip_MouseClick;
@@ -52,6 +54,8 @@ namespace WzComparerR2.CharaSimControl
         public RecipeTooltipRender RecipeRender { get; private set; }
         public MobTooltipRenderer MobRender { get; private set; }
         public NpcTooltipRenderer NpcRender { get; private set; }
+        public HelpTooltipRender HelpRender { get; private set; }
+        public SetItemTooltipRender SetItemRender { get; private set; }
 
         public string ImageFileName { get; set; }
 
@@ -101,44 +105,6 @@ namespace WzComparerR2.CharaSimControl
                 renderer = GearRender;
                 GearRender.Gear = this.TargetItem as Gear;
 
-                if (false)
-                {
-                    Gear g = GearRender.Gear;
-                    if (this.StringLinker.StringEqp.ContainsKey(g.ItemID))
-                    {
-                        this.StringLinker.StringEqp[g.ItemID].Name = "暴君之高卡文黑锅";
-                        this.StringLinker.StringEqp[g.ItemID].Desc = @"""#c这个锅 我背了！#"" ————gaokawen";
-                    }
-                    g.Star = 25;
-                    g.Grade = GearGrade.SS;
-                    g.AdditionGrade = GearGrade.B;
-                    g.Props[GearPropType.reqLevel] = 250;
-                    g.Props[GearPropType.reqSTR] = 6;
-                    g.Props[GearPropType.reqDEX] = 6;
-                    g.Props[GearPropType.reqINT] = 6;
-                    g.Props[GearPropType.reqLUK] = 6;
-                    g.Props[GearPropType.reqPOP] = 666;
-                    g.Props[GearPropType.level] = 1;
-                    g.Props[GearPropType.reqJob] = 0;
-                    g.Props[GearPropType.incPAD] = 6;
-                    g.Props[GearPropType.incMAD] = 6;
-                    g.Props[GearPropType.incPDD] = 666;
-                    g.Props[GearPropType.incMDD] = 666;
-                    g.Props[GearPropType.tuc] = 66;
-                    g.Props[GearPropType.superiorEqp] = 1;
-                    g.Props[GearPropType.tradeAvailable] = 2;
-                    //g.Props[GearPropType.charismaEXP] = 88;
-                    //g.Props[GearPropType.willEXP] = 88;
-                    //g.Props[GearPropType.charmEXP] = 88;
-                    g.Props[GearPropType.nActivatedSocket] = 1;
-                    //g.Props[GearPropType.setItemID] = 135;
-                    //g.Options[0] = Potential.LoadFromWz(60001, 3);
-                    //g.Options[1] = Potential.LoadFromWz(60001, 3);
-                    //g.Options[2] = Potential.LoadFromWz(60001, 3);
-                    //g.AdditionalOptions[0] = Potential.LoadFromWz(32086, 10);
-                    //g.AdditionalOptions[1] = Potential.LoadFromWz(32086, 10);
-                    //g.AdditionalOptions[2] = Potential.LoadFromWz(32086, 10);
-                }
             }
             else if (item is Skill)
             {
@@ -159,6 +125,16 @@ namespace WzComparerR2.CharaSimControl
             {
                 renderer = NpcRender;
                 NpcRender.NpcInfo = this.item as Npc;
+            }
+            else if (item is TooltipHelp)
+            {
+                renderer = HelpRender;
+                HelpRender.Pair = this.item as TooltipHelp;
+            }
+            else if (item is SetItem)
+            {
+                renderer = SetItemRender;
+                SetItemRender.SetItem = this.item as SetItem;
             }
             else
             {
@@ -193,7 +169,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 using (SaveFileDialog dlg = new SaveFileDialog())
                 {
-                    dlg.Filter = "*.png|*.png|*.*|*.*";
+                    dlg.Filter = "PNG (*.png)|*.png|*.*|*.*";
                     dlg.FileName = this.ImageFileName;
 
                     if (dlg.ShowDialog() == DialogResult.OK)

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
+using WzComparerR2.WzLib;
 
 namespace WzComparerR2.Patcher
 {
@@ -11,11 +13,27 @@ namespace WzComparerR2.Patcher
             this.offset = offset;
             this.fileName = fileName;
             this.type = type;
+
+            Match m = Regex.Match(fileName, @"^([A-Za-z]+)\d*(?:\.wz)?$");
+            if (m.Success)
+            {
+                fileName = m.Result("$1");
+            }
+
+            try
+            {
+                this.wzType = (Wz_Type)Enum.Parse(typeof(Wz_Type), fileName, true);
+            }
+            catch
+            {
+                this.wzType = Wz_Type.Unknown;
+            }
         }
 
         private long offset;
         private string fileName;
         private int type;
+        private Wz_Type wzType;
         private int newFileLength;
         private uint oldChecksum;
         private uint newChecksum;
@@ -40,6 +58,11 @@ namespace WzComparerR2.Patcher
         public int Type
         {
             get { return type; }
+        }
+
+        public Wz_Type WzType
+        {
+            get { return wzType; }
         }
 
         public int NewFileLength

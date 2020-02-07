@@ -23,10 +23,10 @@ namespace WzComparerR2.CharaSim
         incMMP,
         incMMPr,
         incMDF,
-        incARC,
         incPAD_incMAD,
         incPAD,
         incMAD,
+        incAD,
         incPDD_incMDD,
         incPDD,
         incMDD,
@@ -35,6 +35,7 @@ namespace WzComparerR2.CharaSim
         incEVA,
         incSpeed,
         incJump,
+        incARC,
         incCraft,
         knockback,
         incPVPDamage,
@@ -44,6 +45,8 @@ namespace WzComparerR2.CharaSim
         incIMDR,
         damR,
         nbdR,
+        statR,
+        incCHUC,
 
         //潜能属性
         incPADr = 100,
@@ -108,8 +111,9 @@ namespace WzComparerR2.CharaSim
 
         //技能特有属性
         mastery = 300,
-        criticaldamageMin,
-        criticaldamageMax,
+        //criticaldamageMin,
+        //criticaldamageMax,
+        criticaldamage,
         epad,
         emad,
         epdd,
@@ -149,6 +153,7 @@ namespace WzComparerR2.CharaSim
         willEXP,
         craftEXP,
         charmEXP,
+        cashForceCharmExp,
         accountShareTag,
         noPotential,
         fixedPotential,
@@ -167,6 +172,15 @@ namespace WzComparerR2.CharaSim
         abilityTimeLimited,
         blockGoldHammer,
         exceptUpgrade,
+        noMoveToLocker,
+        onlyUpgrade,
+        cantRepair,
         colorvar,
+        noPetEquipStatMoveItem,
+
+        gatherTool_incSkillLevel = 2000,
+        gatherTool_incSpeed,
+        gatherTool_incNum,
+        gatherTool_reqSkillLevel,
     }
 }

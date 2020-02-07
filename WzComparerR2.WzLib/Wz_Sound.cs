@@ -100,7 +100,7 @@ namespace WzComparerR2.WzLib
 
                         case 0x46:
                             {
-                                if (this.Frequency == this.dataLength && this.Ms == 1000)
+                                if (this.Frequency == this.dataLength)
                                 {
                                     soundType = Wz_SoundType.Binary;
                                 }

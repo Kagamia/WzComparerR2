@@ -179,6 +179,7 @@
     <Compile Include="UI\UIHelper.cs" />
     <Compile Include="UI\UIMiniMap.cs" />
     <Compile Include="UI\UIMinimap2.cs" />
+    <Compile Include="UI\UIMirrorFrame.cs" />
     <Compile Include="UI\UIOptions.cs" />
     <Compile Include="UI\UITopBar.cs" />
     <Compile Include="UI\UIWorldMap.cs" />
@@ -187,7 +188,7 @@
     <Compile Include="UI\WindowEx.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CharaSimResource\CharaSimResource.csproj">
+    <ProjectReference Include="..\CharaSimResource\CharaSimResource.csproj">
       <Project>{54797f38-a12c-4202-92a4-1a3ddce914b7}</Project>
       <Name>CharaSimResource</Name>
       <Private>False</Private>

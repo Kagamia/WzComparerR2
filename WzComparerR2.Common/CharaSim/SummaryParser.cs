@@ -56,7 +56,7 @@ namespace WzComparerR2.CharaSim
                     }
                     if (prop != null)
                     {
-                        var val = Calculator.Parse(prop, Level);
+                        var val = Calculator.Parse(prop.ToLower(), Level);
                         sb.Append(val);
                         idx += len + 1;
                         continue;
@@ -76,7 +76,7 @@ namespace WzComparerR2.CharaSim
                         {
                             if (prop != "" && GetValueIgnoreCase(CommonProps, prop, out prop))
                             {
-                                var val = Calculator.Parse(prop, Level);
+                                var val = Calculator.Parse(prop.ToLower(), Level);
                                 sb.Append(val);
                             }
                             else
@@ -115,7 +115,7 @@ namespace WzComparerR2.CharaSim
                         }
                         else
                         {
-                            sb.Append(0);//默认值
+                            //sb.Append(0);//默认值
                         }
                         idx += len + 1;
                     }
@@ -144,7 +144,7 @@ namespace WzComparerR2.CharaSim
                     sb.Append(H[idx++]);
                 }
             }
-            return sb.ToString();
+            return sb.ToString().Replace("\t", "");
         }
 
         private static bool GetValueIgnoreCase(Dictionary<string,string> dict, string key, out string value)

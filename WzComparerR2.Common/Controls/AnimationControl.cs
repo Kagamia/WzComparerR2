@@ -102,6 +102,10 @@ namespace WzComparerR2.Controls
                     {
                         graphics.Draw((SpineAnimator)animation, mt);
                     }
+                    else if (animation is MultiFrameAnimator)
+                    {
+                        graphics.Draw((MultiFrameAnimator)animation, mt);
+                    }
                 }
             }
 

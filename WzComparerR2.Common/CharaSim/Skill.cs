@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using WzComparerR2.WzLib;
 
@@ -39,6 +40,7 @@ namespace WzComparerR2.CharaSim
         public BitmapOrigin IconDisabled { get; set; }
 
         public HyperSkillType Hyper { get; set; }
+        public bool HyperStat { get; set; }
 
         public int Level
         {
@@ -59,9 +61,15 @@ namespace WzComparerR2.CharaSim
         public bool CombatOrders { get; set; }
         public bool NotRemoved { get; set; }
         public bool VSkill { get; set; }
+        public bool TimeLimited { get; set; }
+        public bool DisableNextLevelInfo { get; set; }
         public int MasterLevel { get; set; }
         public Dictionary<int, int> ReqSkill { get; private set; }
         public List<string> Action { get; private set; }
+        public int AddAttackToolTipDescSkill { get; set; }
+        public int AssistSkillLink { get; set; }
+        public Point LT { get; set; }
+        public Point RB { get; set; }
 
         public int MaxLevel
         {
@@ -102,7 +110,36 @@ namespace WzComparerR2.CharaSim
                         {
                             if (commonNode.Value != null && !(commonNode.Value is Wz_Vector))
                             {
-                                skill.common[commonNode.Text] = commonNode.Value.ToString();
+                                if (commonNode.Text == "cooltimeMS")
+                                {
+                                    double coolTimeMs;
+                                    if (double.TryParse(commonNode.Value.ToString(), out coolTimeMs))
+                                    {
+                                        coolTimeMs = coolTimeMs / 1000d;
+                                        skill.common[commonNode.Text] = coolTimeMs.ToString("G");
+                                    }
+                                    else
+                                    {
+                                        skill.common[commonNode.Text] = commonNode.Value.ToString();
+                                    }
+                                }
+                                else
+                                {
+                                    skill.common[commonNode.Text] = commonNode.Value.ToString();
+                                }
+
+                            }
+                            else if (commonNode.Value != null && commonNode.Value is Wz_Vector)
+                            {
+                                Wz_Vector cNode = commonNode.Value as Wz_Vector;
+                                if (commonNode.Text == "lt")
+                                {
+                                    skill.LT = new Point(cNode.X, cNode.Y);
+                                }
+                                else if (commonNode.Text == "rb")
+                                {
+                                    skill.RB = new Point(cNode.X, cNode.Y);
+                                }
                             }
                         }
                         break;
@@ -137,6 +174,9 @@ namespace WzComparerR2.CharaSim
                     case "hyper":
                         skill.Hyper = (HyperSkillType)childNode.GetValue<int>();
                         break;
+                    case "hyperStat":
+                        skill.HyperStat = childNode.GetValue<int>() != 0;
+                        break;
                     case "invisible":
                         skill.Invisible = childNode.GetValue<int>() != 0;
                         break;
@@ -148,6 +188,12 @@ namespace WzComparerR2.CharaSim
                         break;
                     case "vSkill":
                         skill.VSkill = childNode.GetValue<int>() != 0;
+                        break;
+                    case "timeLimited":
+                        skill.TimeLimited = childNode.GetValue<int>() != 0;
+                        break;
+                    case "disableNextLevelInfo":
+                        skill.DisableNextLevelInfo = childNode.GetValue<int>() != 0;
                         break;
                     case "masterLevel":
                         skill.MasterLevel = childNode.GetValue<int>();
@@ -185,6 +231,45 @@ namespace WzComparerR2.CharaSim
                             skill.Action.Add(idxNode.GetValue<string>());
                         }
                         break;
+                    case "addAttack":
+                        Wz_Node toolTipDescNode = childNode.FindNodeByPath("toolTipDesc");
+                        if (toolTipDescNode != null && toolTipDescNode.GetValue<int>() != 0)
+                        {
+                            skill.AddAttackToolTipDescSkill = childNode.FindNodeByPath("toolTipDescSkill").GetValue<int>();
+                        }
+                        break;
+                    case "assistSkillLink":
+                        skill.AssistSkillLink = childNode.FindNodeByPath("skill").GetValue<int>();
+                        break;
+                }
+            }
+
+            if ((skill.common.ContainsKey("forceCon") || (skill.levelCommon.Count > 0 && skill.levelCommon[0].ContainsKey("forceCon"))) && skill.Hyper == HyperSkillType.None)
+            {
+                Wz_Node forceNode = null;
+                if (skill.SkillID / 10000 == 3001 || skill.SkillID / 10000 == 3100 || skill.SkillID / 10000 == 3110 || skill.SkillID / 10000 == 3111 || skill.SkillID / 10000 == 3112)
+                {
+                    forceNode = findNode.Invoke(string.Format("UI\\UIWindow2.img\\Skill\\main\\Force\\{0}", (Int32.Parse(skill.common["forceCon"]) - 1) / 30));
+                }
+                else if (skill.SkillID / 10000 / 1000 == 10)
+                {
+                    forceNode = findNode.Invoke(string.Format("UI\\UIWindow2.img\\SkillZero\\main\\Alpha\\{0}", skill.SkillID / 1000 % 10));
+                }
+                if (forceNode != null)
+                {
+                    BitmapOrigin force = BitmapOrigin.CreateFromNode(forceNode, findNode);
+                    using (Graphics graphics = Graphics.FromImage(skill.Icon.Bitmap))
+                    {
+                        graphics.DrawImage(force.Bitmap, new Point(0, 0));
+                    }
+                    using (Graphics graphics = Graphics.FromImage(skill.IconMouseOver.Bitmap))
+                    {
+                        graphics.DrawImage(force.Bitmap, new Point(0, 0));
+                    }
+                    using (Graphics graphics = Graphics.FromImage(skill.IconDisabled.Bitmap))
+                    {
+                        graphics.DrawImage(force.Bitmap, new Point(0, 0));
+                    }
                 }
             }
 

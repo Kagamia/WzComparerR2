@@ -82,6 +82,11 @@ namespace WzComparerR2
             return SpineAnimationData.CreateFromNode(node, null, this.GraphicsDevice, PluginBase.PluginManager.FindWz);
         }
 
+        public MultiFrameAnimationData LoadMultiFrameAnimation(Wz_Node node)
+        {
+            return MultiFrameAnimationData.CreateFromNode(node, this.GraphicsDevice, PluginBase.PluginManager.FindWz);
+        }
+
         public void ShowAnimation(FrameAnimationData data)
         {
             this.ShowAnimation(new FrameAnimator(data));
@@ -90,6 +95,11 @@ namespace WzComparerR2
         public void ShowAnimation(SpineAnimationData data)
         {
             this.ShowAnimation(new SpineAnimator(data));
+        }
+
+        public void ShowAnimation(MultiFrameAnimationData data)
+        {
+            this.ShowAnimation(new MultiFrameAnimator(data));
         }
 
         public void ShowAnimation(AnimationItem animator)
@@ -126,6 +136,12 @@ namespace WzComparerR2
             {
                 var aniItem = (SpineAnimator)animator;
                 var rect = aniItem.Measure();
+                aniItem.Position = new Point(-rect.Left, -rect.Top);
+            }
+            else if (animator is MultiFrameAnimator)
+            {
+                var aniItem = (MultiFrameAnimator)animator;
+                var rect = aniItem.Data.GetBound(aniItem.SelectedAnimationName);
                 aniItem.Position = new Point(-rect.Left, -rect.Top);
             }
         }
@@ -360,6 +376,10 @@ namespace WzComparerR2
                 else if (aniItem is SpineAnimator)
                 {
                     time = ((SpineAnimator)aniItem).CurrentTime;
+                }
+                else if (aniItem is MultiFrameAnimator)
+                {
+                    time = ((MultiFrameAnimator)aniItem).CurrentTime;
                 }
                 this.sbInfo.AppendFormat("pos: {0}, scale: {1:p0}, play: {2} / {3}",
                     aniItem.Position,

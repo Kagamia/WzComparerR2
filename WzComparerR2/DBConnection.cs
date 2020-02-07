@@ -34,7 +34,7 @@ namespace WzComparerR2
             DataTable jobTable = new DataTable("ms_job");
             jobTable.Columns.Add("jobID", typeof(string));
             jobTable.Columns.Add("jobName", typeof(string));
- 
+
             DataTable skillTable = new DataTable("ms_skill");
             skillTable.Columns.Add("jobID", typeof(string));
             skillTable.Columns.Add("skillID", typeof(string));
@@ -91,7 +91,7 @@ namespace WzComparerR2
                 jobTable.Rows.Add(jobID, (sr != null ? sr["bookName"] : null));
 
                 //获取技能
-                Wz_Node skillListNode = img.Node .FindNodeByPath("skill");
+                Wz_Node skillListNode = img.Node.FindNodeByPath("skill");
                 if (skillListNode == null || skillListNode.Nodes.Count <= 0)
                 {
                     continue;
@@ -99,7 +99,7 @@ namespace WzComparerR2
 
                 foreach (Wz_Node skillNode in skillListNode.Nodes)
                 {
-                    Skill skill = Skill.CreateFromNode(skillNode,  PluginManager.FindWz);
+                    Skill skill = Skill.CreateFromNode(skillNode, PluginManager.FindWz);
                     if (skill == null)
                         continue;
 
@@ -134,7 +134,7 @@ namespace WzComparerR2
                         skill.ReqLevel
                     );
 
-                   
+
                     if (!skill.PreBBSkill)
                     {
                         //导入技能common
@@ -277,7 +277,7 @@ namespace WzComparerR2
                 sw.WriteLine("<html>");
                 sw.WriteLine("<head>");
                 sw.WriteLine("<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">");
-                sw.WriteLine("<title>魂武器系统</title>");
+                sw.WriteLine("<title>靈魂武器系統</title>");
                 sw.WriteLine(@"<style type=""text/css"">");
                 sw.WriteLine("table, tr, th, td { font-size:12px; border-collapse:collapse; border:1px solid #c0c0c0; }");
                 sw.WriteLine("td { padding:4px 5px; }");
@@ -294,7 +294,7 @@ namespace WzComparerR2
                         sl.StringItem.TryGetValue(itemID, out sr);
                         if (sr != null)
                         {
-                            sw.WriteLine(@"<tr style=""background-color:#ffcccc; ""><td>道具名称</td><td>{0} (id:{1})</td></tr>", sr == null ? "null" : sr.Name, itemID);
+                            sw.WriteLine(@"<tr style=""background-color:#ffcccc; ""><td>道具名稱</td><td>{0} (id:{1})</td></tr>", sr == null ? "null" : sr.Name, itemID);
                         }
 
                         Item item = Item.CreateFromNode(node, PluginManager.FindWz);
@@ -308,7 +308,7 @@ namespace WzComparerR2
                                 itemImage.Save(imageName, System.Drawing.Imaging.ImageFormat.Png);
                                 itemImage.Dispose();
                             }
-                            sw.WriteLine(@"<tr><td>道具图片</td><td><img src=""items/{0}.png"" title=""{0}"" /></td></tr>", item.ItemID);
+                            sw.WriteLine(@"<tr><td>道具圖片</td><td><img src=""items/{0}.png"" title=""{0}"" /></td></tr>", item.ItemID);
                         }
 
                         Wz_Node skillOptionNode = skillOption.FindNodeByPath("skill\\" + (itemID % 1000 + 1));
@@ -331,16 +331,16 @@ namespace WzComparerR2
                             }
                             if (incNode != null)
                             {
-                                sw.WriteLine(@"<tr><td rowspan=""3"">魂珠属性</td><td>阶段{0}: 提升物攻/魔攻 + {1}{2}</td></tr>", incNode.Nodes[0].Text, incNode.Nodes[0].Value, per);
+                                sw.WriteLine(@"<tr><td rowspan=""3"">靈魂屬性</td><td>阶段{0}: 提升物攻/魔法攻擊力 + {1}{2}</td></tr>", incNode.Nodes[0].Text, incNode.Nodes[0].Value, per);
                                 sw.WriteLine(@"<tr><td>...</td></tr>");
-                                sw.WriteLine(@"<tr><td>阶段{0}: 提升物攻/魔攻 + {1}{2}</td></tr>", incNode.Nodes[incNode.Nodes.Count - 1].Text, incNode.Nodes[incNode.Nodes.Count - 1].Value, per);
+                                sw.WriteLine(@"<tr><td>階段{0}: 提升物攻/魔法攻擊力 + {1}{2}</td></tr>", incNode.Nodes[incNode.Nodes.Count - 1].Text, incNode.Nodes[incNode.Nodes.Count - 1].Value, per);
                             }
 
-                            sw.WriteLine("<tr><td>需求等级</td><td>{0}</td></tr>", reqLevel);
+                            sw.WriteLine("<tr><td>需求等級</td><td>{0}</td></tr>", reqLevel);
                             sl.StringSkill.TryGetValue(skillId, out sr);
                             if (sr != null)
                             {
-                                sw.WriteLine("<tr><td>技能名称</td><td>{0} (id:{1})</td></tr>", sr == null ? "null" : sr.Name, skillId);
+                                sw.WriteLine("<tr><td>技能名稱</td><td>{0} (id:{1})</td></tr>", sr == null ? "null" : sr.Name, skillId);
                             }
 
                             Skill skill = Skill.CreateFromNode(skill8000.Nodes[skillId.ToString("D7")], PluginManager.FindWz);
@@ -356,13 +356,13 @@ namespace WzComparerR2
                                     skillImage.Save(Path.Combine(skillImageDir, skill.SkillID + ".png"), System.Drawing.Imaging.ImageFormat.Png);
                                     skillImage.Dispose();
                                 }
-                                sw.WriteLine(@"<tr><td>技能图片</td><td><img src=""skills/{0}.png"" title=""{0}"" /></td></tr>", skill.SkillID);
+                                sw.WriteLine(@"<tr><td>技能圖片</td><td><img src=""skills/{0}.png"" title=""{0}"" /></td></tr>", skill.SkillID);
                             }
 
                             List<KeyValuePair<int, Potential>> tempOptions = new List<KeyValuePair<int, Potential>>();
                             int totalProb = 0;
                             Wz_Node tempOptionNode = skillOptionNode.Nodes["tempOption"];
-                           
+
                             if (tempOptionNode != null)
                             {
                                 foreach (Wz_Node optionNode in tempOptionNode.Nodes)
@@ -389,13 +389,13 @@ namespace WzComparerR2
                                     sw.Write("<tr>");
                                     if (i == 0)
                                     {
-                                        sw.Write(@"<td rowspan=""{0}"">附加属性</td>", tempOptions.Count);
+                                        sw.Write(@"<td rowspan=""{0}"">附加屬性</td>", tempOptions.Count);
                                     }
-                                    sw.WriteLine("<td>{0} &nbsp; &nbsp;[潜能代码:{1:D6}, 获得几率:{2}/{3}({4:P2})])</td></tr>", opt.Value.ConvertSummary(),
+                                    sw.WriteLine("<td>{0} &nbsp; &nbsp;[潛能代碼:{1:D6}, 獲得機率:{2}/{3}({4:P2})])</td></tr>", opt.Value.ConvertSummary(),
                                         opt.Value.code, opt.Key, totalProb, (1.0 * opt.Key / totalProb));
                                 }
                             }
-                             
+
                         }
 
                         sw.WriteLine("</tbody></table><br/>");

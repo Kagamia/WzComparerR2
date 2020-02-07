@@ -145,7 +145,7 @@ namespace WzComparerR2.WzLib
                     break;
 
                 default:
-                    throw new Exception("读取字符串错误 在:" + this.FileStream.Name + " " + this.FileStream.Position);
+                    throw new Exception("讀取字符串錯誤 在:" + this.FileStream.Name + " " + this.FileStream.Position);
             }
             return string.Empty;
         }

@@ -68,7 +68,7 @@ namespace WzComparerR2
                 if (stackPrev.Count > 0)
                     return stackPrev.Peek();
                 else
-                    throw new InvalidOperationException("当前列表中没有添加项。");
+                    throw new InvalidOperationException("當前列表中没有添加項。");
             }
         }
 

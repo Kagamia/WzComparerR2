@@ -62,27 +62,27 @@ namespace WzComparerR2.CharaSimControl
             }
             if (MobInfo.FirstAttack)
             {
-                sbExt.Append("主动攻击 ");
+                sbExt.Append("主動攻擊 ");
             }
             if (!MobInfo.BodyAttack)
             {
-                sbExt.Append("无触碰伤害 ");
+                sbExt.Append("無觸碰傷害 ");
             }
             if (MobInfo.DamagedByMob)
             {
-                sbExt.Append("只受怪物伤害 ");
+                sbExt.Append("只受怪物傷害 ");
             }
             if (MobInfo.Invincible)
             {
-                sbExt.Append("无敌 ");
+                sbExt.Append("無敵 ");
             }
             if (MobInfo.NotAttack)
             {
-                sbExt.Append("无法攻击 ");
+                sbExt.Append("無法攻擊 ");
             }
             if (MobInfo.FixedDamage > 0)
             {
-                sbExt.Append("固定伤害" + MobInfo.FixedDamage + " ");
+                sbExt.Append("固定傷害" + MobInfo.FixedDamage + " ");
             }
 
             if (sbExt.Length > 1)
@@ -94,7 +94,7 @@ namespace WzComparerR2.CharaSimControl
 
             if (MobInfo.RemoveAfter > 0)
             {
-                propBlocks.Add(PrepareText(g, "出生" + MobInfo.RemoveAfter + "秒后自动消失", GearGraphics.ItemDetailFont, Brushes.GreenYellow, 0, picY));
+                propBlocks.Add(PrepareText(g, "出現" + MobInfo.RemoveAfter + "秒後自動消失", GearGraphics.ItemDetailFont, Brushes.GreenYellow, 0, picY));
                 picY += 16;
             }
 
@@ -125,7 +125,7 @@ namespace WzComparerR2.CharaSimControl
                 }
 
                 StringBuilder sb = new StringBuilder();
-                sb.Append("死后召唤 ");
+                sb.Append("死後召唤 ");
                 int rowCount = 0;
                 foreach (var kv in reviveCounts)
                 {
@@ -228,7 +228,7 @@ namespace WzComparerR2.CharaSimControl
             StringBuilder sb1 = new StringBuilder(),
                 sb2 = new StringBuilder();
 
-            sb1.Append("冰雷火毒圣暗物");
+            sb1.Append("冰雷火毒聖暗物");
             sb2.Append(GetElemAttrResistString(elemAttr.I));
             sb2.Append(GetElemAttrResistString(elemAttr.L));
             sb2.Append(GetElemAttrResistString(elemAttr.F));

@@ -10,6 +10,7 @@ namespace WzComparerR2.MapRender
         public PatchVisibility()
         {
             this.dictVisible = new Dictionary<RenderObjectType, bool>();
+            this.questVisible = new Dictionary<int, int>();
             foreach (RenderObjectType type in Enum.GetValues(typeof(RenderObjectType)))
             {
                 this.dictVisible[type] = true;
@@ -93,7 +94,14 @@ namespace WzComparerR2.MapRender
             set { this.SetVisible(RenderObjectType.MobName, value); }
         }
 
+        public bool EffectVisible
+        {
+            get { return IsVisible(RenderObjectType.Effect); }
+            set { this.SetVisible(RenderObjectType.Effect, value); }
+        }
+
         private Dictionary<RenderObjectType, bool> dictVisible;
+        private Dictionary<int, int> questVisible;
 
         public bool IsVisible(RenderObjectType type)
         {
@@ -105,6 +113,31 @@ namespace WzComparerR2.MapRender
         private void SetVisible(RenderObjectType type, bool visible)
         {
             this.dictVisible[type] = visible;
+        }
+
+        public bool IsVisible(int questID, int questState)
+        {
+            int visible;
+            if (!questVisible.TryGetValue(questID, out visible))
+            {
+                return true;
+            }
+            return visible == -1 || visible == questState;
+        }
+
+        public bool IsVisibleExact(int questID, int questState)
+        {
+            int visible;
+            if (!questVisible.TryGetValue(questID, out visible))
+            {
+                return false;
+            }
+            return visible == questState;
+        }
+
+        public void SetVisible(int questID, int questState)
+        {
+            this.questVisible[questID] = questState;
         }
     }
 }

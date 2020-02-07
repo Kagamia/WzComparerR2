@@ -165,9 +165,9 @@ namespace WzComparerR2.Animation
 
         public KeyFrame[] GetKeyFrames()
         {
-            //放弃了 算法太麻烦还不如直接对比。。
+            //放弃了 算法太麻烦还不如直接比對。。
             return null;
-            var frames = new LinkedList<KeyFrame>();
+            /*var frames = new LinkedList<KeyFrame>();
             var track = this._animationState.GetCurrent(0);
             if (track != null)
             {
@@ -190,7 +190,7 @@ namespace WzComparerR2.Animation
                     }
                 }
             }
-            return frames.ToArray();
+            return frames.ToArray();*/
         }
 
         private LinkedList<KeyFrame> GetTimeLineKeyFrames(Timeline timeLine)

@@ -60,7 +60,7 @@ namespace WzComparerR2
             }
             else
             {
-                string nodeTxt = "<font color=\"#808080\">没有加载插件_(:з」∠)_</font>";
+                string nodeTxt = "<font color=\"#808080\">没有加载插件</font>";
                 Node node = new Node(nodeTxt);
                 this.advTree1.Nodes.Add(node);
             }

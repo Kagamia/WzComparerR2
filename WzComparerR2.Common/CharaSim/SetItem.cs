@@ -76,6 +76,9 @@ namespace WzComparerR2.CharaSim
                                         case "typeName":
                                             part.TypeName = Convert.ToString(itemNode2.Value);
                                             break;
+                                        case "byGender":
+                                            part.ByGender = Convert.ToInt32(itemNode2.Value) != 0;
+                                            break;
                                         default:
                                             if (Int32.TryParse(itemNode2.Text, out num) && num > 0)
                                             {

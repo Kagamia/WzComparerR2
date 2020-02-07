@@ -188,6 +188,23 @@ namespace WzComparerR2.MapRender.UI
                 return;
             }
 
+            Dictionary<string, string> nameDictionary = new Dictionary<string, string>();
+            string[] searchList = { "worldSearch", "regionSearch1", "regionSearch2", "regionSearch3" };
+            var uiNode = PluginBase.PluginManager.FindWz("UI/UIWindow2.img/WorldMap");
+            foreach (var search in searchList)
+            {
+                var searchNode = uiNode.FindNodeByPath("combo:" + search + "\\contents\\" + search);
+                foreach (var unitNode in searchNode.Nodes)
+                {
+                    string dataValue = unitNode.Nodes["data"].GetValueEx<string>(null);
+                    string stringValue = unitNode.Nodes["string"].GetValueEx<string>(null);
+                    if (dataValue != null && stringValue != null)
+                    {
+                        nameDictionary.Add(dataValue, stringValue);
+                    }
+                }
+            }
+
             //读取所有世界地图
             var worldmapNode = PluginBase.PluginManager.FindWz("Map/WorldMap");
             if (worldmapNode == null) //加载失败
@@ -230,6 +247,11 @@ namespace WzComparerR2.MapRender.UI
                             var stringNode = PluginBase.PluginManager.FindWz("String/WorldMap.img/" + m.Result("$1"));
                             worldMapInfo.DisplayName = stringNode?.Nodes["name"].GetValueEx<string>(null);
                         }
+                    }
+
+                    if (nameDictionary.ContainsKey(worldMapInfo.Name))
+                    {
+                        worldMapInfo.DisplayName = nameDictionary[worldMapInfo.Name];
                     }
 
                     //加载baseImg
@@ -634,6 +656,7 @@ namespace WzComparerR2.MapRender.UI
                         if (link.LinkImg.HitMap?[(int)pos.X, (int)pos.Y] ?? false)
                         {
                             addItem(link.LinkImg, link);
+                            break;
                         }
                     }
                 }

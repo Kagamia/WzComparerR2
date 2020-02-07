@@ -59,7 +59,7 @@ namespace WzComparerR2.MapRender.UI
             var content = Draw(gameTime, env, item);
             if (content.blocks != null)
             {
-                var pos = new Vector2(centerPosition.X - content.size.X / 2, centerPosition.Y - content.size.Y / 2);
+                var pos = new Vector2(centerPosition.X - (int)(content.size.X / 2), centerPosition.Y - (int)(content.size.Y / 2));
                 DrawContent(env, content, pos, false);
             }
         }
@@ -99,7 +99,7 @@ namespace WzComparerR2.MapRender.UI
             }
             else if (target is PortalItem.ItemTooltip)
             {
-                return DrawString(gameTime, env, ((PortalItem.ItemTooltip)target).Title);
+                return DrawItem(gameTime, env, (PortalItem.ItemTooltip)target);
             }
             else if (target is UIWorldMap.Tooltip)
             {
@@ -108,6 +108,10 @@ namespace WzComparerR2.MapRender.UI
             else if (target is string)
             {
                 return DrawString(gameTime, env, (string)target);
+            }
+            else if (target is KeyValuePair<string, string>)
+            {
+                return DrawPair(gameTime, env, (KeyValuePair<string, string>)target);
             }
             return new TooltipContent();
         }
@@ -128,7 +132,7 @@ namespace WzComparerR2.MapRender.UI
                         this.StringLinker?.StringMob.TryGetValue(item.ID, out sr);
                         blocks.Add(PrepareTextBlock(env.Fonts.TooltipTitleFont, sr == null ? "(null)" : sr.Name, ref current, Color.LightYellow));
                         current += new Vector2(4, 4);
-                        blocks.Add(PrepareTextBlock(env.Fonts.TooltipContentFont, "id:" + item.ID.ToString("d7"), ref current, Color.White));
+                        blocks.Add(PrepareTextBlock(env.Fonts.TooltipContentFont, "ID:" + item.ID.ToString("d7"), ref current, Color.White));
                         size.X = Math.Max(size.X, current.X);
                         current = new Vector2(0, current.Y + 16);
 
@@ -149,7 +153,7 @@ namespace WzComparerR2.MapRender.UI
                         this.StringLinker?.StringNpc.TryGetValue(item.ID, out sr);
                         blocks.Add(PrepareTextBlock(env.Fonts.TooltipTitleFont, sr == null ? "(null)" : sr.Name, ref current, Color.LightYellow));
                         current += new Vector2(4, 4);
-                        blocks.Add(PrepareTextBlock(env.Fonts.TooltipContentFont, "id:" + item.ID.ToString("d7"), ref current, Color.White));
+                        blocks.Add(PrepareTextBlock(env.Fonts.TooltipContentFont, "ID:" + item.ID.ToString("d7"), ref current, Color.White));
                         size.X = Math.Max(size.X, current.X);
                         current = new Vector2(0, current.Y + 16);
 
@@ -258,12 +262,28 @@ namespace WzComparerR2.MapRender.UI
             return new TooltipContent() { blocks = blocks, size = size };
         }
 
+        private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, PortalItem.ItemTooltip item)
+        {
+            var blocks = new List<TextBlock>();
+            Vector2 size = Vector2.Zero;
+            Vector2 current = new Vector2(0, 2);
+            TextBlock textBlock = PrepareTextLine(env.Fonts.TooltipContentFont, item.Title, ref current, Color.White, ref size.X);
+            if (size.X < 160)
+            {
+                textBlock.Position.X = (int)(160 - size.X) / 2;
+                size.X = 160;
+            }
+            blocks.Add(textBlock);
+            size.Y = current.Y;
+            return new TooltipContent() { blocks = blocks, size = size };
+        }
+
         private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, UIWorldMap.Tooltip item)
         {
             var blocks = new List<TextBlock>();
             var textures = new List<TextureBlock>();
-            Vector2 size = Vector2.Zero;
-            Vector2 current = Vector2.Zero;
+            Vector2 size = new Vector2(160, 0);
+            Vector2 current = new Vector2(0, 2);
             StringResult sr = null;
 
             var spot = item.Spot;
@@ -376,10 +396,11 @@ namespace WzComparerR2.MapRender.UI
                         {
                             var rect = new Rectangle((int)current.X, (int)current.Y + 1, icon.Width, icon.Height);
                             part1.Add(new TextureBlock(icon, rect));
-                            current.X += rect.Width + 1;
+                            current.X += rect.Width + 2;
+                            current.Y += 1;
                         }
 
-                        var textBlock = PrepareTextBlock(env.Fonts.DefaultFont, barrier.ToString(), ref current, foreColor);
+                        var textBlock = PrepareTextBlock(env.Fonts.MapBarrierFont, barrier.ToString(), ref current, foreColor);
                         part1.Add(textBlock);
                     };
 
@@ -415,10 +436,11 @@ namespace WzComparerR2.MapRender.UI
 
                     if (!string.IsNullOrEmpty(desc))
                     {
-                        current.Y += 2;
+                        current.Y += 5;
                         part2_1 = new List<TextBlock>();
-                        int width = (int)MathHelper2.Max(280, part2Width, size.X, partWidth);
-                        part2_1.AddRange(PrepareFormatText(env.Fonts.TooltipContentFont, desc, ref current, width, ref size.X));
+                        int width = (int)MathHelper2.Max(230, part2Width, size.X, partWidth);
+                        size.X = width;
+                        part2_1.AddRange(PrepareFormatText(env.Fonts.TooltipContentFont, desc, ref current, width - 7, ref size.X, (int)Math.Ceiling(env.Fonts.TooltipContentFont.LineHeight) + 2));
                     }
 
                     current.Y += 4;
@@ -441,7 +463,7 @@ namespace WzComparerR2.MapRender.UI
                     //推荐等级
                     current.X = 15;
                     part3.Add(PrepareTextBlock(font,
-                        string.Format("推荐等级 : Lv.{0} ~ Lv.{1}", minLevel, maxLevel),
+                        string.Format("推薦等級 : Lv.{0} ~ Lv.{1}", minLevel, maxLevel),
                         ref current, new Color(119, 204, 255)));
                     size.X = Math.Max(size.X, current.X);
                     current.X = 0;
@@ -600,6 +622,43 @@ namespace WzComparerR2.MapRender.UI
             return new TooltipContent() { blocks = blocks, size = size };
         }
 
+        private TooltipContent DrawPair(GameTime gameTime, RenderEnv env, KeyValuePair<string, string> pair)
+        {
+            var blocks = new List<TextBlock>();
+            var textures = new List<TextureBlock>();
+            Vector2 size = Vector2.Zero;
+            Vector2 current = new Vector2(-2, -2);
+
+            float nameWidth = 0;
+            TextBlock nameBlock = PrepareTextLine(env.Fonts.TooltipContentFont, pair.Key, ref current, Color.White, ref nameWidth);
+
+            float lineY = current.Y;
+
+            current.X -= 2;
+            current.Y += 3;
+
+            float descWidth = 0;
+            TextBlock descBlock = PrepareTextLine(env.Fonts.TooltipContentFont, pair.Value, ref current, Color.White, ref descWidth);
+
+            size.X = Math.Max(nameWidth, descWidth);
+            if (nameWidth < size.X)
+            {
+                nameBlock.Position.X = (int)(size.X - nameWidth) / 2;
+            }
+            if (descWidth < size.X)
+            {
+                descBlock.Position.X = (int)(size.X - descWidth) / 2;
+            }
+            blocks.Add(nameBlock);
+            blocks.Add(descBlock);
+
+            textures.Add(new TextureBlock(Content.Load<Texture2D>(nameof(MRes.UIWindow_img_ToolTip_WorldMap_Line)), new Rectangle(-2, (int)lineY, (int)size.X + 2, 1)));
+
+            size.X -= 2;
+            size.Y = current.Y - 4;
+            return new TooltipContent() { blocks = blocks, textures = textures, size = size };
+        }
+
         private void DrawContent(RenderEnv env, TooltipContent content, Vector2 position, bool adjustToWindow)
         {
             Vector2 padding = new Vector2(10, 8);
@@ -613,7 +672,7 @@ namespace WzComparerR2.MapRender.UI
                 position.Y = Math.Max(0, Math.Min(position.Y, env.Camera.Height - preferSize.Y));
             }
 
-            env.Sprite.Begin();
+            env.Sprite.Begin(blendState: BlendState.NonPremultiplied);
             var background = UIGraphics.LayoutNinePatch(this.Resource, new Point((int)preferSize.X, (int)preferSize.Y));
             foreach (var block in background)
             {
@@ -626,6 +685,17 @@ namespace WzComparerR2.MapRender.UI
                     env.Sprite.Draw(block.Texture, rect, Color.White);
                 }
             }
+
+            var cover = Res.UIToolTip_img_Item_Frame2_cover.ToTexture(env.GraphicsDevice);
+            var coverRect = new Rectangle((int)position.X + 3,
+                (int)position.Y + 3,
+                Math.Min((int)preferSize.X - 6, cover.Width),
+                Math.Min((int)preferSize.Y - 6, cover.Height));
+            var sourceRect = new Rectangle(0,
+                0,
+                Math.Min((int)preferSize.X - 6, cover.Width),
+                Math.Min((int)preferSize.Y - 6, cover.Height));
+            env.Sprite.Draw(cover, coverRect, sourceRect, Color.White);
 
             if (content.textures != null)
             {

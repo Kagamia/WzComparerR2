@@ -87,10 +87,25 @@ namespace WzComparerR2.MapRender.UI
 
         public MapArea MapAreaControl { get; private set; }
 
+        public bool Mirror
+        {
+            get { return mirror; }
+            set
+            {
+                if (value != mirror)
+                {
+                    this.resource.LoadResource(Engine.Instance.AssetManager, value);
+                }
+                mirror = value;
+            }
+        }
+
         private UIMinimapResource resource;
 
         private TextBlock lblStreetName;
         private TextBlock lblMapName;
+
+        private bool mirror;
 
         protected override void InitializeComponents()
         {
@@ -365,9 +380,86 @@ namespace WzComparerR2.MapRender.UI
                             }
                             break;
 
+                        case IconType.EnchantPortal:
+                            {
+                                var texture = this.FindResource("enchantportal") as TextureBase;
+                                if (texture != null)
+                                {
+                                    var rect = drawIconFunc(texture, icon.WorldPosition);
+                                    iconRectCache.Add(new IconRect() { Rect = rect, Tooltip = icon.Tooltip });
+                                }
+                            }
+                            break;
+
+                        case IconType.HiddenPortal:
+                            {
+                                var texture = this.FindResource("hiddenportal") as TextureBase;
+                                if (texture != null)
+                                {
+                                    var rect = drawIconFunc(texture, icon.WorldPosition);
+                                    iconRectCache.Add(new IconRect() { Rect = rect, Tooltip = icon.Tooltip });
+                                }
+                            }
+                            break;
+
                         case IconType.Transport:
                             {
                                 var texture = this.FindResource("transport") as TextureBase;
+                                if (texture != null)
+                                {
+                                    var rect = drawIconFunc(texture, icon.WorldPosition);
+                                    iconRectCache.Add(new IconRect() { Rect = rect, Tooltip = icon.Tooltip });
+                                }
+                            }
+                            break;
+
+                        case IconType.Npc:
+                            {
+                                var texture = this.FindResource("npc") as TextureBase;
+                                if (texture != null)
+                                {
+                                    var rect = drawIconFunc(texture, icon.WorldPosition);
+                                    iconRectCache.Add(new IconRect() { Rect = rect, Tooltip = icon.Tooltip });
+                                }
+                            }
+                            break;
+
+                        case IconType.EventNpc:
+                            {
+                                var texture = this.FindResource("eventnpc") as TextureBase;
+                                if (texture != null)
+                                {
+                                    var rect = drawIconFunc(texture, icon.WorldPosition);
+                                    iconRectCache.Add(new IconRect() { Rect = rect, Tooltip = icon.Tooltip });
+                                }
+                            }
+                            break;
+
+                        case IconType.Shop:
+                            {
+                                var texture = this.FindResource("shop") as TextureBase;
+                                if (texture != null)
+                                {
+                                    var rect = drawIconFunc(texture, icon.WorldPosition);
+                                    iconRectCache.Add(new IconRect() { Rect = rect, Tooltip = icon.Tooltip });
+                                }
+                            }
+                            break;
+
+                        case IconType.Trunk:
+                            {
+                                var texture = this.FindResource("trunk") as TextureBase;
+                                if (texture != null)
+                                {
+                                    var rect = drawIconFunc(texture, icon.WorldPosition);
+                                    iconRectCache.Add(new IconRect() { Rect = rect, Tooltip = icon.Tooltip });
+                                }
+                            }
+                            break;
+
+                        case IconType.ArrowUp:
+                            {
+                                var texture = this.FindResource("arrowup") as TextureBase;
                                 if (texture != null)
                                 {
                                     var rect = drawIconFunc(texture, icon.WorldPosition);
@@ -411,6 +503,13 @@ namespace WzComparerR2.MapRender.UI
                 {
                     addResource("transport");
                     addResource("portal");
+                    addResource("enchantportal");
+                    addResource("hiddenportal");
+                    addResource("npc");
+                    addResource("eventnpc");
+                    addResource("shop");
+                    addResource("trunk");
+                    addResource("arrowup");
                 }
             }
 
@@ -432,7 +531,14 @@ namespace WzComparerR2.MapRender.UI
         {
             Unknown = 0,
             Portal,
+            EnchantPortal,
+            HiddenPortal,
             Transport,
+            Npc,
+            EventNpc,
+            Shop,
+            Trunk,
+            ArrowUp,
         }
 
         private sealed class UIMinimapResource : INinePatchResource<TextureBase>
@@ -494,18 +600,34 @@ namespace WzComparerR2.MapRender.UI
                 return new Microsoft.Xna.Framework.Point(texture.Width, texture.Height);
             }
 
-            private void LoadResource(AssetManager assetManager)
+            public void LoadResource(AssetManager assetManager, bool mirror = false)
             {
-                this.NW1 = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_nw));
-                this.NW2 = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_nw2));
-                this.N = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_n));
-                this.NE = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_ne));
-                this.W = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_w));
-                //this.C = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_c);
-                this.E = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_e));
-                this.SW = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_sw));
-                this.S = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_s));
-                this.SE = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_se));
+                if (!mirror)
+                {
+                    this.NW1 = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_nw));
+                    this.NW2 = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_nw2));
+                    this.N = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_n));
+                    this.NE = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_ne));
+                    this.W = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_w));
+                    //this.C = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_c);
+                    this.E = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_e));
+                    this.SW = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_sw));
+                    this.S = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_s));
+                    this.SE = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMap_se));
+                }
+                else
+                {
+                    this.NW1 = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMapMirror_nw));
+                    this.NW2 = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMapMirror_nw2));
+                    this.N = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMapMirror_n));
+                    this.NE = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMapMirror_ne));
+                    this.W = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMapMirror_w));
+                    //this.C = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMapMirror_c);
+                    this.E = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMapMirror_e));
+                    this.SW = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMapMirror_sw));
+                    this.S = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMapMirror_s));
+                    this.SE = assetManager.LoadTexture(null, nameof(Res.UIWindow2_img_MiniMap_MaxMapMirror_se));
+                }
             }
         }
 

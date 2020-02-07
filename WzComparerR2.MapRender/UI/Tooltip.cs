@@ -171,12 +171,16 @@ namespace WzComparerR2.MapRender.UI
                 case RenderObjectType.Npc:
                     {
                         LifePatch p = patch as LifePatch;
-                        string name;
+                        string name, desc = null;
                         if (stringLinker != null && stringLinker.StringNpc.TryGetValue(p.LifeID, out sr))
+                        {
                             name = sr.Name;
+                            desc = sr.Desc;
+                        }
                         else
                             name = p.LifeID.ToString();
                         DrawNameTooltip(env, name, env.Fonts.NpcNameFont, p.Position, Color.Yellow);
+                        if (desc != null) DrawNameTooltip(env, desc, env.Fonts.NpcDescFont, p.Position + new Vector2(0, env.Fonts.NpcNameFont.MeasureString(name).Y + 3), Color.Yellow);
                     }
                     break;
             }
@@ -186,12 +190,16 @@ namespace WzComparerR2.MapRender.UI
         {
             SpriteBatchEx sprite = env.Sprite;
             Vector2 size = font.MeasureString(name);
-            Rectangle rect = new Rectangle((int)(mapPosition.X - size.X / 2 - 2), (int)(mapPosition.Y + 2), (int)(size.X + 4), (int)(size.Y + 3));
+            Rectangle rect = new Rectangle((int)(mapPosition.X - size.X / 2 - 1), (int)(mapPosition.Y + 2), (int)(size.X + 3), 1);
+            sprite.FillRectangle(rect, new Color(Color.Black, 0.7f), env.Camera.Origin);
+            rect = new Rectangle((int)(mapPosition.X - size.X / 2 - 1), (int)(mapPosition.Y + 3 + size.Y), (int)(size.X + 3), 1);
+            sprite.FillRectangle(rect, new Color(Color.Black, 0.7f), env.Camera.Origin);
+            rect = new Rectangle((int)(mapPosition.X - size.X / 2 - 2), (int)(mapPosition.Y + 2), (int)(size.X + 4), (int)(size.Y));
             sprite.FillRectangle(rect, new Color(Color.Black, 0.7f), env.Camera.Origin);
             sprite.DrawStringEx(
                 font,
                 name,
-                new Vector2(rect.X + 2, rect.Y + 2),
+                new Vector2(rect.X + 2, rect.Y + 1),
                 color,
                 env.Camera.Origin);
         }

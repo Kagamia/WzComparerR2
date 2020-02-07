@@ -37,6 +37,7 @@ namespace WzComparerR2.CharaSim
         private Dictionary<int, bool> itemIDs;
         private string representName;
         private string typeName;
+        private bool byGender;
 
         public Dictionary<int, bool> ItemIDs
         {
@@ -75,6 +76,12 @@ namespace WzComparerR2.CharaSim
         {
             get { return typeName; }
             set { typeName = value; }
+        }
+
+        public bool ByGender
+        {
+            get { return byGender; }
+            set { byGender = value; }
         }
     }
 }
