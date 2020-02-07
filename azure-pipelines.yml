@@ -31,6 +31,7 @@ variables:
 
 steps:
 - checkout: WzComparerR2
+  persistCredentials: true
 - checkout: CharaSimResource
 
 - task: VSBuild@1
@@ -68,17 +69,10 @@ steps:
   inputs:
     gitHubConnection: 'Kagamia'
     repositoryName: '$(Build.Repository.Name)'
-    action: 'delete'
-    tag: 'ci-build'
-
-- task: GitHubRelease@1
-  inputs:
-    gitHubConnection: 'Kagamia'
-    repositoryName: '$(Build.Repository.Name)'
-    action: 'create'
+    action: 'edit'
     target: '$(Build.SourceVersion)'
     tag: 'ci-build'
-    title: 'CI-Build'
+    title: 'CI-Build-$(Build.BuildNumber)'
     releaseNotesSource: 'inline'
     releaseNotesInline: 'Automation build from azure-pipeline.'
     isPreRelease: true
