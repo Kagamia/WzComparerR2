@@ -66,6 +66,21 @@ steps:
     replaceExistingArchive: true
 
 - task: GitHubRelease@1
+  displayName: Delete last build.
+  inputs:
+    gitHubConnection: 'Kagamia'
+    repositoryName: '$(Build.Repository.Name)'
+    action: 'delete'
+    tag: 'ci-build'
+
+- task: CmdLine@2
+  displayName: Delete ci-build tag.
+  inputs:
+    script: 'git push --delete origin ci-build'
+    workingDirectory: '$(Build.SourcesDirectory)\WzComparerR2'
+    failOnStderr: true
+
+- task: GitHubRelease@1
   inputs:
     gitHubConnection: 'Kagamia'
     repositoryName: '$(Build.Repository.Name)'
