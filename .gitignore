@@ -199,3 +199,13 @@ FakesAssemblies/
 OldVer/
 !References/x86/
 !References/x64/
+/CharaSimResource
+/WzComparerR2.Avatar/Resources
+/WzComparerR2.Common/Animation
+/WzComparerR2/CharaSimControl/CashPackageRender.cs
+/WzComparerR2.Common/CharaSim/CashPackage.cs
+/WzComparerR2.Common/CharaSim/Commodity.cs
+/WzComparerR2.MapRender/Resources/UIWindow3.img.mirrorFrame.1024.png
+/WzComparerR2.MapRender/Resources
+/WzComparerR2.MapRender/UI/UIMirrorFrame.cs
+/WzComparerR2.Common/ProgressDialog.cs

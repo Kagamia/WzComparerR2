@@ -706,6 +706,12 @@ namespace WzComparerR2.CharaSim
                 gear.Grade = (GearGrade)(value - 1);
             }
 
+            //自动填充Grade
+            if (gear.Options.Any(opt => opt != null) && gear.Grade == GearGrade.C)
+            {
+                gear.Grade = GearGrade.B;
+            }
+
             //添加默认装备要求
             GearPropType[] types = new GearPropType[]{
                 GearPropType.reqJob,GearPropType.reqLevel,GearPropType.reqSTR,GearPropType.reqDEX,
