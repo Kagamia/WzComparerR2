@@ -82,10 +82,10 @@ namespace WzComparerR2.Patcher.Builder
             long curPos = this.Position;
             if (curPos < 0)
                 return 0;
-            int maxCount = (int)(this.length - curPos);
+            long maxCount = this.length - curPos;
             if (maxCount < 0)
                 return 0;
-            return baseStream.Read(buffer, offset, Math.Min(count, maxCount));
+            return baseStream.Read(buffer, offset, (int)Math.Min(count, maxCount));
         }
 
         public override long Seek(long offset, SeekOrigin origin)

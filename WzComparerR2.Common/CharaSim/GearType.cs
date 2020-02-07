@@ -174,6 +174,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         magicGauntlet = 128,
         /// <summary>
+        /// 扇子 129
+        /// </summary>
+        handFan = 129,
+        /// <summary>
         /// 单手剑 130
         /// </summary>
         ohSword = 130,
@@ -338,6 +342,14 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         pathOfAbyss = 135360,
         /// <summary>
+        /// 遗物 135370x
+        /// </summary>
+        relic = 135370,
+        /// <summary>
+        /// 扇坠 135380x
+        /// </summary>
+        fanTassel = 135380,
+        /// <summary>
         /// 手杖
         /// </summary>
         cane = 136,
@@ -430,6 +442,10 @@ namespace WzComparerR2.CharaSim
         /// 机甲手枪 158
         /// </summary>
         GauntletBuster = 158,
+        /// <summary>
+        /// 远古弓 159
+        /// </summary>
+        ancientBow = 159,
         /// <summary>
         /// 拼图 168
         /// </summary>

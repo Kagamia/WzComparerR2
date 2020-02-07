@@ -199,7 +199,7 @@ namespace WzComparerR2.CharaSim
         {
             int _type = (int)type;
             return (_type >= 140 && _type <= 149)
-                || (_type >= 152 && _type <= 158);
+                || (_type >= 152 && _type <= 159);
         }
 
         public static bool IsMechanicGear(GearType type)
@@ -672,7 +672,7 @@ namespace WzComparerR2.CharaSim
                         default:
                             {
                                 GearPropType type;
-                                if (Enum.TryParse(subNode.Text, out type))
+                                if (!int.TryParse(subNode.Text, out _) && Enum.TryParse(subNode.Text, out type))
                                 {
                                     try
                                     {
@@ -704,6 +704,12 @@ namespace WzComparerR2.CharaSim
             if (gear.Props.TryGetValue(GearPropType.fixedGrade, out value))
             {
                 gear.Grade = (GearGrade)(value - 1);
+            }
+
+            //自动填充Grade
+            if (gear.Options.Any(opt => opt != null) && gear.Grade == GearGrade.C)
+            {
+                gear.Grade = GearGrade.B;
             }
 
             //添加默认装备要求

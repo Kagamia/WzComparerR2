@@ -483,8 +483,7 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (hasTuc)
             {
-                g.DrawString("可升级次数 : " + value + "回", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
-                picH += 16;
+                GearGraphics.DrawString(g, "可升级次数 : " + value + "回 #c（可修复次数：0）#", GearGraphics.ItemDetailFont, 13, 256, ref picH, 16);
                 hasPart2 = true;
             }
 
@@ -500,22 +499,6 @@ namespace WzComparerR2.CharaSimControl
                 {
                     g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.superiorEqp, value), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 11, picH);
                     picH += 16;
-                }
-
-                if (!Gear.GetBooleanValue(GearPropType.exceptUpgrade))
-                {
-                    int maxStar = Gear.GetMaxStar();
-
-                    if (Gear.Star > 0) //星星
-                    {
-                        g.DrawString("适用" + Gear.Star + "星强化(最高" + maxStar + "星)", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
-                        picH += 16;
-                    }
-                    else
-                    {
-                        g.DrawString("最高可强化到" + maxStar + "星", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
-                        picH += 16;
-                    }
                 }
             }
 
@@ -599,8 +582,8 @@ namespace WzComparerR2.CharaSimControl
                     g.DrawImage(res["dotline"].Image, 0, picH);
                     picH += 8;
                 }
-                g.DrawImage(GetAdditionalOptionIcon(Gear.Grade), 8, picH - 1);
-                g.DrawString("潜在属性", GearGraphics.ItemDetailFont, GearGraphics.GetPotentialTextBrush(Gear.Grade), 26, picH);
+                g.DrawImage(GetAdditionalOptionIcon(Gear.Grade), 9, picH - 1);
+                g.DrawString("潜在属性", GearGraphics.ItemDetailFont, GearGraphics.GetPotentialTextBrush(Gear.Grade), 25, picH);
                 picH += 17;
                 foreach (Potential potential in Gear.Options)
                 {
@@ -1357,12 +1340,12 @@ namespace WzComparerR2.CharaSimControl
         {
             switch (grade)
             {
+                default:
                 case GearGrade.B: return Resource.AdditionalOptionTooltip_rare;
                 case GearGrade.A: return Resource.AdditionalOptionTooltip_epic;
                 case GearGrade.S: return Resource.AdditionalOptionTooltip_unique;
                 case GearGrade.SS: return Resource.AdditionalOptionTooltip_legendary;
             }
-            return null;
         }
 
         private bool TryGetMedalResource(int medalTag, out Wz_Node resNode)

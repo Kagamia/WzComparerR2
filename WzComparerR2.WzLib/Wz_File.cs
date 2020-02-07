@@ -460,7 +460,7 @@ namespace WzComparerR2.WzLib
                 this.type = Wz_Type.Quest;
             }
             else if (this.node.Nodes["Attacktype.img"] != null
-                || this.node.Nodes["MobSkill.img"] != null)
+                || this.node.Nodes["Recipe_9200.img"] != null)
             {
                 this.type = Wz_Type.Skill;
             }

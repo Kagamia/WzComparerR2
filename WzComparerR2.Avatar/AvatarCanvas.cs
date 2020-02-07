@@ -686,9 +686,9 @@ namespace WzComparerR2.Avatar
                 foreach (Wz_Node childNode in linkPartNode.Nodes) //分析部件
                 {
                     Wz_Node linkNode = childNode;
-                    while (linkNode?.Value is Wz_Uol)
+                    while (linkNode?.Value is Wz_Uol uol)
                     {
-                        linkNode = ((Wz_Uol)childNode.Value).HandleUol(linkNode);
+                        linkNode = uol.HandleUol(linkNode);
                     }
                     if (linkNode == null)
                     {
