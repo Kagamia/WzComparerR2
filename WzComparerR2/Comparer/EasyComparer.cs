@@ -21,7 +21,7 @@ namespace WzComparerR2.Comparer
         public bool OutputPng { get; set; }
         public bool OutputAddedImg { get; set; }
         public bool OutputRemovedImg { get; set; }
-        
+
         public string StateInfo
         {
             get { return stateInfo; }
@@ -60,7 +60,7 @@ namespace WzComparerR2.Comparer
         public void EasyCompareWzFiles(Wz_File fileNew, Wz_File fileOld, string outputDir)
         {
             StateInfo = "Comparison in progress...";
-           
+
             if (fileNew.Type == Wz_Type.Base || fileOld.Type == Wz_Type.Base) //至少有一个base 拆分对比
             {
                 var virtualNodeNew = RebuildWzFile(fileNew);
@@ -388,27 +388,12 @@ namespace WzComparerR2.Comparer
             StateDetail = "Outputting comparison report";
             bool noChange = diffList.Count <= 0;
             sw.WriteLine("<table class=\"img{0}\">", noChange ? " noChange" : "");
-            sw.WriteLine("<tr><th colspan=\"3\"><a name=\"{1}\" data-toggle=\"collapse\">{0}</a>: {2} Modified Attributes; {3} Added Attributes; {4} Removed Attributes</th></tr> ",
+            sw.WriteLine("<tr><th colspan=\"3\"><a name=\"{1}\">{0}</a>: {2} Modified Attributes; {3} Added Attributes; {4} Removed Attributes</th></tr>",
                 imgName, anchorName, count[0], count[1], count[2]);
             sw.WriteLine(sb.ToString());
-            sw.WriteLine("<tr class=\"collapse\"><td colspan=\"3\"><a href=\"#{1}\">{0}</a></td></tr>", "Back to Top", menuAnchorName);
+            sw.WriteLine("<tr><td colspan=\"3\"><a href=\"#{1}\">{0}</a></td></tr>", "Back to Top", menuAnchorName);
             sw.WriteLine("</table>");
-            sw.WriteLine("<script>");
-            sw.WriteLine("var acc = document.getElementsByClassName(\"collapsible\");");
-            sw.WriteLine("var i;");
-            sw.WriteLine("for (i = 0; i < acc.length; i++) {");
-            sw.WriteLine("acc[i].addEventListener(\"click\", function() {");
-            sw.WriteLine("this.classList.toggle(\"active\");");
-            sw.WriteLine("var panel = this.nextElementSibling;");
-            sw.WriteLine("if (panel.style.display === \"block\") {");
-            sw.WriteLine("panel.style.display = \"none\";");
-            sw.WriteLine("} else {");
-            sw.WriteLine("panel.style.display = \"block\";");
-            sw.WriteLine("}});");
-            sw.WriteLine("}");
-            sw.WriteLine("</script>");
-
-        imgNew.Unextract();
+            imgNew.Unextract();
             imgOld.Unextract();
             sb = null;
         }
@@ -472,7 +457,7 @@ namespace WzComparerR2.Comparer
             Wz_Uol uol;
             Wz_Sound sound;
             Wz_Vector vector;
-            
+
             if ((png = value as Wz_Png) != null)
             {
                 if (OutputPng)
