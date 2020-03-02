@@ -1,10 +1,12 @@
 ﻿*<s>使用前先大喊 niconiconi! poi! duang!以减少bug发生率</s>*  
 
+[![Build Status](https://dev.azure.com/kagamiastudio/WzComparerR2/_apis/build/status/Kagamia.WzComparerR2?branchName=master)](https://dev.azure.com/kagamiastudio/WzComparerR2/_build/latest?definitionId=2&branchName=master)
+
 # WzComparerR2
-这是一个用C#6.0/.Net4.0组装的冒险岛提取器...  
+这是一个用C#7/.Net4.5组装的冒险岛提取器...  
 包含了一些奇怪的机能比如stringWZ搜索 客户端对比 装备模拟 地图模拟等等..  
 
-tips: WcR2将尽力维持每周更新，Releases里**不会**提供最新版和稳定版下载:)  
+tips: WcR2将尽力维持每周更新，Releases里**不会**提供最稳定版下载，最新版会通过azure-pipeline自动发布。  
 links: [\[更新日志\]](https://github.com/Kagamia/WzComparerR2/tree/master/UpdateLogs)  [\[版本计划\]](https://github.com/Kagamia/WzComparerR2/wiki/Roadmap)
 
 # Modules
@@ -19,11 +21,11 @@ links: [\[更新日志\]](https://github.com/Kagamia/WzComparerR2/tree/master/Up
 - **WzComparerR2.Avatar** (可选插件)纸娃娃
 
 # Usage
-- **2.x**: Win7+/.net4.0+/dx11.0
+- **2.x**: Win7+/.net4.5+/dx11.0
 - **1.x**: WinXp+/.net2.0+/dx9.0
 
 # Compile
-- vs2015 or vs2012/13+Roslyn
+- vs2017 or higher
 - put [CharaSimResource](https://github.com/Kagamia/CharaSimResource) together
 
 # Credits and Acknowledgement

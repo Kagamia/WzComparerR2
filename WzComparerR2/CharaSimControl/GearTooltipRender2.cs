@@ -503,22 +503,6 @@ namespace WzComparerR2.CharaSimControl
                     g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.superiorEqp, value), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 11, picH);
                     picH += 16;
                 }
-
-                if (!Gear.GetBooleanValue(GearPropType.exceptUpgrade))
-                {
-                    int maxStar = Gear.GetMaxStar();
-
-                    if (Gear.Star > 0) //星星
-                    {
-                        g.DrawString("Star Force: " + Gear.Star + " / " + maxStar + " Stars Infused", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
-                        picH += 16;
-                    }
-                    else
-                    {
-                        g.DrawString("Can be enhanced up to " + maxStar + " Star.", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
-                        picH += 16;
-                    }
-                }
             }
 
             if (Gear.Props.TryGetValue(GearPropType.limitBreak, out value) && value > 0) //突破上限

@@ -22,7 +22,7 @@ namespace WzComparerR2.CharaSim
                 case 4: return "Reptile";
                 case 5: return "Spirit";
                 case 6: return "Devil";
-                case 7: return "Immortal";
+                case 7: return "Undead";
                 case 8: return "Enchanted";
                 default: return null;
             }
@@ -448,9 +448,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicWing: return GetExtraJobReqString(152);
 
                 case GearType.pathOfAbyss: return GetExtraJobReqString(155);
-
                 case GearType.fanTassel: return GetExtraJobReqString(164);
-
                 default: return null;
             }
         }

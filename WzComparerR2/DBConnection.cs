@@ -34,7 +34,7 @@ namespace WzComparerR2
             DataTable jobTable = new DataTable("ms_job");
             jobTable.Columns.Add("jobID", typeof(string));
             jobTable.Columns.Add("jobName", typeof(string));
- 
+
             DataTable skillTable = new DataTable("ms_skill");
             skillTable.Columns.Add("jobID", typeof(string));
             skillTable.Columns.Add("skillID", typeof(string));
@@ -91,7 +91,7 @@ namespace WzComparerR2
                 jobTable.Rows.Add(jobID, (sr != null ? sr["bookName"] : null));
 
                 //获取技能
-                Wz_Node skillListNode = img.Node .FindNodeByPath("skill");
+                Wz_Node skillListNode = img.Node.FindNodeByPath("skill");
                 if (skillListNode == null || skillListNode.Nodes.Count <= 0)
                 {
                     continue;
@@ -99,7 +99,7 @@ namespace WzComparerR2
 
                 foreach (Wz_Node skillNode in skillListNode.Nodes)
                 {
-                    Skill skill = Skill.CreateFromNode(skillNode,  PluginManager.FindWz);
+                    Skill skill = Skill.CreateFromNode(skillNode, PluginManager.FindWz);
                     if (skill == null)
                         continue;
 
@@ -134,7 +134,7 @@ namespace WzComparerR2
                         skill.ReqLevel
                     );
 
-                   
+
                     if (!skill.PreBBSkill)
                     {
                         //导入技能common
@@ -169,12 +169,20 @@ namespace WzComparerR2
                     for (int i = 1, j = skill.MaxLevel + (skill.CombatOrders ? 2 : 0); i <= j; i++)
                     {
                         skill.Level = i;
-                        string levelDesc = SummaryParser.GetSkillSummary(skill, sr, SummaryParams.Default);
+                        string levelDesc;
+                        try
+                        {
+                            levelDesc = SummaryParser.GetSkillSummary(skill, sr, SummaryParams.Default);
+                        }
+                        catch(Exception ex)
+                        {
+                            levelDesc = "错误：" + ex.Message;
+                        }
+                       
                         skillLevelTable.Rows.Add(
                             skillID,
                             i,
                             levelDesc);
-
                     }
                 }
 
@@ -362,7 +370,7 @@ namespace WzComparerR2
                             List<KeyValuePair<int, Potential>> tempOptions = new List<KeyValuePair<int, Potential>>();
                             int totalProb = 0;
                             Wz_Node tempOptionNode = skillOptionNode.Nodes["tempOption"];
-                           
+
                             if (tempOptionNode != null)
                             {
                                 foreach (Wz_Node optionNode in tempOptionNode.Nodes)
@@ -395,7 +403,7 @@ namespace WzComparerR2
                                         opt.Value.code, opt.Key, totalProb, (1.0 * opt.Key / totalProb));
                                 }
                             }
-                             
+
                         }
 
                         sw.WriteLine("</tbody></table><br/>");
