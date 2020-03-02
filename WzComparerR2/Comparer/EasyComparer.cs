@@ -388,12 +388,27 @@ namespace WzComparerR2.Comparer
             StateDetail = "Outputting comparison report";
             bool noChange = diffList.Count <= 0;
             sw.WriteLine("<table class=\"img{0}\">", noChange ? " noChange" : "");
-            sw.WriteLine("<tr><th colspan=\"3\"><a name=\"{1}\">{0}</a>: {2} Modified Attributes; {3} Added Attributes; {4} Removed Attributes</th></tr>",
+            sw.WriteLine("<tr><th colspan=\"3\"><a name=\"{1}\" data-toggle=\"collapse\">{0}</a>: {2} Modified Attributes; {3} Added Attributes; {4} Removed Attributes</th></tr> ",
                 imgName, anchorName, count[0], count[1], count[2]);
             sw.WriteLine(sb.ToString());
-            sw.WriteLine("<tr><td colspan=\"3\"><a href=\"#{1}\">{0}</a></td></tr>", "Back to Top", menuAnchorName);
+            sw.WriteLine("<tr class=\"collapse\"><td colspan=\"3\"><a href=\"#{1}\">{0}</a></td></tr>", "Back to Top", menuAnchorName);
             sw.WriteLine("</table>");
-            imgNew.Unextract();
+            sw.WriteLine("<script>");
+            sw.WriteLine("var acc = document.getElementsByClassName(\"collapsible\");");
+            sw.WriteLine("var i;");
+            sw.WriteLine("for (i = 0; i < acc.length; i++) {");
+            sw.WriteLine("acc[i].addEventListener(\"click\", function() {");
+            sw.WriteLine("this.classList.toggle(\"active\");");
+            sw.WriteLine("var panel = this.nextElementSibling;");
+            sw.WriteLine("if (panel.style.display === \"block\") {");
+            sw.WriteLine("panel.style.display = \"none\";");
+            sw.WriteLine("} else {");
+            sw.WriteLine("panel.style.display = \"block\";");
+            sw.WriteLine("}});");
+            sw.WriteLine("}");
+            sw.WriteLine("</script>");
+
+        imgNew.Unextract();
             imgOld.Unextract();
             sb = null;
         }

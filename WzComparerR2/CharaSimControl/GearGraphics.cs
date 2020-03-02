@@ -37,14 +37,18 @@ namespace WzComparerR2.CharaSimControl
 
         public static readonly Dictionary<string, TextureBrush> TBrushes;
         public static readonly Font ItemNameFont = new Font("Arial", 14f, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static readonly Font EquipNameFont = new Font("Arial", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
         public static readonly Font ItemDetailFont = new Font("Arial", 12f, GraphicsUnit.Pixel);
         public static readonly Font EpicGearDetailFont = new Font("Arial", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static readonly Font EquipDetailFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
         public static readonly Font TahomaFont = new Font("Tahoma", 12f, GraphicsUnit.Pixel);
         public static readonly Font SetItemPropFont = new Font("Arial", 12f, GraphicsUnit.Pixel);
         public static readonly Font ItemReqLevelFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
 
         public static Font ItemNameFont2 { get; private set; }
+        public static Font EquipNameFont2 { get; private set; }
         public static Font ItemDetailFont2 { get; private set; }
+        public static Font EquipDetailFont2 { get; private set; }
 
         public static void SetFontFamily(string fontName)
         {
@@ -55,12 +59,26 @@ namespace WzComparerR2.CharaSimControl
             }
             ItemNameFont2 = new Font(fontName, 14f, FontStyle.Bold, GraphicsUnit.Pixel);
 
+            if (EquipNameFont2 != null)
+            {
+                EquipNameFont2.Dispose();
+                EquipNameFont2 = null;
+            }
+            EquipNameFont2 = new Font(fontName, 12f, FontStyle.Bold, GraphicsUnit.Pixel);
+
             if (ItemDetailFont2 != null)
             {
                 ItemDetailFont2.Dispose();
                 ItemDetailFont2 = null;
             }
             ItemDetailFont2 = new Font(fontName, 12f, GraphicsUnit.Pixel);
+
+            if (EquipDetailFont2 != null)
+            {
+                EquipDetailFont2.Dispose();
+                EquipDetailFont2 = null;
+            }
+            EquipDetailFont2 = new Font(fontName, 11f, GraphicsUnit.Pixel);
         }
 
         public static readonly Color GearBackColor = Color.FromArgb(204, 0, 51, 85);
@@ -154,7 +172,7 @@ namespace WzComparerR2.CharaSimControl
         /// </summary>
         public static readonly Brush GearPropChangeBrush = new SolidBrush(gearCyanColor);
 
-        public static Brush GetGearNameBrush(int diff, bool up)
+        public static Brush GetGearNameBrush(int diff, bool up, bool cash = false, bool petEquip = false)
         {
             if (diff < 0)
                 return GearNameBrushA;
@@ -219,7 +237,7 @@ namespace WzComparerR2.CharaSimControl
         /// <param Name="x">起始的x坐标。</param>
         /// <param Name="X1">每行终止的x坐标。</param>
         /// <param Name="y">起始行的y坐标。</param>
-        public static void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height)
+        public static void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height, Color? orangeColor = null)
         {
             if (s == null)
                 return;
@@ -228,7 +246,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 r.WordWrapEnabled = false;
                 r.UseGDIRenderer = false;
-                r.DrawString(g, s, font, x, x1, ref y, height);
+                r.DrawString(g, s, font, x, x1, ref y, height, orangeColor);
             }
         }
 
@@ -509,13 +527,22 @@ namespace WzComparerR2.CharaSimControl
             RectangleF infinityRect;
             int drawX;
             Color defaultColor;
+            Color orangeColor;
 
-            public void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height)
+            public void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height, Color? orangeColor = null)
             {
                 //初始化环境
                 this.g = g;
                 this.drawX = x;
                 this.defaultColor = Color.White;
+                if (orangeColor != null)
+                {
+                    this.orangeColor = (Color)orangeColor;
+                }
+                else
+                {
+                    this.orangeColor = GearGraphics.OrangeBrushColor;
+                }
                 float fontLineHeight = GetFontLineHeight(font);
                 this.infinityRect = new RectangleF(0, 0, ushort.MaxValue, fontLineHeight);
 
@@ -644,7 +671,7 @@ namespace WzComparerR2.CharaSimControl
                 Color color;
                 switch (colorID)
                 {
-                    case "c": color = GearGraphics.OrangeBrushColor; break;
+                    case "c": color = this.orangeColor; break;
                     case "g": color = GearGraphics.gearGreenColor; break;
                     case "$": color = GearGraphics.gearCyanColor; break;
                     default: color = this.defaultColor; break;

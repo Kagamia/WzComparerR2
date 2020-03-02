@@ -390,7 +390,7 @@
             this.chkOutputRemovedImg.Name = "chkOutputRemovedImg";
             this.chkOutputRemovedImg.Size = new System.Drawing.Size(125, 16);
             this.chkOutputRemovedImg.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkOutputRemovedImg, new DevComponents.DotNetBar.SuperTooltipInfo("OutputRemovedImg", "", "对比报告中是否输出被整体移除的Image的完整结构", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
+            this.superTooltip1.SetSuperTooltip(this.chkOutputRemovedImg, new DevComponents.DotNetBar.SuperTooltipInfo("OutputRemovedImg", "", "In the comparison report, outputs the full summary of removed items.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
             this.chkOutputRemovedImg.TabIndex = 14;
             this.chkOutputRemovedImg.Text = "OutputRemovedImg";
             // 
@@ -406,7 +406,7 @@
             this.chkOutputAddedImg.Name = "chkOutputAddedImg";
             this.chkOutputAddedImg.Size = new System.Drawing.Size(113, 16);
             this.chkOutputAddedImg.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkOutputAddedImg, new DevComponents.DotNetBar.SuperTooltipInfo("OutputAddedImg", "", "对比报告中是否输出新增Image的完整结构", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
+            this.superTooltip1.SetSuperTooltip(this.chkOutputAddedImg, new DevComponents.DotNetBar.SuperTooltipInfo("OutputAddedImg", "", "In the comparison report, outputs the full summary of added items.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
             this.chkOutputAddedImg.TabIndex = 13;
             this.chkOutputAddedImg.Text = "OutputAddedImg";
             // 
@@ -440,7 +440,7 @@
             this.chkOutputPng.Name = "chkOutputPng";
             this.chkOutputPng.Size = new System.Drawing.Size(82, 16);
             this.chkOutputPng.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkOutputPng, new DevComponents.DotNetBar.SuperTooltipInfo("OutputPng", "", "对比报告中是否输出有差异的图片文件。", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
+            this.superTooltip1.SetSuperTooltip(this.chkOutputPng, new DevComponents.DotNetBar.SuperTooltipInfo("OutputPng", "", "In the comparison report, outputs updated image files.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
             this.chkOutputPng.TabIndex = 11;
             this.chkOutputPng.Text = "OutputPng";
             // 
@@ -880,7 +880,7 @@
             this.chkResolvePngLink.Name = "chkResolvePngLink";
             this.chkResolvePngLink.Size = new System.Drawing.Size(95, 16);
             this.chkResolvePngLink.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkResolvePngLink, new DevComponents.DotNetBar.SuperTooltipInfo("ResolvePngLink", "", "对比报告中是否智能解析对比被Link的图片\r\n这会过滤掉无用的变更内容", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 72)));
+            this.superTooltip1.SetSuperTooltip(this.chkResolvePngLink, new DevComponents.DotNetBar.SuperTooltipInfo("ResolvePngLink", "", "ResolvePngLink will filter out useless changes, such as image link changes.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 72)));
             this.chkResolvePngLink.TabIndex = 18;
             this.chkResolvePngLink.Text = "ResolveLink";
             // 
