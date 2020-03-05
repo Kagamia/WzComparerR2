@@ -326,23 +326,29 @@ namespace WzComparerR2.WzLib
             int dirCount = dirs.Count;
             bool willLoadBaseWz = useBaseWz ? parent.Text.Equals("base.wz", StringComparison.OrdinalIgnoreCase) : false;
 
+            var baseFolder = Path.GetDirectoryName(this.header.FileName);
+
             if (willLoadBaseWz && this.WzStructure.AutoDetectExtFiles)
             {
-                var baseFolder = Path.GetDirectoryName(this.header.FileName);
                 for (int i = 0; i < dirCount; i++)
                 {
                     //检测文件名
                     var m = Regex.Match(dirs[i], @"^([A-Za-z]+)$");
                     if (m.Success)
                     {
+                        string wzTypeName = m.Result("$1");
+
                         //检测扩展wz文件
                         for (int fileID = 2; ; fileID++)
                         {
-                            string extDirName = m.Result("$1") + fileID;
+                            string extDirName = wzTypeName + fileID;
                             string extWzFile = Path.Combine(baseFolder, extDirName + ".wz");
-                            if (File.Exists(extWzFile) && !dirs.Take(dirCount).Any(dir => extDirName.Equals(dir, StringComparison.OrdinalIgnoreCase)))
+                            if (File.Exists(extWzFile))
                             {
-                                dirs.Add(extDirName);
+                                if (!dirs.Take(dirCount).Any(dir => extDirName.Equals(dir, StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    dirs.Add(extDirName);
+                                }
                             }
                             else
                             {
@@ -352,11 +358,14 @@ namespace WzComparerR2.WzLib
                         //检测KMST1058的wz文件
                         for (int fileID = 1; ; fileID++)
                         {
-                            string extDirName = m.Result("$1") + fileID.ToString("D3");
+                            string extDirName = wzTypeName + fileID.ToString("D3");
                             string extWzFile = Path.Combine(baseFolder, extDirName + ".wz");
-                            if (File.Exists(extWzFile) && !dirs.Take(dirCount).Any(dir => extDirName.Equals(dir, StringComparison.OrdinalIgnoreCase)))
+                            if (File.Exists(extWzFile))
                             {
-                                dirs.Add(extDirName);
+                                if (!dirs.Take(dirCount).Any(dir => extDirName.Equals(dir, StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    dirs.Add(extDirName);
+                                }
                             }
                             else
                             {
@@ -381,7 +390,7 @@ namespace WzComparerR2.WzLib
 
                     try
                     {
-                        string filePath = Path.Combine(Path.GetDirectoryName(this.Header.FileName), dir + ".wz");
+                        string filePath = Path.Combine(baseFolder, dir + ".wz");
                         if (File.Exists(filePath))
                             this.WzStructure.LoadFile(filePath, t);
                     }
