@@ -169,12 +169,20 @@ namespace WzComparerR2
                     for (int i = 1, j = skill.MaxLevel + (skill.CombatOrders ? 2 : 0); i <= j; i++)
                     {
                         skill.Level = i;
-                        string levelDesc = SummaryParser.GetSkillSummary(skill, sr, SummaryParams.Default);
+                        string levelDesc;
+                        try
+                        {
+                            levelDesc = SummaryParser.GetSkillSummary(skill, sr, SummaryParams.Default);
+                        }
+                        catch(Exception ex)
+                        {
+                            levelDesc = "错误：" + ex.Message;
+                        }
+                       
                         skillLevelTable.Rows.Add(
                             skillID,
                             i,
                             levelDesc);
-
                     }
                 }
 
