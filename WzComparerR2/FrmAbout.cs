@@ -32,14 +32,13 @@ namespace WzComparerR2
 
         private string GetFileVersion()
         {
-            return FileVersionInfo.GetVersionInfo(this.GetType().Assembly.Location).FileVersion;
+            return this.GetAsmAttr<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+                ?? this.GetAsmAttr<AssemblyFileVersionAttribute>()?.Version;
         }
 
         private string GetAsmCopyright()
         {
-            Assembly asm = this.GetType().Assembly;
-            object[] attri = asm.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
-            return (attri == null || attri.Length <= 0) ? string.Empty : (attri[0] as AssemblyCopyrightAttribute).Copyright;
+            return this.GetAsmAttr<AssemblyCopyrightAttribute>()?.Copyright;
         }
 
         private void GetPluginInfo()
@@ -66,5 +65,14 @@ namespace WzComparerR2
             }
         }
 
+        private T GetAsmAttr<T>()
+        {
+            object[] attr = this.GetType().Assembly.GetCustomAttributes(typeof(T), true);
+            if (attr != null && attr.Length > 0)
+            {
+                return (T)attr[0];
+            }
+            return default(T);
+        }
     }
 }
