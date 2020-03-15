@@ -312,7 +312,7 @@ namespace WzComparerR2.CharaSimControl
             bool hasTuc = gear.HasTuc && gear.Props.TryGetValue(GearPropType.tuc, out value);
             if (hasTuc)
             {
-                g.DrawString("·可使用卷軸次數：" + value, GearGraphics.ItemDetailFont, Brushes.White, 8, picHeight);
+                g.DrawString("·可使用卷軸次數 : " + value, GearGraphics.ItemDetailFont, Brushes.White, 8, picHeight);
                 picHeight += 16;
                 hasPart2 = true;
             }

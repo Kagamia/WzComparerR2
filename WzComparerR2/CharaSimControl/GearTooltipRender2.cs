@@ -535,7 +535,7 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (hasTuc)
             {
-                GearGraphics.DrawString(g, "可使用卷軸次數：" + value + " #c (可恢復次數: 0) #", GearGraphics.ItemDetailFont, 13, 256, ref picH, 16);
+                GearGraphics.DrawString(g, "可使用卷軸次數 : " + value + (Gear.Cash ? "" : " #c（可恢復次數: 0)#"), GearGraphics.ItemDetailFont, 13, 256, ref picH, 16);
                 hasPart2 = true;
             }
 
@@ -757,11 +757,9 @@ namespace WzComparerR2.CharaSimControl
 
                     if (success && value > 0)
                     {
-                        incline += "， " + inclineString[i] + " " + value;
+                        incline += "， " + inclineString[i] + value;
                     }
                 }
-
-                desc.Add("");
                 
                 if (!string.IsNullOrEmpty(incline))
                 {
@@ -770,7 +768,7 @@ namespace WzComparerR2.CharaSimControl
 
                 if (Gear.type != GearType.pickaxe && Gear.type != GearType.shovel && PluginBase.PluginManager.FindWz(string.Format("Effect/ItemEff.img/{0}/effect", Gear.ItemID)) != null)
                 {
-                    desc.Add(" #c這是角色資料窗等，部份狀況是不會顯示的道具。#");
+                    desc.Add(" #c這是角色資料窗等, 部份狀況是不會顯示的道具。#");
                 }
 
                 if (desc.Last() == "")

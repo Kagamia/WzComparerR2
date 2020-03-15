@@ -204,7 +204,7 @@
             this.chkPrePatch.Name = "chkPrePatch";
             this.chkPrePatch.Size = new System.Drawing.Size(76, 16);
             this.chkPrePatch.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkPrePatch, new DevComponents.DotNetBar.SuperTooltipInfo("PrePatch", "", "開啟此項則會在補丁更新前進行預加載。預加載後可以自由選擇要更新的子檔案，或調整子檔案更新順序。調整完畢後再次單擊\"Patch\"按鈕開始更新。", null, null, DevComponents.DotNetBar.eTooltipColor.Default, true, false, new System.Drawing.Size(180, 120)));
+            this.superTooltip1.SetSuperTooltip(this.chkPrePatch, new DevComponents.DotNetBar.SuperTooltipInfo("PrePatch", "", "開啟此項則會在升級檔更新前進行預加載。預加載後可以自由選擇要更新的子檔案，或調整子檔案更新順序。調整完畢後再次單擊\"Patch\"按鈕開始更新。", null, null, DevComponents.DotNetBar.eTooltipColor.Default, true, false, new System.Drawing.Size(180, 120)));
             this.chkPrePatch.TabIndex = 6;
             this.chkPrePatch.Text = "PrePatch";
             // 
@@ -390,7 +390,7 @@
             this.chkOutputRemovedImg.Name = "chkOutputRemovedImg";
             this.chkOutputRemovedImg.Size = new System.Drawing.Size(125, 16);
             this.chkOutputRemovedImg.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkOutputRemovedImg, new DevComponents.DotNetBar.SuperTooltipInfo("OutputRemovedImg", "", "比對報告中是否輸出被整體移除的Image的完整結構", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
+            this.superTooltip1.SetSuperTooltip(this.chkOutputRemovedImg, new DevComponents.DotNetBar.SuperTooltipInfo("輸出刪除Img檔案", "", "比對報告中是否輸出被整體移除的Image的完整結構", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
             this.chkOutputRemovedImg.TabIndex = 14;
             this.chkOutputRemovedImg.Text = "輸出刪除Img檔案";
             // 
@@ -406,7 +406,7 @@
             this.chkOutputAddedImg.Name = "chkOutputAddedImg";
             this.chkOutputAddedImg.Size = new System.Drawing.Size(113, 16);
             this.chkOutputAddedImg.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkOutputAddedImg, new DevComponents.DotNetBar.SuperTooltipInfo("OutputAddedImg", "", "比對報告中是否輸出新增Image的完整結構", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
+            this.superTooltip1.SetSuperTooltip(this.chkOutputAddedImg, new DevComponents.DotNetBar.SuperTooltipInfo("輸出添加Img檔案", "", "比對報告中是否輸出新增Image的完整結構", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
             this.chkOutputAddedImg.TabIndex = 13;
             this.chkOutputAddedImg.Text = "輸出添加Img檔案";
             // 
@@ -421,7 +421,7 @@
             this.cmbComparePng.Name = "cmbComparePng";
             this.cmbComparePng.Size = new System.Drawing.Size(115, 21);
             this.cmbComparePng.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.cmbComparePng, new DevComponents.DotNetBar.SuperTooltipInfo("PngComparison", "", "對於比對報告中圖片的比對方式。\r\nSizeOnly - 僅比對圖片大小，可能會遺漏。\r\nSizeAndDataLength - 同時比對圖片大小和壓縮流暢度，可能" +
+            this.superTooltip1.SetSuperTooltip(this.cmbComparePng, new DevComponents.DotNetBar.SuperTooltipInfo("Png比對", "", "對於比對報告中圖片的比對方式。\r\nSizeOnly - 僅比對圖片大小，可能會遺漏。\r\nSizeAndDataLength - 同時比對圖片大小和壓縮流暢度，可能" +
             "會誤判。\r\nPixel - 像素級比對，非常精確但可能略耗時。", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, true, new System.Drawing.Size(300, 100)));
             this.cmbComparePng.TabIndex = 12;
             // 
@@ -440,7 +440,7 @@
             this.chkOutputPng.Name = "chkOutputPng";
             this.chkOutputPng.Size = new System.Drawing.Size(82, 16);
             this.chkOutputPng.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkOutputPng, new DevComponents.DotNetBar.SuperTooltipInfo("OutputPng", "", "比對報告中是否輸出有差異的圖片檔案。", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
+            this.superTooltip1.SetSuperTooltip(this.chkOutputPng, new DevComponents.DotNetBar.SuperTooltipInfo("檢查輸出Png檔案", "", "比對報告中是否輸出有差異的圖片檔案。", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
             this.chkOutputPng.TabIndex = 11;
             this.chkOutputPng.Text = "檢查輸出Png檔案";
             // 
@@ -456,9 +456,9 @@
             this.chkCompare.Name = "chkCompare";
             this.chkCompare.Size = new System.Drawing.Size(70, 16);
             this.chkCompare.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkCompare, new DevComponents.DotNetBar.SuperTooltipInfo("Compare", "", "開啟此項後，每更新完一個Wz檔案，將會進行新舊檔案比對並輸出更新報告。有一些額外的選項可以控制比對更新的執行方式。\r\n比對過程出错不會影響補丁繼續執行。", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(238, 100)));
+            this.superTooltip1.SetSuperTooltip(this.chkCompare, new DevComponents.DotNetBar.SuperTooltipInfo("比對", "", "開啟此項後，每更新完一個Wz檔案，將會進行新舊檔案比對並輸出更新報告。有一些額外的選項可以控制比對更新的執行方式。\r\n比對過程出错不會影響升級檔繼續執行。", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(238, 100)));
             this.chkCompare.TabIndex = 10;
-            this.chkCompare.Text = "Compare";
+            this.chkCompare.Text = "比對";
             // 
             // panelEx2
             // 
@@ -880,7 +880,7 @@
             this.chkResolvePngLink.Name = "chkResolvePngLink";
             this.chkResolvePngLink.Size = new System.Drawing.Size(95, 16);
             this.chkResolvePngLink.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkResolvePngLink, new DevComponents.DotNetBar.SuperTooltipInfo("ResolvePngLink", "", "比對報告中是否智能解析比對被Link的圖片\r\n這會過濾掉無用的變更内容", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 72)));
+            this.superTooltip1.SetSuperTooltip(this.chkResolvePngLink, new DevComponents.DotNetBar.SuperTooltipInfo("解除png連結", "", "比對報告中是否智能解析比對被Link的圖片\r\n這會過濾掉無用的變更内容", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 72)));
             this.chkResolvePngLink.TabIndex = 18;
             this.chkResolvePngLink.Text = "解除png連結";
             // 

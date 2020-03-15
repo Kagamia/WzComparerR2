@@ -220,10 +220,10 @@ namespace WzComparerR2.CharaSim
                 case GearType.faceAccessory: return "臉飾";
                 case GearType.eyeAccessory: return "眼飾";
                 case GearType.earrings: return "耳環";
-                case GearType.pendant: return "項鍊";
+                case GearType.pendant: return "墜飾";
                 case GearType.belt: return "腰帶";
                 case GearType.medal: return "勳章";
-                case GearType.shoulderPad: return "肩飾";
+                case GearType.shoulderPad: return "肩膀裝飾";
                 case GearType.cap: return "帽子";
                 case GearType.cape: return "披風";
                 case GearType.coat: return "上衣";
@@ -277,7 +277,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.dualBow: return "雙弩槍";
                 case GearType.handCannon: return "加農砲";
                 case GearType.badge: return "胸章";
-                case GearType.emblem: return "徽章";
+                case GearType.emblem: return "象徽";
                 case GearType.soulShield: return "靈魂盾牌";
                 case GearType.demonShield: return "力量之盾";
                 case GearType.totem: return "圖騰";
@@ -392,28 +392,28 @@ namespace WzComparerR2.CharaSim
             switch (type)
             {
                 //0xxx
-                case GearType.heroMedal: return "英雄可以裝備";
-                case GearType.rosario: return "聖騎士可以裝備";
-                case GearType.chain: return "黑骑士可以裝備";
-                case GearType.book1: return "火毒大魔導師可以裝備";
-                case GearType.book2: return "冰雷大魔導師可以裝備";
-                case GearType.book3: return "主教大魔導師可以裝備";
-                case GearType.bowMasterFeather: return "箭神可以裝備";
-                case GearType.crossBowThimble: return "神射手可以裝備";
-                case GearType.relic: return "開拓者可以裝備";
-                case GearType.shadowerSheath: return "暗影神偷可以裝備";
-                case GearType.nightLordPoutch: return "夜使者可以裝備";
+                case GearType.heroMedal: return "英雄職業群可套用";
+                case GearType.rosario: return "聖騎士職業群可套用";
+                case GearType.chain: return "黑骑士職業群可套用";
+                case GearType.book1: return "火毒系列魔法師可套用";
+                case GearType.book2: return "冰雷系列魔法師可套用";
+                case GearType.book3: return "主教系列魔法師可套用";
+                case GearType.bowMasterFeather: return "箭神職業群可套用";
+                case GearType.crossBowThimble: return "神射手職業群可套用";
+                case GearType.relic: return "開拓者職業可穿載";
+                case GearType.shadowerSheath: return "暗影神偷職業群可套用";
+                case GearType.nightLordPoutch: return "夜使者職業群可套用";
                 case GearType.katara: return "影武者可以裝備";
-                case GearType.viperWristband: return "拳霸可以裝備";
-                case GearType.captainSight: return "槍神可以裝備";
+                case GearType.viperWristband: return "拳霸職業群可套用";
+                case GearType.captainSight: return "槍神職業群可套用";
                 case GearType.connonGunPowder: 
-                case GearType.connonGunPowder2: return "重砲指揮官可以裝備";
+                case GearType.connonGunPowder2: return "重砲指揮官職業群可套用";
                 case GearType.box:
                 case GearType.boxingClaw:
                 case GearType.boxingClaw2: return "蒼龍俠客可以裝備";
 
                 //1xxx
-                case GearType.cygnusGem: return "皇家騎士團團長可以裝備";
+                case GearType.cygnusGem: return "皇家騎士團可套用";
 
                 //2xxx
                 case GearType.aranPendulum: return GetExtraJobReqString(21);
@@ -426,10 +426,10 @@ namespace WzComparerR2.CharaSim
 
                 //3xxx
                 case GearType.demonShield: return GetExtraJobReqString(31);
-                case GearType.desperado: return "惡魔復仇者可以裝備";
-                case GearType.battlemageBall: return "煉獄巫師可以裝備";
-                case GearType.wildHunterArrowHead: return "狂豹獵人可以裝備";
-                case GearType.mailin: return "機甲戰神可以裝備";
+                case GearType.desperado: return "可以裝備在惡魔職業群上";
+                case GearType.battlemageBall: return "煉獄巫師職業群可套用";
+                case GearType.wildHunterArrowHead: return "狂豹獵人職業群可套用";
+                case GearType.mailin: return "機甲戰神可套用";
                 case GearType.controller:
                 case GearType.powerSource:
                 case GearType.energySword: return GetExtraJobReqString(36);
@@ -443,7 +443,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.fan: return GetExtraJobReqString(42);
 
                 //5xxx
-                case GearType.soulShield: return "米哈逸可以裝備";
+                case GearType.soulShield: return "可套用米哈逸";
 
                 //6xxx
                 case GearType.novaMarrow: return GetExtraJobReqString(61);
@@ -486,28 +486,28 @@ namespace WzComparerR2.CharaSim
         {
             switch (specJob)
             {
-                case 21: return "狂狼勇士可以裝備";
-                case 22: return "魔龍導士可以裝備";
+                case 21: return "狂狼勇士職業群可套用";
+                case 22: return "魔龍導士職業群可套用";
                 case 23: return "精靈遊俠可以裝備";
                 case 24: return "幻影俠盜可以裝備";
-                case 25: return "隐月可以裝備";
-                case 27: return "夜光可以裝備";
-                case 31: return "惡魔殺手可以裝備";
-                case 36: return "傑諾可以裝備";
+                case 25: return "隐月可套用";
+                case 27: return "夜光可套用";
+                case 31: return "可以裝備在惡魔職業群上";
+                case 36: return "可以套用傑諾";
                 case 37: return "爆拳槍神可以裝備";
-                case 41: return "劍豪可以裝備";
+                case 41: return "劍豪可套用";
                 case 42: return "陰陽師可以裝備";
-                case 51: return "米哈逸可以裝備";
-                case 61: return "凱薩可以裝備";
+                case 51: return "可套用米哈逸";
+                case 61: return "凱薩可套用";
                 case 64: return "卡蒂娜可以裝備";
-                case 65: return "天使破壞者可以裝備";
+                case 65: return "天使破壞者可套用";
                 case 101: return "神之子可以裝備";
-                case 112: return "幻獸師可以裝備";
+                case 112: return "幻獸師可裝備";
                 case 142: return "凱內西斯可以裝備";
                 case 151: return "阿戴爾可以裝備";
                 case 152: return "伊利恩可以裝備";
-                case 155: return "亞克可以裝備";
-                case 164: return "虎影可以裝備";
+                case 155: return "亞克可以套用";
+                case 164: return "虎影職業群可裝備";
                 default: return null;
             }
         }
@@ -529,7 +529,7 @@ namespace WzComparerR2.CharaSim
                 case ItemPropType.quest:
                     return value == 0 ? null : "任務道具";
                 case ItemPropType.pquest:
-                    return value == 0 ? null : "任務裝備物品";
+                    return value == 0 ? null : "組隊任務道具";
                 case ItemPropType.permanent:
                     return value == 0 ? null : "魔法時間不會結束的奇幻寵物。";
                 default:
