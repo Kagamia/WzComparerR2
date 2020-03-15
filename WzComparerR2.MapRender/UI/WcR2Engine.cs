@@ -71,7 +71,7 @@ namespace WzComparerR2.MapRender.UI
 
         public static void Unload()
         {
-            if (Engine.instance != null)
+            if (Engine.instance?.InputDevice?.KeyboardState != null)
             {
                 InputManager.Current.ClearFocus();
                 Engine.instance = null;
