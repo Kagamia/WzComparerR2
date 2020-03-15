@@ -129,7 +129,7 @@ namespace WzComparerR2.MapRender
 
         CoroutineManager cm;
         FpsCounter fpsCounter;
-        List<IDisposable> attachedEvent = new List<IDisposable>();
+        readonly List<IDisposable> attachedEvent = new List<IDisposable>();
         IMEHandler imeHelper;
 
         bool isUnloaded;
@@ -837,9 +837,9 @@ namespace WzComparerR2.MapRender
                 return;
             }
 
-            this.batcher.Dispose();
+            this.batcher?.Dispose();
             this.batcher = null;
-            this.renderEnv.Dispose();
+            this.renderEnv?.Dispose();
             this.renderEnv = null;
             this.engine = null;
 
