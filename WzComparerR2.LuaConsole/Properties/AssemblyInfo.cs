@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kagamia Studio")]
 [assembly: AssemblyProduct("WzComparerR2.LuaConsole")]
-[assembly: AssemblyCopyright("Copyright © Kagamia Studio 2014-2016")]
+[assembly: AssemblyCopyright("Copyright © Kagamia Studio 2014-2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

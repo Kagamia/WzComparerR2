@@ -38,6 +38,11 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.XML" />
   </ItemGroup>
+  <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
+    <Compile Include="..\Build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="Wz_SoundType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
