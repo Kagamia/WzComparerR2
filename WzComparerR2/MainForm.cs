@@ -389,6 +389,8 @@ namespace WzComparerR2
             {
                 return;
             }
+            var config = ImageHandlerConfig.Default;
+
             var aniItem = this.pictureBoxEx1.Items[0];
 
             //单帧图像
@@ -398,16 +400,30 @@ namespace WzComparerR2
                 var frame = frameData.Frames[0];
                 if (frame.Png != null)
                 {
-                    using (var bmp = frame.Png.ExtractPng())
+                    string pngFileName = pictureBoxEx1.PictureName + ".png";
+
+                    if (config.AutoSaveEnabled)
+                    {
+                        pngFileName = Path.Combine(config.AutoSavePictureFolder, pngFileName);
+                    }
+                    else
                     {
                         var dlg = new SaveFileDialog();
                         dlg.Filter = "Png图片(*.png)|*.png|全部文件(*.*)|*.*";
-                        dlg.FileName = pictureBoxEx1.PictureName + ".png";
-                        if (dlg.ShowDialog() == DialogResult.OK)
+                        dlg.FileName = pngFileName;
+                        if (dlg.ShowDialog() != DialogResult.OK)
                         {
-                            bmp.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                            return;
                         }
+
+                        pngFileName = dlg.FileName;
                     }
+
+                    using (var bmp = frame.Png.ExtractPng())
+                    {
+                        bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
+                    }
+                    labelItemStatus.Text = "图片保存于" + pngFileName;
                 }
                 else
                 {
@@ -416,7 +432,6 @@ namespace WzComparerR2
                 return;
             }
 
-            var config = ImageHandlerConfig.Default;
             var encParams = AnimateEncoderFactory.GetEncoderParams(config.GifEncoder.Value);
 
             string aniName = this.cmbItemAniNames.SelectedItem as string;
