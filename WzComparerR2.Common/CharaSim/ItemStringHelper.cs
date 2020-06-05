@@ -327,6 +327,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.handFan: return "Ritual Fan";
                 case GearType.fanTassel: return "Fan Tassel";
 
+                case GearType.tuner: return "Bladecaster";
+                case GearType.bracelet: return "Bladebinder";
+
                 default: return null;
             }
         }
@@ -444,6 +447,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.espLimiter:
                 case GearType.chess: return GetExtraJobReqString(142);
 
+                case GearType.tuner:
+                case GearType.bracelet: return GetExtraJobReqString(151);
+
                 case GearType.magicGauntlet: 
                 case GearType.magicWing: return GetExtraJobReqString(152);
 
@@ -480,6 +486,7 @@ namespace WzComparerR2.CharaSim
                 case 101: return "Zero Only";
                 case 112: return "Beast Tamers Only";
                 case 142: return "Kinesis only";
+                case 151: return "Adele Only";
                 case 152: return "Illium Only";
                 case 155: return "Ark Only";
                 case 164: return "Hoyoung Only";
@@ -764,6 +771,12 @@ namespace WzComparerR2.CharaSim
 
                 case 15000: return "Illium";
                 case 15001: return "Ark";
+                case 15002: return "Adele";
+                case 15100: return "Adele (1st)";
+                case 15110: return "Adele (2nd)";
+                case 15111: return "Adele (3rd)";
+                case 15112: return "Adele (4th)";
+                case 15113: return "Adele (5th)";
                 case 15200: return "Illium (1st)";
                 case 15210: return "Illium (2nd)";
                 case 15211: return "Illium (3rd)";

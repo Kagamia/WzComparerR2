@@ -147,6 +147,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         shiningRod = 1212,
         /// <summary>
+        /// Bladecaster 1213
+        /// </summary>
+        tuner = 1213,
+        /// <summary>
         /// Soul Shooter 122
         /// </summary>
         soulShooter = 122,
@@ -358,6 +362,10 @@ namespace WzComparerR2.CharaSim
         /// Fan Tassel 135380
         /// </summary>
         fanTassel = 135380,
+        /// <summary>
+        /// Bladebinder 135400
+        /// </summary>
+        bracelet = 135400,
         /// <summary>
         /// Cane 136
         /// </summary>
