@@ -86,6 +86,11 @@
       <HintPath>..\References\TSF.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
+    <Compile Include="..\Build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="Animation\IStateMachineAnimationData.cs" />
     <Compile Include="Animation\RepeatableFrameAnimationData.cs" />

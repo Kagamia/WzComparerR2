@@ -71,15 +71,21 @@ namespace WzComparerR2.MapRender.UI
 
         public static void Unload()
         {
-            InputManager.Current.ClearFocus();
-            Engine.instance = null;
+            if (Engine.instance?.InputDevice?.KeyboardState != null)
+            {
+                InputManager.Current.ClearFocus();
+                Engine.instance = null;
+
+                FieldInfo inputManagerCurrentField = typeof(InputManager)
+                    .GetFields(BindingFlags.Static | BindingFlags.NonPublic)
+                    .FirstOrDefault(field => field.FieldType == typeof(InputManager));
+                inputManagerCurrentField.SetValue(null, (InputManager)null);
+            }
+          
             VisualTreeHelper.Instance.ClearParentCache();
             typeof(MessageBox).GetFields(BindingFlags.Static | BindingFlags.NonPublic)
                 .FirstOrDefault(field => field.FieldType == typeof(MessageBox))
                 .SetValue(null, Activator.CreateInstance(typeof(MessageBox), true));
-            typeof(InputManager).GetFields(BindingFlags.Static | BindingFlags.NonPublic)
-                .FirstOrDefault(field => field.FieldType == typeof(InputManager))
-                .SetValue(null, (InputManager)null);
             typeof(DragDrop).GetFields(BindingFlags.Static | BindingFlags.NonPublic)
                 .FirstOrDefault(field => field.FieldType == typeof(DragDrop))
                 .SetValue(null, Activator.CreateInstance(typeof(DragDrop), true));

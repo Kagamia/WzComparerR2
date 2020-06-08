@@ -447,14 +447,14 @@ namespace WzComparerR2.CharaSim
                 case GearType.espLimiter:
                 case GearType.chess: return GetExtraJobReqString(142);
 
-                case GearType.tuner:
-                case GearType.bracelet: return GetExtraJobReqString(151);
-
                 case GearType.magicGauntlet: 
                 case GearType.magicWing: return GetExtraJobReqString(152);
 
                 case GearType.pathOfAbyss: return GetExtraJobReqString(155);
                 case GearType.fanTassel: return GetExtraJobReqString(164);
+
+                case GearType.tuner:
+                case GearType.bracelet: return GetExtraJobReqString(151);
                 default: return null;
             }
         }

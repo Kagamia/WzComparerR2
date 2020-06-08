@@ -314,6 +314,10 @@ namespace WzComparerR2.CharaSim
                     return GearType.soulShield;
                 case 1099:
                     return GearType.demonShield;
+                case 1212:
+                    return GearType.shiningRod;
+                case 1213:
+                    return GearType.tuner;
             }
             if (code / 10000 == 135)
             {

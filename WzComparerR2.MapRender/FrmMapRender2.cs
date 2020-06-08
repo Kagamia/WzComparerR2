@@ -129,7 +129,7 @@ namespace WzComparerR2.MapRender
 
         CoroutineManager cm;
         FpsCounter fpsCounter;
-        List<IDisposable> attachedEvent = new List<IDisposable>();
+        readonly List<IDisposable> attachedEvent = new List<IDisposable>();
         IMEHandler imeHelper;
 
         bool isUnloaded;
@@ -810,12 +810,13 @@ namespace WzComparerR2.MapRender
         protected override void UnloadContent()
         {
             base.UnloadContent();
+
             if (!this.isUnloaded)
             {
-                this.resLoader.Unload();
-                this.ui.UnloadContents();
+                this.resLoader?.Unload();
+                this.ui?.UnloadContents();
                 this.Content.Unload();
-                this.imeHelper.Dispose();
+                this.imeHelper?.Dispose();
                 this.bgm = null;
                 this.mapImg = null;
                 this.mapData = null;
@@ -836,9 +837,9 @@ namespace WzComparerR2.MapRender
                 return;
             }
 
-            this.batcher.Dispose();
+            this.batcher?.Dispose();
             this.batcher = null;
-            this.renderEnv.Dispose();
+            this.renderEnv?.Dispose();
             this.renderEnv = null;
             this.engine = null;
 
@@ -847,7 +848,7 @@ namespace WzComparerR2.MapRender
                 disposable.Dispose();
             }
             this.attachedEvent.Clear();
-            this.ui.InputBindings.Clear();
+            this.ui?.InputBindings.Clear();
 
             GameExt.RemoveKeyboardEvent(this);
             GameExt.RemoveMouseStateCache();

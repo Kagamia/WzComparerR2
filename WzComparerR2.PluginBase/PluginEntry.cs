@@ -48,8 +48,14 @@ namespace WzComparerR2.PluginBase
         {
             get
             {
-                var attr = GetAsmAttr<AssemblyFileVersionAttribute>();
-                return attr?.Version;
+                var attrInfoVersion = GetAsmAttr<AssemblyInformationalVersionAttribute>();
+                if (!string.IsNullOrEmpty(attrInfoVersion?.InformationalVersion))
+                {
+                    return attrInfoVersion.InformationalVersion;
+                }
+
+                var attrFileVersion = GetAsmAttr<AssemblyFileVersionAttribute>();
+                return attrFileVersion?.Version;
             }
         }
 
