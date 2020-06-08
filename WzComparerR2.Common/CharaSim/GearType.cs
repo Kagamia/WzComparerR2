@@ -143,9 +143,13 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         shoes = 107,
         /// <summary>
-        /// 双头杖 121
+        /// 双头杖 1212
         /// </summary>
-        shiningRod = 121,
+        shiningRod = 1212,
+        /// <summary>
+        /// 调谐器 1213
+        /// </summary>
+        tuner = 1213,
         /// <summary>
         /// 灵魂手铳 122
         /// </summary>
@@ -350,6 +354,10 @@ namespace WzComparerR2.CharaSim
         /// 扇坠 135380x
         /// </summary>
         fanTassel = 135380,
+        /// <summary>
+        /// 手链 135400x
+        /// </summary>
+        bracelet = 135400,
         /// <summary>
         /// 手杖
         /// </summary>

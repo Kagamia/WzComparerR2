@@ -333,6 +333,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.handFan: return "扇子";
                 case GearType.fanTassel: return "扇坠";
 
+                case GearType.tuner: return "调谐器";
+                case GearType.bracelet: return "手链";
                 default: return null;
             }
         }
@@ -453,6 +455,9 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.pathOfAbyss: return GetExtraJobReqString(155);
                 case GearType.fanTassel: return GetExtraJobReqString(164);
+
+                case GearType.tuner:
+                case GearType.bracelet: return GetExtraJobReqString(151);
                 default: return null;
             }
         }
@@ -484,6 +489,7 @@ namespace WzComparerR2.CharaSim
                 case 101: return "双生子可以装备";
                 case 112: return "林之灵可以装备";
                 case 142: return "超能力者可以装备";
+                case 151: return "御剑骑士可穿戴装备";
                 case 152: return "圣晶使徒职业可用";
                 case 155: return "影魂异人可装备";
                 case 164: return "虎影职业群可用";
