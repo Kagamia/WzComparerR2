@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using WzComparerR2.WzLib;
 using WzComparerR2.Common;
@@ -30,6 +31,7 @@ namespace WzComparerR2.MapRender
         private ButtonItem btnItemMapRenderV2;
         private FrmMapRender2 mapRenderGame2;
 
+        [MethodImpl(MethodImplOptions.NoOptimization)]
         protected override void OnLoad()
         {
             #if MapRenderV1
