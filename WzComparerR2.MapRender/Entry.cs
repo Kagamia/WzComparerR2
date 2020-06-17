@@ -32,6 +32,7 @@ namespace WzComparerR2.MapRender
 
         protected override void OnLoad()
         {
+            ConfigManager.RegisterAllSection();
             #if MapRenderV1
             this.bar = Context.AddRibbonBar("Modules", "MapRender");
             btnItemMapRender = new ButtonItem("", "MapRender");
@@ -44,7 +45,6 @@ namespace WzComparerR2.MapRender
             btnItemMapRenderV2.Click += btnItem_Click;
             bar2.Items.Add(btnItemMapRenderV2);
 
-            ConfigManager.RegisterAllSection();
         }
 
         void btnItem_Click(object sender, EventArgs e)
