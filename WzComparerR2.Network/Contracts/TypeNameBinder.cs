@@ -13,6 +13,8 @@ namespace WzComparerR2.Network.Contracts
         readonly Dictionary<Type, string> knownTypeNames = new Dictionary<Type, string>();
         readonly Dictionary<string, Type> knownTypes = new Dictionary<string, Type>();
 
+        //NoInlining防止Assembly.GetCallingAssembly因尾调用优化出错
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         public TypeNameBinder()
         {
             var types = Assembly.GetCallingAssembly().GetTypes()
