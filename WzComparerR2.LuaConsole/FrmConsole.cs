@@ -32,6 +32,8 @@ namespace WzComparerR2.LuaConsole
         Thread executeThread;
         bool isRunning;
 
+        //NoInlining防止Assembly.GetCallingAssembly因尾调用优化出错
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         private void InitLuaEnv()
         {
             lua = new Lua();
