@@ -97,7 +97,7 @@ steps:
       Write-Host "##vso[task.setvariable variable=sasurl]${sasurl}"
 
 - task: GitHubRelease@1
-  condition: eq(variables.isMain, true)
+  condition: and(succeeded(), eq(variables.isMain, true))
   continueOnError: true
   displayName: Delete last build
   inputs:
@@ -107,7 +107,7 @@ steps:
     tag: 'ci-build'
 
 - task: CmdLine@2
-  condition: eq(variables.isMain, true)
+  condition: and(succeeded(), eq(variables.isMain, true))
   continueOnError: true
   displayName: Delete ci-build tag
   inputs:
@@ -116,7 +116,7 @@ steps:
     failOnStderr: false
 
 - task: GitHubRelease@1
-  condition: eq(variables.isMain, true)
+  condition: and(succeeded(), eq(variables.isMain, true))
   inputs:
     gitHubConnection: 'Kagamia'
     repositoryName: '$(Build.Repository.Name)'
