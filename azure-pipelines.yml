@@ -88,10 +88,16 @@ steps:
     inlineScript: |
       Write-Host "Uploading files..."
       az storage blob upload --auth-mode login --account-name $(accountName) --container-name $(containerName) --name "$(outputFileName).zip" --file "$(Build.ArtifactStagingDirectory)/$(outputFileName).zip"
+      
       Write-Host "Generate url..."
-      $expireDate = (Get-Date).ToUniversalTime().AddYears(1).ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")
       $url = ConvertFrom-Json (az storage blob url --auth-mode login --account-name $(accountName) --container-name $(containerName) --name "$(outputFileName).zip")
-      $sas = ConvertFrom-Json (az storage blob generate-sas --auth-mode login --account-name $(accountName) --container-name $(containerName) --name "$(outputFileName).zip" --expiry $expireDate --permissions "r")
+
+      Write-Host "Generate sas..."
+      $expireDate = (Get-Date).ToUniversalTime().AddYears(1).ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")
+      $keys = ConvertFrom-Json ((az storage account keys list --account-name $(accountName)) -join "")
+      $accountKey = $keys[0].value
+      $sas = ConvertFrom-Json (az storage blob generate-sas --account-name $(accountName) --account-key "$accountKey" --container-name $(containerName) --name "$(outputFileName).zip" --expiry "$expireDate" --permissions "r")
+      
       $sasurl = "${url}?${sas}"
       Write-Host "${sasurl}"
       Write-Host "##vso[task.setvariable variable=sasurl]${sasurl}"
