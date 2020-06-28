@@ -20,11 +20,11 @@ namespace WzComparerR2.MapRender
 
         }
 
-        #if MapRenderV1
+#if MapRenderV1
         private RibbonBar bar;
         private ButtonItem btnItemMapRender;
         private FrmMapRender mapRenderGame1;
-        #endif
+#endif
 
         private RibbonBar bar2;
         private ButtonItem btnItemMapRenderV2;
@@ -32,19 +32,17 @@ namespace WzComparerR2.MapRender
 
         protected override void OnLoad()
         {
-            ConfigManager.RegisterAllSection();
-            #if MapRenderV1
+#if MapRenderV1
             this.bar = Context.AddRibbonBar("Modules", "MapRender");
             btnItemMapRender = new ButtonItem("", "MapRender");
             btnItemMapRender.Click += btnItem_Click;
             bar.Items.Add(btnItemMapRender);
-            #endif
-
+#endif
             this.bar2 = Context.AddRibbonBar("Modules", "MapRender2");
             btnItemMapRenderV2 = new ButtonItem("", "MapRenderV2");
             btnItemMapRenderV2.Click += btnItem_Click;
             bar2.Items.Add(btnItemMapRenderV2);
-
+            ConfigManager.RegisterAllSection();
         }
 
         void btnItem_Click(object sender, EventArgs e)
@@ -101,25 +99,25 @@ namespace WzComparerR2.MapRender
                         }
                         else
 #endif
-                        {
-                            if (this.mapRenderGame2 != null)
                             {
-                                return;
-                            }
-                            this.mapRenderGame2 = new FrmMapRender2(img) { StringLinker = sl };
-                            this.mapRenderGame2.Window.Title = "MapRender " + this.Version;
-                            try
-                            {
-                                using (this.mapRenderGame2)
+                                if (this.mapRenderGame2 != null)
                                 {
-                                    this.mapRenderGame2.Run();
+                                    return;
+                                }
+                                this.mapRenderGame2 = new FrmMapRender2(img) { StringLinker = sl };
+                                this.mapRenderGame2.Window.Title = "MapRender " + this.Version;
+                                try
+                                {
+                                    using (this.mapRenderGame2)
+                                    {
+                                        this.mapRenderGame2.Run();
+                                    }
+                                }
+                                finally
+                                {
+                                    this.mapRenderGame2 = null;
                                 }
                             }
-                            finally
-                            {
-                                this.mapRenderGame2 = null;
-                            }
-                        }
 #if !DEBUG
                         }
                         catch (Exception ex)
@@ -138,7 +136,7 @@ namespace WzComparerR2.MapRender
 
             MessageBoxEx.Show("没有选择一个map的img", "MapRender");
 
-            exit:
+        exit:
             return;
         }
 

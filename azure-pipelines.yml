@@ -28,6 +28,9 @@ variables:
   outputDir_anycpu: 'WzComparerR2/WzComparerR2/bin/release'
   outputDir_x86: 'WzComparerR2/WzComparerR2/bin/x86/release'
   outputFileName: 'WcR2_With_Plguins_$(Build.BuildNumber)'
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  accountName: 'wcr2publish'
+  containerName: 'ci-build'
 
 steps:
 - checkout: WzComparerR2
@@ -35,6 +38,7 @@ steps:
 - checkout: CharaSimResource
 
 - task: CmdLine@2
+  displayName: Generate version file
   inputs:
     script: |
       mkdir Build
@@ -42,18 +46,21 @@ steps:
     workingDirectory: '$(Build.SourcesDirectory)\WzComparerR2'
 
 - task: VSBuild@1
+  displayName: Build anycpu
   inputs:
     solution: '$(solution)'
     platform: '$(buildPlatform_anycpu)'
     configuration: '$(buildConfiguration)'
 
 - task: VSBuild@1
+  displayName: Build x86
   inputs:
     solution: '$(solution)'
     platform: '$(buildPlatform_x86)'
     configuration: '$(buildConfiguration)'
 
 - task: CmdLine@2
+  displayName: Prepare output files
   inputs:
     script: |
       move "$(outputDir_anycpu)\*.dll" "$(outputDir_anycpu)\Lib"
@@ -72,9 +79,33 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/$(outputFileName).zip'
     replaceExistingArchive: true
 
+- task: AzureCLI@2
+  displayName: Upload to blob
+  inputs:
+    azureSubscription: 'Visual Studio Enterprise(66312bd9-1264-4b34-872d-2e557fc1bc0d)'
+    scriptType: 'ps'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      Write-Host "Uploading files..."
+      az storage blob upload --auth-mode login --account-name $(accountName) --container-name $(containerName) --name "$(outputFileName).zip" --file "$(Build.ArtifactStagingDirectory)/$(outputFileName).zip"
+      
+      Write-Host "Generate url..."
+      $url = ConvertFrom-Json (az storage blob url --auth-mode login --account-name $(accountName) --container-name $(containerName) --name "$(outputFileName).zip")
+
+      Write-Host "Generate sas..."
+      $expireDate = (Get-Date).ToUniversalTime().AddYears(1).ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")
+      $keys = ConvertFrom-Json ((az storage account keys list --account-name $(accountName)) -join "")
+      $accountKey = $keys[0].value
+      $sas = ConvertFrom-Json (az storage blob generate-sas --account-name $(accountName) --account-key "$accountKey" --container-name $(containerName) --name "$(outputFileName).zip" --expiry "$expireDate" --permissions "r")
+      
+      $sasurl = "${url}?${sas}"
+      Write-Host "${sasurl}"
+      Write-Host "##vso[task.setvariable variable=sasurl]${sasurl}"
+
 - task: GitHubRelease@1
+  condition: and(succeeded(), eq(variables.isMain, true))
   continueOnError: true
-  displayName: Delete last build.
+  displayName: Delete last build
   inputs:
     gitHubConnection: 'Kagamia'
     repositoryName: '$(Build.Repository.Name)'
@@ -82,14 +113,16 @@ steps:
     tag: 'ci-build'
 
 - task: CmdLine@2
+  condition: and(succeeded(), eq(variables.isMain, true))
   continueOnError: true
-  displayName: Delete ci-build tag.
+  displayName: Delete ci-build tag
   inputs:
     script: 'git push --delete origin ci-build'
     workingDirectory: '$(Build.SourcesDirectory)\WzComparerR2'
     failOnStderr: false
 
 - task: GitHubRelease@1
+  condition: and(succeeded(), eq(variables.isMain, true))
   inputs:
     gitHubConnection: 'Kagamia'
     repositoryName: '$(Build.Repository.Name)'
@@ -98,6 +131,8 @@ steps:
     tag: 'ci-build'
     title: 'CI-Build-$(Build.BuildNumber)'
     releaseNotesSource: 'inline'
-    releaseNotesInline: 'Automation build from azure-pipeline.'
+    releaseNotesInline: |
+      Automation build from azure-pipeline.
+      download: [link]($(sasurl))
     isPreRelease: true
     addChangeLog: false

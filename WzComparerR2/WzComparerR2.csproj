@@ -376,8 +376,8 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(SolutionDir)References\x86\*" "$(TargetDir)Lib\x86" /Y /I
-xcopy "$(SolutionDir)References\x64\*" "$(TargetDir)Lib\x64" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)..\References\x86\*" "$(TargetDir)Lib\x86" /Y /I
+xcopy "$(ProjectDir)..\References\x64\*" "$(TargetDir)Lib\x64" /Y /I</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

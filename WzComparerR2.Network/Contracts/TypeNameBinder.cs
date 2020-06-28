@@ -13,6 +13,10 @@ namespace WzComparerR2.Network.Contracts
         readonly Dictionary<Type, string> knownTypeNames = new Dictionary<Type, string>();
         readonly Dictionary<string, Type> knownTypes = new Dictionary<string, Type>();
 
+        /// <summary>
+        /// 对此构造器的调用不应为尾调用, 否则<see cref="Assembly.GetCallingAssembly"/>会因尾调用优化出错.
+        /// </summary>
+        /// <seealso cref="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.getcallingassembly?redirectedfrom=MSDN&view=netcore-3.1#System_Reflection_Assembly_GetCallingAssembly"/>
         public TypeNameBinder()
         {
             var types = Assembly.GetCallingAssembly().GetTypes()

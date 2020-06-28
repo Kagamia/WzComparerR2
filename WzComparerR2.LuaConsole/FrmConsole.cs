@@ -19,6 +19,8 @@ namespace WzComparerR2.LuaConsole
 {
     public partial class FrmConsole : DevComponents.DotNetBar.Office2007Form
     {
+        //NoOptimization防止Assembly.GetCallingAssembly因尾调用优化出错
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
         public FrmConsole()
         {
             InitializeComponent();
