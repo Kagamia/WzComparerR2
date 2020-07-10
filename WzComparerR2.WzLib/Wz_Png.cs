@@ -122,6 +122,8 @@ namespace WzComparerR2.WzLib
                 switch (this.Form)
                 {
                     case 1:
+                    case 257:
+                    case 513:
                         plainData = new byte[this.w * this.h * 2];
                         zlib.Read(plainData, 0, plainData.Length);
                         break;
@@ -136,27 +138,21 @@ namespace WzComparerR2.WzLib
                         zlib.Read(plainData, 0, plainData.Length);
                         break;
 
-                    case 513:
-                        plainData = new byte[this.w * this.h * 2];
-                        zlib.Read(plainData, 0, plainData.Length);
-                        break;
-
                     case 517:
                         plainData = new byte[this.w * this.h / 128];
                         zlib.Read(plainData, 0, plainData.Length);
                         break;
 
                     case 1026:
-                        plainData = new byte[this.w * this.h];
-                        zlib.Read(plainData, 0, plainData.Length);
-                        break;
-
                     case 2050:
                         plainData = new byte[this.w * this.h];
                         zlib.Read(plainData, 0, plainData.Length);
                         break;
 
                     default:
+                        var msOut = new MemoryStream();
+                        zlib.CopyTo(msOut);
+                        plainData = msOut.ToArray();
                         break;
                 }
                 if (zlib != null)
@@ -200,6 +196,13 @@ namespace WzComparerR2.WzLib
                     pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format32bppArgb);
                     bmpdata = pngDecoded.LockBits(new Rectangle(Point.Empty, pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                     Marshal.Copy(argb, 0, bmpdata.Scan0, argb.Length);
+                    pngDecoded.UnlockBits(bmpdata);
+                    break;
+
+                case 257: //16位argb1555
+                    pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format16bppArgb1555);
+                    bmpdata = pngDecoded.LockBits(new Rectangle(Point.Empty, pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
+                    Marshal.Copy(pixel, 0, bmpdata.Scan0, pixel.Length);
                     pngDecoded.UnlockBits(bmpdata);
                     break;
 

@@ -241,5 +241,10 @@ namespace WzComparerR2.Rendering
         {
             return device.IsSupportFormat(SharpDX.DXGI.Format.B5G6R5_UNorm);
         }
+
+        public static bool IsSupportBgra5551(this GraphicsDevice device)
+        {
+            return device.IsSupportFormat(SharpDX.DXGI.Format.B5G5R5A1_UNorm);
+        }
     }
 }
