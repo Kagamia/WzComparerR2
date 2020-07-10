@@ -202,14 +202,14 @@ namespace WzComparerR2.WzLib
                 case 257: //16位argb1555
                     pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format16bppArgb1555);
                     bmpdata = pngDecoded.LockBits(new Rectangle(Point.Empty, pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
-                    Marshal.Copy(pixel, 0, bmpdata.Scan0, pixel.Length);
+                    CopyBmpDataWithStride(pixel, pngDecoded.Width * 2, bmpdata);
                     pngDecoded.UnlockBits(bmpdata);
                     break;
 
                 case 513: //16位rgb565
                     pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format16bppRgb565);
                     bmpdata = pngDecoded.LockBits(new Rectangle(new Point(), pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-                    Marshal.Copy(pixel, 0, bmpdata.Scan0, pixel.Length);
+                    CopyBmpDataWithStride(pixel, pngDecoded.Width * 2, bmpdata);
                     pngDecoded.UnlockBits(bmpdata);
                     break;
 
@@ -217,7 +217,7 @@ namespace WzComparerR2.WzLib
                     argb = GetPixelDataForm517(pixel, this.w, this.h);
                     pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format16bppRgb565);
                     bmpdata = pngDecoded.LockBits(new Rectangle(0, 0, this.w, this.h), ImageLockMode.WriteOnly, PixelFormat.Format16bppRgb565);
-                    Marshal.Copy(argb, 0, bmpdata.Scan0, argb.Length);
+                    CopyBmpDataWithStride(pixel, pngDecoded.Width * 2, bmpdata);
                     pngDecoded.UnlockBits(bmpdata);
                     break;
                    /* pngDecoded = new Bitmap(this.w, this.h);
@@ -532,6 +532,22 @@ namespace WzComparerR2.WzLib
                 (g << 2) | (g >> 4),
                 (b << 3) | (b >> 2));
             return c;
+        }
+
+        public static void CopyBmpDataWithStride(byte[] source, int stride, BitmapData bmpData)
+        {
+            if (bmpData.Stride == stride)
+            {
+                Marshal.Copy(source, 0, bmpData.Scan0, source.Length);
+            }
+            else
+            {
+                for (int y = 0; y < bmpData.Height; y++)
+                {
+                    Marshal.Copy(source, stride * y, bmpData.Scan0 + bmpData.Stride * y, stride);
+                }
+            }
+
         }
     }
 }
