@@ -435,7 +435,7 @@ namespace WzComparerR2.CharaSim
 
                 //6xxx
                 case GearType.novaMarrow: return GetExtraJobReqString(61);
-                //case GearType.chain2:
+                case GearType.chain2:
                 case GearType.transmitter: return GetExtraJobReqString(64);
                 case GearType.soulBangle:
                 case GearType.soulShooter: return GetExtraJobReqString(65);
@@ -484,7 +484,7 @@ namespace WzComparerR2.CharaSim
                 case 42: return "阴阳师可以装备";
                 case 51: return "米哈尔可以装备";
                 case 61: return "狂龙战士可以装备";
-                case 64: return "魔链影士职业可用";
+                case 64: return "魔链影士可穿戴装备";
                 case 65: return "爆莉萌天使可以装备";
                 case 101: return "双生子可以装备";
                 case 112: return "林之灵可以装备";
