@@ -34,6 +34,14 @@ namespace WzComparerR2.Rendering
                     format = SurfaceFormat.Bgra32;
                 }
             }
+            else if (format == SurfaceFormat.Bgra5551)
+            {
+                //检测是否支持 pre-win8
+                if (!graphicsDevice.IsSupportBgra5551())
+                {
+                    format = SurfaceFormat.Bgra32;
+                }
+            }
 
             if (t2d == null)
             {
@@ -80,6 +88,7 @@ namespace WzComparerR2.Rendering
                 {
                     case 1:
                     case 2:
+                    case 257:
                     case 513:
                     case 1026:
                     case 2050:
@@ -109,6 +118,7 @@ namespace WzComparerR2.Rendering
                 case 1: return SurfaceFormat.Bgra4444;
                 case 2:
                 case 3: return SurfaceFormat.Bgra32;
+                case 257: return SurfaceFormat.Bgra5551;
                 case 513: 
                 case 517: return SurfaceFormat.Bgr565;
                 case 1026: return SurfaceFormat.Dxt3;

@@ -1,13 +1,13 @@
 *<s>使用前先大喊 niconiconi! poi! duang!以减少bug发生率</s>*  
 
-[![Build Status](https://dev.azure.com/kagamiastudio/WzComparerR2/_apis/build/status/Kagamia.WzComparerR2?branchName=master)](https://dev.azure.com/kagamiastudio/WzComparerR2/_build/latest?definitionId=2&branchName=master)
+[![Build Status](https://dev.azure.com/kagamiastudio/WzComparerR2/_apis/build/status/Kagamia.WzComparerR2?branchName=master)](https://dev.azure.com/kagamiastudio/WzComparerR2/_build/latest?definitionId=4&branchName=master)
 
 # WzComparerR2
 这是一个用C#7/.Net4.5组装的冒险岛提取器...  
 包含了一些奇怪的机能比如stringWZ搜索 客户端对比 装备模拟 地图模拟等等..  
 
 tips: WcR2将尽力维持每周更新，Releases里**不会**提供最稳定版下载，最新版会通过azure-pipeline自动发布。  
-links: [\[更新日志\]](https://github.com/Kagamia/WzComparerR2/tree/master/UpdateLogs)  [\[版本计划\]](https://github.com/Kagamia/WzComparerR2/wiki/Roadmap)
+links: [\[更新日志\]](https://github.com/Kagamia/WzComparerR2/tree/master/UpdateLogs)  [\[版本计划\]](https://github.com/Kagamia/WzComparerR2/wiki/Roadmap)  [\[最新版下载\]](https://github.com/Kagamia/WzComparerR2/releases/tag/ci-build)
 
 # Modules
 - **WzComparerR2** 主程序
@@ -20,8 +20,8 @@ links: [\[更新日志\]](https://github.com/Kagamia/WzComparerR2/tree/master/Up
 - **WzComparerR2.MapRender** (可选插件)地图仿真器
 - **WzComparerR2.Avatar** (可选插件)纸娃娃
 
-# Usage
-- **2.x**: Win7+/.net4.5+/dx11.0
+# Prerequisite
+- **2.x**: Win7sp1+/.net4.5+/dx11.0
 - **1.x**: WinXp+/.net2.0+/dx9.0
 
 # Compile
