@@ -30,6 +30,8 @@ namespace WzComparerR2.MapRender
         private ButtonItem btnItemMapRenderV2;
         private FrmMapRender2 mapRenderGame2;
 
+        //NoOptimization防止Assembly.GetCallingAssembly因尾调用优化出错
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
         protected override void OnLoad()
         {
             #if MapRenderV1
