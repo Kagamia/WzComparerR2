@@ -67,46 +67,59 @@ namespace WzComparerR2.MapRender.UI
             var current = Vector2.Zero;
             size = Vector2.Zero;
 
-            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "Level: " + info.level + (info.boss ? " (Boss)" : null), ref current, Color.White, ref size.X));
-            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "HP/MP: " + info.maxHP + " / " + info.maxMP, ref current, Color.White, ref size.X));
-            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "PAD/MAD: " + info.PADamage + " / " + info.MADamage, ref current, Color.White, ref size.X));
-            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "PDr/MDr: " + info.PDRate + "% / " + info.MDRate + "%", ref current, Color.White, ref size.X));
-            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "Acc/Eva: " + info.acc + " / " + info.eva, ref current, Color.White, ref size.X));
-            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "KB: " + info.pushed, ref current, Color.White, ref size.X));
-            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "Exp: " + info.exp, ref current, Color.White, ref size.X));
-            if (info.undead) blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "undead: 1", ref current, Color.White, ref size.X));
-            StringBuilder sb;
-            if ((sb = GetLifeElemAttrString(ref info.elemAttr)).Length > 0)
-                blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "elem: " + sb.ToString(), ref current, Color.White, ref size.X));
+            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "LEVEL: " + info.level + (info.boss ? " (Boss)" : null), ref current, Color.White, ref size.X));
+            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "HP: " + info.maxHP.ToString("N0"), ref current, Color.White, ref size.X));
+            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "MP: " + info.maxMP.ToString("N0"), ref current, Color.White, ref size.X));
+            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "Physical Damage: " + info.PADamage.ToString("N0"), ref current, Color.White, ref size.X));
+            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "Magic Damage: " + info.MADamage.ToString("N0"), ref current, Color.White, ref size.X));
+            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "PDRate: " + info.PDRate + "%", ref current, Color.White, ref size.X));
+            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "MDRate: " + info.MDRate + "%", ref current, Color.White, ref size.X));
+            blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "EXP: " + info.exp.ToString("N0"), ref current, Color.White, ref size.X));
+            if (info.undead) blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "Undead: Yes", ref current, Color.White, ref size.X));
+            if (GetLifeElemAttrString(info.elemAttr) != "")
+            {
+                blocks.Add(PrepareTextLine(fonts.TooltipContentFont, "Elements: " + GetLifeElemAttrString(info.elemAttr), ref current, Color.White, ref size.X));
+            }
+
             size.Y = current.Y;
 
             return blocks.ToArray();
         }
 
-        public static StringBuilder GetLifeElemAttrString(ref LifeInfo.ElemAttr elemAttr)
+        private static string GetLifeElemAttrString(LifeInfo.ElemAttr elemAttr)
         {
-            StringBuilder sb = new StringBuilder(14);
-            sb.Append(GetElemResistanceString("冰", elemAttr.I));
-            sb.Append(GetElemResistanceString("雷", elemAttr.L));
-            sb.Append(GetElemResistanceString("火", elemAttr.F));
-            sb.Append(GetElemResistanceString("毒", elemAttr.S));
-            sb.Append(GetElemResistanceString("圣", elemAttr.H));
-            sb.Append(GetElemResistanceString("暗", elemAttr.D));
-            sb.Append(GetElemResistanceString("物", elemAttr.P));
-            return sb;
+            StringBuilder sb1 = new StringBuilder();
+            var elems = new[]
+            {
+                new {name = "Physical", attr =  elemAttr.P },
+                new {name = "Holy", attr =  elemAttr.H },
+                new {name = "Fire", attr = elemAttr.F },
+                new {name = "Ice", attr = elemAttr.I },
+                new {name = "Poison", attr =  elemAttr.S },
+                new {name = "Lightning", attr =  elemAttr.L },
+                new {name = "Dark", attr =  elemAttr.D },
+            };
+            foreach (var item in elems)
+            {
+                if (item.attr != LifeInfo.ElemResistance.Normal)
+                {
+                    sb1.Append($"{item.name} {GetElemResistanceString(item.attr)}, ");
+                }
+            }
+            return sb1.ToString().TrimEnd().TrimEnd(',');
         }
 
-        public static string GetElemResistanceString(string elemName, LifeInfo.ElemResistance resist)
+        private static string GetElemResistanceString(LifeInfo.ElemResistance resist)
         {
             string e = null;
             switch (resist)
             {
-                case LifeInfo.ElemResistance.Immune: e = "× "; break;
-                case LifeInfo.ElemResistance.Resist: e = "△ "; break;
-                case LifeInfo.ElemResistance.Normal: e = null; break;
-                case LifeInfo.ElemResistance.Weak: e = "◎ "; break;
+                case LifeInfo.ElemResistance.Immune: e = "immune"; break;
+                case LifeInfo.ElemResistance.Resist: e = "strong"; break;
+                case LifeInfo.ElemResistance.Normal: e = "neutral"; break;
+                case LifeInfo.ElemResistance.Weak: e = "weak"; break;
             }
-            return e != null ? (elemName + e) : null;
+            return e ?? "  ";
         }
 
         public static string GetPortalTypeString(int pType)
