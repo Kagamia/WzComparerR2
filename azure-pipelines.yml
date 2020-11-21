@@ -8,10 +8,6 @@ trigger:
 
 resources:
  repositories:
-   - repository: WzComparerR2
-     type: github
-     name: kagamia/WzComparerR2
-     endpoint: Kagamia
    - repository: CharaSimResource
      type: github
      name: kagamia/CharaSimResource
@@ -33,7 +29,8 @@ variables:
   containerName: 'ci-build'
 
 steps:
-- checkout: WzComparerR2
+- checkout: self
+  path: s/WzComparerR2
   persistCredentials: true
 - checkout: CharaSimResource
 

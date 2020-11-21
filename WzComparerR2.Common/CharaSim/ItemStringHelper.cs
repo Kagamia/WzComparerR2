@@ -431,7 +431,7 @@ namespace WzComparerR2.CharaSim
 
                 //6xxx
                 case GearType.novaMarrow: return GetExtraJobReqString(61);
-                //case GearType.chain2:
+                case GearType.chain2:
                 case GearType.transmitter: return GetExtraJobReqString(64);
                 case GearType.soulBangle:
                 case GearType.soulShooter: return GetExtraJobReqString(65);

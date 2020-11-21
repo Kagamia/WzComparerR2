@@ -208,7 +208,7 @@ namespace WzComparerR2.WzLib
 
                 case 513: //16位rgb565
                     pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format16bppRgb565);
-                    bmpdata = pngDecoded.LockBits(new Rectangle(new Point(), pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    bmpdata = pngDecoded.LockBits(new Rectangle(new Point(), pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format16bppRgb565);
                     CopyBmpDataWithStride(pixel, pngDecoded.Width * 2, bmpdata);
                     pngDecoded.UnlockBits(bmpdata);
                     break;

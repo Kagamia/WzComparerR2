@@ -20,8 +20,8 @@ links: [\[更新日志\]](https://github.com/Kagamia/WzComparerR2/tree/master/Up
 - **WzComparerR2.MapRender** (可选插件)地图仿真器
 - **WzComparerR2.Avatar** (可选插件)纸娃娃
 
-# Usage
-- **2.x**: Win7+/.net4.5+/dx11.0
+# Prerequisite
+- **2.x**: Win7sp1+/.net4.5+/dx11.0
 - **1.x**: WinXp+/.net2.0+/dx9.0
 
 # Compile

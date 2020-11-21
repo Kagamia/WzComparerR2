@@ -316,7 +316,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 g.DrawImage(GearGraphics.EnlargeBitmap(item.Icon.Bitmap),
                 iconX + 6 + (1 - item.Icon.Origin.X) * 2,
-                picH + 6 + (33 - item.Icon.Bitmap.Height) * 2);
+                picH + 6 + (33 - item.Icon.Origin.Y) * 2);
             }
             if (item.Cash)
             {

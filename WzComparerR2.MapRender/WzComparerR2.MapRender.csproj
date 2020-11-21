@@ -183,6 +183,7 @@
     <Compile Include="UI\Tooltip2.cs" />
     <Compile Include="UI\TooltipHelper.cs" />
     <Compile Include="UI\UIChatBox.cs" />
+    <Compile Include="UI\UIDanmaku.cs" />
     <Compile Include="UI\UIGraphics.cs" />
     <Compile Include="UI\UIHelper.cs" />
     <Compile Include="UI\UIMiniMap.cs" />
