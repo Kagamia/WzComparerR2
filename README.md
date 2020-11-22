@@ -3,7 +3,7 @@
 # WzComparerR2
 Translated for English use by PirateIzzy (extraction tool only)
 
-- NOTE: As of November 1, 2018, you will need to re-clone this repository if you cloned it before.
+- NOTE: As of November 21, 2020, you will need to re-clone this repository if you cloned it before.
 
 # Modules
 - **WzComparerR2** 
