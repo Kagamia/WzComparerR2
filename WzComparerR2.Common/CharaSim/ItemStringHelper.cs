@@ -343,8 +343,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.handFan: return "仙扇";
                 case GearType.fanTassel: return "扇墜";
                     
-                case GearType.tuner: return "튜너";
-                case GearType.bracelet: return "브레이슬릿";
+                case GearType.tuner: return "調節器";
+                case GearType.bracelet: return "手鐲";
 
                 default: return null;
             }
@@ -526,6 +526,8 @@ namespace WzComparerR2.CharaSim
                     return GetGearPropString(GearPropType.only, value);
                 case ItemPropType.accountSharable:
                     return GetGearPropString(GearPropType.accountSharable, value);
+                case ItemPropType.sharableOnce:
+                    return GetGearPropString(GearPropType.sharableOnce, value);
                 case ItemPropType.quest:
                     return value == 0 ? null : "任務道具";
                 case ItemPropType.pquest:

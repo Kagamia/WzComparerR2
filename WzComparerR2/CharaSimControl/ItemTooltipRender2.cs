@@ -295,7 +295,7 @@ namespace WzComparerR2.CharaSimControl
                 g.DrawImage(setItemBmp, setItemOrigin.X, setItemOrigin.Y,
                     new Rectangle(Point.Empty, setItemBmp.Size), GraphicsUnit.Pixel);
             }
-            
+
             if (levelBmp != null)
             {
                 //绘制背景区域
@@ -419,9 +419,17 @@ namespace WzComparerR2.CharaSimControl
                     expireTime = time.ToString("到yyyy年 M月 d日 H時 可以用");
                 }
             }
-            else if (item.EndUseDate != null)
+            else if (item.ConsumableFrom != null || item.EndUseDate != null)
             {
-                expireTime = string.Format("到 {0}年 {1}月 {2}日 {3:D2}時 {4:D2}分 可以用", Convert.ToInt32(item.EndUseDate.Substring(0, 4)), Convert.ToInt32(item.EndUseDate.Substring(4, 2)), Convert.ToInt32(item.EndUseDate.Substring(6, 2)), Convert.ToInt32(item.EndUseDate.Substring(8, 2)), Convert.ToInt32(item.EndUseDate.Substring(10, 2)));
+                expireTime = "";
+                if (item.ConsumableFrom != null)
+                {
+                    expireTime += string.Format("\n{0}年 {1}月 {2}日 {3:D2}時 {4:D2}分開始使用", Convert.ToInt32(item.ConsumableFrom.Substring(0, 4)), Convert.ToInt32(item.ConsumableFrom.Substring(4, 2)), Convert.ToInt32(item.ConsumableFrom.Substring(6, 2)), Convert.ToInt32(item.ConsumableFrom.Substring(8, 2)), Convert.ToInt32(item.ConsumableFrom.Substring(10, 2)));
+                }
+                if (item.EndUseDate != null)
+                {
+                    expireTime += string.Format("\n{0}年 {1}月 {2}日 {3:D2}時 {4:D2}分可以用", Convert.ToInt32(item.EndUseDate.Substring(0, 4)), Convert.ToInt32(item.EndUseDate.Substring(4, 2)), Convert.ToInt32(item.EndUseDate.Substring(6, 2)), Convert.ToInt32(item.EndUseDate.Substring(8, 2)), Convert.ToInt32(item.EndUseDate.Substring(10, 2)));
+                }
             }
             else if ((item.Props.TryGetValue(ItemPropType.permanent, out value) && value != 0) || (item.ItemID / 10000 == 500 && item.Props.TryGetValue(ItemPropType.life, out value) && value == 0))
             {
@@ -442,14 +450,22 @@ namespace WzComparerR2.CharaSimControl
             }
             if (!string.IsNullOrEmpty(expireTime))
             {
-                g.DrawString(expireTime, GearGraphics.ItemDetailFont, Brushes.White, tooltip.Width / 2, picH, format);
-                picH += 19;
+                picH += 3;
+                foreach (string expireTimeLine in expireTime.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+				    g.DrawString(expireTimeLine, GearGraphics.ItemDetailFont, Brushes.White, tooltip.Width / 2, picH, format);
+                    picH += 16;
+                }
+                if (expireTime.Contains('\n'))
+                {
+                    picH += 4;
+                }
                 hasPart2 = true;
             }
 
             if (hasPart2)
             {
-                picH += 1;
+                picH += 4;
             }
 
             //绘制图标
@@ -505,6 +521,58 @@ namespace WzComparerR2.CharaSimControl
                 desc += $"[LV.{item.Level}] ";
             }
             desc += sr.Desc;
+            if (item.ItemID / 10000 == 500)
+            {
+                if (item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && value > 0)
+                {
+                    int setID;
+                    if (item.Props.TryGetValue(ItemPropType.setItemID, out setID))
+                    {
+                        SetItem setItem;
+                        if (CharaSimLoader.LoadedSetItems.TryGetValue(setID, out setItem))
+                        {
+                            string wonderGradeString = null;
+                            string setItemName = setItem.SetItemName;
+                            string setSkillName = "";
+                            switch (value)
+                            {
+                                case 1:
+                                    wonderGradeString = "원더 블랙";
+                                    foreach (KeyValuePair<GearPropType, object> prop in setItem.Effects.Values.SelectMany(f => f.PropsV5))
+                                    {
+                                        if (prop.Key == GearPropType.activeSkill)
+                                        {
+                                            SetItemActiveSkill p = ((List<SetItemActiveSkill>)prop.Value)[0];
+                                            StringResult sr2;
+                                            if (StringLinker == null || !StringLinker.StringSkill.TryGetValue(p.SkillID, out sr2))
+                                            {
+                                                sr2 = new StringResult();
+                                                sr2.Name = p.SkillID.ToString();
+                                            }
+                                            setSkillName = Regex.Replace(sr2.Name, " Lv.\\d", "");
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                case 4:
+                                    wonderGradeString = "루나 스윗";
+                                    setSkillName = "루나 스윗";
+                                    break;
+                                case 5:
+                                    wonderGradeString = "루나 드림";
+                                    setSkillName = "루나 드림";
+                                    break;
+                            }
+                            if (wonderGradeString != null)
+                            {
+                                desc += $"\n#c{wonderGradeString}# 등급의 #c{setItemName}# 펫 장착시 #c{setSkillName}# 세트 효과를 얻게 됩니다. (최대 3단계)\n세트 효과는 장착한 #c{setItemName}# 펫의 종류에 따라 3세트까지 강화됩니다.";
+                            }
+                        }
+                    }
+                }
+                desc += "\n#c스킬:메소 줍기";
+                desc += "#";
+            }
             if (!string.IsNullOrEmpty(desc))
             {
                 GearGraphics.DrawString(g, desc, GearGraphics.ItemDetailFont2, 100, right, ref picH, 16);
@@ -751,7 +819,14 @@ namespace WzComparerR2.CharaSimControl
                 {
                     tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.useTradeBlock, 1));
                 }
-                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.accountSharable, value));
+                if (item.Props.TryGetValue(ItemPropType.sharableOnce, out value2) && value2 != 0)
+                {
+                    tags.AddRange(ItemStringHelper.GetItemPropString(ItemPropType.sharableOnce, value2).Split('\n'));
+                }
+                else
+                {
+                    tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.accountSharable, value));
+                }
             }
             if (item.Props.TryGetValue(ItemPropType.multiPet, out value))
             {
@@ -838,7 +913,7 @@ namespace WzComparerR2.CharaSimControl
             renderer.TargetItem = cashPackage;
             return renderer.Render();
         }
-        
+
         private Bitmap RenderLevel(out int picHeight)
         {
             Bitmap level = null;

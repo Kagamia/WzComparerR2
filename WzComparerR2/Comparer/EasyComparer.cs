@@ -570,7 +570,8 @@ namespace WzComparerR2.Comparer
             Wz_Sound sound;
             Wz_Vector vector;
             
-            if ((linkNode = value.GetLinkedSourceNode(PluginBase.PluginManager.FindWz)) != value)
+            var wzFile = value.GetNodeWzFile();
+            if (wzFile != null && (linkNode = value.GetLinkedSourceNode(path => PluginBase.PluginManager.FindWz(path, wzFile))) != value)
             {
                 return "(link) " + OutputNodeValue(fullPath, linkNode, col, outputDir);
             }

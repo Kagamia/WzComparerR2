@@ -2307,7 +2307,7 @@
             this.chkResolvePngLink.Size = new System.Drawing.Size(107, 23);
             this.chkResolvePngLink.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkResolvePngLink.TabIndex = 9;
-            this.chkResolvePngLink.Text = "解除Png連結";
+            this.chkResolvePngLink.Text = "跟隨Png連結";
             // 
             // chkOutputRemovedImg
             // 

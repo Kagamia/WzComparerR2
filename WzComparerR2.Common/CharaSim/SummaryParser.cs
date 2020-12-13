@@ -41,12 +41,13 @@ namespace WzComparerR2.CharaSim
                         }
                     }
                     //优先匹配common
+                    string key = null;
                     string prop = null;
                     if (CommonProps != null)
                     {
                         for (int i = len; i > 0; i--)
                         {
-                            string key = H.Substring(idx + 1, i);
+                            key = H.Substring(idx + 1, i);
                             if (GetValueIgnoreCase(CommonProps, key, out prop))
                             {
                                 len = i;
@@ -57,13 +58,24 @@ namespace WzComparerR2.CharaSim
                     if (prop != null)
                     {
                         var val = Calculator.Parse(prop.ToLower(), Level);
-                        sb.Append(val);
+                        if (key.EndsWith("PerM"))
+                        {
+                            sb.Append(string.Format("{0:F1}", val / 100));
+                        }
+                        else if (key == "cooltimeMS")
+                        {
+                            sb.Append(string.Format("{0:G}", val / 1000));
+                        }
+                        else
+                        {
+                            sb.Append(val);
+                        }
                         idx += len + 1;
                         continue;
                     }
                     else //试图匹配全局变量
                     {
-                        string key = null;
+                        key = null;
                         for (int i = len; i > 0; i--)
                         {
                             key = H.Substring(idx + 1, i);
@@ -77,7 +89,18 @@ namespace WzComparerR2.CharaSim
                             if (prop != "" && GetValueIgnoreCase(CommonProps, prop, out prop))
                             {
                                 var val = Calculator.Parse(prop.ToLower(), Level);
-                                sb.Append(val);
+                                if (key.EndsWith("PerM"))
+                                {
+                                    sb.Append(string.Format("{0:F1}", val / 100));
+                                }
+                                else if (key == "cooltimeMS")
+                                {
+                                    sb.Append(string.Format("{0:G}", val / 1000));
+                                }
+                                else
+                                {
+                                    sb.Append(val);
+                                }
                             }
                             else
                             {
@@ -108,7 +131,7 @@ namespace WzComparerR2.CharaSim
                     }
                     else //无法匹配 取最长的common段
                     {
-                        string key = H.Substring(idx + 1, len);
+                        key = H.Substring(idx + 1, len);
                         if (System.Text.RegularExpressions.Regex.IsMatch(key, @"^\d+$"))
                         {
                             sb.Append(key);

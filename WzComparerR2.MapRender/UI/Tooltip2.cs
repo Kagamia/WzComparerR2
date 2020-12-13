@@ -339,7 +339,8 @@ namespace WzComparerR2.MapRender.UI
                         {
                             this.StringLinker?.StringMob.TryGetValue(mobID, out sr);
                             var mobLevel = PluginManager.FindWz(string.Format("Mob/{0:D7}.img/info/level", mobID)).GetValueEx<int>(0);
-                            string mobText = sr != null ? string.Format("{0}(Lv.{1})", sr.Name, mobLevel) : mobID.ToString();
+                            var mobDescLevelForWorldMap = PluginManager.FindWz(string.Format("Mob/{0:D7}.img/info/descLevelforWorldmap", mobID)).GetValueEx<string>(null);
+                            string mobText = sr != null ? string.Format("{0}(Lv.{1})", sr.Name, mobDescLevelForWorldMap ?? mobLevel.ToString()) : mobID.ToString();
                             mobNames.Add(mobText);
                             if (mobLevel > 0)
                             {
@@ -359,6 +360,19 @@ namespace WzComparerR2.MapRender.UI
                             this.StringLinker?.StringNpc.TryGetValue(npcID, out sr);
                             string npcText = sr?.Name ?? npcID.ToString();
                             npcNames.Add(npcText);
+                        }
+                        npcNames = npcNames.Distinct().ToList();
+                        foreach (var npcID in npcs)
+                        {
+                            this.StringLinker?.StringNpc.TryGetValue(npcID, out sr);
+                            string npcText = sr?.Name ?? npcID.ToString();
+                            var npcInfo = PluginManager.FindWz(string.Format("Npc/{0:D7}.img/info", npcID));
+                            var hide = npcInfo.Nodes["hide"].GetValueEx<int>(0);
+                            var hideName = npcInfo.Nodes["hideName"].GetValueEx<int>(0);
+                            if ((hide != 0 || hideName != 0) && npcNames.Contains(npcText))
+                            {
+                                npcNames[npcNames.IndexOf(npcText)] = "";
+                            }
                         }
                     }
                 }
@@ -382,6 +396,8 @@ namespace WzComparerR2.MapRender.UI
                     }
                     partWidth += 15;
                 }
+
+                npcNames = npcNames.Where(text => text.Length > 0).ToList();
 
                 //开始绘制
                 //属性要求

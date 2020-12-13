@@ -880,9 +880,9 @@
             this.chkResolvePngLink.Name = "chkResolvePngLink";
             this.chkResolvePngLink.Size = new System.Drawing.Size(95, 16);
             this.chkResolvePngLink.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkResolvePngLink, new DevComponents.DotNetBar.SuperTooltipInfo("解除png連結", "", "比對報告中是否智能解析比對被Link的圖片\r\n這會過濾掉無用的變更内容", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 72)));
+            this.superTooltip1.SetSuperTooltip(this.chkResolvePngLink, new DevComponents.DotNetBar.SuperTooltipInfo("跟隨png連結", "", "比對報告中是否智能解析比對被Link的圖片\r\n這會過濾掉無用的變更内容", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 72)));
             this.chkResolvePngLink.TabIndex = 18;
-            this.chkResolvePngLink.Text = "解除png連結";
+            this.chkResolvePngLink.Text = "跟隨png連結";
             // 
             // FrmPatcher
             // 

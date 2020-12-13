@@ -275,14 +275,14 @@ namespace WzComparerR2.CharaSimControl
                     }
                     if (commodity.originalPrice > 0)
                     {
-                        info += commodity.originalPrice + " 樂豆點      ";
+                        info += commodity.originalPrice + "樂豆點      ";
                         totalOriginalPrice += commodity.originalPrice;
                     }
                     else
                     {
                         totalOriginalPrice += commodity.Price;
                     }
-                    info += commodity.Price + " 樂豆點";
+                    info += commodity.Price + "樂豆點";
                     totalPrice += commodity.Price;
                 }
                 else
@@ -290,19 +290,19 @@ namespace WzComparerR2.CharaSimControl
                     info += commodity.Count + "個 ";
                     if (commodity.originalPrice > 0)
                     {
-                        info += commodity.originalPrice + " 樂豆點";
+                        info += commodity.originalPrice + "樂豆點";
                         totalOriginalPrice += commodity.originalPrice;
                     }
                     else
                     {
-                        info += commodity.Price + " 樂豆點";
+                        info += commodity.Price + "樂豆點";
                         totalOriginalPrice += commodity.Price;
                     }
                 }
 
                 if (commodity.Period > 0)
                 {
-                    time = commodity.Period + "使用期限: ";
+                    time ="使用期限: " + commodity.Period;
                 }
 
                 g.DrawImage(Resource.CSDiscount_backgrnd, columnLeft + 13, picH + 12);
@@ -362,13 +362,13 @@ namespace WzComparerR2.CharaSimControl
             g.DrawImage(Resource.CSDiscount_total, 9, picH + 4);
             if (totalOriginalPrice == totalPrice)
             {
-                TextRenderer.DrawText(g, totalPrice + " 樂豆點", GearGraphics.ItemDetailFont, new Point(51, picH), Color.White, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, totalPrice + "樂豆點", GearGraphics.ItemDetailFont, new Point(51, picH), Color.White, TextFormatFlags.NoPadding);
             }
             else
             {
-                TextRenderer.DrawText(g, totalOriginalPrice + " 樂豆點     " + totalPrice + " 樂豆點", GearGraphics.ItemDetailFont, new Point(51, picH), Color.White, TextFormatFlags.NoPadding);
-                TextRenderer.DrawText(g, totalOriginalPrice + " 樂豆點", GearGraphics.ItemDetailFont, new Point(51, picH), Color.Red, TextFormatFlags.NoPadding);
-                g.DrawImage(Resource.CSDiscount_arrow, 50 + TextRenderer.MeasureText(g, totalOriginalPrice + " 樂豆點", GearGraphics.ItemDetailFont, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width + 5, picH + 3);
+                TextRenderer.DrawText(g, totalOriginalPrice + "樂豆點     " + totalPrice + "樂豆點", GearGraphics.ItemDetailFont, new Point(51, picH), Color.White, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, totalOriginalPrice + "樂豆點", GearGraphics.ItemDetailFont, new Point(51, picH), Color.Red, TextFormatFlags.NoPadding);
+                g.DrawImage(Resource.CSDiscount_arrow, 50 + TextRenderer.MeasureText(g, totalOriginalPrice + "樂豆點", GearGraphics.ItemDetailFont, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width + 5, picH + 3);
                 DrawDiscountNum(g, "-" + (int)((100 - 100.0 * totalPrice / totalOriginalPrice)) + "%", cashBitmap.Width - 9, picH + 2, StringAlignment.Far);
             }
             picH += 11;

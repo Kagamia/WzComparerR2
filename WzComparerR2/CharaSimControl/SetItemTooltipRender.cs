@@ -36,16 +36,18 @@ namespace WzComparerR2.CharaSimControl
             {
                 return null;
             }
+            
+            bool specialPetSetEffectName = this.SetItem.ItemIDs.Parts.Any(p => p.Value.ItemIDs.Any(i => isSpecialPet(i.Key)));
 
             int width = 261;
             int picHeight1;
-            Bitmap originBmp = RenderSetItem(out picHeight1);
+            Bitmap originBmp = RenderSetItem(specialPetSetEffectName, out picHeight1);
             int picHeight2 = 0;
             Bitmap effectBmp = null;
 
             if (this.SetItem.ExpandToolTip)
             {
-                effectBmp = RenderEffectPart(out picHeight2);
+                effectBmp = RenderEffectPart(specialPetSetEffectName, out picHeight2);
                 width += 261;
             }
 
@@ -68,8 +70,24 @@ namespace WzComparerR2.CharaSimControl
             g.Dispose();
             return tooltip;
         }
+        
+        private bool isSpecialPet(int itemID)
+        {
+            if (itemID / 1000000 != 5)
+            {
+                return false;
+            }
+            Wz_Node itemNode = PluginBase.PluginManager.FindWz(string.Format(@"Item\Pet\{0:D7}.img", itemID));
+            if (itemNode != null)
+            {
+                var item = Item.CreateFromNode(itemNode, PluginManager.FindWz);
+                int value;
+                return item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && (value == 1 || value == 4 || value == 5 || value == 6);
+            }
+            return false;
+        }
 
-        private Bitmap RenderSetItem(out int picHeight)
+        private Bitmap RenderSetItem(bool specialPetSetEffectName, out int picHeight)
         {
             Bitmap setBitmap = new Bitmap(261, DefaultPicHeight);
             Graphics g = Graphics.FromImage(setBitmap);
@@ -189,6 +207,11 @@ namespace WzComparerR2.CharaSimControl
                     {
                         typeName = "(" + typeName + ")";
                     }
+                    
+                    if (this.SetItem.Effects.Count > 1 && this.SetItem.ItemIDs.Parts.Count == 1)
+                    {
+                        typeName += "  [0/3]";
+                    }
 
                     if (!partNames.Contains(itemName + typeName))
                     {
@@ -265,7 +288,7 @@ namespace WzComparerR2.CharaSimControl
                 picHeight += 5;
                 g.DrawLine(Pens.White, 6, picHeight, 254, picHeight);//分割线
                 picHeight += 9;
-                RenderEffect(g, ref picHeight);
+                RenderEffect(g, specialPetSetEffectName, ref picHeight);
             }
             picHeight += 11;
 
@@ -274,12 +297,12 @@ namespace WzComparerR2.CharaSimControl
             return setBitmap;
         }
 
-        private Bitmap RenderEffectPart(out int picHeight)
+        private Bitmap RenderEffectPart(bool specialPetSetEffectName, out int picHeight)
         {
             Bitmap effBitmap = new Bitmap(261, DefaultPicHeight);
             Graphics g = Graphics.FromImage(effBitmap);
             picHeight = 9;
-            RenderEffect(g, ref picHeight);
+            RenderEffect(g, specialPetSetEffectName, ref picHeight);
             picHeight += 11;
             g.Dispose();
             return effBitmap;
@@ -288,7 +311,7 @@ namespace WzComparerR2.CharaSimControl
         /// <summary>
         /// 绘制套装属性。
         /// </summary>
-        private void RenderEffect(Graphics g, ref int picHeight)
+        private void RenderEffect(Graphics g, bool specialPetSetEffectName, ref int picHeight)
         {
             foreach (KeyValuePair<int, SetItemEffect> effect in this.SetItem.Effects)
             {
@@ -296,6 +319,10 @@ namespace WzComparerR2.CharaSimControl
                 if (this.SetItem.SetItemID < 0)
                 {
                     effTitle = $"伺服器内重複裝備效果({effect.Key} / {this.SetItem.CompleteCount})";
+                }
+                else if (specialPetSetEffectName && this.SetItem.SetItemName.EndsWith(" 세트"))
+                {
+                    effTitle = $"{Regex.Replace(this.SetItem.SetItemName, " 세트$", "")} {effect.Key}세트 효과";
                 }
                 else
                 {

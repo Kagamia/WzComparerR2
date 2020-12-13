@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Runtime.InteropServices;
 using WzComparerR2.WzLib;
 using WzComparerR2.Common;
 
@@ -154,7 +155,8 @@ namespace WzComparerR2.Comparer
                             //对比node的绝对路径
                             var left = (arrayNew[l] as WzVirtualNodeAgent).Target.LinkNodes;
                             var right = (arrayOld[r] as WzVirtualNodeAgent).Target.LinkNodes;
-                            var compFunc2 = new Comparison<Wz_Node>((a, b) => string.Compare(a.FullPathToFile, b.FullPathToFile));
+                            //var compFunc2 = new Comparison<Wz_Node>((a, b) => string.Compare(a.FullPathToFile, b.FullPathToFile));
+                            var compFunc2 = new Comparison<Wz_Node>((a, b) => StrCmpLogicalW(a.FullPathToFile, b.FullPathToFile));
                             left.Sort(compFunc2);
                             right.Sort(compFunc2);
 
@@ -228,7 +230,7 @@ namespace WzComparerR2.Comparer
                                         {
                                             if (newPng != oldPng && !CompareData(newPng, oldPng)) //对比有差异 不输出dummy
                                             {
-                                                //yield return new CompareDifference(nodeNew.LinkNode, nodeOld.LinkNode, DifferenceType.Changed);
+                                                yield return new CompareDifference(nodeNew.LinkNode, nodeOld.LinkNode, DifferenceType.Changed);
                                             }
                                             else
                                             {
@@ -251,7 +253,7 @@ namespace WzComparerR2.Comparer
                             {
                                 foreach (CompareDifference diff in Compare(arrayNew[l], arrayOld[r]))
                                 {
-                                    if (linkFilter) // && diff.DifferenceType != DifferenceType.Changed) [s]过滤新增或删除[/s] 全部过滤
+                                    /*if (linkFilter) // && diff.DifferenceType != DifferenceType.Changed) [s]过滤新增或删除[/s] 全部过滤
                                     {
                                         if ((diff.NodeNew?.ParentNode == arrayNew[l].LinkNode
                                             || diff.NodeOld?.ParentNode == arrayOld[r].LinkNode)) //差异节点为当前的子级
@@ -262,7 +264,7 @@ namespace WzComparerR2.Comparer
                                                 continue;
                                             }
                                         }
-                                    }
+                                    }*/
                                     yield return diff;
                                 }
                             }
@@ -470,7 +472,8 @@ namespace WzComparerR2.Comparer
 
             public int CompareTo(ComparableNode other)
             {
-                return Math.Sign(string.CompareOrdinal(this.Name, other.Name));
+                //return Math.Sign(string.CompareOrdinal(this.Name, other.Name));
+                return Math.Sign(StrCmpLogicalW(this.Name, other.Name));
             }
         }
 
@@ -678,5 +681,8 @@ namespace WzComparerR2.Comparer
             Inlink = 1,
             Outlink = 2
         }
+
+        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
+        static extern int StrCmpLogicalW(string psz1, string psz2);
     }
 }

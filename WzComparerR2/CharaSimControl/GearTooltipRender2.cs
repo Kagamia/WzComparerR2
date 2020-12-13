@@ -281,6 +281,7 @@ namespace WzComparerR2.CharaSimControl
             //分割线1号
             picH += 7;
             g.DrawImage(res["dotline"].Image, 0, picH);
+            picH += 1;
 
             //绘制装备图标
             if (Gear.Grade > 0 && (int)Gear.Grade <= 4) //绘制外框
@@ -334,7 +335,7 @@ namespace WzComparerR2.CharaSimControl
                 }
                 if (cashImg == null) //default cashImg
                 {
-                   cashImg = Resource.CashItem_0;
+                    cashImg = Resource.CashItem_0;
                 }
 
                 g.DrawImage(GearGraphics.EnlargeBitmap(cashImg),
@@ -760,7 +761,9 @@ namespace WzComparerR2.CharaSimControl
                         incline += "， " + inclineString[i] + value;
                     }
                 }
-                
+
+                desc.Add("");
+
                 if (!string.IsNullOrEmpty(incline))
                 {
                     desc.Add("\n #c裝備時可獲得僅限1次" + incline.Substring(2) + "的經驗值。#");
@@ -1124,7 +1127,7 @@ namespace WzComparerR2.CharaSimControl
                 int value2;
                 if (Gear.Props.TryGetValue(GearPropType.sharableOnce, out value2) && value2 != 0)
                 {
-                    tags.Add(ItemStringHelper.GetGearPropString(GearPropType.sharableOnce, value2));
+                    tags.AddRange(ItemStringHelper.GetGearPropString(GearPropType.sharableOnce, value2).Split('\n'));
                 }
                 else
                 {
@@ -1135,17 +1138,21 @@ namespace WzComparerR2.CharaSimControl
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.blockGoldHammer, value));
             }
-            if ((Gear.Props.TryGetValue(GearPropType.fixedPotential, out value) && value != 0) || (Gear.Props.TryGetValue(GearPropType.fixedGrade, out value) && value != 0))
-            {
-                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.fixedPotential, value));
-            }
             if (Gear.Props.TryGetValue(GearPropType.noPotential, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.noPotential, value));
             }
+            if ((Gear.Props.TryGetValue(GearPropType.fixedPotential, out value) && value != 0) || (Gear.Props.TryGetValue(GearPropType.fixedGrade, out value) && value != 0))
+            {
+                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.fixedPotential, value));
+            }
             if (Gear.Props.TryGetValue(GearPropType.notExtend, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.notExtend, value));
+            }
+            if (Gear.Props.TryGetValue(GearPropType.cantRepair, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.cantRepair, value));
             }
 
             return tags;
@@ -1185,17 +1192,21 @@ namespace WzComparerR2.CharaSimControl
             Size size;
             //需求等級
             this.Gear.Props.TryGetValue(GearPropType.reqLevel, out value);
+            int reduceReq = 0;
             {
-                int reduceReq;
-                if (this.Gear.Props.TryGetValue(GearPropType.reduceReq, out reduceReq))
-                {
-                    value = Math.Max(0, value - reduceReq);
-                }
+                this.Gear.Props.TryGetValue(GearPropType.reduceReq, out reduceReq);
             }
-            can = this.charStat == null || this.charStat.Level >= value;
-            type = GetReqType(can, value);
+            int value2 = Math.Max(0, value - reduceReq);
+            can = this.charStat == null || this.charStat.Level >= value2;
+            type = GetReqType(can, value2);
             g.DrawImage(FindReqImage(type, "reqLEV", out size), x, y);
-            DrawReqNum(g, value.ToString().PadLeft(3), (type == NumberType.Can ? NumberType.YellowNumber : type), x + 54, y, StringAlignment.Near);
+            int levX = DrawReqNum(g, value2.ToString().PadLeft(3), (type == NumberType.Can ? NumberType.YellowNumber : type), x + 54, y, StringAlignment.Near);
+            if (reduceReq != 0)
+            {
+                DrawReqNum(g, $"({value.ToString()}-{reduceReq.ToString()})", NumberType.Can, levX + 2, y, StringAlignment.Near);
+                DrawReqNum(g, $"({value.ToString()}-{reduceReq.ToString()}", NumberType.YellowNumber, levX + 2, y, StringAlignment.Near);
+                DrawReqNum(g, $"({value.ToString()}", NumberType.Can, levX + 2, y, StringAlignment.Near);
+            }
 
             //需求人氣
             this.Gear.Props.TryGetValue(GearPropType.reqPOP, out value);
@@ -1371,7 +1382,7 @@ namespace WzComparerR2.CharaSimControl
                     }
                     picH += 18;
                 }
-                picH -= 1;
+                //picH -= 1;
             }
         }
 
@@ -1385,10 +1396,10 @@ namespace WzComparerR2.CharaSimControl
                 return NumberType.Cannot;
         }
 
-        private void DrawReqNum(Graphics g, string numString, NumberType type, int x, int y, StringAlignment align)
+        private int DrawReqNum(Graphics g, string numString, NumberType type, int x, int y, StringAlignment align)
         {
             if (g == null || numString == null || align == StringAlignment.Center)
-                return;
+                return x;
             int spaceWidth = type == NumberType.LookAhead ? 3 : 6;
             bool near = align == StringAlignment.Near;
 
@@ -1406,10 +1417,16 @@ namespace WzComparerR2.CharaSimControl
                         break;
                     case '-':
                         image = Resource.ResourceManager.GetObject("UIToolTip_img_Item_Equip_" + type.ToString() + "_" + "minus") as Image;
-                        origin.Y = 3;
+                        origin.Y = 2;
                         break;
                     case '%':
                         image = Resource.ResourceManager.GetObject("UIToolTip_img_Item_Equip_" + type.ToString() + "_" + "percent") as Image;
+                        break;
+                    case '(':
+                        image = Resource.ResourceManager.GetObject("UIToolTip_img_Item_Equip_" + type.ToString() + "_" + "leftParenthesis") as Image;
+                        break;
+                    case ')':
+                        image = Resource.ResourceManager.GetObject("UIToolTip_img_Item_Equip_" + type.ToString() + "_" + "rightParenthesis") as Image;
                         break;
                     default:
                         if ('0' <= c && c <= '9')
@@ -1442,6 +1459,7 @@ namespace WzComparerR2.CharaSimControl
                     x += spaceWidth * (near ? 1 : -1);
                 }
             }
+            return x;
         }
 
         private Image GetAdditionalOptionIcon(GearGrade grade)

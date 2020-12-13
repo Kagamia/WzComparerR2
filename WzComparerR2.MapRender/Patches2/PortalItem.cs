@@ -41,7 +41,7 @@ namespace WzComparerR2.MapRender.Patches2
             return item;
         }
 
-        public static readonly string[] PortalTypes = new[] { "sp", "pi", "pv", "pc", "pg", "tp", "ps", "pgi", "psi", "pcs", "ph", "psh", "pcj", "pci", "pcig", "pshg" };
+        public static readonly string[] PortalTypes = new[] { "sp", "pi", "pv", "pc", "pg", "tp", "ps", "pgi", "psi", "pcs", "ph", "psh", "pcj", "pci", "pcig", "pshg", "pcc" };
 
         public class ItemView
         {

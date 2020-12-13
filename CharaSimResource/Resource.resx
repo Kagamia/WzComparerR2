@@ -760,6 +760,12 @@
   <data name="UIToolTip_img_Item_Equip_Cannot_plus" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\UIToolTip.img.Item.Equip.Cannot.plus.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="UIToolTip_img_Item_Equip_Cannot_leftParenthesis" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\UIToolTip.img.Item.Equip.Cannot.(.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UIToolTip_img_Item_Equip_Cannot_rightParenthesis" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\UIToolTip.img.Item.Equip.Cannot.).png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="UIToolTip_img_Item_Equip_Cannot_reqDEX" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\UIToolTip.img.Item.Equip.Cannot.reqDEX.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -838,6 +844,12 @@
   <data name="UIToolTip_img_Item_Equip_Can_plus" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\UIToolTip.img.Item.Equip.Can.+.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="UIToolTip_img_Item_Equip_Can_leftParenthesis" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\UIToolTip.img.Item.Equip.Can.(.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UIToolTip_img_Item_Equip_Can_rightParenthesis" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\UIToolTip.img.Item.Equip.Can.).png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="UIToolTip_img_Item_Equip_Disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\UIToolTip.img.Item.Equip.Disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -879,6 +891,12 @@
   </data>
   <data name="UIToolTip_img_Item_Equip_Disabled_plus" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\UIToolTip.img.Item.Equip.Disabled.plus.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UIToolTip_img_Item_Equip_Disabled_leftParenthesis" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\UIToolTip.img.Item.Equip.Disabled.(.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UIToolTip_img_Item_Equip_Disabled_rightParenthesis" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\UIToolTip.img.Item.Equip.Disabled.).png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="UIToolTip_img_Item_Equip_Disabled_reqDEX" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\UIToolTip.img.Item.Equip.Disabled.reqDEX.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -1078,14 +1096,20 @@
   <data name="UIToolTip_img_Item_Equip_YellowNumber_none" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\UIToolTip.img.Item.Equip.YellowNumber.none.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="UIToolTip_img_Item_Equip_YellowNumber__" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="UIToolTip_img_Item_Equip_YellowNumber_percent" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\UIToolTip.img.Item.Equip.YellowNumber.%.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="UIToolTip_img_Item_Equip_YellowNumber__1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="UIToolTip_img_Item_Equip_YellowNumber_minus" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\UIToolTip.img.Item.Equip.YellowNumber.-.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="UIToolTip_img_Item_Equip_YellowNumber__2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="UIToolTip_img_Item_Equip_YellowNumber_plus" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\UIToolTip.img.Item.Equip.YellowNumber.+.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UIToolTip_img_Item_Equip_YellowNumber_leftParenthesis" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\UIToolTip.img.Item.Equip.YellowNumber.(.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UIToolTip_img_Item_Equip_YellowNumber_rightParenthesis" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\UIToolTip.img.Item.Equip.YellowNumber.).png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="UIWindow2_img_MiniMap_MaxMap_c" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\UIWindow2.img.MiniMap.MaxMap.c.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -1554,6 +1578,9 @@
   </data>
   <data name="Stat_detail_metierLine_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Stat.detail.metierLine.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Stat_detail_metierLine_disabled_1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Stat.detail.metierLine.disabled.1.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Stat_main_BtHyperStatClose_disabled_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Stat.main.BtHyperStatClose.disabled.0.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

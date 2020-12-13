@@ -374,8 +374,14 @@ namespace WzComparerR2
                             //comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], this.compareFolder);
                             foreach (PatchPartContext part in typedParts[e.Part.WzType])
                             {
-                                wznew.Load(part.TempFilePath, false);
-                                wzold.Load(part.OldFilePath, false);
+                                if (part.Type != 2)
+                                {
+                                    wznew.Load(part.TempFilePath, false);
+                                }
+                                if (part.Type != 0)
+                                {
+                                    wzold.Load(part.OldFilePath, false);
+                                }
                             }
                             if (htmlFilePath == null)
                             {
