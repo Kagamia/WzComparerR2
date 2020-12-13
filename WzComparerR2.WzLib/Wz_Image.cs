@@ -72,7 +72,16 @@ namespace WzComparerR2.WzLib
                 {
                     if (!this.IsLuaImage)
                     {
-                        TryDetectEnc();
+                        try
+                        {
+                            TryDetectEnc();
+                        }
+                        catch (Exception ex)
+                        {
+                            e = ex;
+                            this.Unextract();
+                            return false;
+                        }
                     }
                 }
 
