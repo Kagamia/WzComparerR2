@@ -290,7 +290,7 @@ namespace WzComparerR2.MapRender.UI
             if (spot != null)
             {
                 //计算属性要求 获取怪物列表和npc列表
-                int spotBarrier = 0, spotBarrierArc = 0;
+                int spotBarrier = 0, spotBarrierArc = 0, spotBarrierAut = 0;
                 var mobNames = new List<string>();
                 var npcNames = new List<string>();
                 int minLevel = 0, maxLevel = 0;
@@ -307,8 +307,10 @@ namespace WzComparerR2.MapRender.UI
                         {
                             int barrier = mapNode?.Nodes["barrier"].GetValueEx(0) ?? 0;
                             int barrierArc = mapNode?.Nodes["barrierArc"].GetValueEx(0) ?? 0;
+                            int barrierAut = mapNode?.Nodes["barrierAut"].GetValueEx(0) ?? 0;
                             spotBarrier = Math.Max(spotBarrier, barrier);
                             spotBarrierArc = Math.Max(spotBarrierArc, barrierArc);
+                            spotBarrierAut = Math.Max(spotBarrierAut, barrierAut);
                         }
 
                         var mapInfo = PluginManager.FindWz(string.Format("Etc/MapObjectInfo.img/{0}", mapNo));
@@ -403,7 +405,7 @@ namespace WzComparerR2.MapRender.UI
                 //属性要求
                 List<object> part1 = null;
                 float part1Width = 0;
-                if (spotBarrier > 0 || spotBarrierArc > 0)
+                if (spotBarrier > 0 || spotBarrierArc > 0 || spotBarrierAut > 0)
                 {
                     part1 = new List<object>();
                     Action<int, Texture2D, Color> addBarrier = (barrier, icon, foreColor) =>
@@ -429,6 +431,11 @@ namespace WzComparerR2.MapRender.UI
                     {
                         var icon = Content.Load<Texture2D>(nameof(MRes.UIWindow_img_ToolTip_WorldMap_ArcaneForce));
                         addBarrier(spotBarrierArc, icon, new Color(221, 170, 255));
+                    }
+                    else if (spotBarrierAut > 0)
+                    {
+                        var icon = Content.Load<Texture2D>(nameof(MRes.UIWindow_img_ToolTip_WorldMap_AuthenticForce));
+                        addBarrier(spotBarrierAut, icon, new Color(221, 170, 255));
                     }
 
                     part1Width = current.X;
@@ -492,7 +499,7 @@ namespace WzComparerR2.MapRender.UI
                     //怪物列表
                     Texture2D icon;
                     Color color;
-                    if (spotBarrier > 0 || spotBarrierArc > 0)
+                    if (spotBarrier > 0 || spotBarrierArc > 0 || spotBarrierAut > 0)
                     {
                         icon = Content.Load<Texture2D>(nameof(MRes.UIWindow_img_ToolTip_WorldMap_enchantMob));
                         color = new Color(255, 0, 102);
