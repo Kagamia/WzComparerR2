@@ -139,6 +139,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incACC_incEVA: return "命中值/回避值：" + sign + value;
 
                 case GearPropType.incARC: return "ARC : " + sign + value;
+                case GearPropType.incAUT: return "AUT : " + sign + value;
                 default: return null;
             }
         }
