@@ -177,7 +177,7 @@ namespace WzComparerR2
             if (chkCompare.Checked)
             {
                 FolderBrowserDialog dlg = new FolderBrowserDialog();
-                dlg.Description = "Please select the comparison report output folder";
+                dlg.Description = "Please select the comparison report output folder.";
                 if (dlg.ShowDialog() != DialogResult.OK)
                 {
                     return;
@@ -244,15 +244,15 @@ namespace WzComparerR2
                         }
                     }
                 }
-                AppendStateText("Starting Update\r\n");
+                AppendStateText("Starting Update: \r\n");
                 DateTime time = DateTime.Now;
                 patcher.Patch(msFolder);
                 TimeSpan interval = DateTime.Now - time;
-                MessageBoxEx.Show(this, "End of Patch, Time" + interval.ToString(), "Patcher");
+                MessageBoxEx.Show(this, "End of Patch, Time Elapsed: " + interval.ToString(), "Patcher");
             }
             catch (ThreadAbortException)
             {
-                MessageBoxEx.Show("Patch Aborted。", "Patcher");
+                MessageBoxEx.Show("Patch Aborted.", "Patcher");
             }
             catch (Exception ex)
             {
@@ -279,7 +279,7 @@ namespace WzComparerR2
             switch (e.State)
             {
                 case PatchingState.PatchStart:
-                    AppendStateText("Starting Update" + e.Part.FileName + "\r\n");
+                    AppendStateText("Starting Update: " + e.Part.FileName + "\r\n");
                     break;
                 case PatchingState.VerifyOldChecksumBegin:
                     AppendStateText("  Checking old file checksum...");

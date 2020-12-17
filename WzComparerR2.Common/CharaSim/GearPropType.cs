@@ -162,12 +162,21 @@ namespace WzComparerR2.CharaSim
         limitBreak,
         nActivatedSocket,
         jokerToSetItem,
+        plusToSetItem,
         medalTag,
         ringOptionSkill,
         ringOptionSkillLv,
         abilityTimeLimited,
         blockGoldHammer,
         exceptUpgrade,
+        noMoveToLocker,
+        onlyUpgrade,
+        cantRepair,
         colorvar,
+
+        gatherTool_incSkillLevel = 2000,
+        gatherTool_incSpeed,
+        gatherTool_incNum,
+        gatherTool_reqSkillLevel,
     }
 }

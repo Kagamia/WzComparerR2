@@ -99,7 +99,7 @@ namespace WzComparerR2.CharaSim
 
                 case GearPropType.only: return value == 0 ? null : "One-of-a-kind item";
                 case GearPropType.tradeBlock: return value == 0 ? null : "Untradeable";
-                case GearPropType.equipTradeBlock: return value == 0 ? null : "Untradeable Once Equipped";
+                case GearPropType.equipTradeBlock: return value == 0 ? null : "Cannot be Traded when equipped";
                 case GearPropType.accountSharable: return value == 0 ? null : "Tradeable within account";
                 case GearPropType.sharableOnce: return value == 0 ? null : "Tradeable within account once";
                 case GearPropType.onlyEquip: return value == 0 ? null : "Unique Equipped Item";
@@ -122,6 +122,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.superiorEqp: return value == 0 ? null : "Allows you to gain even higher stats with successful item enhancement.";
                 case GearPropType.nActivatedSocket: return value == 0 ? null : "#cYou can mount a Nebulite on this item.#";
                 case GearPropType.jokerToSetItem: return value == 0 ? null : "#cThis lucky item counts toward any set, so long as you have at least 3 set pieces equipped!#";
+                case GearPropType.plusToSetItem: return value == 0 ? null : "#cWhen equipped, the item set will count as having equipped two.#";
                 case GearPropType.abilityTimeLimited: return value == 0 ? null : "Time Limited Stats";
                 case GearPropType.blockGoldHammer: return value == 0 ? null : "Golden Hammer cannot be used.";
                 // case GearPropType.colorvar: return value == 0 ? null : "#cè¯¥è£…å¤‡å¯é€šè¿‡æŸ“è‰²é¢œæ–™æ¥å˜æ›´é¢œè‰².#";
@@ -379,27 +380,27 @@ namespace WzComparerR2.CharaSim
             switch (type)
             {
                 //0xxx
-                case GearType.heroMedal: return "Fighter job branch only";
-                case GearType.rosario: return "Page job branch only";
-                case GearType.chain: return "Spearman job branch only";
-                case GearType.book1: return "Fire/Poison Magician job branch only";
-                case GearType.book2: return "Ice/Lightning Magician job branch only";
-                case GearType.book3: return "Cleric job branch only";
-                case GearType.bowMasterFeather: return "Hunter job branch only";
-                case GearType.crossBowThimble: return "Crossbowman job branch only";
-                case GearType.shadowerSheath: return "Bandit job branch only";
-                case GearType.nightLordPoutch: return "Assassin job branch only";
-                case GearType.katara: return "Dual Blades Only";
-                case GearType.viperWristband: return "Brawler job branch only";
-                case GearType.captainSight: return "Gunslinger job branch only";
+                case GearType.heroMedal: return "Hero only";
+                case GearType.rosario: return "Paladin only";
+                case GearType.chain: return "Dark Knight only";
+                case GearType.book1: return "Fire/Poison Magician branch only";
+                case GearType.book2: return "Ice/Lightning Magician branch only";
+                case GearType.book3: return "Bishop Magician only";
+                case GearType.bowMasterFeather: return "Bow Master only";
+                case GearType.crossBowThimble: return "Marksman only";
+                case GearType.shadowerSheath: return "Shadower only";
+                case GearType.nightLordPoutch: return "Night Lord only";
+                case GearType.katara: return "Dual Blade only";
+                case GearType.viperWristband: return "Buccaneer only";
+                case GearType.captainSight: return "Corsair only";
                 case GearType.connonGunPowder:
-                case GearType.connonGunPowder2: return "Cannoneers Only";
+                case GearType.connonGunPowder2: return "Cannoneer only";
                 case GearType.box:
                 case GearType.boxingClaw: return "Jett Only";
-                case GearType.relic: return "Can be equipped by the Pathfinder.";
+                case GearType.relic: return "Pathfinder only";
 
                 //1xxx
-                case GearType.cygnusGem: return "Cygnus Knights Only";
+                case GearType.cygnusGem: return "Cygnus Knights only";
 
                 //2xxx
                 case GearType.aranPendulum: return GetExtraJobReqString(21);
@@ -412,10 +413,10 @@ namespace WzComparerR2.CharaSim
 
                 //3xxx
                 case GearType.demonShield: return GetExtraJobReqString(31);
-                case GearType.desperado: return "Demon Avenger Only";
-                case GearType.battlemageBall: return "Battle Mages Only";
-                case GearType.wildHunterArrowHead: return "Wild Hunters Only";
-                case GearType.mailin: return "Mechanics Only";
+                case GearType.desperado: return "Demon Avenger only";
+                case GearType.battlemageBall: return "Battle Mage only";
+                case GearType.wildHunterArrowHead: return "Wild Hunter only";
+                case GearType.mailin: return "Mechanic only";
                 case GearType.controller:
                 case GearType.energySword: return GetExtraJobReqString(36);
                 case GearType.GauntletBuster:
@@ -469,28 +470,28 @@ namespace WzComparerR2.CharaSim
         {
             switch (specJob)
             {
-                case 21: return "Aran Only";
-                case 22: return "Evan Only";
-                case 23: return "Mercedes Only";
-                case 24: return "Phantom Only";
-                case 25: return "Shade Only";
-                case 27: return "Luminous Only";
-                case 31: return "Demon Only";
-                case 36: return "Xenon Only";
+                case 21: return "Aran only";
+                case 22: return "Evan only";
+                case 23: return "Mercedes only";
+                case 24: return "Phantom only";
+                case 25: return "Shade only";
+                case 27: return "Luminous only";
+                case 31: return "Demon only";
+                case 36: return "Xenon only";
                 case 37: return "Blaster only";
-                case 41: return "Hayato Only";
-                case 42: return "Kanna Only";
-                case 51: return "Mihile Only";
-                case 61: return "Kaiser Only";
-                case 64: return "Cadena Only";
-                case 65: return "Angelic Buster Only";
-                case 101: return "Zero Only";
-                case 112: return "Beast Tamers Only";
+                case 41: return "Hayato only";
+                case 42: return "Kanna only";
+                case 51: return "Mihile only";
+                case 61: return "Kaiser only";
+                case 64: return "Cadena only";
+                case 65: return "Angelic Buster only";
+                case 101: return "Zero only";
+                case 112: return "Beast Tamer only";
                 case 142: return "Kinesis only";
-                case 151: return "Adele Only";
-                case 152: return "Illium Only";
-                case 155: return "Ark Only";
-                case 164: return "Hoyoung Only";
+                case 151: return "Adele only";
+                case 152: return "Illium only";
+                case 155: return "Ark only";
+                case 164: return "Hoyoung only";
                 default: return null;
             }
         }

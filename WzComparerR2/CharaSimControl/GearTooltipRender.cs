@@ -438,29 +438,30 @@ namespace WzComparerR2.CharaSimControl
             if (gear.State == GearState.itemList)
             {
                 string incline = null;
-                GearPropType[] inclineTypes = new GearPropType[]{
+                GearPropType[] inclineTypes = new GearPropType[] {
                     GearPropType.charismaEXP,
                     GearPropType.senseEXP,
                     GearPropType.insightEXP,
                     GearPropType.willEXP,
                     GearPropType.craftEXP,
-                    GearPropType.charmEXP };
+                    GearPropType.charmEXP
+                };
 
-                string[] inclineString = new string[]{
-                    "Ambition ","Empathy ","Insight ","Willpower ","Diligence ","Charm "};
+                string[] inclineString = new string[] {
+                    " Ambition", " Empathy", " Insight", " Willpower", " Diligence", " Charm"};
 
                 for (int i = 0; i < inclineTypes.Length; i++)
                 {
                     if (gear.Props.TryGetValue(inclineTypes[i], out value) && value > 0)
                     {
-                        incline += "，" + inclineString[i] + value;
+                        incline += "，" + value + inclineString[i];
                     }
                 }
 
                 if (!string.IsNullOrEmpty(incline))
                 {
                     picHeight -= 5;
-                    GearGraphics.DrawString(g, "#c" + incline.Substring(1) + " EXP can be obtained once when equipped.#",
+                    GearGraphics.DrawString(g, "#cGrants " + incline.Substring(1) + " EXP when first equipped (up to the daily maximum).#",
                         GearGraphics.ItemDetailFont, 8, 236, ref picHeight, 16);
                     picHeight += 8;
                 }

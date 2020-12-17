@@ -687,6 +687,7 @@ namespace WzComparerR2.CharaSimControl
                 GearPropType.tradeAvailable,
                 GearPropType.accountShareTag,
                 GearPropType.jokerToSetItem,
+                GearPropType.plusToSetItem,
                 GearPropType.colorvar,
             };
             foreach (GearPropType type in descTypes)
