@@ -24,6 +24,7 @@ namespace WzComparerR2.CharaSim
         incMMPr,
         incMDF,
         incARC,
+        incAUT,
         incPAD_incMAD,
         incPAD,
         incMAD,
@@ -167,14 +168,6 @@ namespace WzComparerR2.CharaSim
         abilityTimeLimited,
         blockGoldHammer,
         exceptUpgrade,
-        noMoveToLocker,
-        onlyUpgrade,
-        cantRepair,
         colorvar,
-
-        gatherTool_incSkillLevel = 2000,
-        gatherTool_incSpeed,
-        gatherTool_incNum,
-        gatherTool_reqSkillLevel,
     }
 }
