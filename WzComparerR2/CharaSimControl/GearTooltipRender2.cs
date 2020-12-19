@@ -710,20 +710,20 @@ namespace WzComparerR2.CharaSimControl
                     GearPropType.craftEXP,
                     GearPropType.charmEXP };
 
-                string[] inclineString = new string[]{
-                    "Ambition ","Empathy ","Insight ","Willpower ","Diligence ","Charm "};
+                string[] inclineString = new string[] {
+                    " Ambition", " Empathy", " Insight", " Willpower", " Diligence", " Charm"};
 
                 for (int i = 0; i < inclineTypes.Length; i++)
                 {
                     if (Gear.Props.TryGetValue(inclineTypes[i], out value) && value > 0)
                     {
-                        incline += "，" + inclineString[i] + value;
+                        incline += "，" + value + inclineString[i];
                     }
                 }
 
                 if (!string.IsNullOrEmpty(incline))
                 {
-                    desc.Add("\n#c" + incline.Substring(1) + " EXP can be obtained once when equipped.#");
+                    desc.Add("\n#cGrants " + incline.Substring(1) + " EXP when first equipped (up to the daily maximum).#");
                 }
             }
 
