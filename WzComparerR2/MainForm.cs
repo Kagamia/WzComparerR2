@@ -1,5 +1,5 @@
-﻿using System; 
-using System.Collections.Generic; 
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -43,6 +43,7 @@ namespace WzComparerR2
             RegisterPluginEvents();
             createStyleItems();
             initFields();
+            loadUIState();
         }
 
         List<Wz_Structure> openedWz;
@@ -106,6 +107,78 @@ namespace WzComparerR2
                 cmbComparePng.Items.Add(comp);
             }
             cmbComparePng.SelectedItem = WzPngComparison.SizeAndDataLength;
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            saveUIState();
+        }
+
+        private void saveUIState()
+        {
+            UIStateConfig.Default.WindowState = (int)this.WindowState;
+            UIStateConfig.Default.WindowWidth = this.Size.Width;
+            UIStateConfig.Default.WindowHeight = this.Size.Height;
+            UIStateConfig.Default.RibbonExpanded = this.ribbonControl1.Expanded;
+            UIStateConfig.Default.SelectedRibbonTabIndex = this.ribbonControl1.SelectedRibbonTabItem.Name.Last() - '0';
+            UIStateConfig.Default.SplitterPosition1 = this.expandableSplitter1.SplitPosition;
+            UIStateConfig.Default.SplitterPosition2 = this.expandableSplitter2.SplitPosition;
+            UIStateConfig.Default.ColumnWidth3 = this.columnHeader3.Width.Absolute;
+            UIStateConfig.Default.ColumnWidth4 = this.columnHeader4.Width.Absolute;
+            UIStateConfig.Default.ColumnWidth5 = this.columnHeader5.Width.Absolute;
+            UIStateConfig.Default.ColumnWidth6 = this.columnHeader6.Width;
+            UIStateConfig.Default.ColumnWidth7 = this.columnHeader7.Width;
+            UIStateConfig.Default.ColumnWidth8 = this.columnHeader8.Width;
+            UIStateConfig.Default.ColumnWidth9 = this.columnHeader9.Width;
+            UIStateConfig.Default.BarLayout = this.dotNetBarManager1.LayoutDefinition;
+            ConfigManager.Save();
+        }
+
+        private void loadUIState()
+        {
+            try
+            {
+                this.WindowState = (FormWindowState)UIStateConfig.Default.WindowState.Value;
+                this.Size = new Size(UIStateConfig.Default.WindowWidth, UIStateConfig.Default.WindowHeight);
+                if(this.ribbonControl1.Expanded = UIStateConfig.Default.RibbonExpanded)
+                {
+                    switch(UIStateConfig.Default.SelectedRibbonTabIndex)
+                    {
+                        case 1: this.ribbonControl1.SelectedRibbonTabItem = this.ribbonTabItem1; break;
+                        case 2: this.ribbonControl1.SelectedRibbonTabItem = this.ribbonTabItem2; break;
+                        case 3: this.ribbonControl1.SelectedRibbonTabItem = this.ribbonTabItem3; break;
+                        default: this.ribbonControl1.SelectFirstVisibleRibbonTab(); break;
+                    }
+                }
+                this.expandableSplitter1.SplitPosition = UIStateConfig.Default.SplitterPosition1;
+                this.expandableSplitter2.SplitPosition = UIStateConfig.Default.SplitterPosition2;
+                this.columnHeader3.Width.Absolute = UIStateConfig.Default.ColumnWidth3;
+                this.columnHeader4.Width.Absolute = UIStateConfig.Default.ColumnWidth4;
+                this.columnHeader5.Width.Absolute = UIStateConfig.Default.ColumnWidth5;
+                this.columnHeader6.Width = UIStateConfig.Default.ColumnWidth6;
+                this.columnHeader7.Width = UIStateConfig.Default.ColumnWidth7;
+                this.columnHeader8.Width = UIStateConfig.Default.ColumnWidth8;
+                this.columnHeader9.Width = UIStateConfig.Default.ColumnWidth9;
+                this.dotNetBarManager1.LayoutDefinition = UIStateConfig.Default.BarLayout;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Invalid ui data!");
+                this.WindowState = FormWindowState.Normal;
+                this.Size = new Size(1200, 800); // = new Size(766, 520);
+                this.ribbonControl1.Expanded = false; // = false;
+                this.expandableSplitter1.SplitPosition = 468; // = 233;
+                this.expandableSplitter2.SplitPosition = 230; // = 255;
+                this.columnHeader3.Width.Absolute = 150;
+                this.columnHeader4.Width.Absolute = 150;
+                this.columnHeader5.Width.Absolute = 150;
+                this.columnHeader6.Width = 80;
+                this.columnHeader7.Width = 200; // = 100
+                this.columnHeader8.Width = 600; // = 350
+                this.columnHeader9.Width = 250; // = 150
+                this.dotNetBarManager1.LayoutDefinition = "<dotnetbarlayout version=\"6\" zorder=\"7,8,1,0\"><docksite size=\"0\" dockingside=\"Top\" originaldocksitesize=\"0\" /><docksite size=\"182\" dockingside=\"Bottom\" originaldocksitesize=\"0\"><dockcontainer orientation=\"1\" w=\"0\" h=\"0\"><barcontainer w=\"1184\" h=\"179\"><bar name=\"bar1\" dockline=\"0\" layout=\"2\" dockoffset=\"0\" state=\"2\" dockside=\"4\" visible=\"true\"><items><item name=\"dockContainerItem1\" origBar=\"\" origPos=\"-1\" pos=\"0\" /></items></bar></barcontainer></dockcontainer></docksite><docksite size=\"0\" dockingside=\"Left\" originaldocksitesize=\"0\" /><docksite size=\"0\" dockingside=\"Right\" originaldocksitesize=\"0\" /><bars /></dotnetbarlayout>";
+            }
         }
 
         /// <summary>
