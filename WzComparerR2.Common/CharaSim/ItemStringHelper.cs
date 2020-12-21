@@ -208,9 +208,11 @@ namespace WzComparerR2.CharaSim
             {
                 case GearType.body: return "纸娃娃(身体)";
                 case GearType.head: return "纸娃娃(头部)";
-                case GearType.face: return "纸娃娃(脸型)";
+                case GearType.face:
+                case GearType.face2: return "纸娃娃(脸型)";
                 case GearType.hair:
-                case GearType.hair2: return "纸娃娃(发型)";
+                case GearType.hair2:
+                case GearType.hair3: return "纸娃娃(发型)";
                 case GearType.faceAccessory: return "脸饰";
                 case GearType.eyeAccessory: return "眼饰";
                 case GearType.earrings: return "耳环";
