@@ -164,7 +164,6 @@ namespace WzComparerR2
             }
             catch(Exception ex)
             {
-                MessageBox.Show("Invalid ui data!");
                 this.WindowState = FormWindowState.Normal;
                 this.Size = new Size(1200, 800); // = new Size(766, 520);
                 this.ribbonControl1.Expanded = false; // = false;
