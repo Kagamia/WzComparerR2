@@ -25,7 +25,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowProperties { get; set; } = true;
         public bool ShowDelay { get; set; }
         public bool ShowReqSkill { get; set; } = true;
-
+        public bool DisplayCooltimeMSAsSec { get; set; } = true;
 
         public override Bitmap Render()
         {
@@ -116,7 +116,7 @@ namespace WzComparerR2.CharaSimControl
 
             if (Skill.Level > 0)
             {
-                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default);
+                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default, this.DisplayCooltimeMSAsSec);
                 GearGraphics.DrawString(g, "[现在等级 " + Skill.Level + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
                 if (hStr != null)
                 {
@@ -126,7 +126,7 @@ namespace WzComparerR2.CharaSimControl
 
             if (Skill.Level < Skill.MaxLevel)
             {
-                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level + 1, sr, SummaryParams.Default);
+                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level + 1, sr, SummaryParams.Default, this.DisplayCooltimeMSAsSec);
                 GearGraphics.DrawString(g, "[下次等级 " + (Skill.Level + 1) + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
                 if (hStr != null)
                 {

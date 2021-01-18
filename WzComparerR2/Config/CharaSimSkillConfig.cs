@@ -36,6 +36,13 @@ namespace WzComparerR2.Config
             set { this["showReqSkill"] = value; }
         }
 
+        [ConfigurationProperty("displayCooltimeMSAsSec", DefaultValue = true)]
+        public bool DisplayCooltimeMSAsSec
+        {
+            get { return (bool)this["displayCooltimeMSAsSec"]; }
+            set { this["displayCooltimeMSAsSec"] = value; }
+        }
+
         [ConfigurationProperty("defaultLevel", DefaultValue = DefaultLevel.LevelMax)]
         public DefaultLevel DefaultLevel
         {
