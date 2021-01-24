@@ -14,7 +14,7 @@ namespace WzComparerR2.CharaSim
             GlobalVariableMapping["comboConAran"] = "aranComboCon";
         }
 
-        public static string GetSkillSummary(string H, int Level, Dictionary<string, string> CommonProps, SummaryParams param, bool convertCooltimeMS = false)
+        public static string GetSkillSummary(string H, int Level, Dictionary<string, string> CommonProps, SummaryParams param, SkillSummaryOptions options = default)
         {
             if (H == null) return null;
 
@@ -58,9 +58,13 @@ namespace WzComparerR2.CharaSim
                     if (prop != null)
                     {
                         var val = Calculator.Parse(prop, Level);
-                        if (convertCooltimeMS && propKey == "cooltimeMS")
+                        if (options.ConvertCooltimeMS && propKey == "cooltimeMS")
                         {
                             sb.Append((val / 1000).ToString("f2"));
+                        }
+                        else if (options.ConvertPerM && propKey.EndsWith("PerM", StringComparison.Ordinal))
+                        {
+                            sb.Append((val / 100).ToString("f1"));
                         }
                         else
                         {
@@ -177,7 +181,7 @@ namespace WzComparerR2.CharaSim
             return GetSkillSummary(skill, skill.Level, sr, param);
         }
 
-        public static string GetSkillSummary(Skill skill, int level, StringResult sr, SummaryParams param, bool convertCooltimeMS = false)
+        public static string GetSkillSummary(Skill skill, int level, StringResult sr, SummaryParams param, SkillSummaryOptions options = default)
         {
             if (skill == null || sr == null)
                 return null;
@@ -203,9 +207,15 @@ namespace WzComparerR2.CharaSim
                 }
             }
 
-            return GetSkillSummary(h, level, skill.Common, param, convertCooltimeMS);
+            return GetSkillSummary(h, level, skill.Common, param, options);
         }
 
         public static Dictionary<string,string> GlobalVariableMapping { get; private set; }
+    }
+
+    public struct SkillSummaryOptions
+    {
+        public bool ConvertCooltimeMS { get; set; }
+        public bool ConvertPerM { get; set; }
     }
 }

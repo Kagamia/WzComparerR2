@@ -76,6 +76,13 @@ namespace WzComparerR2
         }
 
         [Link]
+        public bool Skill_DisplayPermyriadAsPercent
+        {
+            get { return checkBoxX14.Checked; }
+            set { checkBoxX14.Checked = value; }
+        }
+
+        [Link]
         public bool Gear_ShowID
         {
             get { return checkBoxX3.Checked; }

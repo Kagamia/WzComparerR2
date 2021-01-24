@@ -43,6 +43,13 @@ namespace WzComparerR2.Config
             set { this["displayCooltimeMSAsSec"] = value; }
         }
 
+        [ConfigurationProperty("displayPermyriadAsPercent", DefaultValue = true)]
+        public bool DisplayPermyriadAsPercent
+        {
+            get { return (bool)this["displayPermyriadAsPercent"]; }
+            set { this["displayPermyriadAsPercent"] = value; }
+        }
+
         [ConfigurationProperty("defaultLevel", DefaultValue = DefaultLevel.LevelMax)]
         public DefaultLevel DefaultLevel
         {
