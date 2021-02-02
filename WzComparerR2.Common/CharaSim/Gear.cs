@@ -200,7 +200,8 @@ namespace WzComparerR2.CharaSim
         {
             int _type = (int)type;
             return (_type >= 140 && _type <= 149)
-                || (_type >= 152 && _type <= 159);
+                || (_type >= 152 && _type <= 159)
+                || type == GearType.boxingCannon;
         }
 
         public static bool IsMechanicGear(GearType type)
@@ -300,6 +301,8 @@ namespace WzComparerR2.CharaSim
                     return GearType.shiningRod;
                 case 1213:
                     return GearType.tuner;
+                case 1403:
+                    return GearType.boxingCannon;
             }
             if (code / 10000 == 135)
             {
