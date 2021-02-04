@@ -158,7 +158,8 @@ namespace WzComparerR2.CharaSim
         public static bool IsWeapon(GearType type)
         {
             return IsLeftWeapon(type)
-                || IsDoubleHandWeapon(type);
+                || IsDoubleHandWeapon(type)
+                || type == GearType.boxingCannon;
         }
 
         /// <summary>
@@ -200,8 +201,7 @@ namespace WzComparerR2.CharaSim
         {
             int _type = (int)type;
             return (_type >= 140 && _type <= 149)
-                || (_type >= 152 && _type <= 159)
-                || type == GearType.boxingCannon;
+                || (_type >= 152 && _type <= 159);
         }
 
         public static bool IsMechanicGear(GearType type)

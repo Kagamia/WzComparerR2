@@ -383,7 +383,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             //装备类型
-            bool isWeapon = Gear.IsLeftWeapon(Gear.type) || Gear.IsDoubleHandWeapon(Gear.type);
+            bool isWeapon = Gear.IsWeapon(Gear.type);
             string typeStr = ItemStringHelper.GetGearTypeString(Gear.type);
             if (!string.IsNullOrEmpty(typeStr))
             {
