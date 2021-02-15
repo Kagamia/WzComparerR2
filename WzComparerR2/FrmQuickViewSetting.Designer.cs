@@ -534,9 +534,6 @@
             // 
             this.checkBoxX11.AutoSize = true;
             this.checkBoxX11.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
             this.checkBoxX11.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.checkBoxX11.Location = new System.Drawing.Point(13, 84);
             this.checkBoxX11.Name = "checkBoxX11";
@@ -549,31 +546,25 @@
             // 
             this.checkBoxX13.AutoSize = true;
             this.checkBoxX13.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
             this.checkBoxX13.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.checkBoxX13.Location = new System.Drawing.Point(13, 81);
             this.checkBoxX13.Name = "checkBoxX13";
             this.checkBoxX13.Size = new System.Drawing.Size(138, 18);
             this.checkBoxX13.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX13.TabIndex = 8;
-            this.checkBoxX13.Text = "Cooldown time converted to seconds";
+            this.checkBoxX13.Text = "Convert cooldown time to seconds";
             // 
             // checkBoxX14
             // 
             this.checkBoxX14.AutoSize = true;
             this.checkBoxX14.BackColor = System.Drawing.Color.Transparent;
-            // 
-            // 
-            // 
             this.checkBoxX14.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.checkBoxX14.Location = new System.Drawing.Point(13, 105);
             this.checkBoxX14.Name = "checkBoxX14";
             this.checkBoxX14.Size = new System.Drawing.Size(150, 18);
             this.checkBoxX14.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX14.TabIndex = 9;
-            this.checkBoxX14.Text = "PerM属性转换为百分制";
+            this.checkBoxX14.Text = "Display permyriad attributes as percentages";
             // 
             // FrmQuickViewSetting
             // 
