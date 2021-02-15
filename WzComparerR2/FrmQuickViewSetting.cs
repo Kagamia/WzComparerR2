@@ -69,6 +69,20 @@ namespace WzComparerR2
         }
 
         [Link]
+        public bool Skill_DisplayCooltimeMSAsSec
+        {
+            get { return checkBoxX13.Checked; }
+            set { checkBoxX13.Checked = value; }
+        }
+
+        [Link]
+        public bool Skill_DisplayPermyriadAsPercent
+        {
+            get { return checkBoxX14.Checked; }
+            set { checkBoxX14.Checked = value; }
+        }
+
+        [Link]
         public bool Gear_ShowID
         {
             get { return checkBoxX3.Checked; }

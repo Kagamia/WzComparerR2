@@ -159,7 +159,8 @@ namespace WzComparerR2.CharaSim
         public static bool IsWeapon(GearType type)
         {
             return IsLeftWeapon(type)
-                || IsDoubleHandWeapon(type);
+                || IsDoubleHandWeapon(type)
+                || type == GearType.boxingCannon;
         }
 
         /// <summary>
@@ -318,6 +319,8 @@ namespace WzComparerR2.CharaSim
                     return GearType.shiningRod;
                 case 1213:
                     return GearType.tuner;
+                case 1403:
+                    return GearType.boxingCannon;
             }
             if (code / 10000 == 135)
             {

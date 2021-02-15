@@ -14,7 +14,7 @@ namespace WzComparerR2.CharaSim
             GlobalVariableMapping["comboConAran"] = "aranComboCon";
         }
 
-        public static string GetSkillSummary(string H, int Level, Dictionary<string, string> CommonProps, SummaryParams param)
+        public static string GetSkillSummary(string H, int Level, Dictionary<string, string> CommonProps, SummaryParams param, SkillSummaryOptions options = default)
         {
             if (H == null) return null;
 
@@ -42,12 +42,13 @@ namespace WzComparerR2.CharaSim
                     }
                     //优先匹配common
                     string prop = null;
+                    string propKey = null;
                     if (CommonProps != null)
                     {
                         for (int i = len; i > 0; i--)
                         {
-                            string key = H.Substring(idx + 1, i);
-                            if (GetValueIgnoreCase(CommonProps, key, out prop))
+                            propKey = H.Substring(idx + 1, i);
+                            if (GetValueIgnoreCase(CommonProps, propKey, out prop))
                             {
                                 len = i;
                                 break;
@@ -57,7 +58,18 @@ namespace WzComparerR2.CharaSim
                     if (prop != null)
                     {
                         var val = Calculator.Parse(prop, Level);
-                        sb.Append(val);
+                        if (options.ConvertCooltimeMS && propKey == "cooltimeMS")
+                        {
+                            sb.Append((val / 1000).ToString("f2"));
+                        }
+                        else if (options.ConvertPerM && propKey.EndsWith("PerM", StringComparison.Ordinal))
+                        {
+                            sb.Append((val / 100).ToString("f1"));
+                        }
+                        else
+                        {
+                            sb.Append(val);
+                        }
                         idx += len + 1;
                         continue;
                     }
@@ -169,7 +181,7 @@ namespace WzComparerR2.CharaSim
             return GetSkillSummary(skill, skill.Level, sr, param);
         }
 
-        public static string GetSkillSummary(Skill skill, int level, StringResult sr, SummaryParams param)
+        public static string GetSkillSummary(Skill skill, int level, StringResult sr, SummaryParams param, SkillSummaryOptions options = default)
         {
             if (skill == null || sr == null)
                 return null;
@@ -195,9 +207,15 @@ namespace WzComparerR2.CharaSim
                 }
             }
 
-            return GetSkillSummary(h, level, skill.Common, param);
+            return GetSkillSummary(h, level, skill.Common, param, options);
         }
 
         public static Dictionary<string,string> GlobalVariableMapping { get; private set; }
+    }
+
+    public struct SkillSummaryOptions
+    {
+        public bool ConvertCooltimeMS { get; set; }
+        public bool ConvertPerM { get; set; }
     }
 }

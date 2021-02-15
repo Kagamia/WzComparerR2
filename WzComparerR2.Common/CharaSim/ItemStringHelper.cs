@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
@@ -201,9 +202,11 @@ namespace WzComparerR2.CharaSim
             {
                 case GearType.body: return "Body";
                 case GearType.head: return "Head";
-                case GearType.face: return "Face";
+                case GearType.face:
+                case GearType.face2: return "Face";
                 case GearType.hair:
-                case GearType.hair2: return "Hair";
+                case GearType.hair2:
+                case GearType.hair3: return "Hair";
                 case GearType.faceAccessory: return "FACE ACCESSORY";
                 case GearType.eyeAccessory: return "EYE ACCESSORY";
                 case GearType.earrings: return "EARRINGS";
@@ -332,6 +335,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.tuner: return "Bladecaster";
                 case GearType.bracelet: return "Bladebinder";
 
+                case GearType.boxingCannon: return "拳炮";
+                case GearType.boxingSky: return "拳天";
+
                 default: return null;
             }
         }
@@ -457,6 +463,9 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.tuner:
                 case GearType.bracelet: return GetExtraJobReqString(151);
+
+                case GearType.boxingCannon:
+                case GearType.boxingSky: return GetExtraJobReqString(175);
                 default: return null;
             }
         }
@@ -492,6 +501,7 @@ namespace WzComparerR2.CharaSim
                 case 152: return "Illium only";
                 case 155: return "Ark only";
                 case 164: return "Hoyoung only";
+                case 175: return "Mo Xuan only";
                 default: return null;
             }
         }
