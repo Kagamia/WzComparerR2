@@ -361,6 +361,7 @@ namespace WzComparerR2.CharaSim
             switch (type)
             {
                 case GearType.emblem:
+                case GearType.powerSource:
                 case GearType.bit:
                 case (GearType)3: //发型
                     return 2;
