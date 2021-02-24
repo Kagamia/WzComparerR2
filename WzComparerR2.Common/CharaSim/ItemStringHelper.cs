@@ -339,7 +339,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.tuner: return "调谐器";
                 case GearType.bracelet: return "手链";
 
-                case GearType.boxingCannon: return "拳炮";
+                case GearType.boxingCannon: return "拳封";
                 case GearType.boxingSky: return "拳天";
                 default: return null;
             }
