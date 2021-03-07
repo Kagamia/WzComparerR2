@@ -37,6 +37,7 @@ namespace WzComparerR2.LuaConsole
         private void InitLuaEnv()
         {
             lua = new Lua();
+            lua.State.Encoding = Encoding.UTF8;
             lua.LoadCLRPackage();
             lua["env"] = env;
 
