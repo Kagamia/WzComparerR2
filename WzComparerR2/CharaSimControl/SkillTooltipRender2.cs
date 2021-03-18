@@ -27,7 +27,8 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowProperties { get; set; } = true;
         public bool ShowDelay { get; set; }
         public bool ShowReqSkill { get; set; } = true;
-
+        public bool DisplayCooltimeMSAsSec { get; set; } = true;
+        public bool DisplayPermyriadAsPercent { get; set; } = true;
 
         public override Bitmap Render()
         {
@@ -126,8 +127,11 @@ namespace WzComparerR2.CharaSimControl
 
             if (Skill.Level > 0)
             {
-                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default);
-                GearGraphics.DrawString(g, "[現在等級 " + Skill.Level + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 18);
+                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default, new SkillSummaryOptions{
+                    ConvertCooltimeMS = this.DisplayCooltimeMSAsSec,
+                    ConvertPerM = this.DisplayPermyriadAsPercent
+                });
+                GearGraphics.DrawString(g, "[現在等級 " + Skill.Level + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
                 if (hStr != null)
                 {
                     GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, 8, 272, ref picH, 18);
@@ -136,8 +140,12 @@ namespace WzComparerR2.CharaSimControl
 
             if (Skill.Level < Skill.MaxLevel && !Skill.DisableNextLevelInfo)
             {
-                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level + 1, sr, SummaryParams.Default);
-                GearGraphics.DrawString(g, "[下次等級 " + (Skill.Level + 1) + "]", GearGraphics.ItemDetailFont, 8, 270, ref picH, 18);
+                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level + 1, sr, SummaryParams.Default, new SkillSummaryOptions
+                {
+                    ConvertCooltimeMS = this.DisplayCooltimeMSAsSec,
+                    ConvertPerM = this.DisplayPermyriadAsPercent
+                });
+                GearGraphics.DrawString(g, "[下次等級 " + (Skill.Level + 1) + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
                 if (hStr != null)
                 {
                     GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, 8, 272, ref picH, 18);

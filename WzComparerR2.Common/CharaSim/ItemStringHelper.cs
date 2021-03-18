@@ -141,6 +141,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incPDD_incMDD: return "物理防禦力：" + sign + value;
                 //case GearPropType.incACC_incEVA: return "命中值/回避值：" + sign + value;
                 case GearPropType.incARC: return "ARC : " + sign + value;
+                case GearPropType.incAUT: return "AUT : " + sign + value;
                 default: return null;
             }
         }
@@ -161,6 +162,7 @@ namespace WzComparerR2.CharaSim
                     case GearPropType.incMHP:
                     case GearPropType.incMMP:
                     case GearPropType.incMDF:
+                    case GearPropType.incARC:
                     case GearPropType.incPAD:
                     case GearPropType.incMAD:
                     case GearPropType.incPDD:
@@ -346,6 +348,12 @@ namespace WzComparerR2.CharaSim
                 case GearType.tuner: return "調節器";
                 case GearType.bracelet: return "手鐲";
 
+                case GearType.breathShooter: return "브레스 슈터";
+                case GearType.weaponBelt: return "웨폰 벨트";
+
+                case GearType.boxingCannon: return "武拳";
+                case GearType.boxingSky: return "拳環";
+
                 default: return null;
             }
         }
@@ -470,9 +478,13 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicWing: return GetExtraJobReqString(152);
 
                 case GearType.pathOfAbyss: return GetExtraJobReqString(155);
-
                 case GearType.fanTassel: return GetExtraJobReqString(164);
 
+                case GearType.tuner:
+                case GearType.bracelet: return GetExtraJobReqString(151);
+
+                case GearType.boxingCannon:
+                case GearType.boxingSky: return GetExtraJobReqString(175);
                 default: return null;
             }
         }
@@ -508,6 +520,7 @@ namespace WzComparerR2.CharaSim
                 case 152: return "伊利恩可以裝備";
                 case 155: return "亞克可以套用";
                 case 164: return "虎影職業群可裝備";
+                case 175: return "墨玄可以裝備";
                 default: return null;
             }
         }

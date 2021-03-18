@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WzComparerR2.LuaConsole</RootNamespace>
     <AssemblyName>WzComparerR2.LuaConsole</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -44,8 +44,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\ICSharpCode.TextEditor.dll</HintPath>
     </Reference>
-    <Reference Include="KopiLua">
-      <HintPath>..\References\KopiLua.dll</HintPath>
+    <Reference Include="KeraLua">
+      <HintPath>..\References\KeraLua.dll</HintPath>
     </Reference>
     <Reference Include="NLua">
       <HintPath>..\References\NLua.dll</HintPath>

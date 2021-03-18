@@ -12,6 +12,7 @@ namespace WzComparerR2.CharaSim
         hair = 3,
         hair2 = 4,
         face2 = 5,
+        hair3 = 6,
 
         /// <summary>
         /// 臉飾 101
@@ -295,6 +296,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         boxingClaw2 = 135285,
         /// <summary>
+        /// 拳環 135_86
+        /// </summary>
+        boxingSky = 135286,
+        /// <summary>
         /// 手腕护带 135_90
         /// </summary>
         viperWristband = 135290,
@@ -390,6 +395,10 @@ namespace WzComparerR2.CharaSim
         /// 雙手劍 140
         /// </summary>
         thSword = 140,
+        /// <summary>
+        /// 武拳 140_3xxx
+        /// </summary>
+        boxingCannon = 1403,
         /// <summary>
         /// 雙手斧 141
         /// </summary>

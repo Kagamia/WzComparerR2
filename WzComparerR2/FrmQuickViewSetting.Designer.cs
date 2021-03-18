@@ -67,6 +67,8 @@
             this.buttonX1 = new DevComponents.DotNetBar.ButtonX();
             this.checkBoxX11 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX12 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX13 = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.checkBoxX14 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
             this.superTabControlPanel1.SuspendLayout();
@@ -104,7 +106,7 @@
             this.superTabControl1.ReorderTabsEnabled = true;
             this.superTabControl1.SelectedTabFont = new System.Drawing.Font("宋體", 9F, System.Drawing.FontStyle.Bold);
             this.superTabControl1.SelectedTabIndex = 0;
-            this.superTabControl1.Size = new System.Drawing.Size(304, 171);
+            this.superTabControl1.Size = new System.Drawing.Size(304, 231);
             this.superTabControl1.TabAlignment = DevComponents.DotNetBar.eTabStripAlignment.Left;
             this.superTabControl1.TabFont = new System.Drawing.Font("宋體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.superTabControl1.TabIndex = 0;
@@ -117,6 +119,8 @@
             // 
             // superTabControlPanel1
             // 
+            this.superTabControlPanel1.Controls.Add(this.checkBoxX14);
+            this.superTabControlPanel1.Controls.Add(this.checkBoxX13);
             this.superTabControlPanel1.Controls.Add(this.checkBoxX10);
             this.superTabControlPanel1.Controls.Add(this.labelX3);
             this.superTabControlPanel1.Controls.Add(this.comboBoxEx2);
@@ -128,7 +132,7 @@
             this.superTabControlPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControlPanel1.Location = new System.Drawing.Point(62, 0);
             this.superTabControlPanel1.Name = "superTabControlPanel1";
-            this.superTabControlPanel1.Size = new System.Drawing.Size(242, 171);
+            this.superTabControlPanel1.Size = new System.Drawing.Size(242, 231);
             this.superTabControlPanel1.TabIndex = 1;
             this.superTabControlPanel1.TabItem = this.superTabItem1;
             // 
@@ -156,7 +160,7 @@
             // 
             this.labelX3.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.labelX3.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.labelX3.Location = new System.Drawing.Point(13, 132);
+            this.labelX3.Location = new System.Drawing.Point(13, 185);
             this.labelX3.Name = "labelX3";
             this.labelX3.Size = new System.Drawing.Size(142, 30);
             this.labelX3.TabIndex = 6;
@@ -176,7 +180,7 @@
             this.comboItem8,
             this.comboItem9,
             this.comboItem10});
-            this.comboBoxEx2.Location = new System.Drawing.Point(94, 105);
+            this.comboBoxEx2.Location = new System.Drawing.Point(94, 153);
             this.comboBoxEx2.Name = "comboBoxEx2";
             this.comboBoxEx2.Size = new System.Drawing.Size(90, 21);
             this.comboBoxEx2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -214,7 +218,7 @@
             // 
             // 
             this.labelX2.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX2.Location = new System.Drawing.Point(13, 108);
+            this.labelX2.Location = new System.Drawing.Point(13, 156);
             this.labelX2.Name = "labelX2";
             this.labelX2.Size = new System.Drawing.Size(81, 18);
             this.labelX2.TabIndex = 4;
@@ -228,7 +232,7 @@
             // 
             // 
             this.labelX1.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX1.Location = new System.Drawing.Point(13, 83);
+            this.labelX1.Location = new System.Drawing.Point(13, 131);
             this.labelX1.Name = "labelX1";
             this.labelX1.Size = new System.Drawing.Size(81, 18);
             this.labelX1.TabIndex = 3;
@@ -246,7 +250,7 @@
             this.comboItem2,
             this.comboItem3,
             this.comboItem4});
-            this.comboBoxEx1.Location = new System.Drawing.Point(94, 80);
+            this.comboBoxEx1.Location = new System.Drawing.Point(94, 128);
             this.comboBoxEx1.Name = "comboBoxEx1";
             this.comboBoxEx1.Size = new System.Drawing.Size(90, 21);
             this.comboBoxEx1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -346,7 +350,7 @@
             this.superTabControlPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControlPanel3.Location = new System.Drawing.Point(62, 0);
             this.superTabControlPanel3.Name = "superTabControlPanel3";
-            this.superTabControlPanel3.Size = new System.Drawing.Size(242, 171);
+            this.superTabControlPanel3.Size = new System.Drawing.Size(242, 211);
             this.superTabControlPanel3.TabIndex = 0;
             this.superTabControlPanel3.TabItem = this.superTabItem3;
             // 
@@ -426,7 +430,7 @@
             this.superTabControlPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControlPanel2.Location = new System.Drawing.Point(62, 0);
             this.superTabControlPanel2.Name = "superTabControlPanel2";
-            this.superTabControlPanel2.Size = new System.Drawing.Size(242, 171);
+            this.superTabControlPanel2.Size = new System.Drawing.Size(242, 211);
             this.superTabControlPanel2.TabIndex = 0;
             this.superTabControlPanel2.TabItem = this.superTabItem2;
             // 
@@ -481,7 +485,7 @@
             this.superTabItem2.GlobalItem = false;
             this.superTabItem2.Name = "superTabItem2";
             this.superTabItem2.Text = "Gear";
-            // 
+            //
             // panelEx1
             // 
             this.panelEx1.CanvasColor = System.Drawing.SystemColors.Control;
@@ -490,7 +494,7 @@
             this.panelEx1.Controls.Add(this.buttonX1);
             this.panelEx1.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelEx1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelEx1.Location = new System.Drawing.Point(0, 171);
+            this.panelEx1.Location = new System.Drawing.Point(0, 231);
             this.panelEx1.Name = "panelEx1";
             this.panelEx1.Size = new System.Drawing.Size(304, 30);
             this.panelEx1.Style.Alignment = System.Drawing.StringAlignment.Center;
@@ -525,7 +529,7 @@
             this.buttonX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.buttonX1.TabIndex = 0;
             this.buttonX1.Text = "確定";
-            // 
+            //
             // checkBoxX11
             // 
             this.checkBoxX11.AutoSize = true;
@@ -540,12 +544,42 @@
             this.checkBoxX11.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX11.TabIndex = 4;
             this.checkBoxX11.Text = "顯示勳章樣式";
+            //
+            // checkBoxX13
+            // 
+            this.checkBoxX13.AutoSize = true;
+            this.checkBoxX13.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX13.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX13.Location = new System.Drawing.Point(13, 81);
+            this.checkBoxX13.Name = "checkBoxX13";
+            this.checkBoxX13.Size = new System.Drawing.Size(138, 18);
+            this.checkBoxX13.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX13.TabIndex = 8;
+            this.checkBoxX13.Text = "冷卻時間轉換為[秒]";
+            // 
+            // checkBoxX14
+            // 
+            this.checkBoxX14.AutoSize = true;
+            this.checkBoxX14.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.checkBoxX14.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.checkBoxX14.Location = new System.Drawing.Point(13, 105);
+            this.checkBoxX14.Name = "checkBoxX14";
+            this.checkBoxX14.Size = new System.Drawing.Size(150, 18);
+            this.checkBoxX14.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.checkBoxX14.TabIndex = 9;
+            this.checkBoxX14.Text = "PerM屬性轉換為百分制";
             // 
             // FrmQuickViewSetting
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(304, 201);
+            this.ClientSize = new System.Drawing.Size(304, 261);
             this.Controls.Add(this.superTabControl1);
             this.Controls.Add(this.panelEx1);
             this.DoubleBuffered = true;
@@ -610,5 +644,7 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX10;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX11;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX12;
+        private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX13;
+        private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX14;
     }
 }
