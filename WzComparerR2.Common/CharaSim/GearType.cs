@@ -384,7 +384,7 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         thSword = 140,
         /// <summary>
-        /// 拳炮 140_3xxx
+        /// 拳封 140_3xxx
         /// </summary>
         boxingCannon = 1403,
         /// <summary>
