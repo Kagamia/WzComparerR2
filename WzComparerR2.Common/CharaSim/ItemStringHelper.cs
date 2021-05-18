@@ -460,6 +460,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicWing: return GetExtraJobReqString(152);
 
                 case GearType.pathOfAbyss: return GetExtraJobReqString(155);
+                case GearType.handFan:
                 case GearType.fanTassel: return GetExtraJobReqString(164);
 
                 case GearType.tuner:
@@ -501,7 +502,7 @@ namespace WzComparerR2.CharaSim
                 case 151: return "御剑骑士可穿戴装备";
                 case 152: return "圣晶使徒可穿戴装备";
                 case 155: return "影魂异人可穿戴装备";
-                case 164: return "虎影职业群可穿戴装备";
+                case 164: return "虎影可穿戴装备";
                 case 175: return "墨玄可穿戴装备";
                 default: return null;
             }
