@@ -152,6 +152,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         tuner = 1213,
         /// <summary>
+        /// Whispershot 1213
+        /// </summary>
+        breathShooter = 1214,
+        /// <summary>
         /// Soul Shooter 122
         /// </summary>
         soulShooter = 122,
@@ -372,6 +376,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         bracelet = 135400,
         /// <summary>
+        /// Weapon Belt 135400
+        /// </summary>
+        weaponBelt = 135401,
+        /// <summary>
         /// Cane 136
         /// </summary>
         cane = 136,
@@ -392,7 +400,7 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         thSword = 140,
         /// <summary>
-        /// 拳炮 140_3xxx
+        /// 拳封 140_3xxx
         /// </summary>
         boxingCannon = 1403,
         /// <summary>

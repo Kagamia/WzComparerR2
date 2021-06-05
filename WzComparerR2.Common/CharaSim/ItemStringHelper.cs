@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
@@ -438,6 +439,8 @@ namespace WzComparerR2.CharaSim
 
                 //6xxx
                 case GearType.novaMarrow: return GetExtraJobReqString(61);
+                case GearType.breathShooter:
+                case GearType.weaponBelt: return GetExtraJobReqString(63);
                 case GearType.chain2:
                 case GearType.transmitter: return GetExtraJobReqString(64);
                 case GearType.soulBangle:
@@ -458,6 +461,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicWing: return GetExtraJobReqString(152);
 
                 case GearType.pathOfAbyss: return GetExtraJobReqString(155);
+
+                case GearType.handFan:
                 case GearType.fanTassel: return GetExtraJobReqString(164);
 
                 case GearType.tuner:
@@ -491,6 +496,7 @@ namespace WzComparerR2.CharaSim
                 case 42: return "Kanna only";
                 case 51: return "Mihile only";
                 case 61: return "Kaiser only";
+                case 63: return "Kain only";
                 case 64: return "Cadena only";
                 case 65: return "Angelic Buster only";
                 case 101: return "Zero only";

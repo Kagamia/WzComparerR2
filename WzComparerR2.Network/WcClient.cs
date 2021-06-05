@@ -80,7 +80,12 @@ namespace WzComparerR2.Network
 
         private async Task BeginConnect()
         {
-            this.client = new TcpClient();
+            this.client = new TcpClient()
+            {
+                ReceiveTimeout = 60000,
+                SendTimeout = 10000,
+            };
+            
             Log.Debug("Begin connect.");
             while (true)
             {
