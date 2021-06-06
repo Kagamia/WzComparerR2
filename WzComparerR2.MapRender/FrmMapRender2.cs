@@ -43,7 +43,7 @@ namespace WzComparerR2.MapRender
             this.patchVisibility.FootHoldVisible = false;
             this.patchVisibility.LadderRopeVisible = false;
             this.patchVisibility.SkyWhaleVisible = false;
-            
+
             var form = Form.FromHandle(this.Window.Handle) as Form;
             form.Load += Form_Load;
             form.GotFocus += Form_GotFocus;
@@ -102,7 +102,7 @@ namespace WzComparerR2.MapRender
             WcR2Engine.FixEKBugs();
 
             (this.engine.AssetManager as WcR2AssetManager).DefaultContentManager = this.Content as WcR2ContentManager;
-            
+
         }
 
         public StringLinker StringLinker { get; set; }
@@ -472,8 +472,11 @@ namespace WzComparerR2.MapRender
 
             StringResult sr = null;
             this.StringLinker?.StringMap.TryGetValue(mapID, out sr);
-            var message = string.Format("是否传送到地图\r\n{0} ({1})？", sr?.Name ?? "null", mapID);
-            MessageBox.Show(message, "提示", MessageBoxButton.OKCancel, callback, false);
+            string mapName = sr?["mapName"] ?? "(null)";
+            int last = (mapName.LastOrDefault(c => c >= '가' && c <= '힣') - '가') % 28;
+            //var message = string.Format("是否传送到地图\r\n{0} ({1})？", sr?.Name ?? "null", mapID);
+            var message = mapName + (last == 0 || last == 8 ? "" : "으") + "로 이동하시겠습니까?";
+            MessageBox.Show(message, "", MessageBoxButton.OKCancel, callback, false);
         }
 
         private void ChatBox_TextSubmit(object sender, TextEventArgs e)
@@ -491,7 +494,7 @@ namespace WzComparerR2.MapRender
             }
         }
 
-        private void ChatCommand(string command)
+        private async void ChatCommand(string command)
         {
             string[] arguments = command.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
             if (arguments.Length <= 0)
@@ -503,11 +506,11 @@ namespace WzComparerR2.MapRender
             {
                 case "/help":
                 case "/?":
-                    this.ui.ChatBox.AppendTextHelp(@"/help 显示帮助。");
-                    this.ui.ChatBox.AppendTextHelp(@"/map (mapID) 跳转地图。");
-                    this.ui.ChatBox.AppendTextHelp(@"/back 回到上一地图。");
-                    this.ui.ChatBox.AppendTextHelp(@"/home 回城。");
-                    this.ui.ChatBox.AppendTextHelp(@"/history [maxCount] 查看历史地图。");
+                    this.ui.ChatBox.AppendTextHelp(@"/help Show help.");
+                    this.ui.ChatBox.AppendTextHelp(@"/map (mapID) Teleport to a Map.");
+                    this.ui.ChatBox.AppendTextHelp(@"/back Teleport to the previous Map.");
+                    this.ui.ChatBox.AppendTextHelp(@"/home Return to town.");
+                    this.ui.ChatBox.AppendTextHelp(@"/history [maxCount] View map history.");
                     break;
 
                 case "/map":
@@ -518,7 +521,7 @@ namespace WzComparerR2.MapRender
                     }
                     else
                     {
-                        this.ui.ChatBox.AppendTextSystem($"缺少地图ID。");
+                        this.ui.ChatBox.AppendTextSystem($"Please enter the correct Map ID.");
                     }
                     break;
 
@@ -529,7 +532,7 @@ namespace WzComparerR2.MapRender
                     }
                     else
                     {
-                        this.ui.ChatBox.AppendTextSystem($"前面没有地图。");
+                        this.ui.ChatBox.AppendTextSystem($"No previous Maps.");
                     }
                     break;
 
@@ -537,7 +540,7 @@ namespace WzComparerR2.MapRender
                     var retMapID = this.mapData?.ReturnMap;
                     if (retMapID == null || retMapID == 999999999)
                     {
-                        this.ui.ChatBox.AppendTextSystem($"回不到那里去。");
+                        this.ui.ChatBox.AppendTextSystem($"Cannot return to town.");
                     }
                     else
                     {
@@ -553,7 +556,7 @@ namespace WzComparerR2.MapRender
                     {
                         historyCount = 5;
                     }
-                    this.ui.ChatBox.AppendTextHelp($"历史地图：({this.viewHistory.Count})");
+                    this.ui.ChatBox.AppendTextHelp($"Number of Maps Visited: ({this.viewHistory.Count})");
                     var node = this.viewHistory.Last;
                     while (node != null && historyCount > 0)
                     {
@@ -563,14 +566,64 @@ namespace WzComparerR2.MapRender
                             this.StringLinker.StringMap.TryGetValue(node.Value.MapID, out sr);
                         }
                         this.ui.ChatBox.AppendTextHelp($"  {sr?.Name ?? "(null)"}({node.Value.MapID})");
-                        
+
                         node = node.Previous;
                         historyCount--;
                     }
                     break;
 
+                case "/multibgmlist":
+                    if (!string.IsNullOrEmpty(this.mapData.Bgm))
+                    {
+                        var path = new List<string>() { "Sound" };
+                        path.AddRange(this.mapData.Bgm.Split('/'));
+                        path[1] += ".img";
+                        var bgmNode = PluginBase.PluginManager.FindWz(string.Join("\\", path));
+                        var subNodes = bgmNode?.Nodes ?? new Wz_Node.WzNodeCollection(null);
+                        this.ui.ChatBox.AppendTextHelp($"Multi BGM Count: {subNodes.Count}");
+                        foreach (Wz_Node subNode in subNodes)
+                        {
+                            this.ui.ChatBox.AppendTextHelp($"  {subNode.Text}");
+                        }
+                    }
+                    else
+                    {
+                        this.ui.ChatBox.AppendTextHelp($"Multi BGM Count: 0");
+                    }
+                    break;
+
+                case "/multibgmset":
+                    Music multiBgm;
+                    if (arguments.Length > 1 && (multiBgm = LoadBgm(this.mapData, arguments[1])) != null)
+                    {
+                        this.ui.ChatBox.AppendTextSystem($"Multi BGM: Current BGM changed to {arguments[1]}.");
+
+                        Task bgmTask = null;
+                        bool willSwitchBgm = this.bgm != multiBgm;
+                        if (willSwitchBgm && this.bgm != null) //准备切换
+                        {
+                            bgmTask = FadeOut(this.bgm, 1000);
+                        }
+
+                        if (bgmTask != null)
+                        {
+                            await bgmTask;
+                        }
+
+                        this.bgm = multiBgm;
+                        if (willSwitchBgm && this.bgm != null)
+                        {
+                            bgmTask = FadeIn(this.bgm, 1000);
+                        }
+                    }
+                    else
+                    {
+                        this.ui.ChatBox.AppendTextHelp($"Please enter the correct Multi BGM.");
+                    }
+                    break;
+
                 default:
-                    this.ui.ChatBox.AppendTextSystem($"不支持{arguments[0]}命令。");
+                    this.ui.ChatBox.AppendTextSystem($"Unknown Command: {arguments[0]}");
                     break;
             }
         }

@@ -6,7 +6,7 @@ namespace WzComparerR2.CharaSim
 {
     public enum ItemSpecType
     {
-        recipe = 1,
+        recipe = 100,
         reqSkill,
         reqSkillLevel,
         reqSkillProficiency,
