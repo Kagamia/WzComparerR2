@@ -152,6 +152,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         tuner = 1213,
         /// <summary>
+        /// 龙息臂箭 1214
+        /// </summary>
+        breathShooter = 1214,
+        /// <summary>
         /// 灵魂手铳 122
         /// </summary>
         soulShooter = 122,
@@ -363,6 +367,10 @@ namespace WzComparerR2.CharaSim
         /// 手链 135400x
         /// </summary>
         bracelet = 135400,
+        /// <summary>
+        /// 武器腰带 135401x
+        /// </summary>
+        weaponBelt = 135401,
         /// <summary>
         /// 手杖
         /// </summary>
