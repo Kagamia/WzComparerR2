@@ -156,7 +156,7 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         breathShooter = 1214,
         /// <summary>
-        /// Soul Shooter 122
+        /// 灵魂手铳 122
         /// </summary>
         soulShooter = 122,
         /// <summary>
@@ -376,7 +376,7 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         bracelet = 135400,
         /// <summary>
-        /// Weapon Belt 135400
+        /// Weapon Belt 135401
         /// </summary>
         weaponBelt = 135401,
         /// <summary>

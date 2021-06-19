@@ -132,7 +132,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incPAD_incMAD: return "Attack Power & Magic ATT: " + sign + value;
                 case GearPropType.incPDD_incMDD: return "Defense: " + sign + value;
                 case GearPropType.incARC: return "ARC : " + sign + value;
-                case GearPropType.incAUT: return "AUT : " + sign + value;
+                case GearPropType.incAUT: return "SAC : " + sign + value;
                 default: return null;
             }
         }

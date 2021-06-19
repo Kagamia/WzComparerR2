@@ -319,11 +319,17 @@ namespace WzComparerR2.CharaSim
                     return GearType.shiningRod;
                 case 1213:
                     return GearType.tuner;
+                case 1214:
+                    return GearType.breathShooter;
                 case 1403:
                     return GearType.boxingCannon;
             }
             if (code / 10000 == 135)
             {
+                if (code / 10 == 135401)
+                {
+                    return GearType.weaponBelt;
+                }
                 switch (code / 100)
                 {
                     case 13522:
