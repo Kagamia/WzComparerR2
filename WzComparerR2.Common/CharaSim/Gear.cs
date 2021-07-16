@@ -308,15 +308,12 @@ namespace WzComparerR2.CharaSim
             }
             if (code / 10000 == 135)
             {
-                if (code / 10 == 135401)
-                {
-                    return GearType.weaponBelt;
-                }
                 switch (code / 100)
                 {
                     case 13522:
                     case 13528:
                     case 13529:
+                    case 13540:
                         return (GearType)(code / 10);
 
                     default:
