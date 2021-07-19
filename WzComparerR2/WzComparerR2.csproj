@@ -177,6 +177,7 @@
     <Compile Include="Config\CharaSimSkillConfig.cs" />
     <Compile Include="Config\ImageHandlerConfig.cs" />
     <Compile Include="Config\MosaicInfo.cs" />
+    <Compile Include="Config\UIStateConfig.cs" />
     <Compile Include="Config\WcR2Config.cs" />
     <Compile Include="DBConnection.cs" />
     <Compile Include="FrmAbout.cs">

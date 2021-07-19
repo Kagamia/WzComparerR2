@@ -283,7 +283,7 @@
             this.ribbonControl1.Controls.Add(this.ribbonPanel1);
             this.ribbonControl1.Controls.Add(this.ribbonPanel3);
             this.ribbonControl1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.ribbonControl1.Expanded = false;
+            //this.ribbonControl1.Expanded = false;
             this.ribbonControl1.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.ribbonTabItem1,
             this.ribbonTabItem2,
