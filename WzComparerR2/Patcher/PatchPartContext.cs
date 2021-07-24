@@ -17,7 +17,7 @@ namespace WzComparerR2.Patcher
         private string fileName;
         private int type;
         private int newFileLength;
-        private uint oldChecksum;
+        private uint? oldChecksum;
         private uint newChecksum;
         private string tempFilePath;
         private string oldFilePath;
@@ -25,6 +25,8 @@ namespace WzComparerR2.Patcher
         private int action0;
         private int action1;
         private int action2;
+
+        private readonly HashSet<string> dependencyFiles = new HashSet<string>();
 
         public long Offset
         {
@@ -48,7 +50,7 @@ namespace WzComparerR2.Patcher
             set { newFileLength = value; }
         }
 
-        public uint OldChecksum
+        public uint? OldChecksum
         {
             get { return oldChecksum; }
             set { oldChecksum = value; }
@@ -88,6 +90,11 @@ namespace WzComparerR2.Patcher
         {
             get { return action2; }
             set { action2 = value; }
+        }
+
+        public ICollection<string> DependencyFiles
+        {
+            get { return this.dependencyFiles; }
         }
     }
 }
