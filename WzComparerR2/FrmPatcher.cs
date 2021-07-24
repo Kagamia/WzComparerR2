@@ -53,6 +53,7 @@ namespace WzComparerR2
         Thread patchThread;
         EventWaitHandle waitHandle;
         bool waiting;
+        string loggingFileName;
 
         private void combineUrl()
         {
@@ -211,6 +212,7 @@ namespace WzComparerR2
             advTreePatchFiles.Nodes.Clear();
             txtNotice.Clear();
             txtPatchState.Clear();
+            this.loggingFileName = Path.Combine(msFolder, $"wcpatcher_{DateTime.Now:yyyyMMdd_HHmmssfff}.log");
             try
             {
                 patcher = new WzPatcher(patchFile);
@@ -222,6 +224,14 @@ namespace WzComparerR2
                 {
                     AppendStateText("Pre-reading patch...\r\n");
                     long decompressedSize = patcher.PrePatch();
+                    if (patcher.IsKMST1125Format.Value)
+                    {
+                        AppendStateText("Patch Type：KMST1225\r\n");
+                        if (patcher.OldFileHash != null)
+                        {
+                            AppendStateText($"Getting original file information：{patcher.OldFileHash.Count} 个\r\n");
+                        }
+                    }
                     AppendStateText(string.Format("Patch Size: {0:N0} bytes...\r\n", decompressedSize));
                     AppendStateText(string.Format("File Changes: {0} 个...\r\n",
                         patcher.PatchParts == null ? -1 : patcher.PatchParts.Count));
@@ -247,6 +257,7 @@ namespace WzComparerR2
                 AppendStateText("Starting Update: \r\n");
                 DateTime time = DateTime.Now;
                 patcher.Patch(msFolder);
+                AppendStateText("完成\r\n");
                 TimeSpan interval = DateTime.Now - time;
                 MessageBoxEx.Show(this, "End of Patch, Time Elapsed: " + interval.ToString(), "Patcher");
             }
@@ -256,6 +267,7 @@ namespace WzComparerR2
             }
             catch (Exception ex)
             {
+                AppendStateText(ex.ToString());
                 MessageBoxEx.Show(this, ex.ToString(), "Patcher");
             }
             finally
@@ -339,18 +351,39 @@ namespace WzComparerR2
                         }
                     }
 
-                    if (this.deadPatch && e.Part.Type == 1)
+                    if (this.deadPatch && e.Part.Type == 1 && sender is WzPatcher patcher)
                     {
-                        ((WzPatcher)sender).SafeMove(e.Part.TempFilePath, e.Part.OldFilePath);
-                        AppendStateText("  (deadpatch)Applying files...\r\n");
+                        if (patcher.IsKMST1125Format.Value)
+                        {
+                            // TODO: we should build the file dependency tree to make sure all old files could be overridden safely.
+                            AppendStateText("  (deadpatch)Delayed application of files...\r\n");
+                        }
+                        else
+                        {
+                            patcher.SafeMove(e.Part.TempFilePath, e.Part.OldFilePath);
+                            AppendStateText("  (deadpatch)Applying files...\r\n");
+                        }
                     }
+                    break;
+                case PatchingState.PrepareVerifyOldChecksumBegin:
+                    AppendStateText($"Pre-check old files checksum: {e.Part.FileName}");
+                    break;
+                case PatchingState.PrepareVerifyOldChecksumEnd:
+                    AppendStateText("\nDone\r\n");
+                    break;
+                case PatchingState.ApplyFile:
+                    AppendStateText($"\nApplying file: {e.Part.FileName}\r\n");
                     break;
             }
         }
 
         private void AppendStateText(string text)
         {
-            this.Invoke((Action<string>)(t => this.txtPatchState.AppendText(t)), text);
+            this.Invoke((Action<string>)(t => { this.txtPatchState.AppendText(t); }), text);
+            if (this.loggingFileName != null)
+            {
+                File.AppendAllText(this.loggingFileName, text, Encoding.UTF8);
+            }
         }
 
         private Node CreateFileNode(PatchPartContext part)
@@ -361,35 +394,14 @@ namespace WzComparerR2
             node.Cells.Add(new Cell(part.Type.ToString(), style));
             node.Cells.Add(new Cell(part.NewFileLength.ToString("n0"), style));
             node.Cells.Add(new Cell(part.NewChecksum.ToString("x8"), style));
-            node.Cells.Add(new Cell(part.OldChecksum.ToString("x8"), style));
+            node.Cells.Add(new Cell(part.OldChecksum?.ToString("x8"), style));
             if (part.Type == 1)
             {
-                node.Cells.Add(new Cell(part.Action0 + "|" + part.Action1 + "|" + part.Action2, style));
+                string text = string.Format("{0}|{1}|{2}|{3}", part.Action0, part.Action1, part.Action2, part.DependencyFiles.Count);
+                node.Cells.Add(new Cell(text, style));
             }
             node.Tag = part;
             return node;
-        }
-
-        /// <summary>
-        /// ForTestOnly
-        /// </summary>
-        private void buttonX1_Click(object sender, EventArgs e)
-        {
-            WzPatcher patcher = new WzPatcher(@"F:\TDDOWNLOAD\Anime\00475to00476.patch");
-            patcher.OpenDecompress();
-            patcher.PrePatch();
-            System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
-            foreach (PatchPartContext part in patcher.PatchParts)
-            {
-                if (part.FileName.Equals("map.wz", StringComparison.OrdinalIgnoreCase))
-                {
-                    patcher.RebuildFile(part, @"E:\", @"E:\MapleT");
-                    break;
-                }
-            }
-            sw.Stop();
-            MessageBoxEx.Show(sw.ElapsedMilliseconds.ToString());
-            patcher.Close();
         }
 
         private void buttonXOpen3_Click(object sender, EventArgs e)
@@ -419,7 +431,8 @@ namespace WzComparerR2
 > 还没完成 所以请选择patch文件  exe补丁暂时懒得分离
 > 没有检查原客户端版本 为了正确执行请预先确认
 > 暂时不提供文件块的筛选或文件缺失提示
-> 没优化 于是可能生成文件体积较大 但是几乎可以保证完整性", "声明");
+> 没优化 于是可能生成文件体积较大 但是几乎可以保证完整性
+> 对于KMST1225后无法正常工作", "声明");
 
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.Filter = "*.patch|*.patch";
