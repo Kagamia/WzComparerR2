@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace WzComparerR2.WzLib
 {
-    public class Wz_File
+    public class Wz_File : IDisposable
     {
         public Wz_File(string fileName, Wz_Structure wz)
         {
@@ -26,7 +26,10 @@ namespace WzComparerR2.WzLib
         private Wz_Node node;
         private int imageCount;
         private bool loaded;
+        private bool isSubDir;
         private Wz_Type type;
+        private List<Wz_File> mergedWzFiles;
+        private Wz_File ownerWzFile;
 
         public Encoding TextEncoding { get; set; }
 
@@ -73,10 +76,25 @@ namespace WzComparerR2.WzLib
             get { return loaded; }
         }
 
+        public bool IsSubDir
+        {
+            get { return this.isSubDir; }
+        }
+
         public Wz_Type Type
         {
             get { return type; }
             set { type = value; }
+        }
+
+        public IEnumerable<Wz_File> MergedWzFiles
+        {
+            get { return this.mergedWzFiles ?? Enumerable.Empty<Wz_File>(); }
+        }
+
+        public Wz_File OwnerWzFile
+        {
+            get { return this.ownerWzFile; }
         }
 
         public void Close()
@@ -85,6 +103,11 @@ namespace WzComparerR2.WzLib
                 this.bReader.Close();
             if (this.fileStream != null)
                 this.fileStream.Close();
+        }
+
+        void IDisposable.Dispose()
+        {
+            this.Close();
         }
 
         private bool GetHeader(string fileName)
@@ -273,12 +296,7 @@ namespace WzComparerR2.WzLib
             return offset;
         }
 
-        public void GetDirTree(Wz_Node parent)
-        {
-            GetDirTree(parent, true);
-        }
-
-        public void GetDirTree(Wz_Node parent, bool useBaseWz)
+        public void GetDirTree(Wz_Node parent, bool useBaseWz = false, bool loadWzAsFolder = false)
         {
             List<string> dirs = new List<string>();
             string name = null;
@@ -380,30 +398,46 @@ namespace WzComparerR2.WzLib
             {
                 string dir = dirs[i];
                 Wz_Node t = parent.Nodes.Add(dir);
-                if (willLoadBaseWz)
+                if (i < dirCount)
                 {
-                    this.WzStructure.has_basewz = true;
-                    if (i < dirCount)
-                    {
-                        GetDirTree(t, false);
-                    }
+                    GetDirTree(t, false);
+                }
+
+                if (t.Nodes.Count == 0)
+                {
+                    this.WzStructure.has_basewz |= willLoadBaseWz;
 
                     try
                     {
-                        string filePath = Path.Combine(baseFolder, dir + ".wz");
-                        if (File.Exists(filePath))
-                            this.WzStructure.LoadFile(filePath, t);
+                        if (loadWzAsFolder)
+                        {
+                            string wzFolder = willLoadBaseWz ? Path.Combine(Path.GetDirectoryName(baseFolder), dir) : Path.Combine(baseFolder, dir);
+                            if (Directory.Exists(wzFolder))
+                            {
+                                this.wzStructure.LoadWzFolder(wzFolder, ref t, false);
+                                if (!willLoadBaseWz)
+                                {
+                                    var dirWzFile = t.GetValue<Wz_File>();
+                                    dirWzFile.Type = Wz_Type.Unknown;
+                                    dirWzFile.isSubDir = true;
+                                }
+                            }
+                        }
+                        else if (willLoadBaseWz)
+                        {
+                            string filePath = Path.Combine(baseFolder, dir + ".wz");
+                            if (File.Exists(filePath))
+                            {
+                                this.WzStructure.LoadFile(filePath, t, false, loadWzAsFolder);
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
                     }
                 }
-                else
-                {
-                    GetDirTree(t, false);
-                }
             }
-
+        
             parent.Nodes.Trim();
         }
 
@@ -493,20 +527,12 @@ namespace WzComparerR2.WzLib
             {
                 string wzName = this.node.Text;
 
-                Match m = Regex.Match(wzName, @"^([A-Za-z]+)(\d+)?(?:\.wz)?$");
+                Match m = Regex.Match(wzName, @"^([A-Za-z]+)_?(\d+)?(?:\.wz)?$");
                 if (m.Success)
                 {
                     wzName = m.Result("$1");
                 }
-
-                try
-                {
-                    this.type = (Wz_Type)Enum.Parse(typeof(Wz_Type), wzName, true);
-                }
-                catch
-                {
-                    this.type = Wz_Type.Unknown;
-                }
+                this.type = Enum.TryParse<Wz_Type>(wzName, true, out var result) ? result : Wz_Type.Unknown;
             }
         }
 
@@ -517,7 +543,7 @@ namespace WzComparerR2.WzLib
                 //选择最小的img作为实验品
                 Wz_Image minSizeImg = null;
                 List<Wz_Image> imgList = new List<Wz_Image>(this.imageCount);
-                foreach (var img in (EnumerableAllWzImage(this.node)))
+                foreach (var img in (EnumerableAllWzImage(this.node).Where(_img=>_img.WzFile == this)))
                 {
                     if (img.Size >= 20
                         && (minSizeImg == null || img.Size < minSizeImg.Size))
@@ -578,6 +604,24 @@ namespace WzComparerR2.WzLib
                     this.header.VersionChecked = true;
                 }
             }
+        }
+
+        public void MergeWzFile(Wz_File wz_File)
+        {
+            var children = wz_File.node.Nodes.ToList();
+            wz_File.node.Nodes.Clear();
+            foreach (var child in children)
+            {
+                this.node.Nodes.Add(child);
+            }
+
+            if (this.mergedWzFiles == null)
+            {
+                this.mergedWzFiles = new List<Wz_File>();
+            }
+            this.mergedWzFiles.Add(wz_File);
+
+            wz_File.ownerWzFile = this;
         }
 
         private IEnumerable<Wz_Image> EnumerableAllWzImage(Wz_Node parentNode)

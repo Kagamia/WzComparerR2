@@ -63,7 +63,7 @@ namespace WzComparerR2.WzLib
                 Wz_Node node = this;
                 do
                 {
-                    if (node.value is Wz_File)
+                    if (node.value is Wz_File wzf && !wzf.IsSubDir)
                     {
                         if (node.text.EndsWith(".wz", StringComparison.OrdinalIgnoreCase))
                         {
@@ -481,25 +481,42 @@ namespace WzComparerR2.WzLib
         /// </summary>
         /// <param Name="node">要搜索的wznode。</param>
         /// <returns></returns>
-        public static Wz_File GetNodeWzFile(this Wz_Node node)
+        public static Wz_File GetNodeWzFile(this Wz_Node node, bool returnClosestWzFile = false)
         {
             Wz_File wzfile = null;
-            Wz_Image wzImg = null;
             while (node != null)
             {
                 if ((wzfile = node.Value as Wz_File) != null)
                 {
-                    break;
+                    if (wzfile.OwnerWzFile != null)
+                    {
+                        wzfile = wzfile.OwnerWzFile;
+                        node = wzfile.Node;
+                    }
+                    if (!wzfile.IsSubDir || returnClosestWzFile)
+                    {
+                        break;
+                    }
                 }
-                if ((wzImg = node.Value as Wz_Image) != null
+                else if (node.Value is Wz_Image wzImg
                     || (wzImg = (node as Wz_Image.Wz_ImageNode)?.Image) != null)
                 {
-                    wzfile = wzImg.WzFile;
+                    wzfile = GetImageWzFile(wzImg, returnClosestWzFile);
                     break;
                 }
                 node = node.ParentNode;
             }
             return wzfile;
+        }
+
+        public static Wz_File GetImageWzFile(this Wz_Image wzImg, bool returnClosestWzFile = false)
+        {
+            if (!returnClosestWzFile && wzImg.WzFile != null)
+            {
+                return GetNodeWzFile(wzImg.WzFile.Node, returnClosestWzFile);
+            }
+
+            return wzImg.WzFile;
         }
 
         public static Wz_Image GetNodeWzImage(this Wz_Node node)
