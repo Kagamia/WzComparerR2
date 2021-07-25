@@ -110,7 +110,7 @@ namespace WzComparerR2.Comparer
             foreach (var childNode in wzFile.Node.Nodes)
             {
                 var subFile = childNode.GetValue<Wz_File>();
-                if (subFile != null) //wz子文件
+                if (subFile != null && !subFile.IsSubDir) //wz子文件
                 {
                     subFiles.Add(subFile);
                 }
@@ -178,6 +178,22 @@ namespace WzComparerR2.Comparer
                 Directory.CreateDirectory(srcDirPath);
             }
 
+            int GetDisplayVersion(Wz_File file)
+            {
+                if (file.Header.WzVersion != 0)
+                {
+                    return file.Header.WzVersion;
+                }
+                foreach(var subFile in file.MergedWzFiles)
+                {
+                    if (subFile.Header.WzVersion != 0)
+                    {
+                        return subFile.Header.WzVersion;
+                    }
+                }
+                return 0;
+            } 
+
             FileStream htmlFile = null;
             StreamWriter sw = null;
             StateInfo = "正在努力对比文件..." + type;
@@ -190,7 +206,7 @@ namespace WzComparerR2.Comparer
                 sw.WriteLine("<html>");
                 sw.WriteLine("<head>");
                 sw.WriteLine("<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">");
-                sw.WriteLine("<title>{0} {1}←{2}</title>", type, fileNew[0].Header.WzVersion, fileOld[0].Header.WzVersion);
+                sw.WriteLine("<title>{0} {1}←{2}</title>", type, GetDisplayVersion(fileNew[0]), GetDisplayVersion(fileOld[0]));
                 sw.WriteLine("<link type=\"text/css\" rel=\"stylesheet\" href=\"style.css\" />");
                 sw.WriteLine("</head>");
                 sw.WriteLine("<body>");
@@ -199,14 +215,14 @@ namespace WzComparerR2.Comparer
                 sw.WriteLine("<table>");
                 sw.WriteLine("<tr><th>&nbsp;</th><th>文件名</th><th>文件大小</th><th>文件版本</th></tr>");
                 sw.WriteLine("<tr><td>新文件</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
-                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileName).ToArray()),
-                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileSize.ToString("N0")).ToArray()),
-                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.WzVersion.ToString()).ToArray())
+                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileName)),
+                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileSize.ToString("N0"))),
+                    string.Join("<br/>", fileNew.Select(GetDisplayVersion))
                     );
                 sw.WriteLine("<tr><td>旧文件</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
                     string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileName).ToArray()),
-                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileSize.ToString("N0")).ToArray()),
-                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.WzVersion.ToString()).ToArray())
+                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileSize.ToString("N0"))),
+                    string.Join("<br/>", fileOld.Select(GetDisplayVersion))
                     );
                 sw.WriteLine("<tr><td>对比时间</td><td colspan='3'>{0:yyyy-MM-dd HH:mm:ss.fff}</td></tr>", DateTime.Now);
                 sw.WriteLine("<tr><td>参数</td><td colspan='3'>{0}</td></tr>", string.Join("<br/>", new[] {
