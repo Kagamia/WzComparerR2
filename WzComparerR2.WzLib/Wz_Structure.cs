@@ -82,6 +82,7 @@ namespace WzComparerR2.WzLib
                 {
                     throw new Exception("The file is not a valid wz file.");
                 }
+                this.wz_files.Add(file);
                 file.TextEncoding = this.TextEncoding;
                 if (!this.encryption.encryption_detected)
                 {
@@ -93,13 +94,15 @@ namespace WzComparerR2.WzLib
                 file.GetDirTree(node, useBaseWz, loadWzAsFolder);
                 file.DetectWzType();
                 file.DetectWzVersion();
-
-                this.wz_files.Add(file);
                 return file;
             }
             catch
             {
-                file?.Close();
+                if (file != null)
+                {
+                    file.Close();
+                    this.wz_files.Remove(file);
+                }
                 throw;
             }
         }
