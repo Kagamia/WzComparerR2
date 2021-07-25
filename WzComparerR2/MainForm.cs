@@ -639,9 +639,9 @@ namespace WzComparerR2
             advTree1.BeginUpdate();
             try
             {
-                if (wz.IsKMST1225DataWz(wzFilePath))
+                if (wz.IsKMST1125WzFormat(wzFilePath))
                 {
-                    wz.LoadKMST1225DataWz(wzFilePath);
+                    wz.LoadKMST1125DataWz(wzFilePath);
                 }
                 else
                 {

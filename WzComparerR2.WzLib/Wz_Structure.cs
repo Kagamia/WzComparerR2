@@ -137,50 +137,40 @@ namespace WzComparerR2.WzLib
             }
         }
 
-        public void LoadKMST1225DataWz(string dataWzFile)
+        public void LoadKMST1125DataWz(string fileName)
         {
-            string dataDir = GetDataDir(dataWzFile);
-
-            // load base dir as the root node
-            string baseWzDir = Path.Combine(dataDir, "Base");
-            if (!Directory.Exists(baseWzDir))
-            {
-                throw new DirectoryNotFoundException($"Directory {baseWzDir} does not exist.");
-            }
-
-            LoadWzFolder(baseWzDir, ref this.WzNode, true);
+            LoadWzFolder(Path.GetDirectoryName(fileName), ref this.WzNode, true);
+            calculate_img_count();
         }
 
-        public bool IsKMST1225DataWz(string fileName)
+        public bool IsKMST1125WzFormat(string fileName)
         {
-            string fn = Path.GetFileName(fileName);
-            if (!string.Equals(fn, "Data.wz", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(Path.GetExtension(fileName), ".wz", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
 
-            string dataDir = GetDataDir(fileName);
-            if (!Directory.Exists(dataDir))
+            string iniFile = Path.ChangeExtension(fileName, ".ini");
+            if (!File.Exists(iniFile))
             {
                 return false;
             }
 
-            // check if the file is a valid WzImage file
-            using (var wzf = new Wz_File(fileName, this))
+            // check if the file is an empty wzfile
+            using (var file = new Wz_File(fileName, this))
             {
-                var img = new Wz_Image(fn, (int)wzf.FileStream.Length, 0, 0, 0, wzf)
-                {
-                    Offset = 0,
-                    IsChecksumChecked = true
-                };
-
-                if (!img.TryExtract())
+                if (!file.Loaded)
                 {
                     return false;
                 }
-
-                // For KMST1225 the file is empty.
-                return img.Node.Nodes.Count == 0;
+                var tempNode = new Wz_Node();
+                if (!this.encryption.encryption_detected)
+                {
+                    this.encryption.DetectEncryption(file);
+                }
+                file.FileStream.Position = 62;
+                file.GetDirTree(tempNode);
+                return file.ImageCount == 0;
             }
         }
 
@@ -257,11 +247,6 @@ namespace WzComparerR2.WzLib
                     entryWzf.MergeWzFile(extraWzf);
                 }
             }
-        }
-
-        private static string GetDataDir(string dataWzFile)
-        {
-            return Path.Combine(Path.GetDirectoryName(dataWzFile), Path.GetFileNameWithoutExtension(dataWzFile));
         }
 
         #region Global Settings
