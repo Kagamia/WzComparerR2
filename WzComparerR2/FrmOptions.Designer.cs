@@ -77,7 +77,7 @@
             this.buttonX2.Size = new System.Drawing.Size(60, 23);
             this.buttonX2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.buttonX2.TabIndex = 1;
-            this.buttonX2.Text = "取消";
+            this.buttonX2.Text = "Cancel";
             // 
             // buttonX1
             // 
@@ -90,7 +90,7 @@
             this.buttonX1.Size = new System.Drawing.Size(60, 23);
             this.buttonX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.buttonX1.TabIndex = 0;
-            this.buttonX1.Text = "确定";
+            this.buttonX1.Text = "Save";
             // 
             // superTabControl1
             // 
@@ -217,7 +217,7 @@
             this.chkWzSortByImgID.Size = new System.Drawing.Size(107, 18);
             this.chkWzSortByImgID.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.chkWzSortByImgID.TabIndex = 5;
-            this.chkWzSortByImgID.Text = "按照ImgID排序";
+            this.chkWzSortByImgID.Text = "Sort by ImgID";
             // 
             // chkImgCheckDisabled
             // 

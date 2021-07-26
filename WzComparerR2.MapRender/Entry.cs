@@ -59,7 +59,7 @@ namespace WzComparerR2.MapRender
                 {
                     if (wzFile == null || wzFile.Type != Wz_Type.Map)
                     {
-                        if (MessageBoxEx.Show("所选Img不属于Map.wz，是否继续？", "提示", MessageBoxButtons.OKCancel) != DialogResult.OK)
+                        if (MessageBoxEx.Show("The selected Img does not belong to Map.wz. Continue?", "Prompt", MessageBoxButtons.OKCancel) != DialogResult.OK)
                         {
                             goto exit;
                         }
@@ -136,7 +136,7 @@ namespace WzComparerR2.MapRender
                 }
             }
 
-            MessageBoxEx.Show("没有选择一个map的img", "MapRender");
+            MessageBoxEx.Show("Please select a Map Img.", "MapRender");
 
         exit:
             return;

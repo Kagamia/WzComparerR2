@@ -20,13 +20,13 @@ namespace WzComparerR2
 
             cmbWzEncoding.Items.AddRange(new[]
             {
-                new ComboItem("默认"){ Value = 0 },
+                new ComboItem("Default"){ Value = 0 },
                 new ComboItem("CMS(gb2312)"){ Value = 936 },
                 new ComboItem("KMS(euc-kr)"){ Value = 949 },
                 new ComboItem("JMS(shift-jis)"){ Value = 932 },
                 new ComboItem("TMS(big5)"){ Value = 950 },
                 new ComboItem("GMS(iso-8859-1)"){ Value = 1252 },
-                new ComboItem("自定义"){ Value = -1 },
+                new ComboItem("Custom"){ Value = -1 },
             });
         }
 

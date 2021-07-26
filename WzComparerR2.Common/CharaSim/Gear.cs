@@ -35,7 +35,6 @@ namespace WzComparerR2.CharaSim
         public int Hammer { get; set; }
         public bool HasTuc { get; internal set; }
         public bool CanPotential { get; internal set; }
-        public string EpicHs { get; internal set; }
 
         public bool FixLevel { get; internal set; }
         public List<GearLevelInfo> Levels { get; internal set; }
@@ -91,7 +90,7 @@ namespace WzComparerR2.CharaSim
             int reqLevel;
             this.Props.TryGetValue(GearPropType.reqLevel, out reqLevel);
             int[] data = null;
-            foreach(int[] item in starData)
+            foreach (int[] item in starData)
             {
                 if (reqLevel >= item[0])
                 {
@@ -111,12 +110,12 @@ namespace WzComparerR2.CharaSim
         }
 
         private static readonly int[][] starData = new int[][] {
-            new[]{ 0, 5, 3 }, 
-            new[]{ 95, 8, 5 }, 
-            new[]{ 110, 10, 8 }, 
-            new[]{ 120, 15, 10 }, 
-            new[]{ 130, 20, 12 }, 
-            new[]{ 140, 25, 15 }, 
+            new[]{ 0, 5, 3 },
+            new[]{ 95, 8, 5 },
+            new[]{ 110, 10, 8 },
+            new[]{ 120, 15, 10 },
+            new[]{ 130, 20, 12 },
+            new[]{ 140, 25, 15 },
         };
 
         public override object Clone()
@@ -136,7 +135,7 @@ namespace WzComparerR2.CharaSim
         {
             if (AbilityTimeLimited.Count > 0)
             {
-                foreach(var kv in AbilityTimeLimited)
+                foreach (var kv in AbilityTimeLimited)
                 {
                     this.Props[kv.Key] = kv.Value;
                 }
@@ -169,12 +168,8 @@ namespace WzComparerR2.CharaSim
         /// <returns></returns>
         public static bool IsLeftWeapon(GearType type)
         {
-            int _type = (int)type;
-            if (type == GearType.shiningRod || type == GearType.tuner)
-            {
-                _type = (int)type / 10;
-            }
-            return _type >= 121 && _type <= 139 && type != GearType.katara;
+            return (int)type >= 121 && (int)type <= 139 && type != GearType.katara
+                || ((int)type / 10) == 121;
         }
 
         public static bool IsSubWeapon(GearType type)
@@ -246,26 +241,13 @@ namespace WzComparerR2.CharaSim
             {
                 switch (type)
                 {
-                    case GearPropType.incSTR:
-                    case GearPropType.incDEX:
-                    case GearPropType.incINT:
-                    case GearPropType.incLUK:
-                    case GearPropType.incPAD:
-                    case GearPropType.incMAD:
-                    case GearPropType.incSpeed:
-                    case GearPropType.incJump:
-                        return 1;
                     case GearPropType.incMHP:
                     case GearPropType.incMMP:
-                        return 100;
-                    case GearPropType.incPDD_incMDD:
-                    case GearPropType.incPDD:
+                    case GearPropType.incACC:
+                    case GearPropType.incEVA:
                         return 10;
-                    case GearPropType.incPAD_incMAD:
-                        return 2;
-                    case GearPropType.incMHP_incMMP:
-                        return 200;
                 }
+                return 1;
             }
             return int.MaxValue;
         }
@@ -344,15 +326,6 @@ namespace WzComparerR2.CharaSim
                 {
                     case 11902:
                         return (GearType)(code / 10);
-                }
-            }
-            if (code / 10000 == 121)
-            {
-                switch (code / 1000)
-                {
-                    case 1212:
-                    case 1213:
-                        return (GearType)(code / 1000);
                 }
             }
             return (GearType)(code / 10000);
@@ -544,7 +517,7 @@ namespace WzComparerR2.CharaSim
                             break;
 
                         case "option": //附加潜能信息
-                            Wz_Node itemWz = findNode !=null? findNode("Item\\ItemOption.img"):null;
+                            Wz_Node itemWz = findNode != null ? findNode("Item\\ItemOption.img") : null;
                             if (itemWz == null)
                                 break;
                             int optIdx = 0;
@@ -708,35 +681,6 @@ namespace WzComparerR2.CharaSim
                             }
                             break;
 
-                        case "onlyUpgrade":
-                            gear.Props.Add(GearPropType.onlyUpgrade, Convert.ToInt32(subNode.Nodes["0"]?.Value));
-                            break;
-
-                        case "epic":
-                            Wz_Node hsNode = subNode.Nodes["hs"];
-                            if (hsNode != null)
-                            {
-                                gear.EpicHs = Convert.ToString(hsNode.Value);
-                            }
-                            break;
-
-                        case "gatherTool":
-                            foreach (Wz_Node gatherNode in subNode.Nodes)
-                            {
-                                GearPropType type;
-                                if (Enum.TryParse(subNode.Text + "_" + gatherNode.Text, out type))
-                                {
-                                    try
-                                    {
-                                        gear.Props.Add(type, Convert.ToInt32(gatherNode.Value));
-                                    }
-                                    finally
-                                    {
-                                    }
-                                }
-                            }
-                            break;
-
                         default:
                             {
                                 GearPropType type;
@@ -771,14 +715,7 @@ namespace WzComparerR2.CharaSim
             //读取默认gearGrade
             if (gear.Props.TryGetValue(GearPropType.fixedGrade, out value))
             {
-                switch (value)
-                {
-                    case 2: gear.Grade = GearGrade.B; break;
-                    case 3: gear.Grade = GearGrade.A; break;
-                    case 5: gear.Grade = GearGrade.S; break;
-                    case 7: gear.Grade = GearGrade.SS; break;
-                    default: gear.Grade = (GearGrade)(value - 1); break;
-                }
+                gear.Grade = (GearGrade)(value - 1);
             }
 
             //自动填充Grade

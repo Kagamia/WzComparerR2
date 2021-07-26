@@ -474,8 +474,7 @@ namespace WzComparerR2.MapRender
             this.StringLinker?.StringMap.TryGetValue(mapID, out sr);
             string mapName = sr?["mapName"] ?? "(null)";
             int last = (mapName.LastOrDefault(c => c >= '가' && c <= '힣') - '가') % 28;
-            //var message = string.Format("是否传送到地图\r\n{0} ({1})？", sr?.Name ?? "null", mapID);
-            var message = mapName + (last == 0 || last == 8 ? "" : "으") + "로 이동하시겠습니까?";
+            var message = string.Format("Will you teleport to this map?\r\n[" + mapName + "]\r\n({1})", sr?.Name ?? "null", mapID);
             MessageBox.Show(message, "", MessageBoxButton.OKCancel, callback, false);
         }
 

@@ -366,10 +366,10 @@ namespace WzComparerR2
                     }
                     break;
                 case PatchingState.PrepareVerifyOldChecksumBegin:
-                    AppendStateText($"Pre-check old files checksum: {e.Part.FileName}");
+                    AppendStateText($"Pre-check old files checksum: {e.Part.FileName}\r\n");
                     break;
                 case PatchingState.PrepareVerifyOldChecksumEnd:
-                    AppendStateText("\nDone\r\n");
+                    AppendStateText("Done\r\n");
                     break;
                 case PatchingState.ApplyFile:
                     AppendStateText($"\nApplying file: {e.Part.FileName}\r\n");

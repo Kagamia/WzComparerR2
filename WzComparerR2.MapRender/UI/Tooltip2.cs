@@ -448,7 +448,7 @@ namespace WzComparerR2.MapRender.UI
                     //推荐等级
                     current.X = 15;
                     part3.Add(PrepareTextBlock(font,
-                        string.Format("推荐等级 : Lv.{0} ~ Lv.{1}", minLevel, maxLevel),
+                        string.Format("Recommended Level : Lv.{0} ~ Lv.{1}", minLevel, maxLevel),
                         ref current, new Color(119, 204, 255)));
                     size.X = Math.Max(size.X, current.X);
                     current.X = 0;

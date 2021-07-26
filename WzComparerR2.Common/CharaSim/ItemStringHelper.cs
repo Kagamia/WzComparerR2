@@ -98,12 +98,12 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.nbdR: return "Damage Against Normal Monsters: +" + value + "%";
 
                 case GearPropType.only: return value == 0 ? null : "One-of-a-kind item";
-                case GearPropType.tradeBlock: return value == 0 ? null : "Untradeable";
+                case GearPropType.tradeBlock: return value == 0 ? null : "Untradable";
                 case GearPropType.equipTradeBlock: return value == 0 ? null : "Cannot be Traded when equipped";
-                case GearPropType.accountSharable: return value == 0 ? null : "Tradeable within account";
-                case GearPropType.sharableOnce: return value == 0 ? null : "Tradeable within account once";
+                case GearPropType.accountSharable: return value == 0 ? null : "Account-bound. Transferable within world.";
+                case GearPropType.sharableOnce: return value == 0 ? null : "Tradable once within the same world.\n(Cannot be traded after transfer)";
                 case GearPropType.onlyEquip: return value == 0 ? null : "Unique Equipped Item";
-                case GearPropType.notExtend: return value == 0 ? null : "Time Limit extension is not possible.";
+                case GearPropType.notExtend: return value == 0 ? null : "Duration cannot be extended.";
                 case GearPropType.tradeAvailable:
                     switch (value)
                     {
@@ -117,7 +117,7 @@ namespace WzComparerR2.CharaSim
                         case 1: return "#cUse the Sharing Tag to move an item to another character on the same account once.#";
                         default: return null;
                     }
-                case GearPropType.noPotential: return value == 0 ? null : "This item has no Potential.";
+                case GearPropType.noPotential: return value == 0 ? null : "This item cannot gain Potential.";
                 case GearPropType.fixedPotential: return value == 0 ? null : "Potential Reset Not Allowed";
                 case GearPropType.superiorEqp: return value == 0 ? null : "Allows you to gain even higher stats with successful item enhancement.";
                 case GearPropType.nActivatedSocket: return value == 0 ? null : "#cYou can mount a Nebulite on this item.#";
@@ -334,6 +334,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.tuner: return "Bladecaster";
                 case GearType.bracelet: return "Bladebinder";
 
+                case GearType.breathShooter: return "Whispershot";
+                case GearType.weaponBelt: return "Weapon Belt";
+
                 case GearType.boxingCannon: return "拳炮";
                 case GearType.boxingSky: return "拳天";
 
@@ -504,6 +507,7 @@ namespace WzComparerR2.CharaSim
                 case 151: return "Adele only";
                 case 152: return "Illium only";
                 case 155: return "Ark only";
+                case 162: return "Lara only";
                 case 164: return "Hoyoung only";
                 case 175: return "Mo Xuan only";
                 default: return null;
@@ -753,6 +757,12 @@ namespace WzComparerR2.CharaSim
                 case 6111: return "Kaiser (3rd)";
                 case 6112: return "Kaiser (4th)";
                 case 6113: return "Kaiser (5th)";
+                case 6003: return "Kain";
+                case 6300: return "Kain (1st)";
+                case 6310: return "Kain (2nd)";
+                case 6311: return "Kain (3rd)";
+                case 6312: return "Kain (4th)";
+                case 6313: return "Kain (5th)";
                 case 6002: return "Cadena";
                 case 6400: return "Cadena (1st)";
                 case 6410: return "Cadena (2nd)";
@@ -804,6 +814,12 @@ namespace WzComparerR2.CharaSim
                 case 15512: return "Ark (4th)";
                 case 15513: return "Ark (5th)";
 
+                case 16001: return "Lara";
+                case 16200: return "Lara (1st)";
+                case 16210: return "Lara (2nd)";
+                case 16211: return "Lara (3rd)";
+                case 16212: return "Lara (4th)";
+                case 16213: return "Lara (5th)";
                 case 16000: return "Hoyoung";
                 case 16400: return "Hoyoung (1st)";
                 case 16410: return "Hoyoung (2nd)";
