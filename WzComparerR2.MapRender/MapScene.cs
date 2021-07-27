@@ -31,6 +31,12 @@ namespace WzComparerR2.MapRender
         public ContainerNode Effect { get; private set; }
 
         public IEnumerable<PortalItem> Portals => this.Fly.Portal.Slots.OfType<PortalItem>();
+        public IEnumerable<LifeItem> Npcs => this.Layers.Nodes.OfType<LayerNode>()
+            .SelectMany(layerNode => layerNode.Foothold.Nodes).OfType<ContainerNode<FootholdItem>>()
+            .SelectMany(fhNode => fhNode.Slots).OfType<LifeItem>()
+            .Where(lifeNode => lifeNode.Type == LifeItem.LifeType.Npc && !lifeNode.Hide)
+            .Concat(this.Fly.Sky.Slots.OfType<LifeItem>()
+            .Where(lifeNode => lifeNode.Type == LifeItem.LifeType.Npc && !lifeNode.Hide));
 
         public PortalItem FindPortal(string pName)
         {
