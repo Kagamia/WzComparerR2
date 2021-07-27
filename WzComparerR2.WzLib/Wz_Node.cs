@@ -519,6 +519,22 @@ namespace WzComparerR2.WzLib
             return wzImg.WzFile;
         }
 
+        public static int GetMergedVersion(this Wz_File wzFile)
+        {
+            if (wzFile.Header.WzVersion != 0)
+            {
+                return wzFile.Header.WzVersion;
+            }
+            foreach (var subFile in wzFile.MergedWzFiles)
+            {
+                if (subFile.Header.WzVersion != 0)
+                {
+                    return subFile.Header.WzVersion;
+                }
+            }
+            return 0;
+        }
+
         public static Wz_Image GetNodeWzImage(this Wz_Node node)
         {
             Wz_Image wzImg = null;

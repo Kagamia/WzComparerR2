@@ -2831,9 +2831,9 @@ namespace WzComparerR2
                         {
                             string txt = string.Format("待比较wz文件：\r\n\r\n  new : {0} (ver:{1})\r\n  old : {2} (ver:{3})\r\n\r\n如果继续对比请选择Yes，如果想交换文件顺序请选择No。",
                                 fileNew.Header.FileName,
-                                fileNew.Header.WzVersion,
+                                fileNew.GetMergedVersion(),
                                 fileOld.Header.FileName,
-                                fileOld.Header.WzVersion
+                                fileOld.GetMergedVersion()
                                 );
                             switch (MessageBoxEx.Show(txt, "Easy Compare", MessageBoxButtons.YesNoCancel))
                             {
