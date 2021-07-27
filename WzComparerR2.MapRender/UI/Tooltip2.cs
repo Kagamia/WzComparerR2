@@ -620,7 +620,7 @@ namespace WzComparerR2.MapRender.UI
                 position.Y = Math.Max(0, Math.Min(position.Y, env.Camera.Height - preferSize.Y));
             }
 
-            env.Sprite.Begin();
+            env.Sprite.Begin(blendState: BlendState.NonPremultiplied);
             var background = UIGraphics.LayoutNinePatch(this.Resource, new Point((int)preferSize.X, (int)preferSize.Y));
             foreach (var block in background)
             {
