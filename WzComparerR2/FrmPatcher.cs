@@ -432,7 +432,7 @@ namespace WzComparerR2
 > 没有检查原客户端版本 为了正确执行请预先确认
 > 暂时不提供文件块的筛选或文件缺失提示
 > 没优化 于是可能生成文件体积较大 但是几乎可以保证完整性
-> 对于KMST1225后无法正常工作", "声明");
+> 对于KMST1125后无法正常工作", "声明");
 
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.Filter = "*.patch|*.patch";

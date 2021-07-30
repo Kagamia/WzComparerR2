@@ -265,6 +265,7 @@
     <Content Include="Resources\StatusBar3.img.chat.ingame.view.max.center.png" />
     <Content Include="Resources\StatusBar3.img.chat.ingame.view.max.top.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.ArcaneForce.png" />
+    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.AuthenticForce.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.enchantMob.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Line.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Mob.png" />

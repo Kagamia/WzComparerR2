@@ -356,6 +356,14 @@ namespace WzComparerR2.Comparer
         /// <returns></returns>
         public virtual bool CompareData(object dataNew, object dataOld)
         {
+            // skip virtual dir
+            {
+                if (dataNew is Wz_File fileNew && fileNew.IsSubDir)
+                    dataNew = null;
+                if (dataOld is Wz_File fileOld && fileOld.IsSubDir)
+                    dataNew = null;
+            }
+
             if (dataNew == null && dataOld == null)
                 return true;
             if (dataNew == null ^ dataOld == null)
@@ -365,84 +373,68 @@ namespace WzComparerR2.Comparer
             if (type != dataOld.GetType())
                 return false;
 
-            string str;
-            Wz_Image img;
-            Wz_File file;
-            Wz_Png png;
-            Wz_Vector vector;
-            Wz_Uol uol;
-            Wz_Sound sound;
-
             if (type.IsClass)
             {
-                if ((str = dataNew as string) != null)
+                switch (dataNew)
                 {
-                    return str == (string)dataOld;
-                }
-                else if ((img = dataNew as Wz_Image) != null)
-                {
-                    Wz_Image imgOld = (Wz_Image)dataOld;
-                    return img.Size == imgOld.Size
-                        && img.Checksum == imgOld.Checksum;
-                }
-                else if ((file = dataNew as Wz_File) != null)
-                {
-                    Wz_File fileOld = (Wz_File)dataOld;
-                    return file.Type == fileOld.Type;
-                }
-                else if ((png = dataNew as Wz_Png) != null)
-                {
-                    Wz_Png pngOld = (Wz_Png)dataOld;
-                    switch (this.PngComparison)
-                    {
-                        case WzPngComparison.SizeOnly:
-                            return png.Width == pngOld.Width && png.Height == pngOld.Height;
+                    case string str:
+                        return str == (string)dataOld;
 
-                        case WzPngComparison.SizeAndDataLength:
-                            return png.Width == pngOld.Width
-                                && png.Height == pngOld.Height
-                                && png.DataLength == pngOld.DataLength;
+                    case Wz_Image img:
+                        Wz_Image imgOld = (Wz_Image)dataOld;
+                        return img.Size == imgOld.Size && img.Checksum == imgOld.Checksum;
 
-                        case WzPngComparison.Pixel:
-                            if (!(png.Width == pngOld.Width && png.Height == pngOld.Height && png.Form == pngOld.Form))
-                            {
-                                return false;
-                            }
-                            byte[] pixelNew = png.GetRawData();
-                            byte[] pixelOld = pngOld.GetRawData();
-                            if (pixelNew == null || pixelOld == null || pixelNew.Length != pixelOld.Length)
-                            {
-                                return false;
-                            }
-                            for (int i = 0, i1 = pixelNew.Length; i < i1; i++)
-                            {
-                                if (pixelNew[i] != pixelOld[i])
+                    case Wz_File file:
+                        Wz_File fileOld = (Wz_File)dataOld;
+                        return file.Type == fileOld.Type;
+
+                    case Wz_Png png:
+                        Wz_Png pngOld = (Wz_Png)dataOld;
+                        switch (this.PngComparison)
+                        {
+                            case WzPngComparison.SizeOnly:
+                                return png.Width == pngOld.Width && png.Height == pngOld.Height;
+
+                            case WzPngComparison.SizeAndDataLength:
+                                return png.Width == pngOld.Width
+                                    && png.Height == pngOld.Height
+                                    && png.DataLength == pngOld.DataLength;
+
+                            case WzPngComparison.Pixel:
+                                if (!(png.Width == pngOld.Width && png.Height == pngOld.Height && png.Form == pngOld.Form))
                                 {
                                     return false;
                                 }
-                            }
-                            return true;
+                                byte[] pixelNew = png.GetRawData();
+                                byte[] pixelOld = pngOld.GetRawData();
+                                if (pixelNew == null || pixelOld == null || pixelNew.Length != pixelOld.Length)
+                                {
+                                    return false;
+                                }
+                                for (int i = 0, i1 = pixelNew.Length; i < i1; i++)
+                                {
+                                    if (pixelNew[i] != pixelOld[i])
+                                    {
+                                        return false;
+                                    }
+                                }
+                                return true;
 
-                        default:
-                            goto case WzPngComparison.SizeAndDataLength;
+                            default:
+                                goto case WzPngComparison.SizeAndDataLength;
+                        }
+                        break;
 
-                    }
-                }
-                else if ((vector = dataNew as Wz_Vector) != null)
-                {
-                    Wz_Vector vectorOld = (Wz_Vector)dataOld;
-                    return vector.X == vectorOld.X
-                        && vector.Y == vectorOld.Y;
-                }
-                else if ((uol = dataNew as Wz_Uol) != null)
-                {
-                    return uol.Uol == ((Wz_Uol)dataOld).Uol;
-                }
-                else if ((sound = dataNew as Wz_Sound) != null)
-                {
-                    Wz_Sound soundOld = (Wz_Sound)dataOld;
-                    return sound.Ms == soundOld.Ms
-                        && sound.DataLength == soundOld.DataLength;
+                    case Wz_Vector vector:
+                        Wz_Vector vectorOld = (Wz_Vector)dataOld;
+                        return vector.X == vectorOld.X && vector.Y == vectorOld.Y;
+
+                    case Wz_Uol uol:
+                        return uol.Uol == ((Wz_Uol)dataOld).Uol;
+
+                    case Wz_Sound sound:
+                        Wz_Sound soundOld = (Wz_Sound)dataOld;
+                        return sound.Ms == soundOld.Ms && sound.DataLength == soundOld.DataLength;
                 }
             }
 

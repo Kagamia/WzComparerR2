@@ -23,7 +23,7 @@ variables:
   buildConfiguration: 'Release'
   outputDir_anycpu: 'WzComparerR2/WzComparerR2/bin/release'
   outputDir_x86: 'WzComparerR2/WzComparerR2/bin/x86/release'
-  outputFileName: 'WcR2_With_Plguins_$(Build.BuildNumber)'
+  outputFileName: 'WcR2_With_Plugins_$(Build.BuildNumber)'
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   accountName: 'wcr2publish'
   containerName: 'ci-build'
@@ -39,7 +39,7 @@ steps:
   inputs:
     script: |
       mkdir Build
-      echo [assembly: global::System.Reflection.AssemblyInformationalVersion("2.1.$(Build.BuildNumber)")] >> Build\CommonAssemblyInfo.cs
+      echo [assembly: global::System.Reflection.AssemblyInformationalVersion("2.2.$(Build.BuildNumber)")] >> Build\CommonAssemblyInfo.cs
     workingDirectory: '$(Build.SourcesDirectory)\WzComparerR2'
 
 - task: VSBuild@1
@@ -130,6 +130,6 @@ steps:
     releaseNotesSource: 'inline'
     releaseNotesInline: |
       Automation build from azure-pipeline.
-      download: [link]($(sasurl))
+      Binaries: [Zip]($(sasurl))
     isPreRelease: true
     addChangeLog: false
