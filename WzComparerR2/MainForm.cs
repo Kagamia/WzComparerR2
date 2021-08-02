@@ -404,7 +404,7 @@ namespace WzComparerR2
                     else
                     {
                         var dlg = new SaveFileDialog();
-                        dlg.Filter = "Png图片(*.png)|*.png|全部文件(*.*)|*.*";
+                        dlg.Filter = "PNG Image(*.png)|*.png|All Files (*.*)|*.*";
                         dlg.FileName = pngFileName;
                         if (dlg.ShowDialog() != DialogResult.OK)
                         {
@@ -418,7 +418,7 @@ namespace WzComparerR2
                     {
                         bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
                     }
-                    labelItemStatus.Text = "图片保存于" + pngFileName;
+                    labelItemStatus.Text = "PNG File Path: " + pngFileName;
                 }
                 else
                 {
@@ -442,7 +442,7 @@ namespace WzComparerR2
             {
                 var dlg = new SaveFileDialog();
 
-                dlg.Filter = string.Format("{0}(*{1})|*{1}|全部文件(*.*)|*.*", encParams.FileDescription, encParams.FileExtension);
+                dlg.Filter = string.Format("{0}(*{1})|*{1}|All Files (*.*)|*.*", encParams.FileDescription, encParams.FileExtension);
                 dlg.FileName = aniFileName;
 
                 if (dlg.ShowDialog() != DialogResult.OK)
