@@ -510,9 +510,8 @@ namespace WzComparerR2.MapRender
                     this.ui.ChatBox.AppendTextHelp(@"/back Teleport to the previous Map.");
                     this.ui.ChatBox.AppendTextHelp(@"/home Return to town.");
                     this.ui.ChatBox.AppendTextHelp(@"/history [maxCount] View map history.");
-                    this.ui.ChatBox.AppendTextHelp(@"/history [maxCount] View map history.");
-                    this.ui.ChatBox.AppendTextHelp(@"/multibgmlist View Multi BGM list (maps under BgmMultiTrack only).");
-                    this.ui.ChatBox.AppendTextHelp(@"/multibgmset (BGM name) Change current BGM (maps under BgmMultiTrack only).");
+                    this.ui.ChatBox.AppendTextHelp(@"/multibgmlist View Multi BGM list (maps using BgmMultiTrack only).");
+                    this.ui.ChatBox.AppendTextHelp(@"/multibgmset (BGM name) Change current BGM (maps using BgmMultiTrack only).");
                     break;
 
                 case "/map":
@@ -620,7 +619,7 @@ namespace WzComparerR2.MapRender
                     }
                     else
                     {
-                        this.ui.ChatBox.AppendTextHelp($"Please enter the correct Multi BGM Name.");
+                        this.ui.ChatBox.AppendTextHelp($"Please enter the correct BGM name.");
                     }
                     break;
 
