@@ -25,7 +25,7 @@ namespace WzComparerR2
                         ID = 0,
                         EncoderType = typeof(BuildInGifEncoder),
                         FileExtension = ".gif",
-                        FileDescription = "Gif图片",
+                        FileDescription = "GIF Image",
                         SupportAlphaChannel = false,
                     };
 
@@ -35,7 +35,7 @@ namespace WzComparerR2
                         ID = 1,
                         EncoderType = typeof(BuildInGifEncoder),
                         FileExtension = ".gif",
-                        FileDescription = "Gif图片",
+                        FileDescription = "GIF Image",
                         SupportAlphaChannel = false,
                     };
 
@@ -45,7 +45,7 @@ namespace WzComparerR2
                         ID = 2,
                         EncoderType = typeof(BuildInGifEncoder),
                         FileExtension = ".png",
-                        FileDescription = "APng图片",
+                        FileDescription = "APNG Image",
                         SupportAlphaChannel = true,
                     };
             }

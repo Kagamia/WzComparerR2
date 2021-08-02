@@ -180,7 +180,6 @@ namespace WzComparerR2.CharaSim
         {
             switch (rank)
             {
-                case GearGrade.C: return "(Common Item)";
                 case GearGrade.B: return "(Rare Item)";
                 case GearGrade.A: return "(Epic Item)";
                 case GearGrade.S: return "(Unique Item)";
