@@ -710,6 +710,7 @@ namespace WzComparerR2.Patcher
                 msBuffer = null;
                 tempFileStream.Flush();
                 tempFileStream.SetLength(tempFileStream.Position);  //设置文件大小为当前长度
+                closeAllFiles();
 
                 this.OnVerifyNewChecksumBegin(part);
                 //tempFileStream.Seek(0, SeekOrigin.Begin);
@@ -717,7 +718,6 @@ namespace WzComparerR2.Patcher
                 VerifyCheckSum(part.NewChecksum, newCheckSum1, part.FileName, "new");
                 this.OnVerifyNewChecksumEnd(part);
 
-                tempFileStream.Close();
                 this.OnTempFileClosed(part);
             }
             finally
