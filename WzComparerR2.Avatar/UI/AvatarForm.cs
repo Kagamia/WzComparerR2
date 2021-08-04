@@ -955,12 +955,13 @@ namespace WzComparerR2.Avatar.UI
                 return;
             }
 
-            var characWz = PluginManager.FindWz(Wz_Type.Character);
-            if (characWz == null)
+            if (PluginManager.FindWz(Wz_Type.Base) == null)
             {
-                MessageBoxEx.Show("没有打开Character.Wz。", "错误");
+                MessageBoxEx.Show("没有打开Base.Wz。", "错误");
                 return;
             }
+
+            var characWz = PluginManager.FindWz(Wz_Type.Character);
 
             //试图初始化
             if (!this.inited && !this.AvatarInit())
