@@ -969,6 +969,11 @@ namespace WzComparerR2.Avatar.UI
                 MessageBoxEx.Show("Avatar初始化失败。", "错误");
                 return;
             }
+            var sl = this.PluginEntry.Context.DefaultStringLinker;
+            if (!sl.HasValues) //生成默认stringLinker
+            {
+                sl.Load(PluginManager.FindWz(Wz_Type.String).GetValueEx<Wz_File>(null));
+            }
 
             if (loadType == 0) //先清空。。
             {
