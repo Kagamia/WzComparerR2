@@ -665,7 +665,7 @@ namespace WzComparerR2.MapRender.UI
                         {
                             Texture = texture.Texture,
                             Origin = new PointF(-spot.Spot.X + texture.Origin.X, -spot.Spot.Y + texture.Origin.Y),
-                            Z = texture.Z
+                            Z = 128 + texture.Z
                         };
                         if (spot.IsPreBB && curMap.BaseImg != null) //pre-bb地图点调整
                         {
