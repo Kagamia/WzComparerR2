@@ -243,14 +243,16 @@ namespace WzComparerR2.MapRender.UI
                     node = img.Node.Nodes["MapList"];
                     if (node != null)
                     {
-                        for (int i = 0; ; i++)
-                        {
-                            var spotNode = node.Nodes[i.ToString()];
-                            if (spotNode == null)
-                            {
-                                break;
-                            }
+                        // KMST 1125: the spot indices are not always continuous.
+                        var spotNodes = node.Nodes.Select(child => new {
+                                child,
+                                index = int.TryParse(child.Text, out var nodeInex) ? nodeInex : -1,
+                            }).Where(item => item.index > -1)
+                            .OrderBy(item => item.index)
+                            .Select(item => item.child);
 
+                        foreach (var spotNode in spotNodes)
+                        {
                             var spot = new MapSpot();
                             var location = spotNode.Nodes["spot"]?.GetValueEx<Wz_Vector>(null);
                             if (location != null)
