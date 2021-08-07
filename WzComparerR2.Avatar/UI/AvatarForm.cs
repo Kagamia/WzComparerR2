@@ -274,6 +274,11 @@ namespace WzComparerR2.Avatar.UI
             selectedItem = this.cmbEar.SelectedItem as ComboItem;
             this.avatar.EarType = selectedItem != null ? Convert.ToInt32(selectedItem.Text) : 0;
 
+            if (bodyFrame < 0 && emoFrame < 0 && tamingFrame < 0)
+            {
+                return;
+            }
+
             string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5},{6},{7},{8},{9},{10}",
                 this.avatar.ActionName,
                 bodyFrame,
