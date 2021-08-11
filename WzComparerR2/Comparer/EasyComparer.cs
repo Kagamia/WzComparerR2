@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Net;
 using System.Drawing;
 using System.Linq;
 using WzComparerR2.WzLib;
@@ -204,7 +205,7 @@ namespace WzComparerR2.Comparer
                     string.Join("<br/>", fileNew.Select(wzf => wzf.GetMergedVersion()))
                     );
                 sw.WriteLine("<tr><td>New File</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
-                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileName).ToArray()),
+                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileName)),
                     string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileSize.ToString("N0"))),
                     string.Join("<br/>", fileOld.Select(wzf => wzf.GetMergedVersion()))
                     );
@@ -477,7 +478,7 @@ namespace WzComparerR2.Comparer
                         bmp.Save(Path.Combine(outputDir, filePath), System.Drawing.Imaging.ImageFormat.Png);
                         bmp.Dispose();
                     }
-                    return string.Format("<img src=\"{0}\" />", Path.Combine(new DirectoryInfo(outputDir).Name, filePath));
+                    return string.Format("<img src=\"{0}/{1}\" />", new DirectoryInfo(outputDir).Name, WebUtility.UrlEncode(filePath));
                 }
                 else
                 {

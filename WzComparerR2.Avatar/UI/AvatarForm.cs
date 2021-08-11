@@ -274,6 +274,11 @@ namespace WzComparerR2.Avatar.UI
             selectedItem = this.cmbEar.SelectedItem as ComboItem;
             this.avatar.EarType = selectedItem != null ? Convert.ToInt32(selectedItem.Text) : 0;
 
+            if (bodyFrame < 0 && emoFrame < 0 && tamingFrame < 0)
+            {
+                return;
+            }
+
             string actionTag = string.Format("{0}:{1},{2}:{3},{4}:{5},{6},{7},{8},{9},{10}",
                 this.avatar.ActionName,
                 bodyFrame,
@@ -955,18 +960,24 @@ namespace WzComparerR2.Avatar.UI
                 return;
             }
 
-            var characWz = PluginManager.FindWz(Wz_Type.Character);
-            if (characWz == null)
+            if (PluginManager.FindWz(Wz_Type.Base) == null)
             {
-                MessageBoxEx.Show("Please manually specify a Character.wz file.", "Prompt");
+                MessageBoxEx.Show("Base.wz is not opened.", "Prompt");
                 return;
             }
+
+            var characWz = PluginManager.FindWz(Wz_Type.Character);
 
             //试图初始化
             if (!this.inited && !this.AvatarInit())
             {
                 MessageBoxEx.Show("Character generation failed.", "Prompt");
                 return;
+            }
+            var sl = this.PluginEntry.Context.DefaultStringLinker;
+            if (!sl.HasValues) //生成默认stringLinker
+            {
+                sl.Load(PluginManager.FindWz(Wz_Type.String).GetValueEx<Wz_File>(null));
             }
 
             if (loadType == 0) //先清空。。

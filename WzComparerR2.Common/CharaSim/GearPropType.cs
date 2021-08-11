@@ -169,10 +169,12 @@ namespace WzComparerR2.CharaSim
         abilityTimeLimited,
         blockGoldHammer,
         exceptUpgrade,
+        colorvar,
         noMoveToLocker,
         onlyUpgrade,
         cantRepair,
-        colorvar,
+        noPetEquipStatMoveItem,
+        BTSLabel,
 
         gatherTool_incSkillLevel = 2000,
         gatherTool_incSpeed,

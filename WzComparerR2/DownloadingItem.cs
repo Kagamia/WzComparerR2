@@ -50,6 +50,8 @@ namespace WzComparerR2
             switch (uri.Scheme.ToLower())
             {
                 case "http":
+                case "https":
+                    ServicePointManager.SecurityProtocol = (SecurityProtocolType)(3072 | 12288); //TLS1.2/TLS1.3
                     GetFileLengthHttp();
                     break;
 

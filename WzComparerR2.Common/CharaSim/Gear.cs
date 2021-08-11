@@ -35,6 +35,7 @@ namespace WzComparerR2.CharaSim
         public int Hammer { get; set; }
         public bool HasTuc { get; internal set; }
         public bool CanPotential { get; internal set; }
+        public string EpicHs { get; internal set; }
 
         public bool FixLevel { get; internal set; }
         public List<GearLevelInfo> Levels { get; internal set; }
@@ -83,6 +84,18 @@ namespace WzComparerR2.CharaSim
         public int GetMaxStar()
         {
             if (!this.HasTuc)
+            {
+                return 0;
+            }
+            if (this.Cash)
+            {
+                return 0;
+            }
+            if (this.GetBooleanValue(GearPropType.onlyUpgrade))
+            {
+                return 0;
+            }
+            if (this.type == GearType.machineEngine || this.type == GearType.machineArms || this.type == GearType.machineLegs || this.type == GearType.machineBody || this.type == GearType.machineTransistors || this.type == GearType.dragonMask || this.type == GearType.dragonPendant || this.type == GearType.dragonWings || this.type == GearType.dragonTail)
             {
                 return 0;
             }
@@ -673,6 +686,36 @@ namespace WzComparerR2.CharaSim
                                     try
                                     {
                                         gear.AbilityTimeLimited.Add(type, Convert.ToInt32(statNode.Value));
+                                    }
+                                    finally
+                                    {
+                                    }
+                                }
+                            }
+                            break;
+
+                        case "onlyUpgrade":
+                            int upgradeItemID = subNode.Nodes["0"]?.GetValueEx(0) ?? 0;
+                            gear.Props.Add(GearPropType.onlyUpgrade, upgradeItemID);
+                            break;
+
+                        case "epic":
+                            Wz_Node hsNode = subNode.Nodes["hs"];
+                            if (hsNode != null)
+                            {
+                                gear.EpicHs = Convert.ToString(hsNode.Value);
+                            }
+                            break;
+
+                        case "gatherTool":
+                            foreach (Wz_Node gatherNode in subNode.Nodes)
+                            {
+                                GearPropType type;
+                                if (Enum.TryParse(subNode.Text + "_" + gatherNode.Text, out type))
+                                {
+                                    try
+                                    {
+                                        gear.Props.Add(type, Convert.ToInt32(gatherNode.Value));
                                     }
                                     finally
                                     {
