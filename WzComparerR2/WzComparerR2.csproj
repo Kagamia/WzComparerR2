@@ -197,6 +197,12 @@
     <Compile Include="FrmGifMaker.Designer.cs">
       <DependentUpon>FrmGifMaker.cs</DependentUpon>
     </Compile>
+    <Compile Include="FrmGifClipOptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmGifClipOptions.Designer.cs">
+      <DependentUpon>FrmGifClipOptions.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmOptions.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -278,6 +284,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FrmGifMaker.resx">
       <DependentUpon>FrmGifMaker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmGifClipOptions.resx">
+      <DependentUpon>FrmGifClipOptions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmOptions.resx">
       <DependentUpon>FrmOptions.cs</DependentUpon>

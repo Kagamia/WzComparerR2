@@ -272,7 +272,11 @@ namespace WzComparerR2.Animation
 
             return frameList;
         }
-      
+
+        public override object Clone()
+        {
+            return new SpineAnimator(this.Data);
+        }
 
         private void Load()
         {

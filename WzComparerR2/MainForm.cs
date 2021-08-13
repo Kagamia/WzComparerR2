@@ -380,80 +380,12 @@ namespace WzComparerR2
 
         private void buttonItemSaveImage_Click(object sender, EventArgs e)
         {
-            if (this.pictureBoxEx1.Items.Count <= 0)
-            {
-                return;
-            }
-            var config = ImageHandlerConfig.Default;
+            this.OnSaveImage(false);
+        }
 
-            var aniItem = this.pictureBoxEx1.Items[0];
-
-            //单帧图像
-            var frameData = (aniItem as FrameAnimator)?.Data;
-            if (frameData != null && frameData.Frames.Count == 1)
-            {
-                var frame = frameData.Frames[0];
-                if (frame.Png != null)
-                {
-                    string pngFileName = pictureBoxEx1.PictureName + ".png";
-
-                    if (config.AutoSaveEnabled)
-                    {
-                        pngFileName = Path.Combine(config.AutoSavePictureFolder, pngFileName);
-                    }
-                    else
-                    {
-                        var dlg = new SaveFileDialog();
-                        dlg.Filter = "Png图片(*.png)|*.png|全部文件(*.*)|*.*";
-                        dlg.FileName = pngFileName;
-                        if (dlg.ShowDialog() != DialogResult.OK)
-                        {
-                            return;
-                        }
-
-                        pngFileName = dlg.FileName;
-                    }
-
-                    using (var bmp = frame.Png.ExtractPng())
-                    {
-                        bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
-                    }
-                    labelItemStatus.Text = "图片保存于" + pngFileName;
-                }
-                else
-                {
-                    labelItemStatus.Text = "没有文件被保存。";
-                }
-                return;
-            }
-
-            var encParams = AnimateEncoderFactory.GetEncoderParams(config.GifEncoder.Value);
-
-            string aniName = this.cmbItemAniNames.SelectedItem as string;
-            string aniFileName = pictureBoxEx1.PictureName
-                    + (string.IsNullOrEmpty(aniName) ? "" : ("." + aniName))
-                    + encParams.FileExtension;
-
-            if (config.AutoSaveEnabled)
-            {
-                aniFileName = Path.Combine(config.AutoSavePictureFolder, aniFileName);
-            }
-            else
-            {
-                var dlg = new SaveFileDialog();
-
-                dlg.Filter = string.Format("{0}(*{1})|*{1}|全部文件(*.*)|*.*", encParams.FileDescription, encParams.FileExtension);
-                dlg.FileName = aniFileName;
-
-                if (dlg.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
-                aniFileName = dlg.FileName;
-            }
-
-            this.pictureBoxEx1.SaveAsGif((AnimationItem)aniItem.Clone(), aniFileName, config);
-            labelItemStatus.Text = "图片保存于" + aniFileName;
+        private void buttonItemSaveWithOptions_Click(object sender, EventArgs e)
+        {
+            this.OnSaveImage(true);
         }
 
         private Node handleUol(Node currentNode, string uolString)
@@ -580,7 +512,6 @@ namespace WzComparerR2
             }
         }
 
-
         private void buttonItemAutoSave_Click(object sender, EventArgs e)
         {
             ConfigManager.Reload();
@@ -604,6 +535,106 @@ namespace WzComparerR2
             }
         }
 
+        private void OnSaveImage(bool options)
+        {
+            if (this.pictureBoxEx1.Items.Count <= 0)
+            {
+                return;
+            }
+
+            var aniItem = this.pictureBoxEx1.Items[0];
+            var frameData = (aniItem as FrameAnimator)?.Data;
+            if (frameData != null && frameData.Frames.Count == 1)
+            {
+                // save still picture as png
+                this.OnSavePngFile(frameData.Frames[0]);
+            }
+            else
+            {
+                // save as gif/apng
+                this.OnSaveGifFile(aniItem, options);
+            }
+        }
+
+        private void OnSavePngFile(Frame frame)
+        {
+            if (frame.Png != null)
+            {
+                var config = ImageHandlerConfig.Default;
+                string pngFileName = pictureBoxEx1.PictureName + ".png";
+
+                if (config.AutoSaveEnabled)
+                {
+                    pngFileName = Path.Combine(config.AutoSavePictureFolder, pngFileName);
+                }
+                else
+                {
+                    var dlg = new SaveFileDialog();
+                    dlg.Filter = "Png图片(*.png)|*.png|全部文件(*.*)|*.*";
+                    dlg.FileName = pngFileName;
+                    if (dlg.ShowDialog() != DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    pngFileName = dlg.FileName;
+                }
+
+                using (var bmp = frame.Png.ExtractPng())
+                {
+                    bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
+                }
+                labelItemStatus.Text = "图片保存于" + pngFileName;
+            }
+            else
+            {
+                labelItemStatus.Text = "没有文件被保存。";
+            }
+        }
+
+        private void OnSaveGifFile(AnimationItem aniItem, bool options)
+        {
+            var config = ImageHandlerConfig.Default;
+            var encParams = AnimateEncoderFactory.GetEncoderParams(config.GifEncoder.Value);
+
+            string aniName = this.cmbItemAniNames.SelectedItem as string;
+            string aniFileName = pictureBoxEx1.PictureName
+                    + (string.IsNullOrEmpty(aniName) ? "" : ("." + aniName))
+                    + encParams.FileExtension;
+
+            if (config.AutoSaveEnabled)
+            {
+                var fullFileName = Path.Combine(config.AutoSavePictureFolder, aniFileName);
+                int i = 1;
+                while (File.Exists(fullFileName))
+                {
+                    fullFileName = Path.Combine(config.AutoSavePictureFolder, string.Format("{0}({1}){2}",
+                        Path.GetFileNameWithoutExtension(aniFileName), i, Path.GetExtension(aniFileName)));
+                    i++;
+                }
+                aniFileName = fullFileName;
+            }
+            else
+            {
+                var dlg = new SaveFileDialog();
+
+                dlg.Filter = string.Format("{0}(*{1})|*{1}|全部文件(*.*)|*.*", encParams.FileDescription, encParams.FileExtension);
+                dlg.FileName = aniFileName;
+
+                if (dlg.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+                aniFileName = dlg.FileName;
+            }
+
+            var clonedAniItem = (AnimationItem)aniItem.Clone();
+            clonedAniItem.Position = Microsoft.Xna.Framework.Point.Zero;
+            if (this.pictureBoxEx1.SaveAsGif(clonedAniItem, aniFileName, config, options))
+            {
+                labelItemStatus.Text = "图片保存于" + aniFileName;
+            }
+        }
         #endregion
 
         #region File菜单的事件
@@ -3066,8 +3097,6 @@ namespace WzComparerR2
                 UpdateWzLoadingSettings();
             }
         }
-
-
     }
 
     #region 内部用扩展方法

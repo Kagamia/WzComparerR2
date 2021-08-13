@@ -246,6 +246,7 @@
             this.dockContainerItem2 = new DevComponents.DotNetBar.DockContainerItem();
             this.panelDockContainer2 = new DevComponents.DotNetBar.PanelDockContainer();
             this.btnItemOpenImg = new DevComponents.DotNetBar.ButtonItem();
+            this.buttonItemSaveWithOptions = new DevComponents.DotNetBar.ButtonItem();
             this.ribbonControl1.SuspendLayout();
             this.ribbonPanel2.SuspendLayout();
             this.ribbonPanel1.SuspendLayout();
@@ -1940,7 +1941,8 @@
             this.itemContainer27.Name = "itemContainer27";
             this.itemContainer27.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.buttonItemAutoSave,
-            this.buttonItemAutoSaveFolder});
+            this.buttonItemAutoSaveFolder,
+            this.buttonItemSaveWithOptions});
             // 
             // 
             // 
@@ -2883,6 +2885,12 @@
             this.btnItemOpenImg.Text = "Open Img...";
             this.btnItemOpenImg.Click += new System.EventHandler(this.btnItemOpenImg_Click);
             // 
+            // buttonItemSaveWithOptions
+            // 
+            this.buttonItemSaveWithOptions.Name = "buttonItemSaveWithOptions";
+            this.buttonItemSaveWithOptions.Text = "Save with options";
+            this.buttonItemSaveWithOptions.Click += new System.EventHandler(this.buttonItemSaveWithOptions_Click);
+            // 
             // MainForm
             // 
             this.ClientSize = new System.Drawing.Size(750, 512);
@@ -3148,5 +3156,6 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX chkResolvePngLink;
         private DevComponents.DotNetBar.ComboBoxItem cmbItemSkins;
         private DevComponents.DotNetBar.ButtonItem btnItemOpenImg;
+        private DevComponents.DotNetBar.ButtonItem buttonItemSaveWithOptions;
     }
 }
