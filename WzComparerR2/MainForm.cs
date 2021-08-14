@@ -1729,39 +1729,55 @@ namespace WzComparerR2
             switch (comboBoxItem1.SelectedIndex)
             {
                 case 0:
-                    searchAdvTree(advTree1, 0, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked);
+                    searchAdvTree(advTree1, 0, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked, checkBoxItemRegex1.Checked);
                     break;
                 case 1:
-                    searchAdvTree(advTree2, 0, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked);
+                    searchAdvTree(advTree2, 0, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked, checkBoxItemRegex1.Checked);
                     break;
                 case 2:
-                    searchAdvTree(advTree3, 1, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked);
+                    searchAdvTree(advTree3, 1, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked, checkBoxItemRegex1.Checked);
                     break;
             }
         }
 
-        private void searchAdvTree(AdvTree advTree, int cellIndex, string searchText, bool exact)
+        private void searchAdvTree(AdvTree advTree, int cellIndex, string searchText, bool exact, bool regex)
         {
             if (string.IsNullOrEmpty(searchText))
                 return;
-            Node searchNode = searchAdvTree(advTree, cellIndex, searchText.Split('\\'), exact, true);
+            Node searchNode = searchAdvTree(advTree, cellIndex, searchText, exact, regex, true);
             advTree.SelectedNode = searchNode;
             if (searchNode == null)
                 MessageBoxEx.Show("已经搜索到末尾。", "喵呜~");
         }
 
-        private Node searchAdvTree(AdvTree advTree, int cellIndex, string[] patten, bool exact, bool ignoreCase)
+        private Node searchAdvTree(AdvTree advTree, int cellIndex, string searchText, bool exact, bool isRegex, bool ignoreCase)
         {
             if (advTree.Nodes.Count == 0)
                 return null;
 
-            foreach (var node in findNextNode(advTree))
+            if (isRegex)
             {
-                if (checkSearchNodeText(node, cellIndex, patten, exact, ignoreCase))
+                var r = new Regex(searchText, ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
+                foreach (var node in findNextNode(advTree))
                 {
-                    return node;
+                    if (node != null && node.Cells.Count > cellIndex && r.IsMatch(node.Cells[cellIndex].Text))
+                    {
+                        return node;
+                    }
                 }
             }
+            else
+            {
+                string[] pattern = searchText.Split('\\');
+                foreach (var node in findNextNode(advTree))
+                {
+                    if (checkSearchNodeText(node, cellIndex, pattern, exact, ignoreCase))
+                    {
+                        return node;
+                    }
+                }
+            }
+            
             return null;
         }
 
@@ -1843,12 +1859,6 @@ namespace WzComparerR2
             }
         }
 
-        private void switchBtnString_ValueChanged(object sender, EventArgs e)
-        {
-            /*
-            panelExString.Visible = switchBtnString.Value;*/
-        }
-
         private void buttonItemSearchString_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(textBoxItemSearchString.Text))
@@ -1900,7 +1910,7 @@ namespace WzComparerR2
             }
             listViewExString.BeginUpdate();
             listViewExString.Items.Clear();
-            IEnumerable<KeyValuePair<int, StringResult>> results = searchStringLinker(dicts, textBoxItemSearchString.Text, checkBoxItemExact2.Checked);
+            IEnumerable<KeyValuePair<int, StringResult>> results = searchStringLinker(dicts, textBoxItemSearchString.Text, checkBoxItemExact2.Checked, checkBoxItemRegex2.Checked);
             foreach (KeyValuePair<int, StringResult> kv in results)
             {
                 string[] item = new string[] { kv.Key.ToString(), kv.Value.Name, kv.Value.Desc, kv.Value.FullPath };
@@ -1924,9 +1934,10 @@ namespace WzComparerR2
             return null;
         }
 
-        private IEnumerable<KeyValuePair<int, StringResult>> searchStringLinker(IEnumerable<Dictionary<int, StringResult>> dicts, string key, bool exact)
+        private IEnumerable<KeyValuePair<int, StringResult>> searchStringLinker(IEnumerable<Dictionary<int, StringResult>> dicts, string key, bool exact, bool isRegex)
         {
             string[] match = key.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var re = new Regex(key, RegexOptions.IgnoreCase);
             foreach (Dictionary<int, StringResult> dict in dicts)
             {
                 foreach (KeyValuePair<int, StringResult> kv in dict)
@@ -1935,6 +1946,13 @@ namespace WzComparerR2
                     {
                         if (kv.Key.ToString() == key || kv.Value.Name == key)
                             yield return kv;
+                    }
+                    else if (isRegex)
+                    {
+                        if (re.IsMatch(kv.Key.ToString()) || (!string.IsNullOrEmpty(kv.Value.Name) && re.IsMatch(kv.Value.Name)))
+                        {
+                            yield return kv;
+                        }
                     }
                     else
                     {
