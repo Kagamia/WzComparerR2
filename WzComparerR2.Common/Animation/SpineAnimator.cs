@@ -277,7 +277,10 @@ namespace WzComparerR2.Animation
         {
             var clonedAnimator = new SpineAnimator(this.Data);
             clonedAnimator.SelectedAnimationIndex = this.SelectedAnimationIndex;
-            clonedAnimator.SelectedSkin = this.SelectedSkin;
+            if (this.SelectedSkin != null)
+            {
+                clonedAnimator.SelectedSkin = this.SelectedSkin;
+            }
             return clonedAnimator;
         }
 

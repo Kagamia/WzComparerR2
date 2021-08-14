@@ -45,6 +45,26 @@ namespace WzComparerR2.Controls
             set { this.globalScale = MathHelper.Clamp(value, 0.1f, 10f); }
         }
 
+        public bool IsPlaying
+        {
+            get { return this.timer.Enabled; }
+            set
+            {
+                if (value)
+                {
+                    this.lastUpdateTime = TimeSpan.Zero;
+                    this.sw.Restart();
+                }
+                this.timer.Enabled = value;
+            }
+        }
+
+        public int FrameInterval
+        {
+            get { return this.timer.Interval; }
+            set { this.timer.Interval = value; }
+        }
+
         private float globalScale;
         private Timer timer;
         private Stopwatch sw;

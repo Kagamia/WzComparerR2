@@ -422,8 +422,10 @@ namespace WzComparerR2
                 var step4 = step3.Select(item => ApplyFrame(item.Item1, item.Item2));
 
                 // run pipeline
+                bool isPlaying = this.IsPlaying;
                 try
                 {
+                    this.IsPlaying = false;
                     rec.Begin(bounds, targetSize);
                     if (startTime > 0)
                     {
@@ -446,6 +448,7 @@ namespace WzComparerR2
                 {
                     rec.End();
                     enc.Dispose();
+                    this.IsPlaying = isPlaying;
                 }
             }
 

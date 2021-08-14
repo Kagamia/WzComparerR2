@@ -629,7 +629,6 @@ namespace WzComparerR2
             }
 
             var clonedAniItem = (AnimationItem)aniItem.Clone();
-            clonedAniItem.Position = Microsoft.Xna.Framework.Point.Zero;
             if (this.pictureBoxEx1.SaveAsGif(clonedAniItem, aniFileName, config, options))
             {
                 labelItemStatus.Text = "图片保存于" + aniFileName;
@@ -2927,63 +2926,6 @@ namespace WzComparerR2
         private void buttonItemAbout_Click(object sender, EventArgs e)
         {
             new FrmAbout().ShowDialog();
-            /*
-            Wz_File mob78 = openedWz[0].wz_files[0];
-            Wz_File mob109 = openedWz[1].wz_files[0];
-            WzFileComparer comp = new WzFileComparer();
-            StringBuilder sb= new StringBuilder();
-            foreach(var diff in comp.Compare(mob78.Node,mob109.Node))
-            {
-                if (diff.DifferenceType == DifferenceType.Changed)//新增
-                {
-                    Wz_Image img78 = diff.ValueNew as Wz_Image;
-                    Wz_Image img109 = diff.ValueOld as Wz_Image;
-                    if (img78 != null && img109 != null
-                        && img78.Check_if_extracted() && img109.Check_if_extracted())
-                    {
-                        foreach (var diff2 in comp.Compare(img78.Node, img109.Node))
-                        {
-                            if (diff2.NodeNew != null &&
-                                (diff2.NodeNew.Text == "maxHP" || diff2.NodeNew.Text == "finalmaxHP"))
-                            {
-                                sb.Append(img78.Node.Text).Append("\t").Append(diff2.NodeNew.Text).Append("\t")
-                                    .Append(diff2.ValueNew).Append("\t").Append(diff2.ValueOld);
-                                StringResult sr;
-                                if (this.stringLinker.StringMob.TryGetValue(Convert.ToInt32(diff.NodeNew.Text.Substring(0, 7)), out sr))
-                                {
-                                    sb.Append("\t").Append(sr.Name);
-                                }
-                                sb.AppendLine();
-                            }
-                        }
-
-                        img78.Unextract();
-                        img109.Unextract();
-                    }
-                }
-            }
-            Clipboard.SetText(sb.ToString());
-            */
-            /*
-            Wz_Node mobWz = PluginBase.PluginManager.FindWz(Wz_Type.Mob);
-            Wz_Node stand;
-            Gif gif;
-            Wz_Image img;
-            foreach (Wz_Node imgNode in mobWz.Nodes)
-            {
-                string fn = @"D:\Mob\" + imgNode.Text + ".gif";
-                if (!File.Exists(fn)
-                    && (img = imgNode.Value as Wz_Image) != null
-                    && img.Check_if_extracted()
-                    && (stand = img.Node.FindChildByPath("stand", true)) != null
-                    && (gif = Gif.LoadFromNode(stand)) != null)
-                {
-                    Bitmap bgif = gif.EncodeGif(Color.Transparent, 0); //9400724
-                    bgif.Save(@"D:\Mob\" + imgNode.Text + ".gif");
-                    bgif.Dispose();
-                    img.Unextract();
-                }
-            }*/
         }
 
         private void btnExportSkill_Click(object sender, EventArgs e)
@@ -3029,23 +2971,6 @@ namespace WzComparerR2
             ConfigManager.Reload();
             CharaSimConfig.Default.AutoQuickView = buttonItemAutoQuickView.Checked;
             ConfigManager.Save();
-        }
-
-        private void buttonItem2_Click(object sender, EventArgs e)
-        {
-
-            /*
-            Patcher.WzPatcherWriter w = new Patcher.WzPatcherWriter(fs);
-            w.Begin();
-            w.WriteNewDirectory("abc\\");
-            FileStream fs1 = new FileStream(@"D:\jx3server.txt", FileMode.Open, FileAccess.Read);
-
-            w.WriteNewFile("abc\\jx3server.txt", (int)fs1.Length, Patcher.CheckSum.ComputeHash(fs1, (int)fs1.Length));
-            fs1.Position = 0;
-            w.WriteContent(fs1, (int)fs1.Length);
-            w.End();
-            MessageBox.Show("已创建" + fs.Name);*/
-
         }
 
         private void panelExLeft_SizeChanged(object sender, EventArgs e)
