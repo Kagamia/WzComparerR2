@@ -101,6 +101,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\AvatarPartButtonItem.resx">
       <DependentUpon>AvatarPartButtonItem.cs</DependentUpon>
@@ -117,6 +118,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\script_code.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\disk.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj">

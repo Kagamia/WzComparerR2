@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -297,12 +298,6 @@ namespace WzComparerR2.Avatar.UI
                 try
                 {
                     var actionFrames = avatar.GetActionFrames(avatar.ActionName);
-                    ActionFrame f = null;
-                    if (bodyFrame > -1 && bodyFrame < actionFrames.Length)
-                    {
-                        f = actionFrames[bodyFrame];
-                    }
-
                     var bone = avatar.CreateFrame(bodyFrame, emoFrame, tamingFrame);
                     var layers = avatar.CreateFrameLayers(bone);
                     avatarContainer1.AddCache(actionTag, layers);
@@ -930,7 +925,8 @@ namespace WzComparerR2.Avatar.UI
 
         private void btnMale_Click(object sender, EventArgs e)
         {
-            if (MessageBoxEx.Show("初始化为男性角色？", "提示") == DialogResult.OK)
+            if (this.avatar.Parts.All(part => part == null) 
+                || MessageBoxEx.Show("初始化为男性角色？", "提示") == DialogResult.OK)
             {
                 LoadCode("2000,12000,20000,30000,1040036,1060026", 0);
             }
@@ -938,7 +934,8 @@ namespace WzComparerR2.Avatar.UI
 
         private void btnFemale_Click(object sender, EventArgs e)
         {
-            if (MessageBoxEx.Show("初始化为女性角色？", "提示") == DialogResult.OK)
+            if (this.avatar.Parts.All(part => part == null)
+                || MessageBoxEx.Show("初始化为女性角色？", "提示") == DialogResult.OK)
             {
                 LoadCode("2000,12000,21000,31000,1041046,1061039", 0);
             }
@@ -948,6 +945,11 @@ namespace WzComparerR2.Avatar.UI
         {
             this.avatarContainer1.Origin = new Point(this.avatarContainer1.Width / 2, this.avatarContainer1.Height / 2 + 40);
             this.avatarContainer1.Invalidate();
+        }
+
+        private void btnSaveAsGif_Click(object sender, EventArgs e)
+        {
+
         }
 
         private void LoadCode(string code, int loadType)
@@ -1128,11 +1130,6 @@ namespace WzComparerR2.Avatar.UI
                 }
                 this.NextFrameDelay = nextFrame;
             }
-        }
-
-        private void buttonItem1_Click_1(object sender, EventArgs e)
-        {
-            this.PluginEntry.btnSetting_Click(sender, e);
         }
     }
 }
