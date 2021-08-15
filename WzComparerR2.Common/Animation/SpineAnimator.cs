@@ -272,7 +272,17 @@ namespace WzComparerR2.Animation
 
             return frameList;
         }
-      
+
+        public override object Clone()
+        {
+            var clonedAnimator = new SpineAnimator(this.Data);
+            clonedAnimator.SelectedAnimationIndex = this.SelectedAnimationIndex;
+            if (this.SelectedSkin != null)
+            {
+                clonedAnimator.SelectedSkin = this.SelectedSkin;
+            }
+            return clonedAnimator;
+        }
 
         private void Load()
         {
