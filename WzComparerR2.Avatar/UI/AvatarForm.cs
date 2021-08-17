@@ -26,10 +26,6 @@ namespace WzComparerR2.Avatar.UI
             btnReset_Click(btnReset, EventArgs.Empty);
             FillWeaponIdx();
             FillEarSelection();
-
-#if !DEBUG
-            buttonItem1.Visible = false;
-#endif
         }
 
         public SuperTabControlPanel GetTabPanel()
