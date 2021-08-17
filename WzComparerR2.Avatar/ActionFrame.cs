@@ -20,6 +20,10 @@ namespace WzComparerR2.Avatar
         public string Action { get; set; }
         public int? Frame { get; set; }
         public int Delay { get; set; }
+        public int AbsoluteDelay
+        {
+            get { return Math.Abs(this.Delay); }
+        }
 
         public bool? Face { get; set; }
         public bool Flip { get; set; }
