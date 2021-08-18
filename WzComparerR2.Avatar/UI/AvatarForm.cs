@@ -788,7 +788,7 @@ namespace WzComparerR2.Avatar.UI
                     AnimateStart();
                 }
 
-                if (this.GetSelectedEmotionFrame(out _, out var actionFrame) && actionFrame.AbsoluteDelay > 0)
+                if (this.GetSelectedTamingFrame(out _, out var actionFrame) && actionFrame.AbsoluteDelay > 0)
                 {
                     this.animator.TamingDelay = actionFrame.AbsoluteDelay;
                 }
@@ -837,12 +837,12 @@ namespace WzComparerR2.Avatar.UI
                 this.animator.BodyDelay = bodyFrame.AbsoluteDelay;
             }
 
-            if (this.animator.EmotionDelay == 0 && FindNextFrame(cmbEmotionFrame) && this.GetSelectedBodyFrame(out _, out var emoFrame))
+            if (this.animator.EmotionDelay == 0 && FindNextFrame(cmbEmotionFrame) && this.GetSelectedEmotionFrame(out _, out var emoFrame))
             {
                 this.animator.EmotionDelay = emoFrame.AbsoluteDelay;
             }
 
-            if (this.animator.TamingDelay == 0 && FindNextFrame(cmbTamingFrame) && this.GetSelectedBodyFrame(out _, out var tamingFrame))
+            if (this.animator.TamingDelay == 0 && FindNextFrame(cmbTamingFrame) && this.GetSelectedTamingFrame(out _, out var tamingFrame))
             {
                 this.animator.TamingDelay = tamingFrame.AbsoluteDelay;
             }
