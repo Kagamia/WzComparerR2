@@ -487,6 +487,8 @@ namespace WzComparerR2.Avatar
 
             actionFrame.ForceCharacterAction = frameNode.Nodes["forceCharacterAction"].GetValueEx<string>(null);
             actionFrame.ForceCharacterActionFrameIndex = frameNode.Nodes["forceCharacterActionFrameIndex"].GetValueEx<int>();
+            actionFrame.ForceCharacterFace = frameNode.Nodes["forceCharacterFace"].GetValueEx<string>(null);
+            actionFrame.ForceCharacterFaceFrameIndex = frameNode.Nodes["forceCharacterFaceFrameIndex"].GetValueEx<int>();
             actionFrame.ForceCharacterFaceHide = frameNode.Nodes["forceCharacterFaceHide"].GetValueEx<int>(0) != 0;
             actionFrame.ForceCharacterFlip = frameNode.Nodes["forceCharacterFlip"].GetValueEx<int>(0) != 0;
         }
@@ -559,6 +561,11 @@ namespace WzComparerR2.Avatar
                     if (tamingAction.ForceCharacterFaceHide) //强制表情
                     {
                         emotionName = null;
+                    }
+                    else if (!string.IsNullOrEmpty(tamingAction.ForceCharacterFace))
+                    {
+                        emotionName = tamingAction.ForceCharacterFace;
+                        faceFrame = tamingAction.ForceCharacterFaceFrameIndex ?? 0;
                     }
 
                     if (tamingAction.ForceCharacterFlip)
