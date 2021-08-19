@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -11,6 +12,7 @@ using DevComponents.DotNetBar.Controls;
 using WzComparerR2.Common;
 using WzComparerR2.WzLib;
 using WzComparerR2.PluginBase;
+using WzComparerR2.Config;
 
 namespace WzComparerR2.Avatar.UI
 {
@@ -24,10 +26,6 @@ namespace WzComparerR2.Avatar.UI
             btnReset_Click(btnReset, EventArgs.Empty);
             FillWeaponIdx();
             FillEarSelection();
-
-#if !DEBUG
-            buttonItem1.Visible = false;
-#endif
         }
 
         public SuperTabControlPanel GetTabPanel()
@@ -256,12 +254,9 @@ namespace WzComparerR2.Avatar.UI
             this.avatar.TamingActionName = selectedItem != null ? selectedItem.Text : null;
 
             //获取动作帧
-            selectedItem = this.cmbBodyFrame.SelectedItem as ComboItem;
-            int bodyFrame = selectedItem != null ? Convert.ToInt32(selectedItem.Text) : -1;
-            selectedItem = this.cmbEmotionFrame.SelectedItem as ComboItem;
-            int emoFrame = selectedItem != null ? Convert.ToInt32(selectedItem.Text) : -1;
-            selectedItem = this.cmbTamingFrame.SelectedItem as ComboItem;
-            int tamingFrame = selectedItem != null ? Convert.ToInt32(selectedItem.Text) : -1;
+            this.GetSelectedBodyFrame(out int bodyFrame, out _);
+            this.GetSelectedEmotionFrame(out int emoFrame, out _);
+            this.GetSelectedTamingFrame(out int tamingFrame, out _);
 
             //获取武器状态
             selectedItem = this.cmbWeaponType.SelectedItem as ComboItem;
@@ -297,12 +292,6 @@ namespace WzComparerR2.Avatar.UI
                 try
                 {
                     var actionFrames = avatar.GetActionFrames(avatar.ActionName);
-                    ActionFrame f = null;
-                    if (bodyFrame > -1 && bodyFrame < actionFrames.Length)
-                    {
-                        f = actionFrames[bodyFrame];
-                    }
-
                     var bone = avatar.CreateFrame(bodyFrame, emoFrame, tamingFrame);
                     var layers = avatar.CreateFrameLayers(bone);
                     avatarContainer1.AddCache(actionTag, layers);
@@ -327,18 +316,6 @@ namespace WzComparerR2.Avatar.UI
                 }
             }
             return string.Join(",", partsID);
-        }
-
-        private void buttonItem1_Click(object sender, EventArgs e)
-        {
-            AddPart("Character\\00002000.img");
-            AddPart("Character\\00012000.img");
-            AddPart("Character\\Face\\00020000.img");
-            AddPart("Character\\Hair\\00030000.img");
-            AddPart("Character\\Coat\\01040036.img");
-            AddPart("Character\\Pants\\01060026.img");
-            FillAvatarParts();
-            UpdateDisplay();
         }
 
         void AddPart(string imgPath)
@@ -634,7 +611,7 @@ namespace WzComparerR2.Avatar.UI
             {
                 ComboItem item = new ComboItem();
                 item.Text = (i++).ToString();
-                item.Tag = Math.Abs(f.Delay);
+                item.Tag = f;
                 items.Add(item);
             }
             FillComboItems(comboBox, items);
@@ -668,6 +645,39 @@ namespace WzComparerR2.Avatar.UI
             }
 
             comboBox.EndUpdate();
+        }
+
+        private bool GetSelectedActionFrame(ComboBoxEx comboBox, out int frameIndex, out ActionFrame actionFrame)
+        {
+            var selectedItem = comboBox.SelectedItem as ComboItem;
+            if (selectedItem != null
+                && int.TryParse(selectedItem.Text, out frameIndex)
+                && selectedItem?.Tag is ActionFrame _actionFrame)
+            {
+                actionFrame = _actionFrame;
+                return true;
+            }
+            else
+            {
+                frameIndex = -1;
+                actionFrame = null;
+                return false;
+            }
+        }
+
+        private bool GetSelectedBodyFrame(out int frameIndex, out ActionFrame actionFrame)
+        {
+            return this.GetSelectedActionFrame(this.cmbBodyFrame, out frameIndex, out actionFrame);
+        }
+
+        private bool GetSelectedEmotionFrame(out int frameIndex, out ActionFrame actionFrame)
+        {
+            return this.GetSelectedActionFrame(this.cmbEmotionFrame, out frameIndex, out actionFrame);
+        }
+
+        private bool GetSelectedTamingFrame(out int frameIndex, out ActionFrame actionFrame)
+        {
+            return this.GetSelectedActionFrame(this.cmbTamingFrame, out frameIndex, out actionFrame);
         }
         #endregion
 
@@ -736,11 +746,9 @@ namespace WzComparerR2.Avatar.UI
                     AnimateStart();
                 }
 
-                var item = cmbBodyFrame.SelectedItem as ComboItem;
-                int? delay;
-                if (item != null && ((delay = item.Tag as int?) != null) && delay.Value >= 0)
+                if (this.GetSelectedBodyFrame(out _, out var actionFrame) && actionFrame.AbsoluteDelay > 0)
                 {
-                    this.animator.BodyDelay = delay.Value;
+                    this.animator.BodyDelay = actionFrame.AbsoluteDelay;
                 }
             }
             else
@@ -758,11 +766,10 @@ namespace WzComparerR2.Avatar.UI
                 {
                     AnimateStart();
                 }
-                var item = cmbEmotionFrame.SelectedItem as ComboItem;
-                int? delay;
-                if (item != null && ((delay = item.Tag as int?) != null) && delay.Value >= 0)
+
+                if (this.GetSelectedEmotionFrame(out _, out var actionFrame) && actionFrame.AbsoluteDelay > 0)
                 {
-                    this.animator.EmotionDelay = delay.Value;
+                    this.animator.EmotionDelay = actionFrame.AbsoluteDelay;
                 }
             }
             else
@@ -780,11 +787,10 @@ namespace WzComparerR2.Avatar.UI
                 {
                     AnimateStart();
                 }
-                var item = cmbTamingFrame.SelectedItem as ComboItem;
-                int? delay;
-                if (item != null && ((delay = item.Tag as int?) != null) && delay.Value >= 0)
+
+                if (this.GetSelectedTamingFrame(out _, out var actionFrame) && actionFrame.AbsoluteDelay > 0)
                 {
-                    this.animator.TamingDelay = delay.Value;
+                    this.animator.TamingDelay = actionFrame.AbsoluteDelay;
                 }
             }
             else
@@ -826,19 +832,19 @@ namespace WzComparerR2.Avatar.UI
         {
             this.SuspendUpdateDisplay();
 
-            if (this.animator.BodyDelay == 0 && FindNextFrame(cmbBodyFrame))
+            if (this.animator.BodyDelay == 0 && FindNextFrame(cmbBodyFrame) && this.GetSelectedBodyFrame(out _, out var bodyFrame))
             {
-                this.animator.BodyDelay = (int)(cmbBodyFrame.SelectedItem as ComboItem).Tag;
+                this.animator.BodyDelay = bodyFrame.AbsoluteDelay;
             }
 
-            if (this.animator.EmotionDelay == 0 && FindNextFrame(cmbEmotionFrame))
+            if (this.animator.EmotionDelay == 0 && FindNextFrame(cmbEmotionFrame) && this.GetSelectedEmotionFrame(out _, out var emoFrame))
             {
-                this.animator.EmotionDelay = (int)(cmbEmotionFrame.SelectedItem as ComboItem).Tag;
+                this.animator.EmotionDelay = emoFrame.AbsoluteDelay;
             }
 
-            if (this.animator.TamingDelay == 0 && FindNextFrame(cmbTamingFrame))
+            if (this.animator.TamingDelay == 0 && FindNextFrame(cmbTamingFrame) && this.GetSelectedTamingFrame(out _, out var tamingFrame))
             {
-                this.animator.TamingDelay = (int)(cmbTamingFrame.SelectedItem as ComboItem).Tag;
+                this.animator.TamingDelay = tamingFrame.AbsoluteDelay;
             }
 
             this.ResumeUpdateDisplay();
@@ -899,14 +905,10 @@ namespace WzComparerR2.Avatar.UI
             {
                 i = (++i) % cmbFrames.Items.Count;
                 item = cmbFrames.Items[i] as ComboItem;
-                if (item != null && item.Tag is int)
+                if (item != null && item.Tag is ActionFrame actionFrame && actionFrame.AbsoluteDelay > 0)
                 {
-                    int delay = (int)item.Tag;
-                    if (delay > 0)
-                    {
-                        cmbFrames.SelectedIndex = i;
-                        return true;
-                    }
+                    cmbFrames.SelectedIndex = i;
+                    return true;
                 }
             }
             while (i != selectedIndex);
@@ -930,7 +932,8 @@ namespace WzComparerR2.Avatar.UI
 
         private void btnMale_Click(object sender, EventArgs e)
         {
-            if (MessageBoxEx.Show("Would you like to generate a Male Character?", "Prompt") == DialogResult.OK)
+            if (this.avatar.Parts.All(part => part == null) 
+                || MessageBoxEx.Show("Would you like to generate a Male Character?", "Prompt") == DialogResult.OK)
             {
                 LoadCode("2000,12000,20000,30000,1040036,1060026", 0);
             }
@@ -938,7 +941,8 @@ namespace WzComparerR2.Avatar.UI
 
         private void btnFemale_Click(object sender, EventArgs e)
         {
-            if (MessageBoxEx.Show("Would you like to generate a Female Character?", "Prompt") == DialogResult.OK)
+            if (this.avatar.Parts.All(part => part == null)
+                || MessageBoxEx.Show("Would you like to generate a Female Character?", "Prompt") == DialogResult.OK)
             {
                 LoadCode("2000,12000,21000,31000,1041046,1061039", 0);
             }
@@ -948,6 +952,278 @@ namespace WzComparerR2.Avatar.UI
         {
             this.avatarContainer1.Origin = new Point(this.avatarContainer1.Width / 2, this.avatarContainer1.Height / 2 + 40);
             this.avatarContainer1.Invalidate();
+        }
+
+        private void btnSaveAsGif_Click(object sender, EventArgs e)
+        {
+            bool bodyPlaying = chkBodyPlay.Checked && cmbBodyFrame.Items.Count > 1;
+            bool emoPlaying = chkEmotionPlay.Checked && cmbEmotionFrame.Items.Count > 1;
+            bool tamingPlaying = chkTamingPlay.Checked && cmbTamingFrame.Items.Count > 1;
+
+            int aniCount = new[] { bodyPlaying, emoPlaying, tamingPlaying }.Count(b => b);
+
+            if (aniCount == 0)
+            {
+                // no animation is playing, save as png
+                var dlg = new SaveFileDialog()
+                {
+                    Title = "Save avatar frame",
+                    Filter = "*.png|*.png|*.*|*.*",
+                    FileName = "avatar.png"
+                };
+
+                if (dlg.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                this.GetSelectedBodyFrame(out int bodyFrame, out _);
+                this.GetSelectedEmotionFrame(out int emoFrame, out _);
+                this.GetSelectedTamingFrame(out int tamingFrame, out _);
+
+                var bone = this.avatar.CreateFrame(bodyFrame, emoFrame, tamingFrame);
+                var frame = this.avatar.DrawFrame(bone);
+                frame.Bitmap.Save(dlg.FileName, System.Drawing.Imaging.ImageFormat.Png);
+            }
+            else
+            {
+                var config = ImageHandlerConfig.Default;
+                var encParams = AnimateEncoderFactory.GetEncoderParams(config.GifEncoder.Value);
+
+                var dlg = new SaveFileDialog()
+                {
+                    Title = "Save avatar",
+                    Filter = string.Format("{0}(*{1})|*{1}|All files(*.*)|*.*", encParams.FileDescription, encParams.FileExtension),
+                    FileName = string.Format("avatar{0}", encParams.FileExtension)
+                };
+
+                if (dlg.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                var actPlaying = new[] { bodyPlaying, emoPlaying, tamingPlaying };
+                var actFrames = new[] { cmbBodyFrame, cmbEmotionFrame, cmbTamingFrame }
+                    .Select((cmb, i) =>
+                    {
+                        if (actPlaying[i])
+                        {
+                            return cmb.Items.OfType<ComboItem>().Select(cmbItem => new
+                            {
+                                index = int.Parse(cmbItem.Text),
+                                actionFrame = cmbItem.Tag as ActionFrame,
+                            }).ToArray();
+                        }
+                        else if (this.GetSelectedActionFrame(cmb, out var index, out var actionFrame))
+                        {
+                            return new[] { new { index, actionFrame } };
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }).ToArray();
+
+                var gifLayer = new GifLayer();
+
+                if (aniCount == 1)
+                {
+                    int aniActIndex = Array.FindIndex(actPlaying, b => b);
+                    for (int fIdx = 0, fCnt = actFrames[aniActIndex].Length; fIdx < fCnt; fIdx++)
+                    {
+                        int[] actionIndices = new int[] { -1, -1, -1 };
+                        int delay = 0;
+                        for (int i = 0; i < actFrames.Length; i++)
+                        {
+                            var act = actFrames[i];
+                            if (i == aniActIndex)
+                            {
+                                actionIndices[i] = act[fIdx].index;
+                                delay = act[i].actionFrame.AbsoluteDelay;
+                            }
+                            else if (act != null)
+                            {
+                                actionIndices[i] = act[0].index;
+                            }
+                        }
+                        var bone = this.avatar.CreateFrame(actionIndices[0], actionIndices[1], actionIndices[2]);
+                        var frameData = this.avatar.DrawFrame(bone);
+                        gifLayer.AddFrame(new GifFrame(frameData.Bitmap, frameData.Origin, delay));
+                    }
+                }
+                else
+                {
+                    // more than 2 animating action parts, for simplicity, we use fixed frame delay.
+                    var aniLength = actFrames.Max(layer => layer == null ? 0 : layer.Sum(f => f.actionFrame.AbsoluteDelay));
+                    var aniDelay = 30;
+
+                    // pipeline functions
+                    IEnumerable<int> RenderDelay()
+                    {
+                        int t = 0;
+                        while (t < aniLength)
+                        {
+                            int frameDelay = Math.Min(aniLength - t, aniDelay);
+                            t += frameDelay;
+                            yield return frameDelay;
+                        }
+                    }
+
+                    IEnumerable<Tuple<int[], int>> GetFrameActionIndices(IEnumerable<int> delayEnumerator)
+                    {
+                        int[] time = new int[actFrames.Length];
+                        int[] actionState = new int[actFrames.Length];
+                        for (int i = 0; i < actionState.Length; i++)
+                        {
+                            actionState[i] = actFrames[i] != null ? 0 : -1;
+                        }
+
+                        foreach (int delay in delayEnumerator)
+                        {
+                            // return state
+                            int[] actIndices = new int[actionState.Length];
+                            for (int i = 0; i < actionState.Length; i++)
+                            {
+                                actIndices[i] = actionState[i] > -1 ? actFrames[i][actionState[i]].index : -1;
+                            }
+                            yield return Tuple.Create(actIndices, delay);
+
+                            // update state
+                            for (int i = 0; i < actionState.Length; i++)
+                            {
+                                if (actPlaying[i])
+                                {
+                                    var act = actFrames[i];
+                                    time[i] += delay;
+                                    int frameIndex = actionState[i];
+                                    while (time[i] >= act[frameIndex].actionFrame.AbsoluteDelay)
+                                    {
+                                        time[i] -= act[frameIndex].actionFrame.AbsoluteDelay;
+                                        frameIndex = (frameIndex + 1) % act.Length;
+                                    }
+                                    actionState[i] = frameIndex;
+                                }
+                            }
+                        }
+                    }
+
+                    IEnumerable<Tuple<int[], int>> MergeFrames(IEnumerable<Tuple<int[], int>> frames)
+                    {
+                        int[] prevFrame = null;
+                        int prevDelay = 0;
+
+                        foreach (var frame in frames)
+                        {
+                            int[] currentFrame = frame.Item1;
+                            int currentDelay = frame.Item2;
+
+                            if (prevFrame == null)
+                            {
+                                prevFrame = currentFrame;
+                                prevDelay = currentDelay;
+                            }
+                            else if (prevFrame.SequenceEqual(currentFrame))
+                            {
+                                prevDelay += currentDelay;
+                            }
+                            else
+                            {
+                                yield return Tuple.Create(prevFrame, prevDelay);
+                                prevFrame = currentFrame;
+                                prevDelay = currentDelay;
+                            }
+                        }
+
+                        if (prevFrame != null)
+                        {
+                            yield return Tuple.Create(prevFrame, prevDelay);
+                        }
+                    }
+
+                    GifFrame ApplyFrame(int[] actionIndices, int delay)
+                    {
+                        var bone = this.avatar.CreateFrame(actionIndices[0], actionIndices[1], actionIndices[2]);
+                        var frameData = this.avatar.DrawFrame(bone);
+                        return new GifFrame(frameData.Bitmap, frameData.Origin, delay);
+                    }
+
+                    // build pipeline
+                    var step1 = RenderDelay();
+                    var step2 = GetFrameActionIndices(step1);
+                    var step3 = MergeFrames(step2);
+                    var step4 = step3.Select(tp => ApplyFrame(tp.Item1, tp.Item2));
+
+                    // run pipeline
+                    foreach(var gifFrame in step4)
+                    {
+                        gifLayer.AddFrame(gifFrame);
+                    }
+                }
+
+                if (gifLayer.Frames.Count <= 0)
+                {
+                    MessageBoxEx.Show(this, "计算动画数据失败。", "Error");
+                    return;
+                }
+
+                Rectangle clientRect = gifLayer.Frames
+                    .Select(f => new Rectangle(-f.Origin.X, -f.Origin.Y, f.Bitmap.Width, f.Bitmap.Height))
+                    .Aggregate((rect1, rect2) =>
+                    {
+                        int left = Math.Min(rect1.X, rect2.X);
+                        int top = Math.Min(rect1.Y, rect2.Y);
+                        int right = Math.Max(rect1.Right, rect2.Right);
+                        int bottom = Math.Max(rect1.Bottom, rect2.Bottom);
+                        return new Rectangle(left, top, right - left, bottom - top);
+                    });
+
+                Brush CreateBackgroundBrush()
+                {
+                    switch (config.BackgroundType.Value)
+                    {
+                        default:
+                        case ImageBackgroundType.Transparent:
+                            return null;
+                        case ImageBackgroundType.Color:
+                            return new SolidBrush(config.BackgroundColor.Value);
+                        case ImageBackgroundType.Mosaic:
+                            int blockSize = Math.Max(1, config.MosaicInfo.BlockSize);
+                            var texture = new Bitmap(blockSize * 2, blockSize * 2);
+                            using (var g = Graphics.FromImage(texture))
+                            using (var brush0 = new SolidBrush(config.MosaicInfo.Color0))
+                            using (var brush1 = new SolidBrush(config.MosaicInfo.Color1))
+                            {
+                                g.FillRectangle(brush0, 0, 0, blockSize, blockSize);
+                                g.FillRectangle(brush0, blockSize, blockSize, blockSize, blockSize);
+                                g.FillRectangle(brush1, 0, blockSize, blockSize, blockSize);
+                                g.FillRectangle(brush1, blockSize, 0, blockSize, blockSize);
+                            }
+                            return new TextureBrush(texture);
+                    }
+                }
+
+                var bgBrush = CreateBackgroundBrush();
+                using (var enc = AnimateEncoderFactory.CreateEncoder(dlg.FileName, clientRect.Width, clientRect.Height, config))
+                {
+                    foreach (IGifFrame gifFrame in gifLayer.Frames)
+                    {
+                        using (var bmp = new Bitmap(clientRect.Width, clientRect.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+                        {
+                            using (var g = Graphics.FromImage(bmp))
+                            {
+                                // draw background
+                                if (bgBrush != null)
+                                {
+                                    g.FillRectangle(bgBrush, 0, 0, bmp.Width, bmp.Height);
+                                }
+                                gifFrame.Draw(g, clientRect);
+                            }
+                            enc.AppendFrame(bmp, Math.Max(10, gifFrame.Delay));
+                        }
+                    }
+                }
+                bgBrush?.Dispose();
+            }
         }
 
         private void LoadCode(string code, int loadType)
@@ -1128,11 +1404,6 @@ namespace WzComparerR2.Avatar.UI
                 }
                 this.NextFrameDelay = nextFrame;
             }
-        }
-
-        private void buttonItem1_Click_1(object sender, EventArgs e)
-        {
-            this.PluginEntry.btnSetting_Click(sender, e);
         }
     }
 }
