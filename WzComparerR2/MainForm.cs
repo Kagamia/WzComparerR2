@@ -1744,10 +1744,18 @@ namespace WzComparerR2
         {
             if (string.IsNullOrEmpty(searchText))
                 return;
-            Node searchNode = searchAdvTree(advTree, cellIndex, searchText, exact, regex, true);
-            advTree.SelectedNode = searchNode;
-            if (searchNode == null)
-                MessageBoxEx.Show("已经搜索到末尾。", "喵呜~");
+
+            try
+            {
+                Node searchNode = searchAdvTree(advTree, cellIndex, searchText, exact, regex, true);
+                advTree.SelectedNode = searchNode;
+                if (searchNode == null)
+                    MessageBoxEx.Show("已经搜索到末尾。", "喵呜~");
+            }
+            catch (Exception ex)
+            {
+                MessageBoxEx.Show(this, ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private Node searchAdvTree(AdvTree advTree, int cellIndex, string searchText, bool exact, bool isRegex, bool ignoreCase)
@@ -1757,7 +1765,7 @@ namespace WzComparerR2
 
             if (isRegex)
             {
-                var r = new Regex(searchText, ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
+                Regex r = new Regex(searchText, ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
                 foreach (var node in findNextNode(advTree))
                 {
                     if (node != null && node.Cells.Count > cellIndex && r.IsMatch(node.Cells[cellIndex].Text))
@@ -1908,15 +1916,26 @@ namespace WzComparerR2
                     dicts.Add(stringLinker.StringSkill);
                     break;
             }
+
             listViewExString.BeginUpdate();
-            listViewExString.Items.Clear();
-            IEnumerable<KeyValuePair<int, StringResult>> results = searchStringLinker(dicts, textBoxItemSearchString.Text, checkBoxItemExact2.Checked, checkBoxItemRegex2.Checked);
-            foreach (KeyValuePair<int, StringResult> kv in results)
+            try
             {
-                string[] item = new string[] { kv.Key.ToString(), kv.Value.Name, kv.Value.Desc, kv.Value.FullPath };
-                listViewExString.Items.Add(new ListViewItem(item));
+                listViewExString.Items.Clear();
+                IEnumerable<KeyValuePair<int, StringResult>> results = searchStringLinker(dicts, textBoxItemSearchString.Text, checkBoxItemExact2.Checked, checkBoxItemRegex2.Checked);
+                foreach (KeyValuePair<int, StringResult> kv in results)
+                {
+                    string[] item = new string[] { kv.Key.ToString(), kv.Value.Name, kv.Value.Desc, kv.Value.FullPath };
+                    listViewExString.Items.Add(new ListViewItem(item));
+                }
             }
-            listViewExString.EndUpdate();
+            catch (Exception ex)
+            {
+                MessageBoxEx.Show(ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                listViewExString.EndUpdate();
+            }            
         }
 
         private Wz_File findStringWz()
