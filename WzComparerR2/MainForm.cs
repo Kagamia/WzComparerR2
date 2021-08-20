@@ -1937,7 +1937,12 @@ namespace WzComparerR2
         private IEnumerable<KeyValuePair<int, StringResult>> searchStringLinker(IEnumerable<Dictionary<int, StringResult>> dicts, string key, bool exact, bool isRegex)
         {
             string[] match = key.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            var re = new Regex(key, RegexOptions.IgnoreCase);
+            Regex re = null;
+            if (isRegex)
+            {
+                re = new Regex(key, RegexOptions.IgnoreCase);
+            }
+
             foreach (Dictionary<int, StringResult> dict in dicts)
             {
                 foreach (KeyValuePair<int, StringResult> kv in dict)
