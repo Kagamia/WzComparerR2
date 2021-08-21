@@ -17,6 +17,7 @@ namespace WzComparerR2.WzLib
             this.bReader = new BinaryReader(this.FileStream);
             this.loaded = this.GetHeader(fileName);
             this.stringTable = new Dictionary<long, string>();
+            this.directories = new List<Wz_Directory>();
         }
 
         private FileStream fileStream;
@@ -30,6 +31,7 @@ namespace WzComparerR2.WzLib
         private Wz_Type type;
         private List<Wz_File> mergedWzFiles;
         private Wz_File ownerWzFile;
+        private readonly List<Wz_Directory> directories;
 
         public Encoding TextEncoding { get; set; }
 
@@ -302,6 +304,7 @@ namespace WzComparerR2.WzLib
             string name = null;
             int size = 0;
             int cs32 = 0;
+            uint pos = 0, hashOffset = 0;
             //int offs = 0;
 
             int count = ReadInt32();
@@ -320,8 +323,8 @@ namespace WzComparerR2.WzLib
                     case 0xffff:
                         size = this.ReadInt32();
                         cs32 = this.ReadInt32();
-                        uint pos = (uint)this.bReader.BaseStream.Position;
-                        uint hashOffset = this.bReader.ReadUInt32();
+                        pos = (uint)this.bReader.BaseStream.Position;
+                        hashOffset = this.bReader.ReadUInt32();
 
                         Wz_Image img = new Wz_Image(name, size, cs32, hashOffset, pos, this);
                         Wz_Node childNode = parent.Nodes.Add(name);
@@ -335,7 +338,9 @@ namespace WzComparerR2.WzLib
                         name = this.ReadString();
                         size = this.ReadInt32();
                         cs32 = this.ReadInt32();
-                        this.FileStream.Position += 4;
+                        pos = (uint)this.bReader.BaseStream.Position;
+                        hashOffset = this.bReader.ReadUInt32();
+                        this.directories.Add(new Wz_Directory(name, size, cs32, hashOffset, pos, this));
                         dirs.Add(name);
                         break;
                 }
@@ -538,36 +543,13 @@ namespace WzComparerR2.WzLib
 
         public void DetectWzVersion()
         {
-            if (!this.header.VersionChecked)
+            bool DetectWithWzImage(Wz_Image testWzImg)
             {
-                //选择最小的img作为实验品
-                Wz_Image minSizeImg = null;
-                List<Wz_Image> imgList = new List<Wz_Image>(this.imageCount);
-                foreach (var img in (EnumerableAllWzImage(this.node).Where(_img=>_img.WzFile == this)))
-                {
-                    if (img.Size >= 20
-                        && (minSizeImg == null || img.Size < minSizeImg.Size))
-                    {
-                        minSizeImg = img;
-                    }
-
-                    imgList.Add(img);
-                }
-
-                if (minSizeImg == null)
-                {
-                    if (imgList.Count <= 0)
-                    {
-                        return;
-                    }
-                    minSizeImg = imgList[0];
-                }
-
                 while (this.header.TryGetNextVersion())
                 {
-                    uint offs = CalcOffset(minSizeImg.HashedOffsetPosition, minSizeImg.HashedOffset);
+                    uint offs = CalcOffset(testWzImg.HashedOffsetPosition, testWzImg.HashedOffset);
 
-                    if (offs < this.header.HeaderSize || offs + minSizeImg.Size > this.fileStream.Length)  //img块越界
+                    if (offs < this.header.HeaderSize || offs + testWzImg.Size > this.fileStream.Length)  //img块越界
                     {
                         continue;
                     }
@@ -583,13 +565,78 @@ namespace WzComparerR2.WzLib
                             continue;
                     }
 
-                    minSizeImg.Offset = offs;
-                    if (minSizeImg.TryExtract()) //试读成功
+                    testWzImg.Offset = offs;
+                    if (testWzImg.TryExtract()) //试读成功
                     {
-                        minSizeImg.Unextract();
+                        testWzImg.Unextract();
                         this.header.VersionChecked = true;
                         break;
                     }
+                }
+                return this.header.VersionChecked;
+            }
+
+            bool DetectWithAllWzDir()
+            {
+                while (this.header.TryGetNextVersion())
+                {
+                    bool isSuccess = true;
+                    foreach (var testDir in this.directories)
+                    {
+                        uint offs = CalcOffset(testDir.HashedOffsetPosition, testDir.HashedOffset);
+
+                        if (offs < this.header.HeaderSize || offs + 1 > this.fileStream.Length) // dir offset out of file size.
+                        {
+                            isSuccess = false;
+                            break;
+                        }
+
+                        this.fileStream.Position = offs;
+                        if (this.fileStream.ReadByte() != 0) // dir data only contains one byte: 0x00
+                        {
+                            isSuccess = false;
+                            break;
+                        }
+                    }
+
+                    if (isSuccess)
+                    {
+                        this.header.VersionChecked = true;
+                        break;
+                    }
+                }
+
+                return this.header.VersionChecked;
+            }
+
+            if (!this.header.VersionChecked)
+            {
+                //选择最小的img作为实验品
+                Wz_Image minSizeImg = null;
+                List<Wz_Image> imgList = new List<Wz_Image>(this.imageCount);
+                foreach (var img in (EnumerableAllWzImage(this.node).Where(_img => _img.WzFile == this)))
+                {
+                    if (img.Size >= 20
+                        && (minSizeImg == null || img.Size < minSizeImg.Size))
+                    {
+                        minSizeImg = img;
+                    }
+
+                    imgList.Add(img);
+                }
+
+                if (minSizeImg == null && imgList.Count > 0)
+                {
+                    minSizeImg = imgList[0];
+                }
+
+                if (minSizeImg != null)
+                {
+                    DetectWithWzImage(minSizeImg);
+                }
+                else if (this.directories.Count > 0)
+                {
+                    DetectWithAllWzDir();
                 }
 
                 if (this.header.VersionChecked) //重新计算全部img
