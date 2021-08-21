@@ -148,7 +148,7 @@ namespace WzComparerR2.Comparer
                     case 0:
                         //TODO: 试着比较多linkNode的场合。。
                         if ((arrayNew[l].HasMultiValues || arrayOld[r].HasMultiValues)
-                            && !(arrayNew[l].Value?.GetType() == typeof(Wz_File) || arrayOld[r].Value?.GetType() == typeof(Wz_File)) //file跳过
+                            && !(arrayNew[l].Value is Wz_File wzf1 && !wzf1.IsSubDir || arrayOld[r].Value is Wz_File wzf2 && !wzf2.IsSubDir) //file跳过
                             )
                         {
                             //对比node的绝对路径
@@ -289,8 +289,8 @@ namespace WzComparerR2.Comparer
 
         private bool CompareChild(ComparableNode node1, ComparableNode node2)
         {
-            if ((node1 != null && node1.Value is Wz_File)
-                || (node2 != null && node2.Value is Wz_File))
+            if ((node1 != null && node1.Value is Wz_File wzf1 && !wzf1.IsSubDir)
+                || (node2 != null && node2.Value is Wz_File wzf2 && !wzf2.IsSubDir))
             {
                 return !IgnoreWzFile;
             }
@@ -361,7 +361,7 @@ namespace WzComparerR2.Comparer
                 if (dataNew is Wz_File fileNew && fileNew.IsSubDir)
                     dataNew = null;
                 if (dataOld is Wz_File fileOld && fileOld.IsSubDir)
-                    dataNew = null;
+                    dataOld = null;
             }
 
             if (dataNew == null && dataOld == null)
