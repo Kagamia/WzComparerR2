@@ -2144,7 +2144,7 @@ namespace WzComparerR2
             {
                 dlg.AddExtension = true;
                 dlg.Title = "Please choose a save path.";
-                dlg.Filter = "MP3 File (*.mp3)|*.mp3|WAV File (*.wav)|*.wav|OGG File (*.ogg)|*.ogg|All Files (*.*)|*.*";
+                dlg.Filter = "All Files (*.*)|*.*";
                 dlg.AddExtension = false;
                 dlg.FileName = soundPlayer.PlayingSoundName;
                 if (dlg.ShowDialog() == DialogResult.OK)

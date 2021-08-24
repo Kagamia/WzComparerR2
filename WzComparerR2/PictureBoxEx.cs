@@ -147,11 +147,11 @@ namespace WzComparerR2
             if (length > 0)
             {
                 IEnumerable<int> delays = timeline?.Take(timeline.Length - 1)
-                ?? Enumerable.Range(0, (int)Math.Ceiling(1.0 * length / delay) - 1);
+                    ?? Enumerable.Range(0, (int)Math.Ceiling(1.0 * length / delay) - 1);
 
                 foreach (var frameDelay in delays)
                 {
-                    rec.Update(TimeSpan.FromMilliseconds(delay));
+                    rec.Update(TimeSpan.FromMilliseconds(frameDelay));
                     var rect = aniItem.Measure();
                     bounds = Microsoft.Xna.Framework.Rectangle.Union(bounds, rect);
                 }
