@@ -11,7 +11,7 @@ namespace WzComparerR2.WzLib
 {
     public class Wz_Png
     {
-        public Wz_Png(int w, int h, int data_length, int form, int offs, Wz_File wz_f)
+        public Wz_Png(int w, int h, int data_length, int form, uint offs, Wz_File wz_f)
         {
             this.w = w;
             this.h = h;
@@ -25,7 +25,7 @@ namespace WzComparerR2.WzLib
         private int h;
         private int data_length;
         private int form;
-        private int offs;
+        private uint offs;
         private Wz_File wz_f;
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace WzComparerR2.WzLib
         /// <summary>
         /// 获取或设置数据块对于文件的偏移。
         /// </summary>
-        public int Offset
+        public uint Offset
         {
             get { return offs; }
             set { offs = value; }

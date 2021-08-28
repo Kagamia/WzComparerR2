@@ -151,7 +151,7 @@ namespace WzComparerR2.WzLib
             }
         }
 
-        private void ExtractImg(long offset, Wz_Node parent, int eob)
+        private void ExtractImg(long offset, Wz_Node parent, long eob)
         {
             int entries = 0;
             string tag = this.WzFile.ReadString(offset);
@@ -186,7 +186,7 @@ namespace WzComparerR2.WzLib
                     int form = this.WzFile.ReadInt32() + this.WzFile.BReader.ReadByte();
                     this.WzFile.FileStream.Position += 4;
                     int bufsize = this.WzFile.BReader.ReadInt32();
-                    parent.Value = new Wz_Png(w, h, bufsize - 1, form, (int)this.WzFile.FileStream.Position + 1, this.WzFile);
+                    parent.Value = new Wz_Png(w, h, bufsize - 1, form, (uint)this.WzFile.FileStream.Position + 1, this.WzFile);
                     this.WzFile.FileStream.Position += bufsize;
                     break;
 
@@ -202,9 +202,9 @@ namespace WzComparerR2.WzLib
                     this.WzFile.FileStream.Position++;
                     int len = this.WzFile.ReadInt32();
                     int ms = this.WzFile.ReadInt32();
-                    int headerLen = eob - len - (int)this.WzFile.FileStream.Position;
+                    int headerLen = (int)(eob - len - this.WzFile.FileStream.Position);
                     byte[] header = this.WzFile.BReader.ReadBytes(headerLen);
-                    parent.Value = new Wz_Sound(eob - len, len, header, ms, this.WzFile);
+                    parent.Value = new Wz_Sound((uint)(eob - len), len, header, ms, this.WzFile);
                     this.WzFile.FileStream.Position = eob;
                     break;
 
@@ -312,7 +312,7 @@ namespace WzComparerR2.WzLib
                     break;
 
                 case 0x09:
-                    ExtractImg(offset, parent, this.WzFile.BReader.ReadInt32() + (int)this.WzFile.FileStream.Position);
+                    ExtractImg(offset, parent, this.WzFile.BReader.ReadInt32() + this.WzFile.FileStream.Position);
                     break;
 
                 default:
