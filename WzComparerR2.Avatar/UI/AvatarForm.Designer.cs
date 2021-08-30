@@ -645,7 +645,7 @@
             // 
             this.btnSaveAsGif.Image = global::WzComparerR2.Avatar.Properties.Resources.disk;
             this.btnSaveAsGif.Name = "btnSaveAsGif";
-            this.btnSaveAsGif.Tooltip = "保存";
+            this.btnSaveAsGif.Tooltip = "Save";
             this.btnSaveAsGif.Click += new System.EventHandler(this.btnSaveAsGif_Click);
             // 
             // dockSite3

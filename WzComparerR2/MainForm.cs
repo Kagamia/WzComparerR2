@@ -697,11 +697,11 @@ namespace WzComparerR2
             }
             catch (FileNotFoundException)
             {
-                MessageBoxEx.Show("File not found", "OK");
+                MessageBoxEx.Show("File not found", "Message");
             }
             catch (Exception ex)
             {
-                MessageBoxEx.Show(ex.ToString(), "OK");
+                MessageBoxEx.Show(ex.ToString(), "Message");
                 wz.Clear();
             }
             finally
@@ -1626,7 +1626,7 @@ namespace WzComparerR2
             Wz_Image img = advTree1.SelectedNode?.AsWzNode()?.GetValue<Wz_Image>();
             if (img == null)
             {
-                MessageBoxEx.Show("No wz_img selected for export.");
+                MessageBoxEx.Show("No wz_img selected for export.", "Message");
                 return;
             }
             SaveFileDialog dlg = new SaveFileDialog();
@@ -1653,7 +1653,7 @@ namespace WzComparerR2
                 }
                 catch (Exception ex)
                 {
-                    MessageBoxEx.Show(ex.ToString(), "OK");
+                    MessageBoxEx.Show(ex.ToString(), "Message");
                 }
                 finally
                 {
@@ -1670,7 +1670,7 @@ namespace WzComparerR2
             Wz_Image img = advTree1.SelectedNode?.AsWzNode()?.GetValue<Wz_Image>();
             if (img == null)
             {
-                MessageBoxEx.Show("No wz_img selected for export.");
+                MessageBoxEx.Show("No wz_img selected for export.", "Message");
                 return;
             }
             SaveFileDialog dlg = new SaveFileDialog();
@@ -1702,7 +1702,7 @@ namespace WzComparerR2
                 }
                 catch (Exception ex)
                 {
-                    MessageBoxEx.Show(ex.ToString(), "OK");
+                    MessageBoxEx.Show(ex.ToString(), "Message");
                 }
                 finally
                 {

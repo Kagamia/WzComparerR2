@@ -933,7 +933,7 @@ namespace WzComparerR2.Avatar.UI
         private void btnMale_Click(object sender, EventArgs e)
         {
             if (this.avatar.Parts.All(part => part == null) 
-                || MessageBoxEx.Show("Would you like to generate a Male Character?", "Prompt") == DialogResult.OK)
+                || MessageBoxEx.Show("Would you like to generate a Male Character?", "Message") == DialogResult.OK)
             {
                 LoadCode("2000,12000,20000,30000,1040036,1060026", 0);
             }
@@ -942,7 +942,7 @@ namespace WzComparerR2.Avatar.UI
         private void btnFemale_Click(object sender, EventArgs e)
         {
             if (this.avatar.Parts.All(part => part == null)
-                || MessageBoxEx.Show("Would you like to generate a Female Character?", "Prompt") == DialogResult.OK)
+                || MessageBoxEx.Show("Would you like to generate a Female Character?", "Message") == DialogResult.OK)
             {
                 LoadCode("2000,12000,21000,31000,1041046,1061039", 0);
             }
@@ -1232,13 +1232,13 @@ namespace WzComparerR2.Avatar.UI
             var matches = Regex.Matches(code, @"(\d+)([,\s]|$)");
             if (matches.Count <= 0)
             {
-                MessageBoxEx.Show("Unable to parse the equipment code.", "Prompt");
+                MessageBoxEx.Show("Unable to parse the equipment code.", "Message");
                 return;
             }
 
             if (PluginManager.FindWz(Wz_Type.Base) == null)
             {
-                MessageBoxEx.Show("Base.wz is not opened.", "Prompt");
+                MessageBoxEx.Show("Base.wz is not opened.", "Message");
                 return;
             }
 
@@ -1247,7 +1247,7 @@ namespace WzComparerR2.Avatar.UI
             //试图初始化
             if (!this.inited && !this.AvatarInit())
             {
-                MessageBoxEx.Show("Character generation failed.", "Prompt");
+                MessageBoxEx.Show("Character generation failed.", "Message");
                 return;
             }
             var sl = this.PluginEntry.Context.DefaultStringLinker;

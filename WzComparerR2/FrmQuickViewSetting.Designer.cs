@@ -222,7 +222,7 @@
             this.labelX2.Name = "labelX2";
             this.labelX2.Size = new System.Drawing.Size(81, 18);
             this.labelX2.TabIndex = 4;
-            this.labelX2.Text = "Level Adjustment Interval";
+            this.labelX2.Text = "Lv. Adjustment Interval";
             // 
             // labelX1
             // 
@@ -236,7 +236,7 @@
             this.labelX1.Name = "labelX1";
             this.labelX1.Size = new System.Drawing.Size(81, 18);
             this.labelX1.TabIndex = 3;
-            this.labelX1.Text = "Default Skill Level";
+            this.labelX1.Text = "Default Skill Lv.";
             // 
             // comboBoxEx1
             // 

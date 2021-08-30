@@ -6,7 +6,7 @@ namespace WzComparerR2.WzLib
 {
     public class Wz_Sound
     {
-        public Wz_Sound(int offset, int length, byte[] header, int ms, Wz_File wz_f)
+        public Wz_Sound(uint offset, int length, byte[] header, int ms, Wz_File wz_f)
         {
             this.offset = offset;
             this.dataLength = length;
@@ -16,7 +16,7 @@ namespace WzComparerR2.WzLib
             TryDecryptHeader();
         }
 
-        private int offset;
+        private uint offset;
         private byte[] header;
         private int dataLength;
         private int ms;
@@ -26,7 +26,7 @@ namespace WzComparerR2.WzLib
         /// <summary>
         /// 获取或设置数据块对于文件的偏移。
         /// </summary>
-        public int Offset
+        public uint Offset
         {
             get { return offset; }
             set { offset = value; }

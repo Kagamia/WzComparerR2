@@ -115,13 +115,13 @@ namespace WzComparerR2.WzLib
         private bool GetHeader(string fileName)
         {
             this.fileStream.Position = 0;
-            int filesize = (int)this.FileStream.Length;
+            long filesize = this.FileStream.Length;
             if (filesize < 4) { goto __failed; }
 
             string signature = new string(this.BReader.ReadChars(4));
             if (signature != "PKG1") { goto __failed; }
 
-            int datasize = (int)this.BReader.ReadInt64();
+            long datasize = this.BReader.ReadInt64();
             int headersize = this.BReader.ReadInt32();
             string copyright = new string(this.BReader.ReadChars(headersize - (int)this.FileStream.Position));
             int encver = this.BReader.ReadUInt16();
