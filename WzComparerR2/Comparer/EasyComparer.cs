@@ -199,12 +199,12 @@ namespace WzComparerR2.Comparer
                 sw.WriteLine("<p class=\"wzf\">");
                 sw.WriteLine("<table>");
                 sw.WriteLine("<tr><th>&nbsp;</th><th>File Path</th><th>File Size</th><th>File Version</th></tr>");
-                sw.WriteLine("<tr><td>Old File</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
+                sw.WriteLine("<tr><td>New File</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
                     string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileName)),
                     string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileSize.ToString("N0"))),
                     string.Join("<br/>", fileNew.Select(wzf => wzf.GetMergedVersion()))
                     );
-                sw.WriteLine("<tr><td>New File</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
+                sw.WriteLine("<tr><td>Old File</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
                     string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileName)),
                     string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileSize.ToString("N0"))),
                     string.Join("<br/>", fileOld.Select(wzf => wzf.GetMergedVersion()))
