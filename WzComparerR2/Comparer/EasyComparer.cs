@@ -158,6 +158,19 @@ namespace WzComparerR2.Comparer
             return dict;
         }
 
+        private IEnumerable<string> GetFileInfo(Wz_File wzf, Func<Wz_File, string> extractor)
+        {
+            IEnumerable<string> result = new[] { extractor.Invoke(wzf) }
+                .Concat(wzf.MergedWzFiles.Select(extractor.Invoke));
+
+            if (wzf.Type != Wz_Type.Base)
+            {
+                result = result.Concat(wzf.Node.Nodes.Where(n => n.Value is Wz_File).SelectMany(nwzf => GetFileInfo((Wz_File)nwzf.Value, extractor)));
+            }
+
+            return result;
+        }
+
         private void OutputFile(Wz_File fileNew, Wz_File fileOld, Wz_Type type, List<CompareDifference> diffLst, string outputDir)
         {
             OutputFile(new List<Wz_File>() { fileNew },
@@ -200,13 +213,13 @@ namespace WzComparerR2.Comparer
                 sw.WriteLine("<table>");
                 sw.WriteLine("<tr><th>&nbsp;</th><th>文件名</th><th>文件大小</th><th>文件版本</th></tr>");
                 sw.WriteLine("<tr><td>新文件</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
-                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileName)),
-                    string.Join("<br/>", fileNew.Select(wzf => wzf.Header.FileSize.ToString("N0"))),
+                    string.Join("<br/>", fileNew.SelectMany(wzf => GetFileInfo(wzf, ewzf => ewzf.Header.FileName))),
+                    string.Join("<br/>", fileNew.SelectMany(wzf => GetFileInfo(wzf, ewzf => ewzf.Header.FileSize.ToString("N0")))),
                     string.Join("<br/>", fileNew.Select(wzf => wzf.GetMergedVersion()))
                     );
                 sw.WriteLine("<tr><td>旧文件</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
-                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileName)),
-                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileSize.ToString("N0"))),
+                    string.Join("<br/>", fileOld.SelectMany(wzf => GetFileInfo(wzf, ewzf => ewzf.Header.FileName))),
+                    string.Join("<br/>", fileOld.SelectMany(wzf => GetFileInfo(wzf, ewzf => ewzf.Header.FileSize.ToString("N0")))),
                     string.Join("<br/>", fileOld.Select(wzf => wzf.GetMergedVersion()))
                     );
                 sw.WriteLine("<tr><td>对比时间</td><td colspan='3'>{0:yyyy-MM-dd HH:mm:ss.fff}</td></tr>", DateTime.Now);
