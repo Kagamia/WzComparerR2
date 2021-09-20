@@ -927,7 +927,7 @@ namespace WzComparerR2
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "File Name", wzFile.Header.FileName }));
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "File Size", wzFile.Header.FileSize + " bytes" }));
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Copyright", wzFile.Header.Copyright }));
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Version", wzFile.Header.WzVersion.ToString() }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Version", wzFile.GetMergedVersion().ToString() }));
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Wz Type", wzFile.IsSubDir ? "SubDir" : wzFile.Type.ToString() }));
 
                 foreach (Wz_File subFile in wzFile.MergedWzFiles)
