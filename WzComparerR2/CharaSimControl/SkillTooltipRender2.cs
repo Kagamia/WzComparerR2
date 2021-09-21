@@ -139,7 +139,6 @@ namespace WzComparerR2.CharaSimControl
                     ConvertCooltimeMS = this.DisplayCooltimeMSAsSec,
                     ConvertPerM = this.DisplayPermyriadAsPercent
                 });
-                GearGraphics.DrawString(g, "[ " + (Skill.Level + 1) + "]", GearGraphics.ItemDetailFont, 8, 272, ref picH, 16);
                 GearGraphics.DrawString(g, "[Next Level " + (Skill.Level + 1) + "]", GearGraphics.ItemDetailFont, region.LevelDescLeft, region.TextRight, ref picH, 16);
                 if (hStr != null)
                 {
