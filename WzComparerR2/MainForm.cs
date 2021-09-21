@@ -1,5 +1,5 @@
-﻿using System; 
-using System.Collections.Generic; 
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -43,6 +43,7 @@ namespace WzComparerR2
             RegisterPluginEvents();
             createStyleItems();
             initFields();
+            loadUIState();
         }
 
         List<Wz_Structure> openedWz;
@@ -93,7 +94,7 @@ namespace WzComparerR2
             if (!soundPlayer.Init())
             {
                 Un4seen.Bass.BASSError error = soundPlayer.GetLastError();
-                MessageBoxEx.Show("Bass initialization failed. \r\n\r\nerrorCode : " + (int)error + "(" + error + ")", "Bug");
+                MessageBoxEx.Show("Bass initialization failed. \r\n\r\nerrorCode : " + (int)error + "(" + error + ")", "Error");
             }
             soundTimer = new Timer(120d);
             soundTimer.Elapsed += new System.Timers.ElapsedEventHandler(soundTimer_Elapsed);
@@ -106,6 +107,23 @@ namespace WzComparerR2
                 cmbComparePng.Items.Add(comp);
             }
             cmbComparePng.SelectedItem = WzPngComparison.SizeAndDataLength;
+        }
+
+        private void loadUIState()
+        {
+            this.WindowState = (int)FormWindowState.Normal;
+            this.Size = new Size(1200, 800); // = new Size(766, 520);
+            this.ribbonControl1.Expanded = false; // = false;
+            this.expandableSplitter1.SplitPosition = 448; // = 233;
+            this.expandableSplitter2.SplitPosition = 250; // = 255;
+            this.columnHeader3.Width.Absolute = 150;
+            this.columnHeader4.Width.Absolute = 150;
+            this.columnHeader5.Width.Absolute = 150;
+            this.columnHeader6.Width = 80;
+            this.columnHeader7.Width = 200; // = 100
+            this.columnHeader8.Width = 600; // = 350
+            this.columnHeader9.Width = 250; // = 150
+            this.dotNetBarManager1.LayoutDefinition = "<dotnetbarlayout version=\"6\" zorder=\"7,8,1,0\"><docksite size=\"0\" dockingside=\"Top\" originaldocksitesize=\"0\" /><docksite size=\"182\" dockingside=\"Bottom\" originaldocksitesize=\"0\"><dockcontainer orientation=\"1\" w=\"0\" h=\"0\"><barcontainer w=\"1184\" h=\"179\"><bar name=\"bar1\" dockline=\"0\" layout=\"2\" dockoffset=\"0\" state=\"2\" dockside=\"4\" visible=\"true\"><items><item name=\"dockContainerItem1\" origBar=\"\" origPos=\"-1\" pos=\"0\" /></items></bar></barcontainer></dockcontainer></docksite><docksite size=\"0\" dockingside=\"Left\" originaldocksitesize=\"0\" /><docksite size=\"0\" dockingside=\"Right\" originaldocksitesize=\"0\" /><bars /></dotnetbarlayout>";
         }
 
         /// <summary>
@@ -642,7 +660,7 @@ namespace WzComparerR2
             using (OpenFileDialog dlg = new OpenFileDialog())
             {
                 dlg.Title = "Please select MapleStory WZ file.";
-                dlg.Filter = "base.wz|*.wz";
+                dlg.Filter = "Base.wz|*.wz";
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     openWz(dlg.FileName);
@@ -677,7 +695,7 @@ namespace WzComparerR2
                 {
                     wz.Load(wzFilePath, true);
                 }
-                
+
                 if (WcR2Config.Default.SortWzOnOpened)
                 {
                     sortWzNode(wz.WzNode);
@@ -689,6 +707,7 @@ namespace WzComparerR2
                 OnWzOpened(new WzStructureEventArgs(wz)); //触发事件
                 QueryPerformance.End();
                 labelItemStatus.Text = "Image successfully read. Time taken: " + (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000) + "ms.";
+
                 ConfigManager.Reload();
                 WcR2Config.Default.RecentDocuments.Remove(wzFilePath);
                 WcR2Config.Default.RecentDocuments.Insert(0, wzFilePath);
@@ -697,11 +716,11 @@ namespace WzComparerR2
             }
             catch (FileNotFoundException)
             {
-                MessageBoxEx.Show("File not found", "Message");
+                MessageBoxEx.Show("File not found.", "Error");
             }
             catch (Exception ex)
             {
-                MessageBoxEx.Show(ex.ToString(), "Message");
+                MessageBoxEx.Show(ex.ToString(), "Error");
                 wz.Clear();
             }
             finally
@@ -731,7 +750,7 @@ namespace WzComparerR2
                 {
                     if (StringComparer.OrdinalIgnoreCase.Equals(wz_f.Header.FileName, imgFileName))
                     {
-                        MessageBoxEx.Show("Opened WZ.", "喵~");
+                        MessageBoxEx.Show("WZ File is already open.", "Error");
                         return;
                     }
                 }
@@ -755,11 +774,11 @@ namespace WzComparerR2
             }
             catch (FileNotFoundException)
             {
-                MessageBoxEx.Show("File Not Found", "嗯?");
+                MessageBoxEx.Show("File not found.", "Error");
             }
             catch (Exception ex)
             {
-                MessageBoxEx.Show(ex.ToString(), "嗯?");
+                MessageBoxEx.Show(ex.ToString(), "Error");
                 wz.Clear();
             }
             finally
@@ -772,7 +791,7 @@ namespace WzComparerR2
         {
             if (advTree1.SelectedNode == null)
             {
-                MessageBoxEx.Show("WZ file not selected.", "Message");
+                MessageBoxEx.Show("WZ file not selected.", "Error");
                 return;
             }
             Node baseWzNode = advTree1.SelectedNode;
@@ -781,14 +800,14 @@ namespace WzComparerR2
             if (baseWzNode.Text.ToLower() == "list.wz")
             {
                 advTree1.Nodes.Remove(baseWzNode);
-                labelItemStatus.Text = "Closing list.wz.";
+                labelItemStatus.Text = "Closing List.wz.";
                 return;
             }
 
             Wz_File wz_f = advTree1.SelectedNode.AsWzNode()?.GetNodeWzFile();
             if (wz_f == null)
             {
-                MessageBoxEx.Show("WZ is not the correct file type.", "Message");
+                MessageBoxEx.Show("Please choose the correct WZ File.", "Error");
                 return;
             }
             Wz_Structure wz = wz_f.WzStructure;
@@ -815,9 +834,9 @@ namespace WzComparerR2
             OnWzClosing(new WzStructureEventArgs(wz));
             wz.Clear();
             if (this.openedWz.Remove(wz))
-                labelItemStatus.Text = "Closing Wz file(s).";
+                labelItemStatus.Text = "WZ File closed.";
             else
-                labelItemStatus.Text = "WZ file has been closed, but an error has occurred.";
+                labelItemStatus.Text = "Wz File close failed. Unknown error occurred.";
         }
 
         private void buttonItemCloseAll_Click(object sender, EventArgs e)
@@ -833,7 +852,7 @@ namespace WzComparerR2
             openedWz.Clear();
             CharaSimLoader.ClearAll();
             stringLinker.Clear();
-            labelItemStatus.Text = "All read resources have been cleaned up.";
+            labelItemStatus.Text = "Close complete.";
             GC.Collect();
         }
 
@@ -926,7 +945,7 @@ namespace WzComparerR2
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "File Name", wzFile.Header.FileName }));
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "File Size", wzFile.Header.FileSize + " bytes" }));
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Copyright", wzFile.Header.Copyright }));
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Version", wzFile.Header.WzVersion.ToString() }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Version", wzFile.GetMergedVersion().ToString() }));
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Wz Type", wzFile.IsSubDir ? "SubDir" : wzFile.Type.ToString() }));
 
                 foreach (Wz_File subFile in wzFile.MergedWzFiles)
@@ -963,17 +982,17 @@ namespace WzComparerR2
                         QueryPerformance.End();
                         double ms = (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000);
 
-                        labelItemStatus.Text = "Image successfully read. Time taken: " + ms + "ms.";
+                        labelItemStatus.Text = "Image successfully loaded. Time taken: " + ms + "ms.";
                     }
                     else
                     {
 
-                        labelItemStatus.Text = "Failed to read image " + ex.Message;
+                        labelItemStatus.Text = "Load failed: " + ex.Message;
                     }
                 }
                 catch (Exception ex)
                 {
-                    labelItemStatus.Text = "Failed to read image " + ex.Message;
+                    labelItemStatus.Text = "Load failed: " + ex.Message;
                 }
             }
             listViewExWzDetail.EndUpdate();
@@ -1041,7 +1060,7 @@ namespace WzComparerR2
 
             if ((png = value as Wz_Png) != null)
             {
-                return "png " + png.Width + "*" + png.Height + " (" + png.Form + ")";
+                return "PNG " + png.Width + "*" + png.Height + " (" + png.Form + ")";
             }
             else if ((vector = value as Wz_Vector) != null)
             {
@@ -1053,7 +1072,7 @@ namespace WzComparerR2
             }
             else if ((sound = value as Wz_Sound) != null)
             {
-                return "sound " + sound.Ms + "ms";
+                return "Sound " + sound.Ms + "ms";
             }
             else if ((img = value as Wz_Image) != null)
             {
@@ -1114,6 +1133,30 @@ namespace WzComparerR2
                     "offset: " + png.Offset + "\r\n" +
                     "size: " + png.Width + "*" + png.Height + "\r\n" +
                     "png format: " + png.Form;
+
+                var linkNode = selectedNode.GetLinkedSourceNode(PluginManager.FindWz);
+                if (linkNode != selectedNode)
+                {
+                    png = linkNode.GetValueEx<Wz_Png>(null);
+                    if (png != null)
+                    {
+                        string valueStr = Convert.ToString((selectedNode.Nodes["source"] ?? selectedNode.Nodes["_inlink"] ?? selectedNode.Nodes["_outlink"])?.Value);
+                        if (valueStr != null && valueStr.Contains("\n") && !valueStr.Contains("\r\n"))
+                        {
+                            valueStr = valueStr.Replace("\n", "\r\n");
+                        }
+                        textBoxX1.AppendText("\r\n\r\n" + Convert.ToString(valueStr));
+
+                        pictureBoxEx1.PictureName = GetSelectedNodeImageName();
+                        pictureBoxEx1.ShowImage(png);
+                        this.cmbItemAniNames.Items.Clear();
+                        advTree3.PathSeparator = ".";
+                        textBoxX1.AppendText("\r\n\r\ndataLength: " + png.DataLength + " bytes\r\n" +
+                            "offset: " + png.Offset + "\r\n" +
+                            "size: " + png.Width + "*" + png.Height + "\r\n" +
+                            "png format: " + png.Form);
+                    }
+                }
             }
             else if ((vector = selectedNode.Value as Wz_Vector) != null)
             {
@@ -1269,7 +1312,7 @@ namespace WzComparerR2
             {
                 path = "(" + objPathList.Count + ") Node";
             }
-            labelItemStatus.Text = "Unable to find imageNode: " + path;
+            labelItemStatus.Text = "Failed to load imageNode: " + path;
         }
 
         private Wz_Node SearchNode(Wz_Node parent, string[] path, int startIndex)
@@ -1383,7 +1426,7 @@ namespace WzComparerR2
             }
             sb.Remove(sb.Length - 1, 1);
             Clipboard.SetText(sb.ToString(), TextDataFormat.UnicodeText);
-            labelItemStatus.Text = "The string entry has been copied to the clipboard.";
+            labelItemStatus.Text = "Copied to clipboard.";
         }
 
         private List<string[]> detectObjPathByStringPath(string id, string stringNodePath)
@@ -1442,7 +1485,7 @@ namespace WzComparerR2
                     {
                         wzPath.Add("TamingMob");
                     }
-                    else
+                    else if (pathArray[2] != "Skin")
                     {
                         wzPath.Add(pathArray[2]);
                     }
@@ -1484,6 +1527,21 @@ namespace WzComparerR2
                         wzPath[1] = id.Substring(0, 6) + ".img";
                         addPath();
                     }
+                    break;
+
+                case "0910.img":
+                    wzPath.Add("Item");
+                    wzPath.Add("Special");
+                    wzPath.Add("0910.img");
+                    imagePath.Add(id);
+                    addPath();
+                    break;
+
+                case "SetItemInfo.img":
+                    wzPath.Add("Etc");
+                    wzPath.Add("SetItemInfo.img");
+                    imagePath.Add(id);
+                    addPath();
                     break;
                 default:
                     break;
@@ -1613,11 +1671,11 @@ namespace WzComparerR2
                     sw.Stop();
                 }
                 GC.Collect();
-                labelItemStatus.Text = $"Image successfully read. Time taken: {sw.ElapsedMilliseconds}ms.";
+                labelItemStatus.Text = $"Image successfully read. Time taken: {sw.ElapsedMilliseconds}ms";
             }
             else
             {
-                labelItemStatus.Text = "WZ not open.";
+                labelItemStatus.Text = "Sort failed: WZ File not open.";
             }
         }
 
@@ -1626,13 +1684,13 @@ namespace WzComparerR2
             Wz_Image img = advTree1.SelectedNode?.AsWzNode()?.GetValue<Wz_Image>();
             if (img == null)
             {
-                MessageBoxEx.Show("No wz_img selected for export.", "Message");
+                MessageBoxEx.Show("Select the img to export.");
                 return;
             }
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.DefaultExt = ".img";
             dlg.FileName = img.Name;
-            dlg.Filter = "*.img|*.img";
+            dlg.Filter = "IMG (*.img)|*.img";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 FileStream fs = null;
@@ -1653,7 +1711,7 @@ namespace WzComparerR2
                 }
                 catch (Exception ex)
                 {
-                    MessageBoxEx.Show(ex.ToString(), "Message");
+                    MessageBoxEx.Show(ex.ToString(), "Error");
                 }
                 finally
                 {
@@ -1670,12 +1728,12 @@ namespace WzComparerR2
             Wz_Image img = advTree1.SelectedNode?.AsWzNode()?.GetValue<Wz_Image>();
             if (img == null)
             {
-                MessageBoxEx.Show("No wz_img selected for export.", "Message");
+                MessageBoxEx.Show("Select the img to export as XML.");
                 return;
             }
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.DefaultExt = ".xml";
-            dlg.Filter = "*.xml|*.xml";
+            dlg.Filter = "XML (*.xml)|*.xml";
             dlg.FileName = img.Node.FullPathToFile.Replace('\\', '.') + ".xml";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -1698,11 +1756,11 @@ namespace WzComparerR2
                     writer.WriteEndDocument();
                     writer.Close();
 
-                    labelItemStatus.Text = img.Name + " successfully exported.";
+                    labelItemStatus.Text = img.Name + " successfully exported as XML.";
                 }
                 catch (Exception ex)
                 {
-                    MessageBoxEx.Show(ex.ToString(), "Message");
+                    MessageBoxEx.Show(ex.ToString(), "Error");
                 }
                 finally
                 {
@@ -1749,7 +1807,7 @@ namespace WzComparerR2
                 Node searchNode = searchAdvTree(advTree, cellIndex, searchText, exact, regex, true);
                 advTree.SelectedNode = searchNode;
                 if (searchNode == null)
-                    MessageBoxEx.Show("Search completed", "Message");
+                    MessageBoxEx.Show("No results found.", "Error");
             }
             catch (Exception ex)
             {
@@ -1784,7 +1842,7 @@ namespace WzComparerR2
                     }
                 }
             }
-            
+
             return null;
         }
 
@@ -1849,7 +1907,7 @@ namespace WzComparerR2
                 else
                 {
                     if (ignoreCase ? node.Cells[cellIndex].Text.IndexOf(searchTextArray[i], StringComparison.CurrentCultureIgnoreCase) < 0 :
-                        !node.Text.Contains(searchTextArray[i]))
+                        !node.Cells[cellIndex].Text.Contains(searchTextArray[i]))
                         return false;
                 }
 
@@ -1875,12 +1933,12 @@ namespace WzComparerR2
             {
                 if (!this.stringLinker.Load(findStringWz()))
                 {
-                    MessageBoxEx.Show("No initialization string linked, please manually specify a String.wz file.", "Message");
+                    MessageBoxEx.Show("Please specify a String.wz File.", "Error");
                     return;
                 }
                 QueryPerformance.End();
                 double ms = (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000);
-                labelItemStatus.Text = "Initialization of StringLinker successful, Time taken: " + ms + "ms.";
+                labelItemStatus.Text = "StringLinker initialization complete. Time taken: " + ms + "ms";
             }
             if (comboBoxItem2.SelectedIndex < 0)
                 comboBoxItem2.SelectedIndex = 0;
@@ -1934,7 +1992,7 @@ namespace WzComparerR2
             finally
             {
                 listViewExString.EndUpdate();
-            }            
+            }
         }
 
         private Wz_File findStringWz()
@@ -2008,10 +2066,12 @@ namespace WzComparerR2
 
         private void buttonItemSelectStringWz_Click(object sender, EventArgs e)
         {
-            Wz_File stringWzFile = advTree1.SelectedNode?.AsWzNode()?.GetNodeWzFile();
-            if (stringWzFile == null)
+            Wz_File stringWzFile = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("String").GetNodeWzFile();
+            Wz_File itemWzFile = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("Item").GetNodeWzFile();
+            Wz_File etcWzFile = advTree1.SelectedNode?.AsWzNode()?.FindNodeByPath("Etc").GetNodeWzFile();
+            if (stringWzFile == null || itemWzFile == null || etcWzFile == null)
             {
-                MessageBoxEx.Show("WZ file not chosen to initialize StringLinker.", "Message");
+                MessageBoxEx.Show("Please specify a String.wz File.", "Error");
                 return;
             }
             QueryPerformance.Start();
@@ -2020,18 +2080,18 @@ namespace WzComparerR2
             if (r)
             {
                 double ms = (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000);
-                labelItemStatus.Text = "Initialization of StringLinker successful, Time taken: " + ms + "ms.";
+                labelItemStatus.Text = "StringLinker initialization complete. Time taken: " + ms + "ms";
             }
             else
             {
-                MessageBoxEx.Show("Initialization of StringLinker failed.", "Message");
+                MessageBoxEx.Show("StringLinker initialization failed.", "Error");
             }
         }
 
         private void buttonItemClearStringWz_Click(object sender, EventArgs e)
         {
             stringLinker.Clear();
-            labelItemStatus.Text = "StringLinker has been cleared.";
+            labelItemStatus.Text = "StringLinker cleanup complete.";
         }
 
         private void buttonItemPatcher_Click(object sender, EventArgs e)
@@ -2087,14 +2147,14 @@ namespace WzComparerR2
             using (OpenFileDialog dlg = new OpenFileDialog())
             {
                 List<string> supportExt = new List<string>();
-                supportExt.Add("Sound File(*.mp3;*.ogg;*.wav)|*.mp3;*.ogg;*.wav");
+                supportExt.Add("Sound File (*.mp3;*.ogg;*.wav)|*.mp3;*.ogg;*.wav");
                 foreach (string ext in this.soundPlayer.GetPluginSupportedExt())
                 {
                     supportExt.Add(ext);
                 }
-                supportExt.Add("Any File|*.*");
+                supportExt.Add("All Files (*.*)|*.*");
 
-                dlg.Title = "Please select a sound file.";
+                dlg.Title = "Open Audio File";
                 dlg.Filter = string.Join("|", supportExt.ToArray());
                 dlg.Multiselect = false;
 
@@ -2143,7 +2203,7 @@ namespace WzComparerR2
             using (SaveFileDialog dlg = new SaveFileDialog())
             {
                 dlg.AddExtension = true;
-                dlg.Title = "Please choose a save path.";
+                dlg.Title = "Choose folder to save";
                 dlg.Filter = "All Files (*.*)|*.*";
                 dlg.AddExtension = false;
                 dlg.FileName = soundPlayer.PlayingSoundName;
@@ -2155,7 +2215,7 @@ namespace WzComparerR2
                         fs = new FileStream(dlg.FileName, FileMode.Create);
                         fs.Write(data, 0, data.Length);
 
-                        MessageBoxEx.Show("File saved successfully!");
+                        MessageBoxEx.Show("File saved.");
                     }
                     catch (Exception ex)
                     {
@@ -2217,7 +2277,7 @@ namespace WzComparerR2
             CustomSoundFile soundFile = new CustomSoundFile(fileName, 0, (int)(new FileInfo(fileName).Length));
             soundPlayer.PreLoad(soundFile);
             soundPlayer.PlayingSoundName = Path.GetFileName(fileName);
-            labelItemSoundTitle.Text = "(Loading the file)" + soundPlayer.PlayingSoundName;
+            labelItemSoundTitle.Text = "(External File): " + soundPlayer.PlayingSoundName;
             labelItemSoundTitle.Tooltip = fileName;
         }
         #endregion
@@ -2238,13 +2298,13 @@ namespace WzComparerR2
                 {
                     dlg.FileName += ".txt";
                 }
-                dlg.Filter = "*.*|*.*";
+                dlg.Filter = "All Files (*.*)|*.*";
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     try
                     {
                         File.WriteAllText(dlg.FileName, (string)item);
-                        this.labelItemStatus.Text = "File saved successfully!";
+                        this.labelItemStatus.Text = "File saved";
                     }
                     catch (Exception ex)
                     {
@@ -2262,10 +2322,10 @@ namespace WzComparerR2
                     switch (wzSound.SoundType)
                     {
                         case Wz_SoundType.Mp3: dlg.FileName += ".mp3"; break;
-                        case Wz_SoundType.WavRaw: dlg.FileName += ".pcm"; break;
+                        case Wz_SoundType.WavRaw: dlg.FileName += ".wav"; break;
                     }
                 }
-                dlg.Filter = "*.*|*.*";
+                dlg.Filter = "All Files (*.*)|*.*";
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     try
@@ -2289,11 +2349,11 @@ namespace WzComparerR2
                                 }
                             }
                         }
-                        this.labelItemStatus.Text = "File saved successfully!";
+                        this.labelItemStatus.Text = "Audio saved.";
                     }
                     catch (Exception ex)
                     {
-                        MessageBoxEx.Show("File save failed.\r\n" + ex.ToString(), "Error");
+                        MessageBoxEx.Show("Audio save failed.\r\n" + ex.ToString(), "Error");
                     }
                 }
             }
@@ -2305,14 +2365,14 @@ namespace WzComparerR2
             Wz_Uol uol = advTree3.SelectedNode?.AsWzNode()?.Value as Wz_Uol;
             if (uol == null)
             {
-                labelItemStatus.Text = "uol node not selected";
+                labelItemStatus.Text = "UOL node is not selected.";
                 return;
             }
 
             Node uolNode = handleUol(advTree3.SelectedNode, uol.Uol);
             if (uolNode == null)
             {
-                labelItemStatus.Text = "Please try to load the parent node on the bottom to re-execute.";
+                labelItemStatus.Text = "UOL target node not found.";
                 return;
             }
             else
@@ -2393,6 +2453,60 @@ namespace WzComparerR2
             while (nodeList.Count > 0)
             {
                 yield return nodeList.Dequeue();
+            }
+        }
+
+        private void tsmi2ExpandType_Click(object sender, EventArgs e)
+        {
+            if (advTree3.SelectedNode == null)
+                return;
+
+            advTree3.BeginUpdate();
+            foreach (Node node in getEqualTypeNode(advTree3.SelectedNode))
+            {
+                node.Expand();
+            }
+            advTree3.EndUpdate();
+        }
+
+        private void tsmi2CollapseType_Click(object sender, EventArgs e)
+        {
+            if (advTree3.SelectedNode == null)
+                return;
+
+            advTree3.BeginUpdate();
+            foreach (Node node in getEqualTypeNode(advTree3.SelectedNode))
+            {
+                node.Collapse();
+            }
+            advTree3.EndUpdate();
+        }
+
+        private IEnumerable<Node> getEqualTypeNode(Node currentNode)
+        {
+            if (currentNode == null)
+                yield break;
+            Type type = currentNode.AsWzNode()?.Value?.GetType();
+            Node parent = currentNode;
+            while (parent != null && parent.Parent != null)
+            {
+                parent = parent.Parent;
+            }
+            Queue<Node> nodeList = new Queue<Node>();
+            nodeList.Enqueue(parent);
+            while (nodeList.Count > 0)
+            {
+                int count = nodeList.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    Node node = nodeList.Dequeue();
+                    if (node.AsWzNode()?.Value?.GetType() == type)
+                    {
+                        yield return node;
+                    }
+                    foreach (Node child in node.Nodes)
+                        nodeList.Enqueue(child);
+                }
             }
         }
 
@@ -2484,7 +2598,7 @@ namespace WzComparerR2
             Wz_File wzf = selectedNode.GetNodeWzFile();
             if (wzf == null)
             {
-                labelItemStatus.Text = "No WZ file found";
+                labelItemStatus.Text = "WZ File not found.";
                 return;
             }
 
@@ -2511,7 +2625,7 @@ namespace WzComparerR2
                     break;
                 case Wz_Type.Item:
                     Wz_Node itemNode = selectedNode;
-                    if (Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\(Cash|Consume|Etc|Install|Cash)\\\d{4,6}.img\\\d+$"))
+                    if (Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\(Cash|Consume|Etc|Install|Cash)\\\d{4,6}.img\\\d+$") || Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\Special\\0910.img\\\d+$"))
                     {
                         var item = Item.CreateFromNode(itemNode, PluginManager.FindWz);
                         obj = item;
@@ -2633,7 +2747,7 @@ namespace WzComparerR2
             success = this.charaSimCtrl.UIItem.AddItem(this.tooltipQuickView.TargetItem as ItemBase);
             if (!success)
             {
-                labelItemStatus.Text = "Inventory adding failed.";
+                labelItemStatus.Text = "No items selected or can no longer be placed.";
             }
         }
 
@@ -2859,7 +2973,7 @@ namespace WzComparerR2
             if (compareThread != null)
             {
                 compareThread.Suspend();
-                if (DialogResult.Yes == MessageBoxEx.Show("Would you like to cancel the comparison?", "Compare", MessageBoxButtons.YesNoCancel))
+                if (DialogResult.Yes == MessageBoxEx.Show("Comparison in progress. Would you like to cancel?", "Compare", MessageBoxButtons.YesNoCancel))
                 {
                     compareThread.Resume();
                     compareThread.Abort();
@@ -2873,12 +2987,12 @@ namespace WzComparerR2
 
             if (openedWz.Count < 2)
             {
-                MessageBoxEx.Show("Did not successfully open 2 Wz files.", "Compare");
+                MessageBoxEx.Show("Please select two or more Wz files to compare.", "Error");
                 return;
             }
 
             FolderBrowserDialog dlg = new FolderBrowserDialog();
-            dlg.Description = "Please select a destination folder.";
+            dlg.Description = "Choose a folder to save to";
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -2906,7 +3020,7 @@ namespace WzComparerR2
                                 fileOld.Header.FileName,
                                 fileOld.GetMergedVersion()
                                 );
-                            switch (MessageBoxEx.Show(txt, "Easy Compare", MessageBoxButtons.YesNoCancel))
+                            switch (MessageBoxEx.Show(txt, "WZ Comparison", MessageBoxButtons.YesNoCancel))
                             {
                                 case DialogResult.Yes:
                                     comparer.EasyCompareWzFiles(fileNew, fileOld, dlg.SelectedPath);
@@ -2927,17 +3041,17 @@ namespace WzComparerR2
                     }
                     catch (ThreadAbortException)
                     {
-                        MessageBoxEx.Show(this, "Comparison has been canceled.", "Compare");
+                        MessageBoxEx.Show(this, "Comparison has been canceled", "Error");
                     }
                     catch (Exception ex)
                     {
-                        MessageBoxEx.Show(this, "Abnormal\r\n" + ex.ToString(), "Compare");
+                        MessageBoxEx.Show(this, "Comparison stopped abruptly." + ex.ToString(), "Error");
                     }
                     finally
                     {
                         sw.Stop();
                         compareThread = null;
-                        labelXComp1.Text = "WZ comparison complete." + sw.Elapsed.ToString();
+                        labelXComp1.Text = "WZ File comparison complete. Time taken: " + sw.Elapsed.ToString();
                         labelXComp2.Text = "";
                     }
                 });
@@ -2995,7 +3109,7 @@ namespace WzComparerR2
         private void btnExportSkillOption_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
-            dlg.Description = "Please select a destination folder";
+            dlg.Description = "Please select a destination folder.";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 if (!this.stringLinker.HasValues)
@@ -3048,7 +3162,7 @@ namespace WzComparerR2
 
         private void buttonItemUpdate_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/Kagamia/WzComparerR2/releases");
+            System.Diagnostics.Process.Start("https://github.com/PirateIzzy/WzComparerR2/releases");
         }
 
         private void btnItemOptions_Click(object sender, System.EventArgs e)

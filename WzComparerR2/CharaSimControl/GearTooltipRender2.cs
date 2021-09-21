@@ -944,13 +944,13 @@ namespace WzComparerR2.CharaSimControl
                         string title;
                         if (info.Prob < info.ProbTotal)
                         {
-                            title = string.Format("{2:P2} chance to gain :", info.Prob, info.ProbTotal, info.Prob * 1.0 / info.ProbTotal);
+                            title = string.Format("{2:P2}({0}/{1}) chance to gain :", info.Prob, info.ProbTotal, info.Prob * 1.0 / info.ProbTotal);
                         }
                         else
                         {
                             title = "Acquired Skills When Equipped :";
                         }
-                        g.DrawString(title, GearGraphics.ItemDetailFont, Brushes.White, 10, picHeight);
+                        TextRenderer.DrawText(g, title, GearGraphics.EquipDetailFont, new Point(10, picHeight), Color.White, TextFormatFlags.NoPadding);
                         picHeight += 15;
                         foreach (var kv in info.EquipmentSkills)
                         {
@@ -959,8 +959,8 @@ namespace WzComparerR2.CharaSimControl
                             {
                                 this.StringLinker.StringSkill.TryGetValue(kv.Key, out sr);
                             }
-                            string text = string.Format("{0}({1}) Lv.{2}", sr == null ? null : sr.Name, kv.Key, kv.Value);
-                            TextRenderer.DrawText(g, title, GearGraphics.EquipDetailFont, new Point(10, picHeight), Color.White, TextFormatFlags.NoPadding);
+                            string text = string.Format("{0} Level {2}", sr == null ? null : sr.Name, kv.Key, kv.Value);
+                            TextRenderer.DrawText(g, text, GearGraphics.EquipDetailFont, new Point(10, picHeight), ((SolidBrush)GearGraphics.OrangeBrush).Color, TextFormatFlags.NoPadding);
                             picHeight += 15;
                         }
                     }

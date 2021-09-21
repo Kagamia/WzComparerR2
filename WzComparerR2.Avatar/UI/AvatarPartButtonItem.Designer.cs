@@ -34,12 +34,12 @@
             // btnItemShow
             // 
             this.btnItemShow.Name = "btnItemShow";
-            this.btnItemShow.Text = "显示/隐藏";
+            this.btnItemShow.Text = "Show/Hide";
             // 
             // btnItemDel
             // 
             this.btnItemDel.Name = "btnItemDel";
-            this.btnItemDel.Text = "移除";
+            this.btnItemDel.Text = "Remove";
             // 
             // AvatarPartButtonItem
             // 
