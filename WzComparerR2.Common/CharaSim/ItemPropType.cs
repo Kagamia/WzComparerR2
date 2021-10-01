@@ -23,5 +23,7 @@ namespace WzComparerR2.CharaSim
         wonderGrade,
         life,
         permanent,
+        exp_minLev,
+        exp_maxLev
     }
 }

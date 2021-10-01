@@ -388,11 +388,18 @@ namespace WzComparerR2.CharaSimControl
             bool willDrawNickTag = this.ShowNickTag
                 && this.Item.Props.TryGetValue(ItemPropType.nickTag, out value)
                 && this.TryGetNickResource(value, out nickResNode);
-            if (item.Sample.Bitmap != null || willDrawNickTag)
+            int minLev = 0, maxLev = 0;
+            bool willDrawExp = item.Props.TryGetValue(ItemPropType.exp_minLev, out minLev) && item.Props.TryGetValue(ItemPropType.exp_maxLev, out maxLev);
+            if (!string.IsNullOrEmpty(sr["desc_leftalign"]) || item.Sample.Bitmap != null || willDrawNickTag || willDrawExp)
             {
                 if (picH < iconY + 84)
                 {
                     picH = iconY + 84;
+                }
+                if (!string.IsNullOrEmpty(sr["desc_leftalign"]))
+                {
+                    picH += 12;
+                    GearGraphics.DrawString(g, sr["desc_leftalign"], GearGraphics.ItemDetailFont, 14, right, ref picH, 16);
                 }
                 if (item.Sample.Bitmap != null)
                 {
