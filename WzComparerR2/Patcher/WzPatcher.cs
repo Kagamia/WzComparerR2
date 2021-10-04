@@ -171,6 +171,11 @@ namespace WzComparerR2.Patcher
                     break;
                 }
 
+                if (this.IsKMST1125Format.Value && this.oldFileHash.TryGetValue(part.FileName, out uint value))
+                {
+                    part.OldChecksum = value;
+                }
+
                 patchParts.Add(part);
 
                 //跳过当前段
