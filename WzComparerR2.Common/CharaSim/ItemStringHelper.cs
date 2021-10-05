@@ -107,7 +107,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.only: return value == 0 ? null : "固有道具";
                 case GearPropType.tradeBlock: return value == 0 ? null : "不可交换";
                 case GearPropType.equipTradeBlock: return value == 0 ? null : "装备后无法交换";
-                case GearPropType.accountSharable: return value == 0 ? null : "世界内只有我的角色之间可以移动";
+                case GearPropType.accountSharable: return value == 0 ? null : "服务器内只有我的角色之间可以移动";
                 case GearPropType.onlyEquip: return value == 0 ? null : "固有装备物品";
                 case GearPropType.notExtend: return value == 0 ? null : "无法延长有效时间。";
                 case GearPropType.tradeAvailable:
