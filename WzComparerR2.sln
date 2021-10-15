@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2", "WzComparerR2\WzComparerR2.csproj", "{5E883BE2-2009-4517-8026-4B90DEB83884}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CharaSimResource", "..\CharaSimResource\CharaSimResource.csproj", "{54797F38-A12C-4202-92A4-1A3DDCE914B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CharaSimResource", "CharaSimResource\CharaSimResource.csproj", "{54797F38-A12C-4202-92A4-1A3DDCE914B7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2.PluginBase", "WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj", "{FA74A2FD-0250-4182-845D-DD98D829B525}"
 EndProject
