@@ -6,13 +6,6 @@
 trigger:
 - master
 
-resources:
- repositories:
-   - repository: CharaSimResource
-     type: github
-     name: kagamia/CharaSimResource
-     endpoint: Kagamia
-
 pool:
   vmImage: 'windows-latest'
 
@@ -30,9 +23,9 @@ variables:
 
 steps:
 - checkout: self
+  submodules: true
   path: s/WzComparerR2
   persistCredentials: true
-- checkout: CharaSimResource
 
 - task: CmdLine@2
   displayName: Generate version file
