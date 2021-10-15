@@ -24,9 +24,14 @@ links: [\[更新日志\]](https://github.com/Kagamia/WzComparerR2/tree/master/Up
 - **2.x**: Win7sp1+/.net4.5+/dx11.0
 - **1.x**: WinXp+/.net2.0+/dx9.0
 
+# Installation
+```sh
+git clone --recurse-submodules -j8 git://github.com/Kagamia/WzComparerR2.git
+```
+Clone repository with submodules.
+
 # Compile
 - vs2017 or higher
-- put [CharaSimResource](https://github.com/Kagamia/CharaSimResource) together
 
 # Credits and Acknowledgement
 - **Fiel** ([Southperry](http://www.southperry.net))  wz文件读取代码改造自WzExtract 以及WzPatcher
