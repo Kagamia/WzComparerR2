@@ -1,0 +1,15 @@
+# https://lgtm.com/help/lgtm/lgtm.yml-configuration-file
+path_classifiers:
+  docs: "*.md"
+extraction:
+  csharp:
+    index:
+      solution: "WzComparerR2.sln"
+      nuget_restore: false
+      vstools_version: "15"
+      all_solutions: false
+      msbuild:
+        configuration: "release"
+        platform: "Any CPU"
+        target: "rebuild"
+      buildless: true
