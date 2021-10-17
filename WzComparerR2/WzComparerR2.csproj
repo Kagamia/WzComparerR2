@@ -351,7 +351,7 @@
     <None Include="Resources\Open.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CharaSimResource\CharaSimResource.csproj">
+    <ProjectReference Include="..\CharaSimResource\CharaSimResource.csproj">
       <Project>{54797f38-a12c-4202-92a4-1a3ddce914b7}</Project>
       <Name>CharaSimResource</Name>
     </ProjectReference>

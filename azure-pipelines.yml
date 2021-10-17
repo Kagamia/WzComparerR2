@@ -6,23 +6,16 @@
 trigger:
 - master
 
-resources:
- repositories:
-   - repository: CharaSimResource
-     type: github
-     name: kagamia/CharaSimResource
-     endpoint: Kagamia
-
 pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: 'WzComparerR2/WzComparerR2.sln'
+  solution: 'WzComparerR2.sln'
   buildPlatform_anycpu: 'Any CPU'
   buildPlatform_x86: 'x86'
   buildConfiguration: 'Release'
-  outputDir_anycpu: 'WzComparerR2/WzComparerR2/bin/release'
-  outputDir_x86: 'WzComparerR2/WzComparerR2/bin/x86/release'
+  outputDir_anycpu: 'WzComparerR2/bin/release'
+  outputDir_x86: 'WzComparerR2/bin/x86/release'
   outputFileName: 'WcR2_With_Plugins_$(Build.BuildNumber)'
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   accountName: 'wcr2publish'
@@ -30,9 +23,9 @@ variables:
 
 steps:
 - checkout: self
+  submodules: true
   path: s/WzComparerR2
   persistCredentials: true
-- checkout: CharaSimResource
 
 - task: CmdLine@2
   displayName: Generate version file
@@ -40,7 +33,6 @@ steps:
     script: |
       mkdir Build
       echo [assembly: global::System.Reflection.AssemblyInformationalVersion("2.2.$(Build.BuildNumber)")] >> Build\CommonAssemblyInfo.cs
-    workingDirectory: '$(Build.SourcesDirectory)\WzComparerR2'
 
 - task: VSBuild@1
   displayName: Build anycpu
@@ -115,7 +107,6 @@ steps:
   displayName: Delete ci-build tag
   inputs:
     script: 'git push --delete origin ci-build'
-    workingDirectory: '$(Build.SourcesDirectory)\WzComparerR2'
     failOnStderr: false
 
 - task: GitHubRelease@1
