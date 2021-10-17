@@ -579,7 +579,7 @@ namespace WzComparerR2.CharaSimControl
             private void MeasureBatch(List<Run> runs)
             {
                 string text = sb.ToString();
-                if (runs.Count > 0)
+                if (runs.Count > 0 && !runs.All(run => run.IsBreakLine))
                 {
                     fmt.SetMeasurableCharacterRanges(runs.Select(r => new CharacterRange(r.StartIndex, r.Length)).ToArray());
                     var regions = g.MeasureCharacterRanges(text, font, infinityRect, fmt);
