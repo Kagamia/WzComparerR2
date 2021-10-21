@@ -107,7 +107,6 @@
     <Compile Include="MeshBatcher.cs" />
     <Compile Include="MeshItem.cs" />
     <Compile Include="Music.cs" />
-    <Compile Include="Net\ChatClient.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleDesc.cs" />
     <Compile Include="ParticleEmitter.cs" />
