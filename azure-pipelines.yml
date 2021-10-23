@@ -60,6 +60,7 @@ steps:
     script: |
       move "$(outputDir_anycpu)\*.dll" "$(outputDir_anycpu)\Lib"
       del "$(outputDir_anycpu)\*.pdb"
+      del "$(outputDir_anycpu)\*.xml"
       rename "$(outputDir_anycpu)\WzComparerR2.exe" "WzComparerR2.anycpu.exe"
       rename "$(outputDir_anycpu)\WzComparerR2.exe.config" "WzComparerR2.anycpu.exe.config"
       copy /y "$(outputDir_x86)\WzComparerR2.exe" "$(outputDir_anycpu)"
