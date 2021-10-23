@@ -35,10 +35,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bass.Net">
-      <HintPath>..\References\Bass.Net.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="DevComponents.DotNetBar2, Version=12.1.0.0, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
@@ -55,6 +51,10 @@
     </Reference>
     <Reference Include="IMEHelper">
       <HintPath>..\References\IMEHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedBass, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ManagedBass.3.1.0\lib\net45\ManagedBass.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.6.0.1625\lib\net40\MonoGame.Framework.dll</HintPath>
@@ -220,6 +220,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="Resources\Basic.img.ComboBox.normal.0.png" />
   </ItemGroup>
   <ItemGroup>
