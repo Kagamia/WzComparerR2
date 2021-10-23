@@ -24,6 +24,7 @@ variables:
 steps:
 - checkout: self
   submodules: true
+  fetchDepth: 1
   path: s/WzComparerR2
   persistCredentials: true
 
