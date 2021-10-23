@@ -863,7 +863,6 @@ namespace WzComparerR2.MapRender
             {
                 this.UnloadContent();
                 this.OnExiting();
-                GameExt.DisposeSwapChain(this.GraphicsDevice);
             }
             base.Dispose(disposing);
         }

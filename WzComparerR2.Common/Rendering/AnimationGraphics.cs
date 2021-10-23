@@ -45,7 +45,10 @@ namespace WzComparerR2.Rendering
                     sourceRectangle: frame.AtlasRect,
                     origin: frame.Origin.ToVector2(),
                     rotation: 0,
-                    color: new Color(Color.White, frame.A0));
+                    color: new Color(Color.White, frame.A0),
+                    scale: 1,
+                    effects: SpriteEffects.None,
+                    layerDepth: 0);
                 sprite.End();
             }
         }

@@ -18,9 +18,9 @@ namespace WzComparerR2.Rendering
             return SharpDX.Color.FromRgba(color.PackedValue);
         }
 
-        public static SharpDX.Rectangle XnaToDxRect(this Rectangle rect)
+        public static SharpDX.RectangleF XnaToDxRect(this Rectangle rect)
         {
-            return new SharpDX.Rectangle(rect.X, rect.Y, rect.Width, rect.Height);
+            return new SharpDX.RectangleF(rect.X, rect.Y, rect.Width, rect.Height);
         }
     }
 }
