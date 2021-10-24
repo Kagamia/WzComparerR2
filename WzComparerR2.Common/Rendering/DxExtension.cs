@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace WzComparerR2.Rendering
 {
-    public static class DxEntension
+    public static class DxExtension
     {
         public static Color DxToXnaColor(this SharpDX.Color color)
         {

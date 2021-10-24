@@ -142,13 +142,13 @@ namespace WzComparerR2.MapRender
 
                         Prepare(frame.Blend ? ItemType.Sprite_BlendAdditive : ItemType.Sprite);
                         sprite.Draw(frame.Texture, pos,
-                            sourceRectangle: frame.AtlasRect,
-                            color: new Color(Color.White, frame.A0),
-                            origin: origin,
-                            effects: eff,
-                            rotation: 0,
-                            scale: 1,
-                            layerDepth: 0
+                            frame.AtlasRect,
+                            new Color(Color.White, frame.A0),
+                            0,
+                            origin,
+                            1,
+                            eff,
+                            0
                             );
                     }
                 }
@@ -160,13 +160,13 @@ namespace WzComparerR2.MapRender
                 {
                     Prepare(frame.Blend ? ItemType.Sprite_BlendAdditive : ItemType.Sprite);
                     sprite.Draw(frame.Texture, mesh.Position,
-                        sourceRectangle: frame.AtlasRect,
-                        color: new Color(Color.White, frame.A0),
-                        origin: origin,
-                        effects: eff,
-                        rotation: 0,
-                        scale: 1,
-                        layerDepth: 0
+                        frame.AtlasRect,
+                        new Color(Color.White, frame.A0),
+                        0,
+                        origin,
+                        1,
+                        eff,
+                        0
                         );
                 }
             }
