@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2", "WzComparerR2\WzComparerR2.csproj", "{5E883BE2-2009-4517-8026-4B90DEB83884}"
 EndProject
@@ -10,8 +10,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2.PluginBase", "WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj", "{FA74A2FD-0250-4182-845D-DD98D829B525}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2.WzLib", "WzComparerR2.WzLib\WzComparerR2.WzLib.csproj", "{0E9801FD-44A2-4AF8-AE91-D6E74BAD56B2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2.Updater", "WzComparerR2.Updater\WzComparerR2.Updater.csproj", "{23769C53-D465-4E44-B1ED-42606A405DF8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugin", "Plugin", "{495B5D02-38A2-48C0-B8D2-C2A1783EC231}"
 EndProject
@@ -83,12 +81,6 @@ Global
 		{0E9801FD-44A2-4AF8-AE91-D6E74BAD56B2}.Release|x64.Build.0 = Release|Any CPU
 		{0E9801FD-44A2-4AF8-AE91-D6E74BAD56B2}.Release|x86.ActiveCfg = Release|Any CPU
 		{0E9801FD-44A2-4AF8-AE91-D6E74BAD56B2}.Release|x86.Build.0 = Release|Any CPU
-		{23769C53-D465-4E44-B1ED-42606A405DF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{23769C53-D465-4E44-B1ED-42606A405DF8}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{23769C53-D465-4E44-B1ED-42606A405DF8}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{23769C53-D465-4E44-B1ED-42606A405DF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{23769C53-D465-4E44-B1ED-42606A405DF8}.Release|x64.ActiveCfg = Release|Any CPU
-		{23769C53-D465-4E44-B1ED-42606A405DF8}.Release|x86.ActiveCfg = Release|Any CPU
 		{1995B977-CD5E-4A8B-BE3D-15A2AFE1BFB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1995B977-CD5E-4A8B-BE3D-15A2AFE1BFB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1995B977-CD5E-4A8B-BE3D-15A2AFE1BFB4}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -154,7 +146,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{23769C53-D465-4E44-B1ED-42606A405DF8} = {495B5D02-38A2-48C0-B8D2-C2A1783EC231}
 		{1995B977-CD5E-4A8B-BE3D-15A2AFE1BFB4} = {495B5D02-38A2-48C0-B8D2-C2A1783EC231}
 		{11E362E4-B8FB-4BD4-B0D3-BA078D5FB002} = {495B5D02-38A2-48C0-B8D2-C2A1783EC231}
 		{A0753218-2C58-4E4A-9017-A435D2E5F639} = {495B5D02-38A2-48C0-B8D2-C2A1783EC231}
