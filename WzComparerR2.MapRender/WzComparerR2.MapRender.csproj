@@ -256,46 +256,13 @@
     <PackageReference Include="MonoGame.Framework.WindowsDX">
       <Version>3.8.0.1641</Version>
       <ExcludeAssets>runtime</ExcludeAssets>
-      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="SharpDX">
       <Version>4.0.1</Version>
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="SharpDX.Direct2D1">
-      <Version>4.0.1</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="SharpDX.Direct3D9">
-      <Version>4.0.1</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="SharpDX.Direct3D11">
-      <Version>4.0.1</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="SharpDX.DXGI">
-      <Version>4.0.1</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="SharpDX.Mathematics">
-      <Version>4.0.1</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="SharpDX.MediaFoundation">
-      <Version>4.0.1</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
     <PackageReference Include="SharpDX.RawInput">
       <Version>4.0.1</Version>
-    </PackageReference>
-    <PackageReference Include="SharpDX.XAudio2">
-      <Version>4.0.1</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="SharpDX.XInput">
-      <Version>4.0.1</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
