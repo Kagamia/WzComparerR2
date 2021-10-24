@@ -40,10 +40,6 @@
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="ICSharpCode.TextEditor, Version=3.2.1.6466, Culture=neutral, PublicKeyToken=4d61825e8dd49f1a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\ICSharpCode.TextEditor.dll</HintPath>
-    </Reference>
     <Reference Include="KeraLua">
       <HintPath>..\References\KeraLua.dll</HintPath>
     </Reference>
@@ -111,6 +107,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Resources\Lua.xshd" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ICSharpCode.TextEditor">
+      <Version>3.2.1.6466</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

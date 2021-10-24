@@ -80,7 +80,7 @@ namespace WzComparerR2.Rendering
                 var rtProp = new RenderTargetProperties(new PixelFormat(SharpDX.DXGI.Format.Unknown, alphaMode));
                 var d2drt = new RenderTarget(this.factory2D, context.DxgiSurface, rtProp);
                 d2drt.TextRenderingParams = new RenderingParams(factoryDWrite, 1f, 0f, 0f, PixelGeometry.Flat, RenderingMode.CleartypeGdiClassic);
-                d2drt.TextAntialiasMode = TextAntialiasMode.Grayscale;
+                d2drt.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Grayscale;
                 context.D2DRenderTarget = d2drt;
                 context.DxgiSurface.Disposing += (o, e) => d2drt.Dispose();
             }

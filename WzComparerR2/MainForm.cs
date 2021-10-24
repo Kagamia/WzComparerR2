@@ -92,7 +92,7 @@ namespace WzComparerR2
             soundPlayer = new BassSoundPlayer();
             if (!soundPlayer.Init())
             {
-                Un4seen.Bass.BASSError error = soundPlayer.GetLastError();
+                ManagedBass.Errors error = soundPlayer.GetLastError();
                 MessageBoxEx.Show("Bass初始化失败！\r\n\r\nerrorCode : " + (int)error + "(" + error + ")", "虫子");
             }
             soundTimer = new Timer(120d);

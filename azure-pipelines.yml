@@ -24,6 +24,7 @@ variables:
 steps:
 - checkout: self
   submodules: true
+  fetchDepth: 1
   path: s/WzComparerR2
   persistCredentials: true
 
@@ -33,6 +34,12 @@ steps:
     script: |
       mkdir Build
       echo [assembly: global::System.Reflection.AssemblyInformationalVersion("2.2.$(Build.BuildNumber)")] >> Build\CommonAssemblyInfo.cs
+
+- task: NuGetCommand@2
+  displayName: Restore NuGet packages
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
 
 - task: VSBuild@1
   displayName: Build anycpu
