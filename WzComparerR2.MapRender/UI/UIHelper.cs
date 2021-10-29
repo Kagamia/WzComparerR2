@@ -72,7 +72,7 @@ namespace WzComparerR2.MapRender.UI
                     hitMap = new HitMap(texture.Width, texture.Height);
                     colorData = new byte[texture.Width * texture.Height * 2];
                     rowHit = new bool[texture.Width];
-                    texture.GetTexture_BGRA4444(0, 0, new Microsoft.Xna.Framework.Rectangle(0, 0, texture.Width, texture.Height), colorData, 0, colorData.Length);
+                    texture.GetData(colorData);
                     for (int y = 0; y < texture.Height; y++)
                     {
                         int rowStart = y * texture.Width * 2;
