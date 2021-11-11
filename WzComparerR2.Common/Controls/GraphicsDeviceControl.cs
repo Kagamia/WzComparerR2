@@ -83,7 +83,10 @@ namespace WzComparerR2.Controls
                 this.swapChainRT = new SwapChainRenderTarget(graphicsDeviceService.GraphicsDevice,
                     this.Handle,
                     ClientSize.Width,
-                    ClientSize.Height);
+                    ClientSize.Height)
+                {
+                    PresentInterval = PresentInterval.Immediate
+                };
 
                 // Register the service, so components like ContentManager can find it.
                 services.AddService<IGraphicsDeviceService>(graphicsDeviceService);
@@ -270,7 +273,10 @@ namespace WzComparerR2.Controls
                         this.graphicsDeviceService.GraphicsDevice,
                         this.Handle,
                         clientSize.Width,
-                        clientSize.Height);
+                        clientSize.Height)
+                    {
+                        PresentInterval = PresentInterval.Immediate
+                    };
                 }
                 catch (Exception e)
                 {
