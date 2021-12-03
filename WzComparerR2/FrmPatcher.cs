@@ -217,6 +217,7 @@ namespace WzComparerR2
             {
                 patcher = new WzPatcher(patchFile);
                 patcher.PatchingStateChanged += new EventHandler<PatchingEventArgs>(patcher_PatchingStateChanged);
+                AppendStateText($"补丁文件：{patchFile}\r\n");
                 AppendStateText("正在检查补丁...");
                 patcher.OpenDecompress();
                 AppendStateText("成功\r\n");
