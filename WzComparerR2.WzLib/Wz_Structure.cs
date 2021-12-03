@@ -90,7 +90,7 @@ namespace WzComparerR2.WzLib
                 }
                 node.Value = file;
                 file.Node = node;
-                file.FileStream.Position = 62;
+                file.FileStream.Position = file.Header.DataStartPosition;
                 file.GetDirTree(node, useBaseWz, loadWzAsFolder);
                 file.DetectWzType();
                 file.DetectWzVersion();
@@ -171,7 +171,7 @@ namespace WzComparerR2.WzLib
                 {
                     this.encryption.DetectEncryption(file);
                 }
-                file.FileStream.Position = 62;
+                file.FileStream.Position = file.Header.DataStartPosition;
                 file.GetDirTree(tempNode);
                 return file.ImageCount == 0;
             }

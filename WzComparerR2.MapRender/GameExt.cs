@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using SharpDX.Win32;
+using SharpDX;
 using SharpDX.RawInput;
 using SharpDX.Multimedia;
 using Microsoft.Xna.Framework;
@@ -84,16 +84,6 @@ namespace WzComparerR2.MapRender
             }
         }
 
-        public static void DisposeSwapChain(Microsoft.Xna.Framework.Graphics.GraphicsDevice graphicsDevice)
-        {
-            var fieldInfo = graphicsDevice.GetType().GetField("_swapChain", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (fieldInfo != null)
-            {
-                IDisposable swapChain = fieldInfo.GetValue(graphicsDevice) as IDisposable;
-                swapChain?.Dispose();
-            }
-        }
-
         public static void EnsureGameExit(Game game)
         {
             var tid = GetCurrentThreadId();
@@ -112,7 +102,7 @@ namespace WzComparerR2.MapRender
             public virtual bool PreFilterMessage(ref Message m)
             {
                 if (m.Msg == 0xff)
-                    Device.HandleMessage(m.LParam);
+                    Device.HandleMessage(m.LParam, m.HWnd);
                 return false;
             }
         }

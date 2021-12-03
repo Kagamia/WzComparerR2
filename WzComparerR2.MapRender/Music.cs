@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WzComparerR2.WzLib;
 using System.Runtime.InteropServices;
-using Un4seen.Bass;
+using ManagedBass;
 
 namespace WzComparerR2.MapRender
 {
@@ -15,7 +15,7 @@ namespace WzComparerR2.MapRender
         {
             this.soundData = sound.ExtractSound();
             this.pData = GCHandle.Alloc(this.soundData, GCHandleType.Pinned);
-            this.hStream = Bass.BASS_StreamCreateFile(pData.AddrOfPinnedObject(), 0, this.soundData.Length, BASSFlag.BASS_DEFAULT);
+            this.hStream = Bass.CreateStream(pData.AddrOfPinnedObject(), 0, this.soundData.Length, BassFlags.Default);
             Music.GlobalVolumeChanged += this.OnGlobalVolumeChanged;
         }
 
@@ -26,20 +26,20 @@ namespace WzComparerR2.MapRender
 
         public bool IsLoop
         {
-            get { return (Bass.BASS_ChannelFlags(hStream, 0, 0) & BASSFlag.BASS_SAMPLE_LOOP) != 0; }
-            set { Bass.BASS_ChannelFlags(hStream, value ? BASSFlag.BASS_SAMPLE_LOOP : BASSFlag.BASS_DEFAULT, BASSFlag.BASS_SAMPLE_LOOP); }
+            get { return (Bass.ChannelFlags(hStream, 0, 0) & BassFlags.Loop) != 0; }
+            set { Bass.ChannelFlags(hStream, value ? BassFlags.Loop : BassFlags.Default, BassFlags.Loop); }
         }
 
         public PlayState State
         {
             get
             {
-                var active = Bass.BASS_ChannelIsActive(hStream);
+                var active = Bass.ChannelIsActive(hStream);
                 switch (active)
                 {
-                    case BASSActive.BASS_ACTIVE_STOPPED: return PlayState.Stopped;
-                    case BASSActive.BASS_ACTIVE_PLAYING: return PlayState.Playing;
-                    case BASSActive.BASS_ACTIVE_PAUSED: return PlayState.Paused;
+                    case PlaybackState.Stopped: return PlayState.Stopped;
+                    case PlaybackState.Playing: return PlayState.Playing;
+                    case PlaybackState.Paused: return PlayState.Paused;
                     default: return PlayState.Unknown;
                 }
             }
@@ -51,37 +51,36 @@ namespace WzComparerR2.MapRender
             {
                 if (vol == null)
                 {
-                    float value = 0;
-                    vol = Bass.BASS_ChannelGetAttribute(hStream, BASSAttribute.BASS_ATTRIB_VOL, ref value) ? value : 0;
+                    vol = Bass.ChannelGetAttribute(hStream, ChannelAttribute.Volume, out float value) ? value : 0;
                 }
                 return vol.Value;
             }
             set
             {
                 vol = value;
-                Bass.BASS_ChannelSetAttribute(hStream, BASSAttribute.BASS_ATTRIB_VOL, vol.Value * globalVol);
+                Bass.ChannelSetAttribute(hStream, ChannelAttribute.Volume, vol.Value * globalVol);
             }
         }
 
         public void Play()
         {
-            Bass.BASS_ChannelPlay(hStream, false);
+            Bass.ChannelPlay(hStream, false);
         }
 
         public void Pause()
         {
-            Bass.BASS_ChannelPause(hStream);
+            Bass.ChannelPause(hStream);
         }
 
         public void Stop()
         {
-            Bass.BASS_ChannelStop(hStream);
+            Bass.ChannelStop(hStream);
         }
 
         public void Dispose()
         {
             Music.GlobalVolumeChanged -= this.OnGlobalVolumeChanged;
-            Bass.BASS_StreamFree(hStream);
+            Bass.StreamFree(hStream);
             this.pData.Free();
 
         }

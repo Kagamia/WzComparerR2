@@ -1,0 +1,3 @@
+[submodule "CharaSimResource"]
+	path = CharaSimResource
+	url = https://github.com/Kagamia/CharaSimResource.git

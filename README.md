@@ -1,7 +1,5 @@
-﻿*<s>使用前先大喊 niconiconi! poi! duang!以减少bug发生率</s>*  
-
-# WzComparerR2
-Translated for English use by PirateIzzy (extraction tool only)
+﻿# WzComparerR2
+-Translated for English use by PirateIzzy (work in progress)
 
 - NOTE: As of November 21, 2020, you will need to re-clone this repository if you cloned it before.
 
@@ -11,10 +9,22 @@ Translated for English use by PirateIzzy (extraction tool only)
 - **WzComparerR2.PluginBase** 
 - **WzComparerR2.WzLib** 
 - **CharaSimResource** 
-- **WzComparerR2.Updater** 
 - **WzComparerR2.LuaConsole** 
 - **WzComparerR2.MapRender**
 - **WzComparerR2.Avatar**
+
+# Prerequisite
+- **2.x**: Win7sp1+/.net4.5.2+/dx11.0
+- **1.x**: WinXp+/.net2.0+/dx9.0
+
+# Installation
+```sh
+git clone --recurse-submodules -j8 git://github.com/Kagamia/WzComparerR2.git
+```
+Clone repository with submodules.
+
+# Compile
+- vs2017 or higher
 
 # How to Use:
 - Download **WzComparerR2.zip** from [Releases](https://github.com/PirateIzzy/WzComparerR2-Code/releases) and extract the ZIP to a location of your choice (note that you may need to make adjustments in your AntiVirus's settings for it to work).

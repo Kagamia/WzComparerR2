@@ -121,12 +121,60 @@ namespace WzComparerR2.WzLib
             string signature = new string(this.BReader.ReadChars(4));
             if (signature != "PKG1") { goto __failed; }
 
-            long datasize = this.BReader.ReadInt64();
-            int headersize = this.BReader.ReadInt32();
-            string copyright = new string(this.BReader.ReadChars(headersize - (int)this.FileStream.Position));
-            int encver = this.BReader.ReadUInt16();
+            long dataSize = this.BReader.ReadInt64();
+            int headerSize = this.BReader.ReadInt32();
+            string copyright = new string(this.BReader.ReadChars(headerSize - (int)this.FileStream.Position));
 
-            this.Header = new Wz_Header(signature, copyright, fileName, headersize, datasize, filesize, encver);
+            // encver detecting:
+            // Since KMST1132, wz removed the 2 bytes encver, and use a fixed wzver '777'.
+            // Here we try to read the first 2 bytes from data part and guess if it looks like an encver.
+            bool encverMissing = false;
+            int encver = -1;
+            if (dataSize >= 2)
+            {
+                this.fileStream.Position = headerSize;
+                encver = this.BReader.ReadUInt16();
+                // encver always less than 256
+                if (encver > 0xff)
+                {
+                    encverMissing = true;
+                }
+                else if (encver == 0x80)
+                {
+                    // there's an exceptional case that the first field of data part is a compressed int which determined property count,
+                    // if the value greater than 127 and also to be a multiple of 256, the first 5 bytes will become to
+                    //   80 00 xx xx xx
+                    // so we additional check the int value, at most time the child node count in a wz won't greater than 65536.
+                    if (dataSize >= 5)
+                    {
+                        this.fileStream.Position = headerSize;
+                        int propCount = this.ReadInt32();
+                        if (propCount > 0 && (propCount & 0xff) == 0 && propCount <= 0xffff)
+                        {
+                            encverMissing = true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Obviously, if data part have only 1 byte, encver must be deleted.
+                encverMissing = true;
+            }
+
+            int dataStartPos = headerSize + (encverMissing ? 0 : 2);
+            this.Header = new Wz_Header(signature, copyright, fileName, headerSize, dataSize, filesize, dataStartPos);
+
+            if (encverMissing)
+            {
+                // not sure if nexon will change this magic version, just hard coded.
+                this.Header.SetWzVersion(777);
+            }
+            else
+            {
+                this.Header.SetOrdinalVersionDetector(encver);
+            }
+
             return true;
 
             __failed:

@@ -94,7 +94,7 @@ namespace WzComparerR2.WzLib
         public void DetectEncryption(Wz_File f)
         {
             int old_off = (int)f.FileStream.Position;
-            f.FileStream.Position = 62;
+            f.FileStream.Position = f.Header.DataStartPosition;
             if (f.ReadInt32() <= 0) //只有文件头 无法预判
             {
                 return;

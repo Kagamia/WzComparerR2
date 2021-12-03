@@ -93,7 +93,7 @@ namespace WzComparerR2
             soundPlayer = new BassSoundPlayer();
             if (!soundPlayer.Init())
             {
-                Un4seen.Bass.BASSError error = soundPlayer.GetLastError();
+                ManagedBass.Errors error = soundPlayer.GetLastError();
                 MessageBoxEx.Show("Bass initialization failed. \r\n\r\nerrorCode : " + (int)error + "(" + error + ")", "Error");
             }
             soundTimer = new Timer(120d);

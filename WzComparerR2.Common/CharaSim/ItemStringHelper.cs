@@ -102,6 +102,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.equipTradeBlock: return value == 0 ? null : "Cannot be Traded when equipped";
                 case GearPropType.accountSharable: return value == 0 ? null : "Account-bound. Transferable within world.";
                 case GearPropType.sharableOnce: return value == 0 ? null : "Tradable once within the same world.\n(Cannot be traded after transfer)";
+                case GearPropType.blockGoldHammer: return value == 0 ? null : "Golden Hammer cannot be used.";
                 case GearPropType.onlyEquip: return value == 0 ? null : "Unique Equipped Item";
                 case GearPropType.notExtend: return value == 0 ? null : "Duration cannot be extended.";
                 case GearPropType.tradeAvailable:
@@ -124,7 +125,6 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.jokerToSetItem: return value == 0 ? null : "#cThis lucky item counts toward any set, so long as you have at least 3 set pieces equipped!#";
                 case GearPropType.plusToSetItem: return value == 0 ? null : "#cWhen equipped, the item set will count as having equipped two.#";
                 case GearPropType.abilityTimeLimited: return value == 0 ? null : "Time Limited Stats";
-                case GearPropType.blockGoldHammer: return value == 0 ? null : "Golden Hammer cannot be used.";
                 // case GearPropType.colorvar: return value == 0 ? null : "#cè¯¥è£…å¤‡å¯é€šè¿‡æŸ“è‰²é¢œæ–™æ¥å˜æ›´é¢œè‰².#";
 
                 case GearPropType.incMHP_incMMP: return "MaxHP / MaxMP : " + sign + value;

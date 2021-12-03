@@ -13,15 +13,10 @@ namespace WzComparerR2.Rendering
         public static Texture2D ToTexture(this Wz_Png png, GraphicsDevice graphicsDevice)
         {
             var format = GetTextureFormatOfPng(png.Form);
-            Texture2D t2d = null;
             if (format == SurfaceFormat.Bgra4444)
             {
                 //检测是否支持 pre-win8
-                if (graphicsDevice.IsSupportBgra4444())
-                {
-                    t2d = MonogameUtils.CreateTexture_BGRA4444(graphicsDevice, png.Width, png.Height);
-                }
-                else
+                if (!graphicsDevice.IsSupportBgra4444())
                 {
                     format = SurfaceFormat.Bgra32;
                 }
@@ -43,11 +38,7 @@ namespace WzComparerR2.Rendering
                 }
             }
 
-            if (t2d == null)
-            {
-                t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, format);
-            }
-
+            var t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, format);
             png.ToTexture(t2d, Point.Zero);
             return t2d;
         }
