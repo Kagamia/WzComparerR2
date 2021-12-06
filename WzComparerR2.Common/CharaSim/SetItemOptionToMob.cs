@@ -29,21 +29,22 @@ namespace WzComparerR2.CharaSim
             {
                 mobStr = Mobs[0].ToString();
             }
-            sb.AppendFormat("When attacking {0}，", mobStr);
 
             foreach (var kv in this.Props)
             {
                 if (kv.Key == GearPropType.damR)
                 {
-                    sb.AppendFormat("Damage: +{0}%，", kv.Value);
+                    sb.AppendFormat("+{0}% damage", kv.Value);
+                    sb.AppendFormat(" when attacking {0}.", mobStr);
                 }
                 else
                 {
                     sb.Append(ItemStringHelper.GetGearPropString(kv.Key, kv.Value));
+                    sb.AppendFormat(" when attacking {0}.", mobStr);
                 }
             }
 
-            return sb.ToString(0, sb.Length - 1);
+            return sb.ToString(0, sb.Length);
         }
     }
 }
