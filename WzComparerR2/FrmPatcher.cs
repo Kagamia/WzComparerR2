@@ -217,6 +217,7 @@ namespace WzComparerR2
             {
                 patcher = new WzPatcher(patchFile);
                 patcher.PatchingStateChanged += new EventHandler<PatchingEventArgs>(patcher_PatchingStateChanged);
+                AppendStateText($"Patch File：{patchFile}\r\n");
                 AppendStateText("Checking patch...");
                 patcher.OpenDecompress();
                 AppendStateText("Success\r\n");
@@ -257,7 +258,7 @@ namespace WzComparerR2
                 AppendStateText("Starting Update: \r\n");
                 DateTime time = DateTime.Now;
                 patcher.Patch(msFolder);
-                AppendStateText("完成\r\n");
+                AppendStateText("Done\r\n");
                 TimeSpan interval = DateTime.Now - time;
                 MessageBoxEx.Show(this, "End of Patch, Time Elapsed: " + interval.ToString(), "Patcher");
             }

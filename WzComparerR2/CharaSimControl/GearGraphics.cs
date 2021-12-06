@@ -36,10 +36,10 @@ namespace WzComparerR2.CharaSimControl
         }
 
         public static readonly Dictionary<string, TextureBrush> TBrushes;
-        public static readonly Font ItemNameFont = new Font("Arial", 14f, FontStyle.Bold, GraphicsUnit.Pixel);
-        public static readonly Font EquipNameFont = new Font("Arial", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static readonly Font ItemNameFont = new Font("Arial", 12f, GraphicsUnit.Pixel);
+        public static readonly Font EquipNameFont = new Font("Arial", 12f, GraphicsUnit.Pixel);
         public static readonly Font ItemDetailFont = new Font("Arial", 12f, GraphicsUnit.Pixel);
-        public static readonly Font EpicGearDetailFont = new Font("Arial", 12f, FontStyle.Bold, GraphicsUnit.Pixel);
+        public static readonly Font EpicGearDetailFont = new Font("Arial", 12f, GraphicsUnit.Pixel);
         public static readonly Font EquipDetailFont = new Font("Arial", 11f, GraphicsUnit.Pixel);
         public static readonly Font TahomaFont = new Font("Tahoma", 12f, GraphicsUnit.Pixel);
         public static readonly Font SetItemPropFont = new Font("Arial", 12f, GraphicsUnit.Pixel);
