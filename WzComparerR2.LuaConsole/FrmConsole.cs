@@ -159,7 +159,7 @@ end
 
             public void Help()
             {
-                this.WriteLine(@"-- Standard Output Functions：
+                this.WriteLine(@"-- Standard Output Functions:
 env:Write(object)
 env:Write(string format, object[] args)
 env:WriteLine(object)

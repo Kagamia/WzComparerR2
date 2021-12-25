@@ -217,7 +217,7 @@ namespace WzComparerR2
             {
                 patcher = new WzPatcher(patchFile);
                 patcher.PatchingStateChanged += new EventHandler<PatchingEventArgs>(patcher_PatchingStateChanged);
-                AppendStateText($"Patch File：{patchFile}\r\n");
+                AppendStateText($"Patch File: {patchFile}\r\n");
                 AppendStateText("Checking patch...");
                 patcher.OpenDecompress();
                 AppendStateText("Success\r\n");
