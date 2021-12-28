@@ -115,6 +115,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
+    <PreferredWindowsNativeLuaPath />
     <PostBuildEvent>xcopy "$(TargetDir)*.dll" "$(SolutionDir)WzComparerR2\bin\$(ConfigurationName)\Plugin\$(ProjectName)" /I /Y
 xcopy "$(TargetDir)x86\*.dll" "$(SolutionDir)WzComparerR2\bin\$(ConfigurationName)\Lib\x86" /I /Y
 xcopy "$(TargetDir)x64\*.dll" "$(SolutionDir)WzComparerR2\bin\$(ConfigurationName)\Lib\x64" /I /Y</PostBuildEvent>
