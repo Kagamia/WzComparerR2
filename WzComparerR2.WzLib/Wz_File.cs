@@ -169,6 +169,7 @@ namespace WzComparerR2.WzLib
             {
                 // not sure if nexon will change this magic version, just hard coded.
                 this.Header.SetWzVersion(777);
+                this.Header.VersionChecked = true;
             }
             else
             {
