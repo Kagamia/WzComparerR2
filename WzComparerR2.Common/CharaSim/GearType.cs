@@ -372,6 +372,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         weaponBelt = 135401,
         /// <summary>
+        /// 饰品 135402x
+        /// </summary>
+        ornament = 135402,
+        /// <summary>
         /// 手杖
         /// </summary>
         cane = 136,
