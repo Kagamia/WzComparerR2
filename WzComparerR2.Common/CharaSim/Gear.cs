@@ -34,6 +34,7 @@ namespace WzComparerR2.CharaSim
         public int ScrollUp { get; set; }
         public int Hammer { get; set; }
         public bool HasTuc { get; internal set; }
+        public int PlatinumHammer { get; set; }
         public bool CanPotential { get; internal set; }
         public string EpicHs { get; internal set; }
 
