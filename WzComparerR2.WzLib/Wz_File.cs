@@ -334,8 +334,7 @@ namespace WzComparerR2.WzLib
         public uint CalcOffset(uint filePos, uint hashedOffset)
         {
             uint offset = (uint)(filePos - 0x3C) ^ 0xFFFFFFFF;
-            int distance = 0;
-            long pos = this.FileStream.Position;
+            int distance;
 
             offset *= this.Header.HashVersion;
             offset -= 0x581C3F6D;
@@ -658,21 +657,19 @@ namespace WzComparerR2.WzLib
                 return this.header.VersionChecked;
             }
 
-            if (!this.header.VersionChecked)
+            List<Wz_Image> imgList = EnumerableAllWzImage(this.node).Where(_img => _img.WzFile == this).ToList();
+
+            if (this.header.VersionChecked)
+            {
+                foreach (var img in imgList)
+                {
+                    img.Offset = CalcOffset(img.HashedOffsetPosition, img.HashedOffset);
+                }
+            }
+            else
             {
                 //选择最小的img作为实验品
-                Wz_Image minSizeImg = null;
-                List<Wz_Image> imgList = new List<Wz_Image>(this.imageCount);
-                foreach (var img in (EnumerableAllWzImage(this.node).Where(_img => _img.WzFile == this)))
-                {
-                    if (img.Size >= 20
-                        && (minSizeImg == null || img.Size < minSizeImg.Size))
-                    {
-                        minSizeImg = img;
-                    }
-
-                    imgList.Add(img);
-                }
+                Wz_Image minSizeImg = imgList.Where(_img => _img.Size >= 20).DefaultIfEmpty().Aggregate((_img1, _img2) => _img1.Size < _img2.Size ? _img1 : _img2);
 
                 if (minSizeImg == null && imgList.Count > 0)
                 {
