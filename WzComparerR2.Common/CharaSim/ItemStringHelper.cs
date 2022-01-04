@@ -92,6 +92,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.damR:
                 case GearPropType.incDAMr: return "总伤害 : " + sign + value + "%";
                 case GearPropType.incCr: return "爆击率 : " + sign + value + "%";
+                case GearPropType.incCDr: return "爆击伤害 : " + sign + value + "%";
                 case GearPropType.knockback: return "直接攻击时" + value + "的比率发生后退现象。";
                 case GearPropType.incPVPDamage: return "大乱斗时追加攻击力" + sign + value;
                 case GearPropType.incPQEXPr: return "组队任务经验值增加" + value + "%";
