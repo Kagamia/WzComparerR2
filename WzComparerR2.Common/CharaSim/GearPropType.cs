@@ -57,6 +57,7 @@ namespace WzComparerR2.CharaSim
         incACCr,
         incEVAr,
         incCr,
+        incCDr,
         incDAMr,
         RecoveryHP,
         RecoveryMP,

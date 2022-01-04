@@ -93,6 +93,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.damR:
                 case GearPropType.incDAMr: return "總傷害 : " + sign + value + "%";
                 case GearPropType.incCr: return "爆擊率 : " + sign + value + "%";
+                case GearPropType.incCDr: return "爆擊傷害 : " + sign + value + "%";
                 case GearPropType.knockback: return "直接攻擊時,以 " + value + "%的機率強弓";
                 case GearPropType.incPVPDamage: return "大亂鬥時追加攻擊力" + sign + value;
                 case GearPropType.incPQEXPr: return "组隊任務經驗值增加" + value + "%";
