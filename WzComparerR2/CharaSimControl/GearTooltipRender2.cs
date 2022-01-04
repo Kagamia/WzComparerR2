@@ -567,11 +567,18 @@ namespace WzComparerR2.CharaSimControl
                 picH += 2;
                 g.DrawString("黃金鐵槌已提高的強化次數", GearGraphics.ItemDetailFont, GearGraphics.GoldHammerBrush, 11, picH);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-                g.DrawString(": " + Gear.Hammer.ToString() + (Gear.Hammer == 2 ? "(MAX)" : null), GearGraphics.TahomaFont, GearGraphics.GoldHammerBrush, 145, picH - 2);
+                g.DrawString(": " + Gear.Hammer.ToString() + (Gear.Hammer == 2 ? "(MAX)" : null), GearGraphics.TahomaFont, GearGraphics.GoldHammerBrush, 145, picH);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
                 picH += 16;
                 hasPart2 = true;
             }*/
+
+            if (hasTuc && Gear.PlatinumHammer > -1)
+            {
+                g.DrawString("白金锤强化次数：" + Gear.PlatinumHammer, GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
+                picH += 16;
+                hasPart2 = true;
+            }
 
             picH += 5;
 

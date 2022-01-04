@@ -244,6 +244,72 @@ namespace WzComparerR2.MapRender
                         break;
                 }
             }
+
+            foreach (var npc in mapData.Scene.Npcs)
+            {
+                object tooltip = null;
+                var npcNode = PluginManager.FindWz(string.Format("Npc/{0:D7}.img/info", npc.ID));
+                if ((npcNode?.Nodes["hide"].GetValueEx(0) ?? 0) != 0 || (npcNode?.Nodes["hideName"].GetValueEx(0) ?? 0) != 0)
+                {
+                    continue;
+                }
+                if (StringLinker.StringNpc.TryGetValue(npc.ID, out sr))
+                {
+                    if (sr.Desc != null)
+                    {
+                        tooltip = new KeyValuePair<string, string>(sr.Name, sr.Desc);
+                    }
+                    else
+                    {
+                        tooltip = sr.Name;
+                    }
+                }
+                if (npc.ID == 9010022)
+                {
+                    this.ui.Minimap.Icons.Add(new UIMinimap2.MapIcon()
+                    {
+                        IconType = UIMinimap2.IconType.Transport,
+                        Tooltip = tooltip,
+                        WorldPosition = new EmptyKeys.UserInterface.PointF(npc.X, npc.Y)
+                    });
+                }
+                else if ((npcNode?.Nodes["shop"].GetValueEx(0) ?? 0) != 0)
+                {
+                    this.ui.Minimap.Icons.Add(new UIMinimap2.MapIcon()
+                    {
+                        IconType = UIMinimap2.IconType.Shop,
+                        Tooltip = tooltip,
+                        WorldPosition = new EmptyKeys.UserInterface.PointF(npc.X, npc.Y)
+                    });
+                }
+                else if (npc.ID / 10000 == 900 || npc.ID / 10000 == 901)
+                {
+                    this.ui.Minimap.Icons.Add(new UIMinimap2.MapIcon()
+                    {
+                        IconType = UIMinimap2.IconType.EventNpc,
+                        Tooltip = tooltip,
+                        WorldPosition = new EmptyKeys.UserInterface.PointF(npc.X, npc.Y)
+                    });
+                }
+                else if ((npcNode?.Nodes["trunkPut"].GetValueEx(0) ?? 0) != 0)
+                {
+                    this.ui.Minimap.Icons.Add(new UIMinimap2.MapIcon()
+                    {
+                        IconType = UIMinimap2.IconType.Trunk,
+                        Tooltip = tooltip,
+                        WorldPosition = new EmptyKeys.UserInterface.PointF(npc.X, npc.Y)
+                    });
+                }
+                else
+                {
+                    this.ui.Minimap.Icons.Add(new UIMinimap2.MapIcon()
+                    {
+                        IconType = UIMinimap2.IconType.Npc,
+                        Tooltip = tooltip,
+                        WorldPosition = new EmptyKeys.UserInterface.PointF(npc.X, npc.Y)
+                    });
+                }
+            }
             foreach (var npc in mapData.Scene.Npcs)
             {
                 object tooltip = null;

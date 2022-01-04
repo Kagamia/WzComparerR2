@@ -134,12 +134,12 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.blockGoldHammer: return value == 0 ? null : "無法使用黄金鐵鎚";
                 case GearPropType.colorvar: return value == 0 ? null : "#c此裝備可以通過染色顏料進行染色。#";
 
-                case GearPropType.incMHP_incMMP: return "MaxHP/MaxMP：" + sign + value;
-                case GearPropType.incMHPr_incMMPr: return "MaxHP/MaxMP：" + sign + value + "%";
-                case GearPropType.incPAD_incMAD: 
-                case GearPropType.incAD: return "攻擊/魔法攻擊力：" + sign + value;
-                case GearPropType.incPDD_incMDD: return "物理防禦力：" + sign + value;
-                //case GearPropType.incACC_incEVA: return "命中值/回避值：" + sign + value;
+                case GearPropType.incMHP_incMMP: return "最大血量/最大魔量：" + sign + value;
+                case GearPropType.incMHPr_incMMPr: return "最大血量/最大魔量：" + sign + value + "%";
+                case GearPropType.incPAD_incMAD: return "攻击力/魔力：" + sign + value;
+                case GearPropType.incPDD_incMDD: return "物理/魔法防御力：" + sign + value;
+                case GearPropType.incACC_incEVA: return "命中值/回避值：" + sign + value;
+
                 case GearPropType.incARC: return "ARC : " + sign + value;
                 case GearPropType.incAUT: return "AUT : " + sign + value;
                 default: return null;
@@ -348,12 +348,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.tuner: return "調節器";
                 case GearType.bracelet: return "手鐲";
 
-                case GearType.breathShooter: return "브레스 슈터";
-                case GearType.weaponBelt: return "웨폰 벨트";
-
-                case GearType.boxingCannon: return "武拳";
-                case GearType.boxingSky: return "拳環";
-
+                case GearType.boxingCannon: return "拳封";
+                case GearType.boxingSky: return "拳天";
                 default: return null;
             }
         }
@@ -455,7 +451,9 @@ namespace WzComparerR2.CharaSim
 
                 //6xxx
                 case GearType.novaMarrow: return GetExtraJobReqString(61);
-                //case GearType.chain2:
+                case GearType.weaponBelt:
+                case GearType.breathShooter: return GetExtraJobReqString(63);
+                case GearType.chain2:
                 case GearType.transmitter: return GetExtraJobReqString(64);
                 case GearType.soulBangle:
                 case GearType.soulShooter: return GetExtraJobReqString(65);
@@ -478,6 +476,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.magicWing: return GetExtraJobReqString(152);
 
                 case GearType.pathOfAbyss: return GetExtraJobReqString(155);
+                case GearType.handFan:
                 case GearType.fanTassel: return GetExtraJobReqString(164);
 
                 case GearType.tuner:
@@ -485,6 +484,8 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.boxingCannon:
                 case GearType.boxingSky: return GetExtraJobReqString(175);
+
+                case GearType.ornament: return GetExtraJobReqString(162);
                 default: return null;
             }
         }

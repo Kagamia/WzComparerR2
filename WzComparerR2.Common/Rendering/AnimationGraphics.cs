@@ -41,11 +41,14 @@ namespace WzComparerR2.Rendering
 
                 sprite.Begin(SpriteSortMode.Deferred, this.blendState, transformMatrix: world);
                 sprite.Draw(frame.Texture,
-                    position: Vector2.Zero,
-                    sourceRectangle: frame.AtlasRect,
-                    origin: frame.Origin.ToVector2(),
-                    rotation: 0,
-                    color: new Color(Color.White, frame.A0));
+                    Vector2.Zero,
+                    frame.AtlasRect,
+                    new Color(Color.White, frame.A0),
+                    0,
+                    frame.Origin.ToVector2(),
+                    1,
+                    SpriteEffects.None,
+                    0);
                 sprite.End();
             }
         }

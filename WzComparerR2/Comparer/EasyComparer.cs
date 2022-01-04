@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Net;
 using System.Drawing;
 using System.Linq;
 using WzComparerR2.WzLib;
@@ -185,7 +186,7 @@ namespace WzComparerR2.Comparer
             foreach (var childNode in wzFile.Node.Nodes)
             {
                 var subFile = childNode.GetValue<Wz_File>();
-                if (subFile != null) //wz子文件
+                if (subFile != null && !subFile.IsSubDir) //wz子文件
                 {
                     subFiles.Add(subFile);
                 }
@@ -288,7 +289,7 @@ namespace WzComparerR2.Comparer
                 sw.WriteLine("<html>");
                 sw.WriteLine("<head>");
                 sw.WriteLine("<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">");
-                sw.WriteLine("<title>{0} {1}←{2}</title>", type, fileNew[0].Header.WzVersion, fileOld[0].Header.WzVersion);
+                sw.WriteLine("<title>{0} {1}←{2}</title>", type, fileNew[0].GetMergedVersion(), fileOld[0].GetMergedVersion());
                 sw.WriteLine("<link type=\"text/css\" rel=\"stylesheet\" href=\"style.css\" />");
                 sw.WriteLine("</head>");
                 sw.WriteLine("<body>");
@@ -302,9 +303,9 @@ namespace WzComparerR2.Comparer
                     string.Join("<br/>", fileNew.Select(wzf => wzf.Header.WzVersion.ToString()).ToArray())
                     );
                 sw.WriteLine("<tr><td>舊檔案</td><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
-                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileName).ToArray()),
-                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileSize.ToString("N0")).ToArray()),
-                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.WzVersion.ToString()).ToArray())
+                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileName).FileName()),
+                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.FileSize.ToString("N0"))),
+                    string.Join("<br/>", fileOld.Select(wzf => wzf.Header.GetMergedVersion()))
                     );
                 sw.WriteLine("<tr><td>比對時間</td><td colspan='3'>{0:yyyy-MM-dd HH:mm:ss.fff}</td></tr>", DateTime.Now);
                 sw.WriteLine("<tr><td>參數</td><td colspan='3'>{0}</td></tr>", string.Join("<br/>", new[] {
@@ -594,7 +595,7 @@ namespace WzComparerR2.Comparer
                         bmp.Save(Path.Combine(outputDir, filePath), System.Drawing.Imaging.ImageFormat.Png);
                         bmp.Dispose();
                     }
-                    return string.Format("<img src=\"{0}\" />", Path.Combine(new DirectoryInfo(outputDir).Name, filePath));
+                    return string.Format("<img src=\"{0}/{1}\" />", new DirectoryInfo(outputDir).Name, WebUtility.UrlEncode(filePath));
                 }
                 else
                 {

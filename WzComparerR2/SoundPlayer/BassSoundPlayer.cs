@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Timers;
-using Un4seen.Bass;
+using ManagedBass;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -10,16 +10,11 @@ namespace WzComparerR2
 {
     public class BassSoundPlayer : ISoundPlayer
     {
-        static BassSoundPlayer()
-        {
-            BassNet.Registration("amethyst50504724@msn.com", "2X3223324222822");
-            bool success = Bass.LoadMe();
-        }
-
         public BassSoundPlayer()
         {
             volume = 100;
             autoPlay = true;
+            loadedPlugin = new HashSet<int>();
         }
 
         private bool inited;
@@ -33,7 +28,7 @@ namespace WzComparerR2
         private string playingSoundName;
         private byte[] data;
 
-        private Dictionary<int, string> loadedPlugin;
+        private HashSet<int> loadedPlugin;
 
         public string PlayingSoundName
         {
@@ -58,9 +53,19 @@ namespace WzComparerR2
             {
                 try
                 {
-                    if (inited = Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero))
+                    if (inited = Bass.Init(-1, 44100, DeviceInitFlags.Default, IntPtr.Zero))
                     {
-                        loadedPlugin = Bass.BASS_PluginLoadDirectory(Program.LibPath);
+                        if (Directory.Exists(Program.LibPath))
+                        {
+                            foreach (string file in Directory.GetFiles(Program.LibPath, "bass*.dll", SearchOption.AllDirectories))
+                            {
+                                int p = Bass.PluginLoad(file);
+                                if (p != 0)
+                                {
+                                    loadedPlugin.Add(p);
+                                }
+                            }
+                        }
                     }
                 }
                 catch
@@ -70,21 +75,21 @@ namespace WzComparerR2
             return inited;
         }
 
-        public BASSError GetLastError()
+        public Errors GetLastError()
         {
-            return Bass.BASS_ErrorGetCode();
+            return Bass.LastError;
         }
 
         public IEnumerable<string> GetPluginSupportedExt()
         {
             if (this.loadedPlugin == null || this.loadedPlugin.Count == 0)
                 yield break;
-            foreach (var kv in this.loadedPlugin)
+            foreach (var p in this.loadedPlugin)
             {
-                BASS_PLUGININFO info = Bass.BASS_PluginGetInfo(kv.Key);
-                foreach (BASS_PLUGINFORM form in info.formats)
+                PluginInfo info = Bass.PluginGetInfo(p);
+                foreach (PluginFormat form in info.Formats)
                 {
-                    yield return form.name + "(" + form.exts + ")" + "|" + form.exts;
+                    yield return form.Name + "(" + form.FileExtensions + ")" + "|" + form.FileExtensions;
                 }
             }
         }
@@ -96,7 +101,7 @@ namespace WzComparerR2
 
             try
             {
-                hStream = Bass.BASS_StreamCreateFile(sound.FileName, sound.StartPosition, sound.Length, BASSFlag.BASS_DEFAULT);
+                hStream = Bass.CreateStream(sound.FileName, sound.StartPosition, sound.Length, BassFlags.Default);
             }
             catch
             {
@@ -120,7 +125,7 @@ namespace WzComparerR2
             try
             {
                 IntPtr pData = Marshal.UnsafeAddrOfPinnedArrayElement(data,0);
-                hStream = Bass.BASS_StreamCreateFile(pData, 0, data.Length, BASSFlag.BASS_DEFAULT);
+                hStream = Bass.CreateStream(pData, 0, data.Length, BassFlags.Default);
             }
             catch
             {
@@ -137,7 +142,7 @@ namespace WzComparerR2
             }
             else
             {
-                var lastErr = Bass.BASS_ErrorGetCode();
+                var lastErr = Bass.LastError;
             }
         }
 
@@ -145,31 +150,31 @@ namespace WzComparerR2
         {
             if (hStream != 0)
             {
-                Bass.BASS_ChannelStop(hStream);
-                Bass.BASS_StreamFree(hStream);
+                Bass.ChannelStop(hStream);
+                Bass.StreamFree(hStream);
                 this.data = null;
             }
         }
 
         public void Play()
         {
-            bool success = Bass.BASS_ChannelPlay(hStream, false);
+            bool success = Bass.ChannelPlay(hStream, false);
         }
 
         public void Pause()
         {
-            Bass.BASS_ChannelPause(hStream);
+            Bass.ChannelPause(hStream);
         }
 
         public void Resume()
         {
-            Bass.BASS_ChannelPlay(hStream, false);
+            Bass.ChannelPlay(hStream, false);
         }
 
         public void Stop()
         {
-            Bass.BASS_ChannelStop(hStream);
-            Bass.BASS_ChannelSetPosition(hStream, 0d);
+            Bass.ChannelStop(hStream);
+            Bass.ChannelSetPosition(hStream, 0);
         }
 
         public int Volume
@@ -181,7 +186,7 @@ namespace WzComparerR2
             set
             {
                 this.volume = Math.Min(Math.Max(value, 0), 100);
-                Bass.BASS_ChannelSetAttribute(hStream, BASSAttribute.BASS_ATTRIB_VOL, this.volume * 0.01f);
+                Bass.ChannelSetAttribute(hStream, ChannelAttribute.Volume, this.volume * 0.01f);
             }
         }
 
@@ -190,7 +195,7 @@ namespace WzComparerR2
             get
             {
                 if (this.hStream != 0)
-                    return Bass.BASS_ChannelBytes2Seconds(hStream, Bass.BASS_ChannelGetPosition(hStream));
+                    return Bass.ChannelBytes2Seconds(hStream, Bass.ChannelGetPosition(hStream));
                 else
                     return 0d;
             }
@@ -200,7 +205,7 @@ namespace WzComparerR2
                 {
                     double totalLen = this.SoundLength;
                     value = Math.Min(Math.Max(value, 0), totalLen);
-                    Bass.BASS_ChannelSetPosition(hStream, value);
+                    Bass.ChannelSetPosition(hStream, Bass.ChannelSeconds2Bytes(hStream, value));
                 }
             }
         }
@@ -210,7 +215,7 @@ namespace WzComparerR2
             get
             {
                 if (this.hStream != 0)
-                    return Bass.BASS_ChannelBytes2Seconds(hStream, Bass.BASS_ChannelGetLength(hStream));
+                    return Bass.ChannelBytes2Seconds(hStream, Bass.ChannelGetLength(hStream));
                 else
                     return 0d;
             }
@@ -221,13 +226,10 @@ namespace WzComparerR2
             if (!isDisposed)
             {
                 this.UnLoad();
-                Bass.BASS_Free();
+                Bass.Free();
                 if (this.loadedPlugin != null && this.loadedPlugin.Count > 0)
                 {
-                    foreach (var kv in this.loadedPlugin)
-                    {
-                        bool success = Bass.BASS_PluginFree(kv.Key);
-                    }
+                    bool success = Bass.PluginFree(0);
                     this.loadedPlugin.Clear();
                 }
                 isDisposed = true;
@@ -258,9 +260,9 @@ namespace WzComparerR2
                 if (this.hStream != 0)
                 {
                     if (this.loop)
-                        Bass.BASS_ChannelFlags(hStream, BASSFlag.BASS_SAMPLE_LOOP, BASSFlag.BASS_SAMPLE_LOOP);
+                        Bass.ChannelFlags(hStream, BassFlags.Loop, BassFlags.Loop);
                     else
-                        Bass.BASS_ChannelFlags(hStream, BASSFlag.BASS_DEFAULT, BASSFlag.BASS_SAMPLE_LOOP);
+                        Bass.ChannelFlags(hStream, BassFlags.Default, BassFlags.Loop);
                 }
             }
         }
@@ -271,12 +273,12 @@ namespace WzComparerR2
             {
                 if (this.hStream != 0)
                 {
-                    BASSActive active = Bass.BASS_ChannelIsActive(hStream);
+                    PlaybackState active = Bass.ChannelIsActive(hStream);
                     switch (active)
                     {
-                        case BASSActive.BASS_ACTIVE_STOPPED: return PlayState.Stopped;
-                        case BASSActive.BASS_ACTIVE_PLAYING: return PlayState.Playing;
-                        case BASSActive.BASS_ACTIVE_PAUSED: return PlayState.Paused;
+                        case PlaybackState.Stopped: return PlayState.Stopped;
+                        case PlaybackState.Playing: return PlayState.Playing;
+                        case PlaybackState.Paused: return PlayState.Paused;
                         default: return PlayState.Stopped;
                     }
                 }

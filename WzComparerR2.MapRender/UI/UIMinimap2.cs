@@ -284,7 +284,7 @@ namespace WzComparerR2.MapRender.UI
                             * Matrix.CreateScale((float)canvas.Width / mapRegion.Width, (float)canvas.Height / mapRegion.Height, 0);
                     var vp = this.CameraViewPort;
                     cameraPos = Vector2.Transform(new Vector2(vp.X, vp.Y), transform);
-                    cameraSize = new Vector2(vp.Width * transform.Scale.X, vp.Height * transform.Scale.Y);
+                    cameraSize = new Vector2(vp.Width * ((float)canvas.Width / mapRegion.Width), vp.Height * ((float)canvas.Height / mapRegion.Height));
 
                     //计算小地图显示位置
                     PointF canvasPos = new PointF(-this.canvasPosCache.X, -this.canvasPosCache.Y);

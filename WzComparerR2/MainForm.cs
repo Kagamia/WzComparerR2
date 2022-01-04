@@ -98,8 +98,8 @@ namespace WzComparerR2
             soundPlayer = new BassSoundPlayer();
             if (!soundPlayer.Init())
             {
-                Un4seen.Bass.BASSError error = soundPlayer.GetLastError();
-                MessageBoxEx.Show("Bass初始化失敗！\r\n\r\nerrorCode : " + (int)error + "(" + error + ")", "虫子");
+                ManagedBass.Errors error = soundPlayer.GetLastError();
+                MessageBoxEx.Show("Bass初始化失败！\r\n\r\nerrorCode : " + (int)error + "(" + error + ")", "虫子");
             }
             soundTimer = new Timer(120d);
             soundTimer.Elapsed += new System.Timers.ElapsedEventHandler(soundTimer_Elapsed);
@@ -186,14 +186,7 @@ namespace WzComparerR2
             if (!string.IsNullOrEmpty(e.FullPath)) //用fullpath作为输入参数
             {
                 fullPath = e.FullPath.Split('/', '\\');
-                try
-                {
-                    e.WzType = (Wz_Type)Enum.Parse(typeof(Wz_Type), fullPath[0], true);
-                }
-                catch
-                {
-                    e.WzType = Wz_Type.Unknown;
-                }
+                e.WzType = Enum.TryParse<Wz_Type>(fullPath[0], true, out var wzType) ? wzType : Wz_Type.Unknown;
             }
 
             List<Wz_Node> preSearch = new List<Wz_Node>();
@@ -401,76 +394,12 @@ namespace WzComparerR2
 
         private void buttonItemSaveImage_Click(object sender, EventArgs e)
         {
-            if (this.pictureBoxEx1.Items.Count <= 0)
-            {
-                return;
-            }
-            var aniItem = this.pictureBoxEx1.Items[0];
+            this.OnSaveImage(false);
+        }
 
-            var config = ImageHandlerConfig.Default;
-
-            //单帧图像
-            var frameData = (aniItem as FrameAnimator)?.Data;
-            if (frameData != null && frameData.Frames.Count == 1)
-            {
-                var frame = frameData.Frames[0];
-                if (frame.Png != null)
-                {
-                    using (var bmp = frame.Png.ExtractPng())
-                    {
-                        string pngFileName = pictureBoxEx1.PictureName + ".png";
-                        if (config.AutoSaveEnabled)
-                        {
-                            pngFileName = Path.Combine(config.AutoSavePictureFolder, string.Join("_", pngFileName.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.None)));
-                        }
-                        else
-                        {
-                            var dlg = new SaveFileDialog();
-                            dlg.Filter = "Png圖片(*.png)|*.png|全部檔案(*.*)|*.*";
-                            dlg.FileName = pngFileName;
-                            if (dlg.ShowDialog() != DialogResult.OK)
-                            {
-                                return;
-                            }
-                            pngFileName = dlg.FileName;
-                        }
-                        bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
-                    }
-                }
-                else
-                {
-                    labelItemStatus.Text = "沒有檔案被儲存。";
-                }
-                return;
-            }
-
-            var encParams = AnimateEncoderFactory.GetEncoderParams(config.GifEncoder.Value);
-
-            string aniName = this.cmbItemAniNames.SelectedItem as string;
-            string aniFileName = pictureBoxEx1.PictureName
-                    + (string.IsNullOrEmpty(aniName) ? "" : ("." + aniName))
-                    + encParams.FileExtension;
-
-            if (config.AutoSaveEnabled)
-            {
-                aniFileName = Path.Combine(config.AutoSavePictureFolder, string.Join("_", aniFileName.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.None)));
-            }
-            else
-            {
-                var dlg = new SaveFileDialog();
-
-                dlg.Filter = string.Format("{0}(*{1})|*{1}|全部檔案(*.*)|*.*", encParams.FileDescription, encParams.FileExtension);
-                dlg.FileName = aniFileName;
-
-                if (dlg.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
-                aniFileName = dlg.FileName;
-            }
-
-            this.pictureBoxEx1.SaveAsGif((AnimationItem)aniItem.Clone(), aniFileName, config);
-            labelItemStatus.Text = "圖片儲存於" + aniFileName;
+        private void buttonItemSaveWithOptions_Click(object sender, EventArgs e)
+        {
+            this.OnSaveImage(true);
         }
 
         private Node handleUol(Node currentNode, string uolString)
@@ -611,7 +540,6 @@ namespace WzComparerR2
             }
         }
 
-
         private void buttonItemAutoSave_Click(object sender, EventArgs e)
         {
             ConfigManager.Reload();
@@ -635,6 +563,105 @@ namespace WzComparerR2
             }
         }
 
+        private void OnSaveImage(bool options)
+        {
+            if (this.pictureBoxEx1.Items.Count <= 0)
+            {
+                return;
+            }
+
+            var aniItem = this.pictureBoxEx1.Items[0];
+            var frameData = (aniItem as FrameAnimator)?.Data;
+            if (frameData != null && frameData.Frames.Count == 1)
+            {
+                // save still picture as png
+                this.OnSavePngFile(frameData.Frames[0]);
+            }
+            else
+            {
+                // save as gif/apng
+                this.OnSaveGifFile(aniItem, options);
+            }
+        }
+
+        private void OnSavePngFile(Frame frame)
+        {
+            if (frame.Png != null)
+            {
+                var config = ImageHandlerConfig.Default;
+                string pngFileName = pictureBoxEx1.PictureName + ".png";
+
+                if (config.AutoSaveEnabled)
+                {
+                    pngFileName = Path.Combine(config.AutoSavePictureFolder, string.Join("_", pngFileName.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.None)));
+                }
+                else
+                {
+                    var dlg = new SaveFileDialog();
+                    dlg.Filter = "Png图片(*.png)|*.png|全部文件(*.*)|*.*";
+                    dlg.FileName = pngFileName;
+                    if (dlg.ShowDialog() != DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    pngFileName = dlg.FileName;
+                }
+
+                using (var bmp = frame.Png.ExtractPng())
+                {
+                    bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
+                }
+                labelItemStatus.Text = "图片保存于" + pngFileName;
+            }
+            else
+            {
+                labelItemStatus.Text = "没有文件被保存。";
+            }
+        }
+
+        private void OnSaveGifFile(AnimationItem aniItem, bool options)
+        {
+            var config = ImageHandlerConfig.Default;
+            var encParams = AnimateEncoderFactory.GetEncoderParams(config.GifEncoder.Value);
+
+            string aniName = this.cmbItemAniNames.SelectedItem as string;
+            string aniFileName = pictureBoxEx1.PictureName
+                    + (string.IsNullOrEmpty(aniName) ? "" : ("." + aniName))
+                    + encParams.FileExtension;
+
+            if (config.AutoSaveEnabled)
+            {
+                var fullFileName = Path.Combine(config.AutoSavePictureFolder, string.Join("_", aniFileName.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.None)));
+                int i = 1;
+                while (File.Exists(fullFileName))
+                {
+                    fullFileName = Path.Combine(config.AutoSavePictureFolder, string.Format("{0}({1}){2}",
+                        Path.GetFileNameWithoutExtension(aniFileName), i, Path.GetExtension(aniFileName)));
+                    i++;
+                }
+                aniFileName = fullFileName;
+            }
+            else
+            {
+                var dlg = new SaveFileDialog();
+
+                dlg.Filter = string.Format("{0}(*{1})|*{1}|全部文件(*.*)|*.*", encParams.FileDescription, encParams.FileExtension);
+                dlg.FileName = aniFileName;
+
+                if (dlg.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+                aniFileName = dlg.FileName;
+            }
+
+            var clonedAniItem = (AnimationItem)aniItem.Clone();
+            if (this.pictureBoxEx1.SaveAsGif(clonedAniItem, aniFileName, config, options))
+            {
+                labelItemStatus.Text = "图片保存于" + aniFileName;
+            }
+        }
         #endregion
 
         #region File菜单的事件
@@ -670,7 +697,15 @@ namespace WzComparerR2
             advTree1.BeginUpdate();
             try
             {
-                wz.Load(wzFilePath);
+                if (wz.IsKMST1125WzFormat(wzFilePath))
+                {
+                    wz.LoadKMST1125DataWz(wzFilePath);
+                }
+                else
+                {
+                    wz.Load(wzFilePath, true);
+                }
+                
                 if (WcR2Config.Default.SortWzOnOpened)
                 {
                     sortWzNode(wz.WzNode);
@@ -915,26 +950,32 @@ namespace WzComparerR2
                 listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Dir Name", Path.GetFileName(e.Node.Text) }));
                 autoResizeColumns(listViewExWzDetail);
             }
-            else if (selectedNode.Value is Wz_File)
+            else if (selectedNode.Value is Wz_File wzFile)
             {
-                Wz_File wzFile = (Wz_File)selectedNode.Value;
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "File Name", wzFile.Header.FileName }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "File Size", wzFile.Header.FileSize + " bytes" }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Copyright", wzFile.Header.Copyright }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Version", wzFile.GetMergedVersion().ToString() }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Wz Type", wzFile.IsSubDir ? "SubDir" : wzFile.Type.ToString() }));
 
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "檔案名稱", wzFile.Header.FileName }));
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "檔案大小", wzFile.Header.FileSize + " bytes" }));
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "版權", wzFile.Header.Copyright }));
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "版本", wzFile.Header.WzVersion.ToString() }));
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Wz類型", wzFile.Type.ToString() }));
+                foreach (Wz_File subFile in wzFile.MergedWzFiles)
+                {
+                    listViewExWzDetail.Items.Add(" ");
+                    listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "File Name", subFile.Header.FileName }));
+                    listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "File Size", subFile.Header.FileSize + " bytes" }));
+                    listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Copyright", subFile.Header.Copyright }));
+                    listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Version", subFile.Header.WzVersion.ToString() }));
+                }
+
                 autoResizeColumns(listViewExWzDetail);
             }
-            else if (selectedNode.Value is Wz_Image)
+            else if (selectedNode.Value is Wz_Image wzImage)
             {
-                Wz_Image wzImage = (Wz_Image)selectedNode.Value;
-
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "圖像名稱", wzImage.Name }));
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "圖像大小", wzImage.Size + " bytes" }));
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "圖像偏移", wzImage.Offset + " bytes" }));
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "路徑", wzImage.Node.FullPathToFile }));
-                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "檢查", wzImage.Checksum.ToString() }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Image Name", wzImage.Name }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Image Size", wzImage.Size + " bytes" }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Image Offset", wzImage.Offset + " bytes" }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Path", wzImage.Node.FullPathToFile }));
+                listViewExWzDetail.Items.Add(new ListViewItem(new string[] { "Check Sum", wzImage.Checksum.ToString() }));
                 autoResizeColumns(listViewExWzDetail);
 
                 advTree2.ClearAndDisposeAllNodes();
@@ -1755,18 +1796,18 @@ namespace WzComparerR2
             switch (comboBoxItem1.SelectedIndex)
             {
                 case 0:
-                    searchAdvTree(advTree1, 0, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked);
+                    searchAdvTree(advTree1, 0, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked, checkBoxItemRegex1.Checked);
                     break;
                 case 1:
-                    searchAdvTree(advTree2, 0, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked);
+                    searchAdvTree(advTree2, 0, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked, checkBoxItemRegex1.Checked);
                     break;
                 case 2:
-                    searchAdvTree(advTree3, 1, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked);
+                    searchAdvTree(advTree3, 1, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked, checkBoxItemRegex1.Checked);
                     break;
             }
         }
 
-        private void searchAdvTree(AdvTree advTree, int cellIndex, string searchText, bool exact)
+        private void searchAdvTree(AdvTree advTree, int cellIndex, string searchText, bool exact, bool regex)
         {
             if (string.IsNullOrEmpty(searchText))
                 return;
@@ -1776,18 +1817,34 @@ namespace WzComparerR2
                 MessageBoxEx.Show("已經搜索到末尾。", "喵呜~");
         }
 
-        private Node searchAdvTree(AdvTree advTree, int cellIndex, string[] patten, bool exact, bool ignoreCase)
+        private Node searchAdvTree(AdvTree advTree, int cellIndex, string searchText, bool exact, bool isRegex, bool ignoreCase)
         {
             if (advTree.Nodes.Count == 0)
                 return null;
 
-            foreach (var node in findNextNode(advTree))
+            if (isRegex)
             {
-                if (checkSearchNodeText(node, cellIndex, patten, exact, ignoreCase))
+                Regex r = new Regex(searchText, ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
+                foreach (var node in findNextNode(advTree))
                 {
-                    return node;
+                    if (node != null && node.Cells.Count > cellIndex && r.IsMatch(node.Cells[cellIndex].Text))
+                    {
+                        return node;
+                    }
                 }
             }
+            else
+            {
+                string[] pattern = searchText.Split('\\');
+                foreach (var node in findNextNode(advTree))
+                {
+                    if (checkSearchNodeText(node, cellIndex, pattern, exact, ignoreCase))
+                    {
+                        return node;
+                    }
+                }
+            }
+            
             return null;
         }
 
@@ -1869,12 +1926,6 @@ namespace WzComparerR2
             }
         }
 
-        private void switchBtnString_ValueChanged(object sender, EventArgs e)
-        {
-            /*
-            panelExString.Visible = switchBtnString.Value;*/
-        }
-
         private void buttonItemSearchString_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(textBoxItemSearchString.Text))
@@ -1928,15 +1979,26 @@ namespace WzComparerR2
                     dicts.Add(stringLinker.StringSetItem);
                     break;
             }
+
             listViewExString.BeginUpdate();
-            listViewExString.Items.Clear();
-            IEnumerable<KeyValuePair<int, StringResult>> results = searchStringLinker(dicts, textBoxItemSearchString.Text, checkBoxItemExact2.Checked, !checkBoxItemExact2.Checked);
-            foreach (KeyValuePair<int, StringResult> kv in results)
+            try
             {
-                string[] item = new string[] { kv.Key.ToString(), kv.Value.Name, kv.Value.Desc, kv.Value.FullPath };
-                listViewExString.Items.Add(new ListViewItem(item));
+                listViewExString.Items.Clear();
+                IEnumerable<KeyValuePair<int, StringResult>> results = searchStringLinker(dicts, textBoxItemSearchString.Text, checkBoxItemExact2.Checked, checkBoxItemRegex2.Checked);
+                foreach (KeyValuePair<int, StringResult> kv in results)
+                {
+                    string[] item = new string[] { kv.Key.ToString(), kv.Value.Name, kv.Value.Desc, kv.Value.FullPath };
+                    listViewExString.Items.Add(new ListViewItem(item));
+                }
             }
-            listViewExString.EndUpdate();
+            catch (Exception ex)
+            {
+                MessageBoxEx.Show(ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                listViewExString.EndUpdate();
+            }            
         }
 
         private Wz_File findStringWz()
@@ -1969,32 +2031,30 @@ namespace WzComparerR2
             return null;
         }
 
-        private Wz_File findEtcWz()
-        {
-            foreach (Wz_Structure wz in openedWz)
-            {
-                foreach (Wz_File file in wz.wz_files)
-                {
-                    if (file.Type == Wz_Type.Etc)
-                    {
-                        return file;
-                    }
-                }
-            }
-            return null;
-        }
-
-        private IEnumerable<KeyValuePair<int, StringResult>> searchStringLinker(IEnumerable<Dictionary<int, StringResult>> dicts, string key, bool exact, bool ignoreCase)
+        private IEnumerable<KeyValuePair<int, StringResult>> searchStringLinker(IEnumerable<Dictionary<int, StringResult>> dicts, string key, bool exact, bool isRegex)
         {
             string[] match = key.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            Regex re = null;
+            if (isRegex)
+            {
+                re = new Regex(key, RegexOptions.IgnoreCase);
+            }
+
             foreach (Dictionary<int, StringResult> dict in dicts)
             {
                 foreach (KeyValuePair<int, StringResult> kv in dict)
                 {
                     if (exact)
                     {
-                        if (string.Compare(kv.Key.ToString(), key, ignoreCase) == 0 || string.Compare(kv.Value.Name, key, ignoreCase) == 0 || string.Compare(kv.Value.Desc, key, ignoreCase) == 0)
+                        if (kv.Key.ToString() == key || kv.Value.Name == key)
                             yield return kv;
+                    }
+                    else if (isRegex)
+                    {
+                        if (re.IsMatch(kv.Key.ToString()) || (!string.IsNullOrEmpty(kv.Value.Name) && re.IsMatch(kv.Value.Name)))
+                        {
+                            yield return kv;
+                        }
                     }
                     else
                     {
@@ -3012,9 +3072,9 @@ namespace WzComparerR2
                         {
                             string txt = string.Format("待比對wz檔案：\r\n\r\n  新 : {0} (ver:{1})\r\n  舊 : {2} (ver:{3})\r\n\r\n如果繼續比對請選擇Yes，如果想交換檔案順序請選擇No。",
                                 fileNew.Header.FileName,
-                                fileNew.Header.WzVersion,
+                                fileNew.GetMergedVersion(),
                                 fileOld.Header.FileName,
-                                fileOld.Header.WzVersion
+                                fileOld.GetMergedVersion()
                                 );
                             switch (MessageBoxEx.Show(txt, "簡單比對", MessageBoxButtons.YesNoCancel))
                             {
@@ -3077,63 +3137,6 @@ namespace WzComparerR2
         private void buttonItemAbout_Click(object sender, EventArgs e)
         {
             new FrmAbout().ShowDialog();
-            /*
-            Wz_File mob78 = openedWz[0].wz_files[0];
-            Wz_File mob109 = openedWz[1].wz_files[0];
-            WzFileComparer comp = new WzFileComparer();
-            StringBuilder sb= new StringBuilder();
-            foreach(var diff in comp.Compare(mob78.Node,mob109.Node))
-            {
-                if (diff.DifferenceType == DifferenceType.Changed)//新增
-                {
-                    Wz_Image img78 = diff.ValueNew as Wz_Image;
-                    Wz_Image img109 = diff.ValueOld as Wz_Image;
-                    if (img78 != null && img109 != null
-                        && img78.Check_if_extracted() && img109.Check_if_extracted())
-                    {
-                        foreach (var diff2 in comp.Compare(img78.Node, img109.Node))
-                        {
-                            if (diff2.NodeNew != null &&
-                                (diff2.NodeNew.Text == "maxHP" || diff2.NodeNew.Text == "finalmaxHP"))
-                            {
-                                sb.Append(img78.Node.Text).Append("\t").Append(diff2.NodeNew.Text).Append("\t")
-                                    .Append(diff2.ValueNew).Append("\t").Append(diff2.ValueOld);
-                                StringResult sr;
-                                if (this.stringLinker.StringMob.TryGetValue(Convert.ToInt32(diff.NodeNew.Text.Substring(0, 7)), out sr))
-                                {
-                                    sb.Append("\t").Append(sr.Name);
-                                }
-                                sb.AppendLine();
-                            }
-                        }
-
-                        img78.Unextract();
-                        img109.Unextract();
-                    }
-                }
-            }
-            Clipboard.SetText(sb.ToString());
-            */
-            /*
-            Wz_Node mobWz = PluginBase.PluginManager.FindWz(Wz_Type.Mob);
-            Wz_Node stand;
-            Gif gif;
-            Wz_Image img;
-            foreach (Wz_Node imgNode in mobWz.Nodes)
-            {
-                string fn = @"D:\Mob\" + imgNode.Text + ".gif";
-                if (!File.Exists(fn)
-                    && (img = imgNode.Value as Wz_Image) != null
-                    && img.Check_if_extracted()
-                    && (stand = img.Node.FindChildByPath("stand", true)) != null
-                    && (gif = Gif.LoadFromNode(stand)) != null)
-                {
-                    Bitmap bgif = gif.EncodeGif(Color.Transparent, 0); //9400724
-                    bgif.Save(@"D:\Mob\" + imgNode.Text + ".gif");
-                    bgif.Dispose();
-                    img.Unextract();
-                }
-            }*/
         }
 
         private void btnExportSkill_Click(object sender, EventArgs e)
@@ -3179,23 +3182,6 @@ namespace WzComparerR2
             ConfigManager.Reload();
             CharaSimConfig.Default.AutoQuickView = buttonItemAutoQuickView.Checked;
             ConfigManager.Save();
-        }
-
-        private void buttonItem2_Click(object sender, EventArgs e)
-        {
-
-            /*
-            Patcher.WzPatcherWriter w = new Patcher.WzPatcherWriter(fs);
-            w.Begin();
-            w.WriteNewDirectory("abc\\");
-            FileStream fs1 = new FileStream(@"D:\jx3server.txt", FileMode.Open, FileAccess.Read);
-
-            w.WriteNewFile("abc\\jx3server.txt", (int)fs1.Length, Patcher.CheckSum.ComputeHash(fs1, (int)fs1.Length));
-            fs1.Position = 0;
-            w.WriteContent(fs1, (int)fs1.Length);
-            w.End();
-            MessageBox.Show("已创建" + fs.Name);*/
-
         }
 
         private void panelExLeft_SizeChanged(object sender, EventArgs e)
@@ -3247,8 +3233,6 @@ namespace WzComparerR2
                 UpdateWzLoadingSettings();
             }
         }
-
-
     }
 
     #region 内部用扩展方法

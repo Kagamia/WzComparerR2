@@ -123,7 +123,6 @@ namespace WzComparerR2.MapRender
                 default:
                     goto case 0;
             }
-            WzComparerR2.Rendering.D2DFactory.Instance.ReleaseContext(graphics.GraphicsDevice);
             graphics.ApplyChanges();
         }
 

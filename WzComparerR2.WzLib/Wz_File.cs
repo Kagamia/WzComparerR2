@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace WzComparerR2.WzLib
 {
-    public class Wz_File
+    public class Wz_File : IDisposable
     {
         public Wz_File(string fileName, Wz_Structure wz)
         {
@@ -17,6 +17,7 @@ namespace WzComparerR2.WzLib
             this.bReader = new BinaryReader(this.FileStream);
             this.loaded = this.GetHeader(fileName);
             this.stringTable = new Dictionary<long, string>();
+            this.directories = new List<Wz_Directory>();
         }
 
         private FileStream fileStream;
@@ -26,7 +27,11 @@ namespace WzComparerR2.WzLib
         private Wz_Node node;
         private int imageCount;
         private bool loaded;
+        private bool isSubDir;
         private Wz_Type type;
+        private List<Wz_File> mergedWzFiles;
+        private Wz_File ownerWzFile;
+        private readonly List<Wz_Directory> directories;
 
         public Encoding TextEncoding { get; set; }
 
@@ -73,10 +78,25 @@ namespace WzComparerR2.WzLib
             get { return loaded; }
         }
 
+        public bool IsSubDir
+        {
+            get { return this.isSubDir; }
+        }
+
         public Wz_Type Type
         {
             get { return type; }
             set { type = value; }
+        }
+
+        public IEnumerable<Wz_File> MergedWzFiles
+        {
+            get { return this.mergedWzFiles ?? Enumerable.Empty<Wz_File>(); }
+        }
+
+        public Wz_File OwnerWzFile
+        {
+            get { return this.ownerWzFile; }
         }
 
         public void Close()
@@ -87,21 +107,75 @@ namespace WzComparerR2.WzLib
                 this.fileStream.Close();
         }
 
+        void IDisposable.Dispose()
+        {
+            this.Close();
+        }
+
         private bool GetHeader(string fileName)
         {
             this.fileStream.Position = 0;
-            int filesize = (int)this.FileStream.Length;
+            long filesize = this.FileStream.Length;
             if (filesize < 4) { goto __failed; }
 
             string signature = new string(this.BReader.ReadChars(4));
             if (signature != "PKG1") { goto __failed; }
 
-            int datasize = (int)this.BReader.ReadInt64();
-            int headersize = this.BReader.ReadInt32();
-            string copyright = new string(this.BReader.ReadChars(headersize - (int)this.FileStream.Position));
-            int encver = this.BReader.ReadUInt16();
+            long dataSize = this.BReader.ReadInt64();
+            int headerSize = this.BReader.ReadInt32();
+            string copyright = new string(this.BReader.ReadChars(headerSize - (int)this.FileStream.Position));
 
-            this.Header = new Wz_Header(signature, copyright, fileName, headersize, datasize, filesize, encver);
+            // encver detecting:
+            // Since KMST1132, wz removed the 2 bytes encver, and use a fixed wzver '777'.
+            // Here we try to read the first 2 bytes from data part and guess if it looks like an encver.
+            bool encverMissing = false;
+            int encver = -1;
+            if (dataSize >= 2)
+            {
+                this.fileStream.Position = headerSize;
+                encver = this.BReader.ReadUInt16();
+                // encver always less than 256
+                if (encver > 0xff)
+                {
+                    encverMissing = true;
+                }
+                else if (encver == 0x80)
+                {
+                    // there's an exceptional case that the first field of data part is a compressed int which determined property count,
+                    // if the value greater than 127 and also to be a multiple of 256, the first 5 bytes will become to
+                    //   80 00 xx xx xx
+                    // so we additional check the int value, at most time the child node count in a wz won't greater than 65536.
+                    if (dataSize >= 5)
+                    {
+                        this.fileStream.Position = headerSize;
+                        int propCount = this.ReadInt32();
+                        if (propCount > 0 && (propCount & 0xff) == 0 && propCount <= 0xffff)
+                        {
+                            encverMissing = true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Obviously, if data part have only 1 byte, encver must be deleted.
+                encverMissing = true;
+            }
+
+            int dataStartPos = headerSize + (encverMissing ? 0 : 2);
+            this.Header = new Wz_Header(signature, copyright, fileName, headerSize, dataSize, filesize, dataStartPos);
+
+            if (encverMissing)
+            {
+                // not sure if nexon will change this magic version, just hard coded.
+                this.Header.SetWzVersion(777);
+                this.Header.VersionChecked = true;
+            }
+            else
+            {
+                this.Header.SetOrdinalVersionDetector(encver);
+            }
+
             return true;
 
             __failed:
@@ -260,8 +334,7 @@ namespace WzComparerR2.WzLib
         public uint CalcOffset(uint filePos, uint hashedOffset)
         {
             uint offset = (uint)(filePos - 0x3C) ^ 0xFFFFFFFF;
-            int distance = 0;
-            long pos = this.FileStream.Position;
+            int distance;
 
             offset *= this.Header.HashVersion;
             offset -= 0x581C3F6D;
@@ -273,17 +346,13 @@ namespace WzComparerR2.WzLib
             return offset;
         }
 
-        public void GetDirTree(Wz_Node parent)
-        {
-            GetDirTree(parent, true);
-        }
-
-        public void GetDirTree(Wz_Node parent, bool useBaseWz)
+        public void GetDirTree(Wz_Node parent, bool useBaseWz = false, bool loadWzAsFolder = false)
         {
             List<string> dirs = new List<string>();
             string name = null;
             int size = 0;
             int cs32 = 0;
+            uint pos = 0, hashOffset = 0;
             //int offs = 0;
 
             int count = ReadInt32();
@@ -302,8 +371,8 @@ namespace WzComparerR2.WzLib
                     case 0xffff:
                         size = this.ReadInt32();
                         cs32 = this.ReadInt32();
-                        uint pos = (uint)this.bReader.BaseStream.Position;
-                        uint hashOffset = this.bReader.ReadUInt32();
+                        pos = (uint)this.bReader.BaseStream.Position;
+                        hashOffset = this.bReader.ReadUInt32();
 
                         Wz_Image img = new Wz_Image(name, size, cs32, hashOffset, pos, this);
                         Wz_Node childNode = parent.Nodes.Add(name);
@@ -317,7 +386,9 @@ namespace WzComparerR2.WzLib
                         name = this.ReadString();
                         size = this.ReadInt32();
                         cs32 = this.ReadInt32();
-                        this.FileStream.Position += 4;
+                        pos = (uint)this.bReader.BaseStream.Position;
+                        hashOffset = this.bReader.ReadUInt32();
+                        this.directories.Add(new Wz_Directory(name, size, cs32, hashOffset, pos, this));
                         dirs.Add(name);
                         break;
                 }
@@ -380,30 +451,46 @@ namespace WzComparerR2.WzLib
             {
                 string dir = dirs[i];
                 Wz_Node t = parent.Nodes.Add(dir);
-                if (willLoadBaseWz)
+                if (i < dirCount)
                 {
-                    this.WzStructure.has_basewz = true;
-                    if (i < dirCount)
-                    {
-                        GetDirTree(t, false);
-                    }
+                    GetDirTree(t, false);
+                }
+
+                if (t.Nodes.Count == 0)
+                {
+                    this.WzStructure.has_basewz |= willLoadBaseWz;
 
                     try
                     {
-                        string filePath = Path.Combine(baseFolder, dir + ".wz");
-                        if (File.Exists(filePath))
-                            this.WzStructure.LoadFile(filePath, t);
+                        if (loadWzAsFolder)
+                        {
+                            string wzFolder = willLoadBaseWz ? Path.Combine(Path.GetDirectoryName(baseFolder), dir) : Path.Combine(baseFolder, dir);
+                            if (Directory.Exists(wzFolder))
+                            {
+                                this.wzStructure.LoadWzFolder(wzFolder, ref t, false);
+                                if (!willLoadBaseWz)
+                                {
+                                    var dirWzFile = t.GetValue<Wz_File>();
+                                    dirWzFile.Type = Wz_Type.Unknown;
+                                    dirWzFile.isSubDir = true;
+                                }
+                            }
+                        }
+                        else if (willLoadBaseWz)
+                        {
+                            string filePath = Path.Combine(baseFolder, dir + ".wz");
+                            if (File.Exists(filePath))
+                            {
+                                this.WzStructure.LoadFile(filePath, t, false, loadWzAsFolder);
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
                     }
                 }
-                else
-                {
-                    GetDirTree(t, false);
-                }
             }
-
+        
             parent.Nodes.Trim();
         }
 
@@ -493,55 +580,24 @@ namespace WzComparerR2.WzLib
             {
                 string wzName = this.node.Text;
 
-                Match m = Regex.Match(wzName, @"^([A-Za-z]+)(\d+)?(?:\.wz)?$");
+                Match m = Regex.Match(wzName, @"^([A-Za-z]+)_?(\d+)?(?:\.wz)?$");
                 if (m.Success)
                 {
                     wzName = m.Result("$1");
                 }
-
-                try
-                {
-                    this.type = (Wz_Type)Enum.Parse(typeof(Wz_Type), wzName, true);
-                }
-                catch
-                {
-                    this.type = Wz_Type.Unknown;
-                }
+                this.type = Enum.TryParse<Wz_Type>(wzName, true, out var result) ? result : Wz_Type.Unknown;
             }
         }
 
         public void DetectWzVersion()
         {
-            if (!this.header.VersionChecked)
+            bool DetectWithWzImage(Wz_Image testWzImg)
             {
-                //选择最小的img作为实验品
-                Wz_Image minSizeImg = null;
-                List<Wz_Image> imgList = new List<Wz_Image>(this.imageCount);
-                foreach (var img in (EnumerableAllWzImage(this.node)))
-                {
-                    if (img.Size >= 20
-                        && (minSizeImg == null || img.Size < minSizeImg.Size))
-                    {
-                        minSizeImg = img;
-                    }
-
-                    imgList.Add(img);
-                }
-
-                if (minSizeImg == null)
-                {
-                    if (imgList.Count <= 0)
-                    {
-                        return;
-                    }
-                    minSizeImg = imgList[0];
-                }
-
                 while (this.header.TryGetNextVersion())
                 {
-                    uint offs = CalcOffset(minSizeImg.HashedOffsetPosition, minSizeImg.HashedOffset);
+                    uint offs = CalcOffset(testWzImg.HashedOffsetPosition, testWzImg.HashedOffset);
 
-                    if (offs < this.header.HeaderSize || offs + minSizeImg.Size > this.fileStream.Length)  //img块越界
+                    if (offs < this.header.HeaderSize || offs + testWzImg.Size > this.fileStream.Length)  //img块越界
                     {
                         continue;
                     }
@@ -557,13 +613,76 @@ namespace WzComparerR2.WzLib
                             continue;
                     }
 
-                    minSizeImg.Offset = offs;
-                    if (minSizeImg.TryExtract()) //试读成功
+                    testWzImg.Offset = offs;
+                    if (testWzImg.TryExtract()) //试读成功
                     {
-                        minSizeImg.Unextract();
+                        testWzImg.Unextract();
                         this.header.VersionChecked = true;
                         break;
                     }
+                }
+                return this.header.VersionChecked;
+            }
+
+            bool DetectWithAllWzDir()
+            {
+                while (this.header.TryGetNextVersion())
+                {
+                    bool isSuccess = true;
+                    foreach (var testDir in this.directories)
+                    {
+                        uint offs = CalcOffset(testDir.HashedOffsetPosition, testDir.HashedOffset);
+
+                        if (offs < this.header.HeaderSize || offs + 1 > this.fileStream.Length) // dir offset out of file size.
+                        {
+                            isSuccess = false;
+                            break;
+                        }
+
+                        this.fileStream.Position = offs;
+                        if (this.fileStream.ReadByte() != 0) // dir data only contains one byte: 0x00
+                        {
+                            isSuccess = false;
+                            break;
+                        }
+                    }
+
+                    if (isSuccess)
+                    {
+                        this.header.VersionChecked = true;
+                        break;
+                    }
+                }
+
+                return this.header.VersionChecked;
+            }
+
+            List<Wz_Image> imgList = EnumerableAllWzImage(this.node).Where(_img => _img.WzFile == this).ToList();
+
+            if (this.header.VersionChecked)
+            {
+                foreach (var img in imgList)
+                {
+                    img.Offset = CalcOffset(img.HashedOffsetPosition, img.HashedOffset);
+                }
+            }
+            else
+            {
+                //选择最小的img作为实验品
+                Wz_Image minSizeImg = imgList.Where(_img => _img.Size >= 20).DefaultIfEmpty().Aggregate((_img1, _img2) => _img1.Size < _img2.Size ? _img1 : _img2);
+
+                if (minSizeImg == null && imgList.Count > 0)
+                {
+                    minSizeImg = imgList[0];
+                }
+
+                if (minSizeImg != null)
+                {
+                    DetectWithWzImage(minSizeImg);
+                }
+                else if (this.directories.Count > 0)
+                {
+                    DetectWithAllWzDir();
                 }
 
                 if (this.header.VersionChecked) //重新计算全部img
@@ -578,6 +697,24 @@ namespace WzComparerR2.WzLib
                     this.header.VersionChecked = true;
                 }
             }
+        }
+
+        public void MergeWzFile(Wz_File wz_File)
+        {
+            var children = wz_File.node.Nodes.ToList();
+            wz_File.node.Nodes.Clear();
+            foreach (var child in children)
+            {
+                this.node.Nodes.Add(child);
+            }
+
+            if (this.mergedWzFiles == null)
+            {
+                this.mergedWzFiles = new List<Wz_File>();
+            }
+            this.mergedWzFiles.Add(wz_File);
+
+            wz_File.ownerWzFile = this;
         }
 
         private IEnumerable<Wz_Image> EnumerableAllWzImage(Wz_Node parentNode)

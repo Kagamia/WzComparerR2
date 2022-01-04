@@ -265,14 +265,16 @@ namespace WzComparerR2.MapRender.UI
                     node = img.Node.Nodes["MapList"];
                     if (node != null)
                     {
-                        for (int i = 0; ; i++)
-                        {
-                            var spotNode = node.Nodes[i.ToString()];
-                            if (spotNode == null)
-                            {
-                                break;
-                            }
+                        // KMST 1125: the spot indices are not always continuous.
+                        var spotNodes = node.Nodes.Select(child => new {
+                                child,
+                                index = int.TryParse(child.Text, out var nodeInex) ? nodeInex : -1,
+                            }).Where(item => item.index > -1)
+                            .OrderBy(item => item.index)
+                            .Select(item => item.child);
 
+                        foreach (var spotNode in spotNodes)
+                        {
                             var spot = new MapSpot();
                             var location = spotNode.Nodes["spot"]?.GetValueEx<Wz_Vector>(null);
                             if (location != null)
@@ -315,6 +317,7 @@ namespace WzComparerR2.MapRender.UI
                             var link = new MapLink();
                             link.Index = int.Parse(mapLinkNode.Text);
                             link.Tooltip = mapLinkNode.Nodes["toolTip"].GetValueEx<string>(null);
+                            link.Desc = mapLinkNode.Nodes["desc"].GetValueEx<string>(null);
                             var linkNode = mapLinkNode.Nodes["link"];
                             if (linkNode != null)
                             {
@@ -543,14 +546,19 @@ namespace WzComparerR2.MapRender.UI
             public object GetTooltipTarget(PointF mouseLocation)
             {
                 var hitItem = HitTest(mouseLocation);
-                if (hitItem is MapSpot)
+                switch(hitItem)
                 {
-                    var spot = (MapSpot)hitItem;
-                    var tooltip = new UIWorldMap.Tooltip()
-                    {
-                        Spot = spot
-                    };
-                    return tooltip;
+                    case MapSpot spot:
+                        return new UIWorldMap.MapSpotTooltip()
+                        {
+                            Spot = spot
+                        };
+
+                    case MapLink link:
+                        return new UIWorldMap.MapLinkTooltip()
+                        {
+                            Link = link
+                        };
                 }
                 return null;
             }
@@ -688,7 +696,7 @@ namespace WzComparerR2.MapRender.UI
                         {
                             Texture = texture.Texture,
                             Origin = new PointF(-spot.Spot.X + texture.Origin.X, -spot.Spot.Y + texture.Origin.Y),
-                            Z = texture.Z
+                            Z = 128 + texture.Z
                         };
                         if (spot.IsPreBB && curMap.BaseImg != null) //pre-bb地图点调整
                         {
@@ -806,6 +814,7 @@ namespace WzComparerR2.MapRender.UI
         {
             public int Index { get; set; }
             public string Tooltip { get; set; }
+            public string Desc { get; set; }
             public string LinkMap { get; set; }
             public TextureItem LinkImg { get; set; }
         }
@@ -835,9 +844,14 @@ namespace WzComparerR2.MapRender.UI
             public HitMap HitMap;
         }
 
-        public class Tooltip
+        public class MapSpotTooltip
         {
             public MapSpot Spot { get; set; }
+        }
+
+        public class MapLinkTooltip
+        {
+            public MapLink Link { get; set; }
         }
 
         public class MapSpotEventArgs : EventArgs

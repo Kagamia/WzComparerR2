@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Microsoft.Xna.Framework;
+
 using WzComparerR2.WzLib;
 using WzComparerR2.Controls;
 using WzComparerR2.Animation;
 using WzComparerR2.Rendering;
-using Microsoft.Xna.Framework;
 using WzComparerR2.Config;
 using WzComparerR2.Common;
-
 
 namespace WzComparerR2
 {
@@ -146,30 +148,100 @@ namespace WzComparerR2
             }
         }
 
-        public void SaveAsGif(AnimationItem aniItem, string fileName, ImageHandlerConfig config)
+        public bool SaveAsGif(AnimationItem aniItem, string fileName, ImageHandlerConfig config, bool options)
         {
-            //保存动画 天坑代码
             var rec = new AnimationRecoder(this.GraphicsDevice);
 
             rec.Items.Add(aniItem);
             int length = rec.GetMaxLength();
-            //rec.GetGifTimeLine(30); 放弃获取时间轴
-
-            //预判大小阶段
-            rec.ResetAll();
-            Microsoft.Xna.Framework.Rectangle? bounds = null;
-
             int delay = Math.Max(10, config.MinDelay);
-            for (int d = 0; d <= length; d += delay)
+            var timeline = rec.GetGifTimeLine(delay, 655350);
+
+            // calc available canvas area
+            rec.ResetAll();
+            Microsoft.Xna.Framework.Rectangle bounds = aniItem.Measure();
+            if (length > 0)
             {
-                rec.Update(TimeSpan.FromMilliseconds(delay));
-                var rect = aniItem.Measure();
-                rect.Offset(aniItem.Position);
-                bounds = (bounds == null || bounds.Value.IsEmpty) ? rect
-                    : Microsoft.Xna.Framework.Rectangle.Union(rect, bounds.Value);
+                IEnumerable<int> delays = timeline?.Take(timeline.Length - 1)
+                    ?? Enumerable.Range(0, (int)Math.Ceiling(1.0 * length / delay) - 1);
+
+                foreach (var frameDelay in delays)
+                {
+                    rec.Update(TimeSpan.FromMilliseconds(frameDelay));
+                    var rect = aniItem.Measure();
+                    bounds = Microsoft.Xna.Framework.Rectangle.Union(bounds, rect);
+                }
+            }
+            bounds.Offset(aniItem.Position);
+
+            // customize clip/scale options
+            AnimationClipOptions clipOptions = new AnimationClipOptions()
+            {
+                StartTime = 0,
+                StopTime = length,
+                Left = bounds.Left,
+                Top = bounds.Top,
+                Right = bounds.Right,
+                Bottom = bounds.Bottom,
+                OutputWidth = bounds.Width,
+                OutputHeight = bounds.Height,
+            };
+
+            if (options)
+            {
+                var frmOptions = new FrmGifClipOptions()
+                {
+                    ClipOptions = clipOptions,
+                    ClipOptionsNew = clipOptions,
+                };
+                if (frmOptions.ShowDialog() == DialogResult.OK)
+                {
+                    var clipOptionsNew = frmOptions.ClipOptionsNew;
+                    clipOptions.StartTime = clipOptionsNew.StartTime ?? clipOptions.StartTime;
+                    clipOptions.StopTime = clipOptionsNew.StopTime ?? clipOptions.StopTime;
+
+                    clipOptions.Left = clipOptionsNew.Left ?? clipOptions.Left;
+                    clipOptions.Top = clipOptionsNew.Top ?? clipOptions.Top;
+                    clipOptions.Right = clipOptionsNew.Right ?? clipOptions.Right;
+                    clipOptions.Bottom = clipOptionsNew.Bottom ?? clipOptions.Bottom;
+
+                    clipOptions.OutputWidth = clipOptionsNew.OutputWidth ?? (clipOptions.Right - clipOptions.Left);
+                    clipOptions.OutputHeight = clipOptionsNew.OutputHeight ?? (clipOptions.Bottom - clipOptions.Top);
+                }
+                else
+                {
+                    return false;
+                }
             }
 
-            //绘制阶段
+            // validate params
+            bounds = new Rectangle(
+                clipOptions.Left.Value,
+                clipOptions.Top.Value,
+                clipOptions.Right.Value - clipOptions.Left.Value,
+                clipOptions.Bottom.Value - clipOptions.Top.Value
+                );
+            var targetSize = new Point(clipOptions.OutputWidth.Value, clipOptions.OutputHeight.Value);
+            var startTime = clipOptions.StartTime.Value;
+            var stopTime = clipOptions.StopTime.Value;
+
+            if (bounds.Width <= 0 || bounds.Height <= 0
+                || targetSize.X <= 0 || targetSize.Y <= 0
+                || startTime < 0 || stopTime > length
+                || stopTime - startTime < 0)
+            {
+                return false;
+            }
+            length = stopTime - startTime;
+
+            // create output dir
+            string framesDirName = Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName) + ".frames");
+            if (config.SavePngFramesEnabled && !Directory.Exists(framesDirName))
+            {
+                Directory.CreateDirectory(framesDirName);
+            }
+
+            // pre-render
             rec.ResetAll();
             switch (config.BackgroundType.Value)
             {
@@ -190,125 +262,214 @@ namespace WzComparerR2
                     break;
             }
 
-            byte[] buffer = new byte[bounds.Value.Width * bounds.Value.Height * 4];
-            byte[] bufferPrev = null, bufferGif = null;
-            int gifTime = 0, prevTime = 0;
-
-            string dirName = Path.Combine(Path.GetDirectoryName(fileName),
-                Path.GetFileNameWithoutExtension(fileName) + ".frames");
-
-
-            if (config.SavePngFramesEnabled && !Directory.Exists(dirName))
-            {
-                Directory.CreateDirectory(dirName);
-            }
-
-            //选择encoder
-            GifEncoder enc = AnimateEncoderFactory.CreateEncoder(fileName, bounds.Value.Width, bounds.Value.Height, config);
+            // select encoder
+            GifEncoder enc = AnimateEncoderFactory.CreateEncoder(fileName, targetSize.X, targetSize.Y, config);
             var encParams = AnimateEncoderFactory.GetEncoderParams(config.GifEncoder.Value);
 
-            Action<int> writeFrame = (curTime) =>
+            // pipeline functions
+            IEnumerable<Tuple<byte[], int>> MergeFrames(IEnumerable<Tuple<byte[], int>> frames)
             {
-                unsafe
+                byte[] prevFrame = null;
+                int prevDelay = 0;
+
+                foreach (var frame in frames)
                 {
-                    string pngFileName = Path.Combine(dirName, prevTime + ".png");
-                    fixed (byte* pBuffer = bufferPrev, pBufferGif = bufferGif)
+                    byte[] currentFrame = frame.Item1;
+                    int currentDelay = frame.Item2;
+
+                    if (prevFrame == null)
                     {
-                        using (var bmp = new System.Drawing.Bitmap(bounds.Value.Width, bounds.Value.Height, bounds.Value.Width * 4, System.Drawing.Imaging.PixelFormat.Format32bppArgb, new IntPtr(pBuffer)))
-                        {
-                            var tasks = new List<Task>();
-                            if (config.SavePngFramesEnabled) //保存单帧图像
-                            {
-                                tasks.Add(Task.Factory.StartNew(
-                                    () => bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png)
-                                ));
-                            }
-
-                            //保存gif帧
-                            int frameDelay = curTime - gifTime;
-                            frameDelay = (int)(Math.Round(frameDelay / 10.0) * 10);
-                            if (frameDelay > 0)
-                            {
-                                gifTime += frameDelay;
-                                var pData = new IntPtr(pBufferGif);
-                                tasks.Add(Task.Factory.StartNew(() =>
-                                    enc.AppendFrame(pData, frameDelay)
-                                ));
-                            }
-
-                            Task.WaitAll(tasks.ToArray());
-                        }
+                        prevFrame = currentFrame;
+                        prevDelay = currentDelay;
+                    }
+                    else if (memcmp(prevFrame, currentFrame, (IntPtr)prevFrame.Length) == 0)
+                    {
+                        prevDelay += currentDelay;
+                    }
+                    else
+                    {
+                        yield return Tuple.Create(prevFrame, prevDelay);
+                        prevFrame = currentFrame;
+                        prevDelay = currentDelay;
                     }
                 }
-            };
 
-            rec.Begin(bounds.Value);
-            //0长度补丁
-            for (int d = 0; d <= length; d += delay, rec.Update(TimeSpan.FromMilliseconds(delay)))
-            {
-                rec.Draw();
-                using (var rt = rec.GetPngTexture())
+                if (prevFrame != null)
                 {
-                    rt.GetData(buffer);
-                    //比较上一帧
-                    if (bufferPrev != null)
+                    yield return Tuple.Create(prevFrame, prevDelay);
+                }
+            }
+
+            IEnumerable<int> RenderDelay()
+            {
+                int t = 0;
+                while (t < length)
+                {
+                    int frameDelay = Math.Min(length - t, delay);
+                    t += frameDelay;
+                    yield return frameDelay;
+                }
+            }
+
+            IEnumerable<int> ClipTimeline(int[] _timeline)
+            {
+                int t = 0;
+                for (int i = 0; i < timeline.Length; i++)
+                {
+                    var frameDelay = timeline[i];
+                    if (t < startTime)
                     {
-                        //跳过当前帧
-                        if (memcmp(buffer, bufferPrev, (IntPtr)buffer.Length) == 0)
+                        if (t + frameDelay > startTime)
                         {
+                            frameDelay = t + frameDelay - startTime;
+                            t = startTime;
+                        }
+                        else
+                        {
+                            t += frameDelay;
                             continue;
                         }
-                        else //计算时间 输出
-                        {
-                            writeFrame(d);
-                        }
+                    }
+
+                    if (t + frameDelay < stopTime)
+                    {
+                        yield return frameDelay;
+                        t += frameDelay;
                     }
                     else
                     {
-                        bufferPrev = new byte[bounds.Value.Width * bounds.Value.Height * 4];
-                    }
-
-                    //交换缓冲区
-                    var temp = buffer;
-                    buffer = bufferPrev;
-                    bufferPrev = temp;
-                    prevTime = d;
-
-                    //透明 额外导出一份gif
-                    if (!encParams.SupportAlphaChannel && config.BackgroundType.Value == ImageBackgroundType.Transparent)
-                    {
-                        using (var rt2 = rec.GetGifTexture(config.BackgroundColor.Value.ToXnaColor(), config.MinMixedAlpha))
-                        {
-                            if (bufferGif == null)
-                            {
-                                bufferGif = new byte[bufferPrev.Length];
-                            }
-                            rt2.GetData(bufferGif);
-                        }
-                    }
-                    else
-                    {
-                        bufferGif = bufferPrev;
+                        frameDelay = stopTime - t;
+                        yield return frameDelay;
+                        break;
                     }
                 }
             }
 
-            //输出最后一帧
-            if (prevTime < length)
+            int prevTime = 0;
+            async Task<int> ApplyFrame(byte[] frameData, int frameDelay)
             {
-                writeFrame(length);
+                byte[] gifData = null;
+                if (!encParams.SupportAlphaChannel && config.BackgroundType.Value == ImageBackgroundType.Transparent)
+                {
+                    using (var rt2 = rec.GetGifTexture(config.BackgroundColor.Value.ToXnaColor(), config.MinMixedAlpha))
+                    {
+                        if (gifData == null)
+                        {
+                            gifData = new byte[frameData.Length];
+                        }
+                        rt2.GetData(gifData);
+                    }
+                }
+                else
+                {
+                    gifData = frameData;
+                }
+
+                var tasks = new List<Task>();
+
+                // save each frame as png
+                if (config.SavePngFramesEnabled)
+                {
+                    tasks.Add(Task.Run(() =>
+                    {
+                        string pngFileName = Path.Combine(framesDirName, $"{prevTime}_{prevTime + frameDelay}.png");
+                        unsafe
+                        {
+                            fixed (byte* pFrameBuffer = frameData)
+                            {
+                                using (var bmp = new System.Drawing.Bitmap(targetSize.X, targetSize.Y, targetSize.X * 4, System.Drawing.Imaging.PixelFormat.Format32bppArgb, new IntPtr(pFrameBuffer)))
+                                {
+                                    bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
+                                }
+                            }
+                        }
+                    }));
+                }
+
+                // append frame data to gif stream
+                tasks.Add(Task.Run(() =>
+                {
+                    // TODO: only for gif here?
+                    frameDelay = Math.Max(10, (int)(Math.Round(frameDelay / 10.0) * 10));
+                    unsafe
+                    {
+                        fixed (byte* pGifBuffer = gifData)
+                        {
+                            enc.AppendFrame(new IntPtr(pGifBuffer), frameDelay);
+                        }
+                    }
+                }));
+
+                await Task.WhenAll(tasks);
+                prevTime += frameDelay;
+                return prevTime;
             }
-            else if (length <= 0) //0长度补丁
+
+            async Task RenderJob(IProgressDialogContext context, CancellationToken cancellationToken)
             {
-                writeFrame(100);
+                bool isCompareAndMergeFrames = timeline == null;
+
+                // build pipeline
+                IEnumerable<int> delayEnumerator = timeline == null ? RenderDelay() : ClipTimeline(timeline);
+                var step1 = delayEnumerator.TakeWhile(_ => !cancellationToken.IsCancellationRequested);
+                var frameRenderEnumerator = step1.Select(frameDelay =>
+                {
+                    rec.Draw();
+                    rec.Update(TimeSpan.FromMilliseconds(frameDelay));
+                    return frameDelay;
+                });
+                var step2 = frameRenderEnumerator.TakeWhile(_ => !cancellationToken.IsCancellationRequested);
+                var getFrameData = step2.Select(frameDelay =>
+                {
+                    using (var t2d = rec.GetPngTexture())
+                    {
+                        byte[] frameData = new byte[t2d.Width * t2d.Height * 4];
+                        t2d.GetData(frameData);
+                        return Tuple.Create(frameData, frameDelay);
+                    }
+                });
+                var step3 = getFrameData.TakeWhile(_ => !cancellationToken.IsCancellationRequested);
+                if (isCompareAndMergeFrames)
+                {
+                    var mergedFrameData = MergeFrames(step3);
+                    step3 = mergedFrameData.TakeWhile(_ => !cancellationToken.IsCancellationRequested);
+                }
+
+                var step4 = step3.Select(item => ApplyFrame(item.Item1, item.Item2));
+
+                // run pipeline
+                bool isPlaying = this.IsPlaying;
+                try
+                {
+                    this.IsPlaying = false;
+                    rec.Begin(bounds, targetSize);
+                    if (startTime > 0)
+                    {
+                        rec.Update(TimeSpan.FromMilliseconds(startTime));
+                    }
+                    context.ProgressMin = 0;
+                    context.ProgressMax = length;
+                    foreach (var task in step4)
+                    {
+                        int currentTime = await task;
+                        context.Progress = currentTime;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    context.Message = $"Error: {ex.Message}";
+                    throw;
+                }
+                finally
+                {
+                    rec.End();
+                    enc.Dispose();
+                    this.IsPlaying = isPlaying;
+                }
             }
-            //保存动画长度
-            if (config.SavePngFramesEnabled)
-            {
-                File.WriteAllText(Path.Combine(dirName, "delay.txt"), length.ToString());
-            }
-            rec.End();
-            enc.Dispose();
+
+            var dialogResult = ProgressDialog.Show(this.FindForm(), "Exporting...", "Save animation file...", true, false, RenderJob);
+            return dialogResult == DialogResult.OK;
         }
 
         public override AnimationItem GetItemAt(int x, int y)
@@ -354,7 +515,9 @@ namespace WzComparerR2
             }
             else
             {
-                this.SaveAsGif(e.Item, fileName, ImageHandlerConfig.Default);
+                //this.SaveAsGif(e.Item, fileName, ImageHandlerConfig.Default);
+                // this is too lag so we don't support dragging gifs!
+                return;
             }
             
             var imgObj = new ImageDataObject(null, fileName);

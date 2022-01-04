@@ -15,12 +15,15 @@ namespace WzComparerR2.Patcher
                 0x4000, FileOptions.Asynchronous | FileOptions.RandomAccess);
         }
 
+        private const int MAX_PATH = 260;
+
         private FileStream patchFile;
         private PartialStream patchBlock;
         private InflateStream inflateStream;
 
         private string noticeText;
         private List<PatchPartContext> patchParts;
+        private Dictionary<string, uint> oldFileHash;
 
         public List<PatchPartContext> PatchParts
         {
@@ -31,6 +34,13 @@ namespace WzComparerR2.Patcher
         {
             get { return noticeText; }
         }
+
+        public Dictionary<string, uint> OldFileHash
+        {
+            get { return oldFileHash; }
+        }
+
+        public bool? IsKMST1125Format { get; private set; }
 
         public event EventHandler<PatchingEventArgs> PatchingStateChanged;
 
@@ -136,8 +146,22 @@ namespace WzComparerR2.Patcher
                 this.inflateStream = new InflateStream(this.inflateStream);
             }
 
-            List<PatchPartContext> patchParts = new List<PatchPartContext>();
-            BinaryReader r = new BinaryReader(this.inflateStream);
+            var patchParts = new List<PatchPartContext>();
+            var r = new BinaryReader(this.inflateStream);
+
+            if (this.TryReadKMST1125FileHashList(r, out var fileHash))
+            {
+                this.oldFileHash = fileHash;
+                this.IsKMST1125Format = true;
+            }
+            else
+            {
+                this.IsKMST1125Format = false;
+                // reset file cursor
+                this.inflateStream = new InflateStream(this.inflateStream);
+                r = new BinaryReader(this.inflateStream);
+            }
+
             while (true)
             {
                 PatchPartContext part = ReadPatchPart(r);
@@ -145,6 +169,11 @@ namespace WzComparerR2.Patcher
                 if (part == null)
                 {
                     break;
+                }
+
+                if (this.IsKMST1125Format.Value && this.oldFileHash.TryGetValue(part.FileName, out uint value))
+                {
+                    part.OldChecksum = value;
                 }
 
                 patchParts.Add(part);
@@ -199,7 +228,11 @@ namespace WzComparerR2.Patcher
 
                 case 1:
                     {
-                        uint oldCheckSum0 = r.ReadUInt32();
+                        uint? oldCheckSum0 = null;
+                        if (!this.IsKMST1125Format.Value)
+                        {
+                            oldCheckSum0 = r.ReadUInt32();
+                        }
                         uint newCheckSum0 = r.ReadUInt32();
                         part = new PatchPartContext(fileName, this.inflateStream.Position, patchType);
                         part.OldChecksum = oldCheckSum0;
@@ -247,8 +280,22 @@ namespace WzComparerR2.Patcher
 
             if (this.patchParts == null) //边读取边执行
             {
-                this.patchParts = new List<PatchPartContext>();
                 BinaryReader r = new BinaryReader(this.inflateStream);
+                if (this.TryReadKMST1125FileHashList(r, out var fileHash))
+                {
+                    this.oldFileHash = fileHash;
+                    this.IsKMST1125Format = true;
+                    this.ValidateFileHash(mapleStoryFolder);
+                }
+                else
+                {
+                    this.IsKMST1125Format = false;
+                    // reset file cursor
+                    this.inflateStream = new InflateStream(this.inflateStream);
+                    r = new BinaryReader(this.inflateStream);
+                }
+
+                this.patchParts = new List<PatchPartContext>();
                 while (true)
                 {
                     PatchPartContext part = ReadPatchPart(r);
@@ -276,6 +323,8 @@ namespace WzComparerR2.Patcher
             }
             else  //按照调整后顺序执行
             {
+                this.ValidateFileHash(mapleStoryFolder);
+
                 foreach (PatchPartContext part in this.patchParts)
                 {
                     switch (part.Type)
@@ -296,10 +345,12 @@ namespace WzComparerR2.Patcher
             {
                 if (part.Type != 2 && !string.IsNullOrEmpty(part.TempFilePath))
                 {
+                    this.OnApplyFile(part);
                     SafeMove(part.TempFilePath, Path.Combine(mapleStoryFolder, part.FileName));
                 }
                 else if (part.Type == 2)
                 {
+                    this.OnApplyFile(part);
                     if (part.FileName.EndsWith("\\"))
                         SafeDeleteDirectory(Path.Combine(mapleStoryFolder, part.FileName));
                     else
@@ -308,6 +359,49 @@ namespace WzComparerR2.Patcher
             }
 
             SafeDeleteDirectory(tempDir);
+        }
+
+        private bool TryReadKMST1125FileHashList(BinaryReader r, out Dictionary<string, uint> fileHash)
+        {
+            fileHash = new Dictionary<string, uint>();
+            try
+            {
+                int count = r.ReadInt32();
+                for (int i = 0; i < count; i++)
+                {
+                    string fn = this.ReadStringWithLength(r, MAX_PATH);
+                    uint checksum = r.ReadUInt32();
+                    fileHash.Add(fn, checksum);
+                }
+                return true;
+            }
+            catch
+            {
+                fileHash = null;
+                return false;
+            }
+        }
+
+        private void ValidateFileHash(string msDir)
+        {
+            if (this.OldFileHash != null && this.OldFileHash.Count > 0)
+            {
+                foreach(var kv in this.OldFileHash)
+                {
+                    var part = new PatchPartContext(kv.Key, -1, -1)
+                    {
+                        OldFilePath = Path.Combine(msDir, kv.Key)
+                    };
+                    uint oldCheckSum1;
+                    this.OnPrepareVerifyOldChecksumBegin(part);
+                    using (var fs = new FileStream(part.OldFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    {
+                        oldCheckSum1 = CheckSum.ComputeHash(fs, fs.Length);
+                    }
+                    this.OnPrepareVerifyOldChecksumEnd(part);
+                    VerifyCheckSum(kv.Value, oldCheckSum1, part.FileName, "origin");
+                }
+            }
         }
 
         private string CreateRandomDir(string folder)
@@ -372,7 +466,6 @@ namespace WzComparerR2.Patcher
             }
         }
 
-
         private int GetFileName(BinaryReader reader, out string fileName)
         {
             int switchByte = 0;
@@ -385,6 +478,20 @@ namespace WzComparerR2.Patcher
 
             fileName = sb.ToString();
             return switchByte;
+        }
+
+        private string ReadStringWithLength(BinaryReader reader, int? maxLength = null)
+        {
+            int length = reader.ReadInt32();
+            if (length < 0)
+            {
+                throw new Exception($"Invalid length: {length}");
+            }
+            if (maxLength != null && length > maxLength)
+            {
+                throw new Exception($"String length exceed the limit ({length} > {maxLength}).");
+            }
+            return Encoding.ASCII.GetString(reader.ReadBytes(length));
         }
 
         public void CreateNewFile(PatchPartContext part, string tempDir)
@@ -417,172 +524,211 @@ namespace WzComparerR2.Patcher
             this.OnPatchStart(part);
             string tempFileName = Path.Combine(tempDir, part.FileName);
             EnsureDirExists(tempFileName);
-
             part.OldFilePath = Path.Combine(msDir, part.FileName);
 
-            this.OnVerifyOldChecksumBegin(part);
-            FileStream oldWzFile = new FileStream(part.OldFilePath, FileMode.Open, FileAccess.Read, FileShare.Read,
-                0x4000, FileOptions.Asynchronous | FileOptions.RandomAccess);
-            uint oldCheckSum1 = CheckSum.ComputeHash(oldWzFile, (int)oldWzFile.Length); //旧版本文件实际hash
-            this.OnVerifyOldChecksumEnd(part);
+            var oldWzFiles = new Dictionary<string, FileStream>();
+            FileStream tempFileStream = null;
+
+            FileStream openFile(string fileName)
+            {
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    return null;
+                }
+                if (!oldWzFiles.TryGetValue(fileName, out var fs))
+                {
+                    fs = new FileStream(Path.Combine(msDir, fileName), FileMode.Open, FileAccess.Read, FileShare.Read);
+                    oldWzFiles.Add(fileName, fs);
+                }
+                return fs;
+            }
+
+            void closeAllFiles()
+            {
+                foreach(var fs in oldWzFiles.Values)
+                {
+                    fs.Close();
+                }
+                tempFileStream?.Close();
+            }
 
             try
             {
-                VerifyCheckSum(part.OldChecksum, oldCheckSum1, part.FileName, "origin");
-            }
-            catch
-            {
-                if (oldWzFile.Length == part.NewFileLength && oldCheckSum1 == part.NewChecksum) //文件已更新的场合
+                if (this.IsKMST1125Format == true)
                 {
-                    oldWzFile.Close();
-                    return;
+                    // skip old file checking
                 }
-                else
+                else if (part.OldChecksum != null)
                 {
-                    throw;
-                }
-            }
-
-            int cmd;
-            //int blockLength;
-            FileStream tempFileStream = new FileStream(tempFileName, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, 0x4000);
-            part.TempFilePath = tempFileName;
-            if (part.NewFileLength > 0) //预申请硬盘空间 似乎可以加快读写速度
-            {
-                tempFileStream.SetLength(part.NewFileLength);
-                tempFileStream.Seek(0, SeekOrigin.Begin);
-            }
-            this.OnTempFileCreated(part);
-            uint newCheckSum1 = 0;
-
-            this.InflateStreamSeek(part.Offset);
-            BinaryReader r = new BinaryReader(this.inflateStream);
-
-            double patchProc = 0;
-            const double patchProcReportInverval = 0.005;
-
-            //v3新增读缓冲
-            List<RebuildFileOperation> operList = new List<RebuildFileOperation>(32768);
-            List<RebuildFileOperation> readFileOperList = new List<RebuildFileOperation>(operList.Capacity);
-            MemoryStream msBuffer = new MemoryStream(1024 * 1024 * 64);
-            int preLoadByteCount = 0;
-            while (true)
-            {
-                cmd = r.ReadInt32();
-                RebuildFileOperation op = null;
-                if (cmd != 0)
-                {
-                    switch ((uint)cmd >> 0x1C)
+                    var oldWzFile = openFile(part.FileName);
+                    this.OnVerifyOldChecksumBegin(part);
+                    uint oldCheckSum1 = CheckSum.ComputeHash(oldWzFile, oldWzFile.Length); //旧版本文件实际hash
+                    this.OnVerifyOldChecksumEnd(part);
+                    try
                     {
-                        case 0x08:
-                            op = new RebuildFileOperation(0);
-                            op.Length = cmd & 0x0fffffff;
-                            break;
-                        case 0x0c:
-                            op = new RebuildFileOperation(1);
-                            op.FillByte = (byte)(cmd & 0xff);
-                            op.Length = (cmd & 0x0fffff00) >> 8;
-                            break;
-                        default:
-                            op = new RebuildFileOperation(2);
-                            op.Length = cmd;
-                            op.StartPosition = r.ReadInt32();
-                            break;
+                        VerifyCheckSum(part.OldChecksum.Value, oldCheckSum1, part.FileName, "origin");
                     }
-                }
-
-                //如果大于 先处理当前所有预读操作
-                if (cmd == 0 || (operList.Count >= operList.Capacity - 1)
-                    || (op.OperType != 1 && (op.Length + preLoadByteCount > msBuffer.Capacity)))
-                {
-                    //排序预读原文件
-                    readFileOperList.Sort((first, second) => first.StartPosition.CompareTo(second.StartPosition));
-                    foreach (var readFileOp in readFileOperList)
+                    catch
                     {
-                        int position = (int)msBuffer.Position;
-                        readFileOp.Flush(oldWzFile, null, null, msBuffer);
-                        readFileOp.bufferStartIndex = position;
-                    }
-
-                    //向新文件输出
-                    foreach (var tempOp in operList)
-                    {
-                        newCheckSum1 = tempOp.Flush(oldWzFile, r.BaseStream, msBuffer, tempFileStream, newCheckSum1);
-
-                        //计算更新进度
-                        if (part.NewFileLength > 0)
+                        if (oldWzFile.Length == part.NewFileLength && oldCheckSum1 == part.NewChecksum) //文件已更新的场合
                         {
-                            double curProc = 1.0 * tempFileStream.Position / part.NewFileLength;
-                            if (curProc - patchProc >= patchProcReportInverval)// || curProc >= 1 - patchProcReportInverval)
-                            {
-                                this.OnTempFileUpdated(part, tempFileStream.Position);//更新进度改变
-                                patchProc = curProc;
-                            }
+                            oldWzFile.Close();
+                            return;
                         }
                         else
                         {
-                            if (tempFileStream.Position - patchProc > 1024 * 1024 * 10)
-                            {
-                                this.OnTempFileUpdated(part, tempFileStream.Position);//更新进度改变
-                                patchProc = tempFileStream.Position;
-                            }
+                            throw;
+                        }
+                    }
+                }
+
+                int cmd;
+                //int blockLength;
+                tempFileStream = new FileStream(tempFileName, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, 0x4000);
+                part.TempFilePath = tempFileName;
+                if (part.NewFileLength > 0) //预申请硬盘空间 似乎可以加快读写速度
+                {
+                    tempFileStream.SetLength(part.NewFileLength);
+                    tempFileStream.Seek(0, SeekOrigin.Begin);
+                }
+                this.OnTempFileCreated(part);
+                uint newCheckSum1 = 0;
+
+                this.InflateStreamSeek(part.Offset);
+                BinaryReader r = new BinaryReader(this.inflateStream);
+
+                double patchProc = 0;
+                const double patchProcReportInverval = 0.005;
+
+                //v3新增读缓冲
+                List<RebuildFileOperation> operList = new List<RebuildFileOperation>(32768);
+                List<RebuildFileOperation> readFileOperList = new List<RebuildFileOperation>(operList.Capacity);
+                MemoryStream msBuffer = new MemoryStream(1024 * 1024 * 64);
+                int preLoadByteCount = 0;
+                while (true)
+                {
+                    cmd = r.ReadInt32();
+                    RebuildFileOperation op = null;
+                    if (cmd != 0)
+                    {
+                        switch ((uint)cmd >> 0x1C)
+                        {
+                            case 0x08:
+                                op = new RebuildFileOperation(0);
+                                op.Length = cmd & 0x0fffffff;
+                                break;
+                            case 0x0c:
+                                op = new RebuildFileOperation(1);
+                                op.FillByte = (byte)(cmd & 0xff);
+                                op.Length = (cmd & 0x0fffff00) >> 8;
+                                break;
+                            default:
+                                op = new RebuildFileOperation(2);
+                                op.Length = cmd;
+                                op.StartPosition = r.ReadInt32();
+                                op.FromFileName = this.IsKMST1125Format.Value ? this.ReadStringWithLength(r) : part.FileName;
+                                break;
                         }
                     }
 
-                    //重置缓冲区
-                    msBuffer.SetLength(0);
-                    preLoadByteCount = 0;
-                    operList.Clear();
-                    readFileOperList.Clear();
-                    if (cmd == 0) // 更新结束 这里是出口无误
+                    //如果大于 先处理当前所有预读操作
+                    if (cmd == 0 || (operList.Count >= operList.Capacity - 1)
+                        || (op.OperType != 1 && (op.Length + preLoadByteCount > msBuffer.Capacity)))
                     {
-                        break;
-                    }
-                }
-
-                if (op.OperType != 1 && op.Length >= msBuffer.Capacity) //还是大于的话 单独执行
-                {
-                    newCheckSum1 = op.Flush(oldWzFile, r.BaseStream, null, tempFileStream, newCheckSum1);
-                }
-                else //直接放进缓冲区里
-                {
-                    op.Index = (ushort)operList.Count;
-                    operList.Add(op);
-                    switch (op.OperType)
-                    {
-                        case 0:
+                        //排序预读原文件
+                        readFileOperList.Sort((left, right) => {
+                            int cmp;
+                            if ((cmp = string.Compare(left.FromFileName, right.FromFileName, StringComparison.OrdinalIgnoreCase)) != 0) 
+                                return cmp;
+                            return left.StartPosition.CompareTo(right.StartPosition);
+                        });
+                        foreach (var readFileOp in readFileOperList)
+                        {
                             int position = (int)msBuffer.Position;
-                            op.Flush(null, r.BaseStream, null, msBuffer);
-                            op.bufferStartIndex = position;
-                            break;
+                            readFileOp.Flush(openFile(readFileOp.FromFileName), null, null, msBuffer);
+                            readFileOp.bufferStartIndex = position;
+                        }
 
-                        case 1:
-                            continue;
+                        //向新文件输出
+                        foreach (var tempOp in operList)
+                        {
+                            newCheckSum1 = tempOp.Flush(openFile(tempOp.FromFileName), r.BaseStream, msBuffer, tempFileStream, newCheckSum1);
 
-                        case 2:
-                            readFileOperList.Add(op);
+                            //计算更新进度
+                            if (part.NewFileLength > 0)
+                            {
+                                double curProc = 1.0 * tempFileStream.Position / part.NewFileLength;
+                                if (curProc - patchProc >= patchProcReportInverval)// || curProc >= 1 - patchProcReportInverval)
+                                {
+                                    this.OnTempFileUpdated(part, tempFileStream.Position);//更新进度改变
+                                    patchProc = curProc;
+                                }
+                            }
+                            else
+                            {
+                                if (tempFileStream.Position - patchProc > 1024 * 1024 * 10)
+                                {
+                                    this.OnTempFileUpdated(part, tempFileStream.Position);//更新进度改变
+                                    patchProc = tempFileStream.Position;
+                                }
+                            }
+                        }
+
+                        //重置缓冲区
+                        msBuffer.SetLength(0);
+                        preLoadByteCount = 0;
+                        operList.Clear();
+                        readFileOperList.Clear();
+                        if (cmd == 0) // 更新结束 这里是出口无误
+                        {
                             break;
+                        }
                     }
-                    preLoadByteCount += op.Length;
+
+                    if (op.OperType != 1 && op.Length >= msBuffer.Capacity) //还是大于的话 单独执行
+                    {
+                        newCheckSum1 = op.Flush(openFile(op.FromFileName), r.BaseStream, null, tempFileStream, newCheckSum1);
+                    }
+                    else //直接放进缓冲区里
+                    {
+                        op.Index = (ushort)operList.Count;
+                        operList.Add(op);
+                        switch (op.OperType)
+                        {
+                            case 0:
+                                int position = (int)msBuffer.Position;
+                                op.Flush(null, r.BaseStream, null, msBuffer);
+                                op.bufferStartIndex = position;
+                                break;
+
+                            case 1:
+                                continue;
+
+                            case 2:
+                                readFileOperList.Add(op);
+                                break;
+                        }
+                        preLoadByteCount += op.Length;
+                    }
                 }
+                msBuffer.Dispose();
+                msBuffer = null;
+                tempFileStream.Flush();
+                tempFileStream.SetLength(tempFileStream.Position);  //设置文件大小为当前长度
+                closeAllFiles();
 
+                this.OnVerifyNewChecksumBegin(part);
+                //tempFileStream.Seek(0, SeekOrigin.Begin);
+                //uint _newCheckSum1 = CheckSum.ComputeHash(tempFileStream, (int)tempFileStream.Length); //新生成文件的hash
+                VerifyCheckSum(part.NewChecksum, newCheckSum1, part.FileName, "new");
+                this.OnVerifyNewChecksumEnd(part);
+
+                this.OnTempFileClosed(part);
             }
-            msBuffer.Dispose();
-            msBuffer = null;
-            tempFileStream.Flush();
-            tempFileStream.SetLength(tempFileStream.Position);  //设置文件大小为当前长度
-
-            this.OnVerifyNewChecksumBegin(part);
-            tempFileStream.Seek(0, SeekOrigin.Begin);
-            //uint _newCheckSum1 = CheckSum.ComputeHash(tempFileStream, (int)tempFileStream.Length); //新生成文件的hash
-            VerifyCheckSum(part.NewChecksum, newCheckSum1, part.FileName, "new");
-            this.OnVerifyNewChecksumEnd(part);
-
-            oldWzFile.Close();
-
-            tempFileStream.Flush();
-            tempFileStream.Close();
-            this.OnTempFileClosed(part);
+            finally
+            {
+                closeAllFiles();
+            }
         }
 
         private class RebuildFileOperation
@@ -598,6 +744,7 @@ namespace WzComparerR2.Patcher
             public int StartPosition; //只有oper2时可用 原文件起始坐标
             public int Length; //输出区块长度
             public int bufferStartIndex; //输出缓冲流的起始索引 执行后才有值
+            public string FromFileName;
 
             public void Flush(Stream oldStream, Stream patchFileStream, Stream bufferStream, Stream newStream)
             {
@@ -674,7 +821,7 @@ namespace WzComparerR2.Patcher
                 {
                     case 0x08:
                         blockLength = cmd & 0x0fffffff;
-                        reader.BaseStream.Seek(blockLength, SeekOrigin.Current);
+                        reader.BaseStream.Seek(blockLength, SeekOrigin.Current); // skip len
                         patchPart.Action0++;
                         break;
 
@@ -685,7 +832,13 @@ namespace WzComparerR2.Patcher
 
                     default:
                         blockLength = cmd;
-                        reader.BaseStream.Seek(4, SeekOrigin.Current);
+                        reader.BaseStream.Seek(4, SeekOrigin.Current); // skip content
+                        if (this.IsKMST1125Format == true)
+                        {
+                            // skip old file name
+                            var fromFile = ReadStringWithLength(reader, MAX_PATH);
+                            patchPart.DependencyFiles.Add(fromFile);
+                        }
                         patchPart.Action2++;
                         break;
                 }
@@ -786,6 +939,21 @@ namespace WzComparerR2.Patcher
         private void OnTempFileClosed(PatchPartContext part)
         {
             PatchingEventArgs e = new PatchingEventArgs(part, PatchingState.TempFileClosed);
+            OnPatchingStateChanged(e);
+        }
+        private void OnPrepareVerifyOldChecksumBegin(PatchPartContext part)
+        {
+            PatchingEventArgs e = new PatchingEventArgs(part, PatchingState.PrepareVerifyOldChecksumBegin);
+            OnPatchingStateChanged(e);
+        }
+        private void OnPrepareVerifyOldChecksumEnd(PatchPartContext part)
+        {
+            PatchingEventArgs e = new PatchingEventArgs(part, PatchingState.PrepareVerifyOldChecksumEnd);
+            OnPatchingStateChanged(e);
+        }
+        private void OnApplyFile(PatchPartContext part)
+        {
+            PatchingEventArgs e = new PatchingEventArgs(part, PatchingState.ApplyFile);
             OnPatchingStateChanged(e);
         }
         #endregion

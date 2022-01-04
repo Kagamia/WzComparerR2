@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WzComparerR2.MapRender</RootNamespace>
     <AssemblyName>WzComparerR2.MapRender</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -35,10 +35,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bass.Net">
-      <HintPath>..\References\Bass.Net.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="DevComponents.DotNetBar2, Version=12.1.0.0, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
@@ -55,21 +51,6 @@
     </Reference>
     <Reference Include="IMEHelper">
       <HintPath>..\References\IMEHelper.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoGame.Framework, Version=3.4.0.456, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\MonoGame.Framework.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="SharpDX, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\SharpDX.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="SharpDX.RawInput, Version=2.5.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\SharpDX.RawInput.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="spine-monogame">
       <HintPath>..\References\spine-monogame.dll</HintPath>
@@ -107,7 +88,6 @@
     <Compile Include="MeshBatcher.cs" />
     <Compile Include="MeshItem.cs" />
     <Compile Include="Music.cs" />
-    <Compile Include="Net\ChatClient.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleDesc.cs" />
     <Compile Include="ParticleEmitter.cs" />
@@ -262,11 +242,29 @@
     <Content Include="Resources\StatusBar3.img.chat.ingame.view.max.center.png" />
     <Content Include="Resources\StatusBar3.img.chat.ingame.view.max.top.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.ArcaneForce.png" />
+    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.AuthenticForce.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.enchantMob.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Line.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Mob.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Npc.png" />
     <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.StarForce.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ManagedBass">
+      <Version>3.1.0</Version>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="MonoGame.Framework.WindowsDX">
+      <Version>3.8.0.1641</Version>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="SharpDX">
+      <Version>4.0.1</Version>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="SharpDX.RawInput">
+      <Version>4.0.1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

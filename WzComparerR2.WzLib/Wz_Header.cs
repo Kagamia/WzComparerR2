@@ -6,7 +6,7 @@ namespace WzComparerR2.WzLib
 {
     public class Wz_Header
     {
-        public Wz_Header(string signature, string copyright, string file_name, int head_size, long data_size, long file_size, int encVersion)
+        public Wz_Header(string signature, string copyright, string file_name, int head_size, long data_size, long file_size, long dataStartPosition)
         {
             this.Signature = signature;
             this.Copyright = copyright;
@@ -14,74 +14,141 @@ namespace WzComparerR2.WzLib
             this.HeaderSize = head_size;
             this.DataSize = data_size;
             this.FileSize = file_size;
-            this.EncryptedVersion = encVersion;
+            this.DataStartPosition = dataStartPosition;
             this.VersionChecked = false;
-
-            this.c_version_test = new List<int>();
-            this.hash_version_test = new List<uint>();
-            this.startVersion = -1;
         }
 
-        public string Signature { get; set; }
-        public string Copyright { get; set; }
-        public string FileName { get; set; }
+        public string Signature { get; private set; }
+        public string Copyright { get; private set; }
+        public string FileName { get; private set; }
 
-        public int HeaderSize { get; set; }
-        public long DataSize { get; set; }
-        public long FileSize { get; set; }
-        public int EncryptedVersion { get; set; }
+        public int HeaderSize { get; private set; }
+        public long DataSize { get; private set; }
+        public long FileSize { get; private set; }
+        public long DataStartPosition { get; private set; }
 
         public bool VersionChecked { get; set; }
 
-        private List<int> c_version_test;
-        private List<uint> hash_version_test;
-        private int startVersion;
+        public int WzVersion => this.versionDetector?.WzVersion ?? 0;
+        public uint HashVersion => this.versionDetector?.HashVersion ?? 0;
+        public bool TryGetNextVersion() => this.versionDetector?.TryGetNextVersion() ?? false;
 
-        public int WzVersion
+        private IWzVersionDetector versionDetector;
+
+        public void SetWzVersion(int wzVersion)
         {
-            get
-            {
-                int idx = this.c_version_test.Count - 1;
-                return idx > -1 ? this.c_version_test[idx] : 0;
-            }
+            this.versionDetector = new FixedVersion(wzVersion);
         }
 
-        public uint HashVersion
+        public void SetOrdinalVersionDetector(int encryptedVersion)
         {
-            get
-            {
-                int idx = this.hash_version_test.Count - 1;
-                return idx > -1 ? this.hash_version_test[idx] : 0;
-            }
+            this.versionDetector = new OrdinalVersionDetector(encryptedVersion);
         }
 
-        public bool TryGetNextVersion()
+        public static int CalcHashVersion(int wzVersion)
         {
-            for (int i = startVersion + 1; i < Int16.MaxValue; i++)
+            int sum = 0;
+            string versionStr = wzVersion.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            for (int j = 0; j < versionStr.Length; j++)
             {
-                int sum = 0;
-                string versionStr = i.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                for (int j = 0; j < versionStr.Length; j++)
-                {
-                    sum <<= 5;
-                    sum += (int)versionStr[j] + 1;
-                }
-                int enc = 0xff
-                    ^ ((sum >> 24) & 0xFF)
-                    ^ ((sum >> 16) & 0xFF)
-                    ^ ((sum >> 8) & 0xFF)
-                    ^ ((sum) & 0xFF);
+                sum <<= 5;
+                sum += (int)versionStr[j] + 1;
+            }
+            
+            return sum;
+        }
 
-                if (enc == EncryptedVersion)
+        public interface IWzVersionDetector
+        {
+            bool TryGetNextVersion();
+            int WzVersion { get; }
+            uint HashVersion { get; }
+        }
+
+        public class FixedVersion : IWzVersionDetector
+        {
+            public FixedVersion(int wzVersion)
+            {
+                this.WzVersion = wzVersion;
+                this.HashVersion = (uint)CalcHashVersion(wzVersion);
+            }
+
+            private bool hasReturned;
+
+
+            public int WzVersion { get; private set; }
+
+            public uint HashVersion { get; private set; }
+
+            public bool TryGetNextVersion()
+            {
+                if (!hasReturned)
                 {
-                    this.c_version_test.Add(i);
-                    this.hash_version_test.Add((uint)sum);
-                    startVersion = i;
+                    hasReturned = true;
                     return true;
                 }
+
+                return false;
+            }
+        }
+
+        public class OrdinalVersionDetector : IWzVersionDetector
+        {
+            public OrdinalVersionDetector(int encryptVersion)
+            {
+                this.EncryptedVersion = encryptVersion;
+                this.versionTest = new List<int>();
+                this.hasVersionTest = new List<uint>();
+                this.startVersion = -1;
             }
 
-            return false;
+            public int EncryptedVersion { get; private set; }
+
+            private int startVersion;
+            private List<int> versionTest;
+            private List<uint> hasVersionTest;
+
+            public int WzVersion
+            {
+                get
+                {
+                    int idx = this.versionTest.Count - 1;
+                    return idx > -1 ? this.versionTest[idx] : 0;
+                }
+            }
+
+            public uint HashVersion
+            {
+                get
+                {
+                    int idx = this.hasVersionTest.Count - 1;
+                    return idx > -1 ? this.hasVersionTest[idx] : 0;
+                }
+            }
+
+            public bool TryGetNextVersion()
+            {
+                for (int i = startVersion + 1; i < Int16.MaxValue; i++)
+                {
+                    int sum = CalcHashVersion(i);
+                    int enc = 0xff
+                        ^ ((sum >> 24) & 0xFF)
+                        ^ ((sum >> 16) & 0xFF)
+                        ^ ((sum >> 8) & 0xFF)
+                        ^ ((sum) & 0xFF);
+
+                    // if encver does not passed, try every version one by one
+                    if (enc == this.EncryptedVersion)
+                    {
+                        this.versionTest.Add(i);
+                        this.hasVersionTest.Add((uint)sum);
+                        startVersion = i;
+                        return true;
+                    }
+                }
+
+                return false;
+            }
         }
     }
 }

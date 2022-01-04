@@ -135,7 +135,7 @@ namespace WzComparerR2.Patcher.Builder
             {
                 long curPos = this.BaseStream.Position;
                 this.BaseStream.Seek(this.baseStreamPosition, SeekOrigin.Begin);
-                uint crc = CheckSum.ComputeHash(this.BaseStream, (int)(curPos - this.baseStreamPosition));
+                uint crc = CheckSum.ComputeHash(this.BaseStream, curPos - this.baseStreamPosition);
                 this.BaseStream.Seek(this.baseStreamPosition - 4, SeekOrigin.Begin);
                 this.writer.Write(crc);
                 this.BaseStream.Seek(curPos, SeekOrigin.Begin);
@@ -143,7 +143,7 @@ namespace WzComparerR2.Patcher.Builder
             else
             {
                 this.tempStream.Seek(0, SeekOrigin.Begin);
-                uint crc = CheckSum.ComputeHash(this.tempStream, (int)this.tempStream.Length);
+                uint crc = CheckSum.ComputeHash(this.tempStream, this.tempStream.Length);
                 this.writer.Write(crc);
                 this.tempStream.Seek(0, SeekOrigin.Begin);
                 StreamUtils.CopyStream(this.tempStream, this.BaseStream, (int)this.tempStream.Length);

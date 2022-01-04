@@ -101,9 +101,13 @@ namespace WzComparerR2.MapRender.UI
             {
                 return DrawItem(gameTime, env, (PortalItem.ItemTooltip)target);
             }
-            else if (target is UIWorldMap.Tooltip)
+            else if (target is UIWorldMap.MapSpotTooltip)
             {
-                return DrawItem(gameTime, env, (UIWorldMap.Tooltip)target);
+                return DrawItem(gameTime, env, (UIWorldMap.MapSpotTooltip)target);
+            }
+            else if (target is UIWorldMap.MapLinkTooltip)
+            {
+                return DrawItem(gameTime, env, (UIWorldMap.MapLinkTooltip)target);
             }
             else if (target is string)
             {
@@ -262,23 +266,7 @@ namespace WzComparerR2.MapRender.UI
             return new TooltipContent() { blocks = blocks, size = size };
         }
 
-        private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, PortalItem.ItemTooltip item)
-        {
-            var blocks = new List<TextBlock>();
-            Vector2 size = Vector2.Zero;
-            Vector2 current = new Vector2(0, 2);
-            TextBlock textBlock = PrepareTextLine(env.Fonts.TooltipContentFont, item.Title, ref current, Color.White, ref size.X);
-            if (size.X < 160)
-            {
-                textBlock.Position.X = (int)(160 - size.X) / 2;
-                size.X = 160;
-            }
-            blocks.Add(textBlock);
-            size.Y = current.Y;
-            return new TooltipContent() { blocks = blocks, size = size };
-        }
-
-        private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, UIWorldMap.Tooltip item)
+        private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, UIWorldMap.MapSpotTooltip item)
         {
             var blocks = new List<TextBlock>();
             var textures = new List<TextureBlock>();
@@ -633,6 +621,39 @@ namespace WzComparerR2.MapRender.UI
             }
             size.Y = current.Y;
             return new TooltipContent() { blocks = blocks, textures = textures, size = size };
+        }
+
+        private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, UIWorldMap.MapLinkTooltip item)
+        {
+            var blocks = new List<TextBlock>();
+            Vector2 size = Vector2.Zero;
+            Vector2 current = Vector2.Zero;
+
+            string tooltip = item.Link.Tooltip, desc = item.Link.Desc;
+            float titleWidth = 0;
+
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                blocks.Add(PrepareTextLine(env.Fonts.TooltipTitleFont, tooltip, ref current, Color.White, ref size.X));
+                titleWidth = size.X;
+                current.Y += 6;
+            }
+            if (!string.IsNullOrEmpty(desc))
+            {
+                blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, desc, ref current, Color.White, ref size.X));
+            }
+
+            size.X = Math.Max(310, size.X);
+            size.Y = current.Y;
+
+            // align center
+            if (titleWidth > 0 && titleWidth < size.X)
+            {
+                var titleBlock = blocks[0];
+                titleBlock.Position.X += (int)(size.X - titleWidth) / 2;
+                blocks[0] = titleBlock;
+            }
+            return new TooltipContent() { blocks = blocks, size = size };
         }
 
         private TooltipContent DrawString(GameTime gameTime, RenderEnv env, string text)

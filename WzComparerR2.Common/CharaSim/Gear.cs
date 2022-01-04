@@ -37,6 +37,7 @@ namespace WzComparerR2.CharaSim
         public int ScrollUp { get; set; }
         public int Hammer { get; set; }
         public bool HasTuc { get; internal set; }
+        public int PlatinumHammer { get; set; }
         public bool CanPotential { get; internal set; }
         public string EpicHs { get; internal set; }
 
@@ -106,7 +107,7 @@ namespace WzComparerR2.CharaSim
             int reqLevel;
             this.Props.TryGetValue(GearPropType.reqLevel, out reqLevel);
             int[] data = null;
-            foreach(int[] item in starData)
+            foreach (int[] item in starData)
             {
                 if (reqLevel >= item[0])
                 {
@@ -174,8 +175,7 @@ namespace WzComparerR2.CharaSim
         public static bool IsWeapon(GearType type)
         {
             return IsLeftWeapon(type)
-                || IsDoubleHandWeapon(type)
-                || type == GearType.boxingCannon;
+                || IsDoubleHandWeapon(type);
         }
 
         /// <summary>
@@ -221,7 +221,8 @@ namespace WzComparerR2.CharaSim
         {
             int _type = (int)type;
             return (_type >= 140 && _type <= 149)
-                || (_type >= 152 && _type <= 159);
+                || (_type >= 152 && _type <= 159)
+                || type == GearType.boxingCannon;
         }
 
         public static bool IsMechanicGear(GearType type)
@@ -354,6 +355,8 @@ namespace WzComparerR2.CharaSim
                     return GearType.shiningRod;
                 case 1213:
                     return GearType.tuner;
+                case 1214:
+                    return GearType.breathShooter;
                 case 1403:
                     return GearType.boxingCannon;
             }
@@ -364,6 +367,7 @@ namespace WzComparerR2.CharaSim
                     case 13522:
                     case 13528:
                     case 13529:
+                    case 13540:
                         return (GearType)(code / 10);
 
                     default:

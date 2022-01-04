@@ -250,9 +250,17 @@ env:WriteLine(string format, object[] args)");
             {
                 lua.DoString(editor.CodeContent);
             }
-            catch(Exception ex)
+            catch (NLua.Exceptions.LuaScriptException ex)
             {
-                env.WriteLine(ex.Message);
+                env.WriteLine(ex);
+                if (ex.IsNetException && ex.InnerException != null)
+                {
+                    env.WriteLine(ex.InnerException);
+                }
+            }
+            catch (Exception ex)
+            {
+                env.WriteLine(ex);
             }
         }
 

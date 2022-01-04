@@ -31,6 +31,8 @@ namespace WzComparerR2.MapRender
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.DeviceCreated += Graphics_DeviceCreated;
+            graphics.DeviceResetting += Graphics_DeviceResetting;
+
             this.mapImg = img;
             this.MaxElapsedTime = TimeSpan.MaxValue;
             this.IsFixedTimeStep = false;
@@ -102,7 +104,12 @@ namespace WzComparerR2.MapRender
             WcR2Engine.FixEKBugs();
 
             (this.engine.AssetManager as WcR2AssetManager).DefaultContentManager = this.Content as WcR2ContentManager;
-            
+        }
+
+        private void Graphics_DeviceResetting(object sender, EventArgs e)
+        {
+            // fix DXGI error 0x887A0001 on gamewindow resizing
+            WzComparerR2.Rendering.D2DFactory.Instance.ReleaseContext(graphics.GraphicsDevice);
         }
 
         public StringLinker StringLinker { get; set; }
@@ -891,7 +898,6 @@ namespace WzComparerR2.MapRender
             {
                 this.UnloadContent();
                 this.OnExiting();
-                GameExt.DisposeSwapChain(this.GraphicsDevice);
             }
             base.Dispose(disposing);
         }

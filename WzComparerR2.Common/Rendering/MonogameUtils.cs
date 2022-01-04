@@ -42,38 +42,6 @@ namespace WzComparerR2.Rendering
             return t2d;
         }
 
-        public static Texture2D CreateTexture_BGRA4444(GraphicsDevice graphicsDevice, int width, int height)
-        {
-            var t2d = new Texture2D(graphicsDevice, width, height, false, SurfaceFormat.Bgra4444);
-
-            Texture2DDescription description = new Texture2DDescription
-            {
-                Width = t2d.Width,
-                Height = t2d.Height,
-                MipLevels = 1,
-                ArraySize = 1,
-                Format = DXGI_FORMAT_B4G4R4A4_UNORM,
-                BindFlags = BindFlags.ShaderResource,
-                CpuAccessFlags = CpuAccessFlags.None
-            };
-            var _device = t2d.GraphicsDevice._d3dDevice();
-
-            var _textureField = typeof(Texture)
-                .GetField("_texture", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-
-            description.SampleDescription.Count = 1;
-            description.SampleDescription.Quality = 0;
-            description.Usage = ResourceUsage.Default;
-            description.OptionFlags = ResourceOptionFlags.None;
-
-            Resource res = new SharpDX.Direct3D11.Texture2D(_device, description);
-            Resource oldRes = _textureField.GetValue(t2d) as Resource;
-            SharpDX.Utilities.Dispose(ref oldRes);
-            _textureField.SetValue(t2d, res);
-
-            return t2d;
-        }
-
         public static Texture2D ToTexture(this System.Drawing.Bitmap bitmap, GraphicsDevice device)
         {
             var t2d = new Texture2D(device, bitmap.Width, bitmap.Height, false, SurfaceFormat.Bgra32);
@@ -103,126 +71,9 @@ namespace WzComparerR2.Rendering
             }
         }
 
-        public static void SaveAsPng(this Texture2D texture, Stream stream)
-        {
-            switch (texture.Format)
-            {
-                case SurfaceFormat.Bgra4444:
-                    byte[] data = new byte[texture.Width * texture.Height * 2];
-                    texture.GetTexture_BGRA4444(data);
-                    data = WzLib.Wz_Png.GetPixelDataBgra4444(data, texture.Width, texture.Height);
-                    unsafe
-                    {
-                        fixed (byte* pData = data)
-                        {
-                            using (var bmp = new System.Drawing.Bitmap(texture.Width, texture.Height, texture.Width * 4,
-                                System.Drawing.Imaging.PixelFormat.Format32bppArgb, new IntPtr(pData)))
-                            {
-                                bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                            }
-                        }
-                    }
-                    break;
-
-                default:
-                    texture.SaveAsPng(stream, texture.Width, texture.Height);
-                    break;
-            }
-        }
-
-        public static void GetTexture_BGRA4444<T>(this Texture2D texture, T[] data) where T : struct
-        {
-            texture.GetTexture_BGRA4444<T>(0, 0, null, data, 0, data.Length);
-        }
-
-        public static void GetTexture_BGRA4444<T>(this Texture2D texture, int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
-        {
-            int num = Math.Max(texture.Width >> level, 1);
-            int num2 = Math.Max(texture.Height >> level, 1);
-            Texture2DDescription description = new Texture2DDescription
-            {
-                Width = num,
-                Height = num2,
-                MipLevels = 1,
-                ArraySize = 1,
-                Format = DXGI_FORMAT_B4G4R4A4_UNORM,
-                BindFlags = BindFlags.None,
-                CpuAccessFlags = CpuAccessFlags.Read
-            };
-            description.SampleDescription.Count = 1;
-            description.SampleDescription.Quality = 0;
-            description.Usage = ResourceUsage.Staging;
-            description.OptionFlags = ResourceOptionFlags.None;
-
-            DeviceContext context = texture.GraphicsDevice._d3dContext();
-
-            using (SharpDX.Direct3D11.Texture2D textured = new SharpDX.Direct3D11.Texture2D(texture.GraphicsDevice._d3dDevice(), description))
-            {
-                lock (context)
-                {
-                    int width;
-                    int height;
-                    SharpDX.DataStream stream;
-                    int sourceSubresource = 0;
-                    if (rect.HasValue)
-                    {
-                        width = rect.Value.Width;
-                        height = rect.Value.Height;
-                        context.CopySubresourceRegion(texture.GetTexture(), sourceSubresource, new ResourceRegion(rect.Value.Left, rect.Value.Top, 0, rect.Value.Right, rect.Value.Bottom, 1), textured, 0, 0, 0, 0);
-                    }
-                    else
-                    {
-                        width = num;
-                        height = texture.Height;
-                        context.CopySubresourceRegion(texture.GetTexture(), sourceSubresource, null, textured, 0, 0, 0, 0);
-                    }
-                    SharpDX.DataBox box = context.MapSubresource(textured, 0, MapMode.Read, MapFlags.None, out stream);
-                    int num7 = 2 * width;
-                    if (num7 == box.RowPitch)
-                    {
-                        stream.ReadRange<T>(data, startIndex, elementCount);
-                    }
-                    else
-                    {
-                        stream.Seek((long)startIndex, SeekOrigin.Begin);
-                        int num8 = Marshal.SizeOf(typeof(T));
-                        for (int i = 0; i < height; i++)
-                        {
-                            int index = (i * num7) / num8;
-                            while (index < (((i + 1) * num7) / num8))
-                            {
-                                data[index] = stream.Read<T>();
-                                index++;
-                            }
-                            if (index >= elementCount)
-                            {
-                                break;
-                            }
-                            stream.Seek((long)(box.RowPitch - num7), SeekOrigin.Current);
-                        }
-                    }
-                    stream.Dispose();
-                }
-            }
-        }
-
-        private static DeviceContext _d3dContext(this GraphicsDevice device)
-        {
-            return (DeviceContext)typeof(GraphicsDevice)
-                .GetField("_d3dContext", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-                .GetValue(device);
-        }
-
         public static Device _d3dDevice(this GraphicsDevice device)
         {
             return (Device)device.Handle;
-        }
-
-        private static Resource GetTexture(this Texture texture)
-        {
-            return (Resource)typeof(Texture)
-                .GetMethod("GetTexture", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-                .Invoke(texture, new object[] { });
         }
 
         public static bool IsSupportFormat(this GraphicsDevice device, SharpDX.DXGI.Format format)

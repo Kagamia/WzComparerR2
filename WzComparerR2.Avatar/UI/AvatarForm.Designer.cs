@@ -70,9 +70,7 @@
             this.btnFemale = new DevComponents.DotNetBar.ButtonItem();
             this.btnReset = new DevComponents.DotNetBar.ButtonItem();
             this.btnLock = new DevComponents.DotNetBar.ButtonItem();
-            this.buttonItem1 = new DevComponents.DotNetBar.ButtonItem();
-            this.btnSave = new DevComponents.DotNetBar.ButtonItem();
-            this.btnEffect = new DevComponents.DotNetBar.ButtonItem();
+            this.btnSaveAsGif = new DevComponents.DotNetBar.ButtonItem();
             this.dockSite3 = new DevComponents.DotNetBar.DockSite();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.effectTimer = new System.Windows.Forms.Timer(this.components);
@@ -128,9 +126,9 @@
             this.dockSite1.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite1.Dock = System.Windows.Forms.DockStyle.Left;
             this.dockSite1.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer();
-            this.dockSite1.Location = new System.Drawing.Point(0, 26);
+            this.dockSite1.Location = new System.Drawing.Point(0, 25);
             this.dockSite1.Name = "dockSite1";
-            this.dockSite1.Size = new System.Drawing.Size(0, 385);
+            this.dockSite1.Size = new System.Drawing.Size(0, 386);
             this.dockSite1.TabIndex = 0;
             this.dockSite1.TabStop = false;
             // 
@@ -142,10 +140,10 @@
             this.dockSite2.Dock = System.Windows.Forms.DockStyle.Right;
             this.dockSite2.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer(new DevComponents.DotNetBar.DocumentBaseContainer[] {
             ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar1, 213, 212))),
-            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar2, 213, 170)))}, DevComponents.DotNetBar.eOrientation.Vertical);
-            this.dockSite2.Location = new System.Drawing.Point(368, 26);
+            ((DevComponents.DotNetBar.DocumentBaseContainer)(new DevComponents.DotNetBar.DocumentBarContainer(this.bar2, 213, 171)))}, DevComponents.DotNetBar.eOrientation.Vertical);
+            this.dockSite2.Location = new System.Drawing.Point(368, 25);
             this.dockSite2.Name = "dockSite2";
-            this.dockSite2.Size = new System.Drawing.Size(216, 385);
+            this.dockSite2.Size = new System.Drawing.Size(216, 386);
             this.dockSite2.TabIndex = 1;
             this.dockSite2.TabStop = false;
             // 
@@ -229,7 +227,7 @@
             this.bar2.LayoutType = DevComponents.DotNetBar.eLayoutType.DockContainer;
             this.bar2.Location = new System.Drawing.Point(3, 215);
             this.bar2.Name = "bar2";
-            this.bar2.Size = new System.Drawing.Size(213, 170);
+            this.bar2.Size = new System.Drawing.Size(213, 171);
             this.bar2.Stretch = true;
             this.bar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar2.TabIndex = 1;
@@ -262,7 +260,7 @@
             this.panelDockContainer2.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelDockContainer2.Location = new System.Drawing.Point(3, 23);
             this.panelDockContainer2.Name = "panelDockContainer2";
-            this.panelDockContainer2.Size = new System.Drawing.Size(207, 144);
+            this.panelDockContainer2.Size = new System.Drawing.Size(207, 145);
             this.panelDockContainer2.Style.Alignment = System.Drawing.StringAlignment.Center;
             this.panelDockContainer2.Style.BackColor1.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarBackground;
             this.panelDockContainer2.Style.BorderColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.BarDockedBorder;
@@ -590,9 +588,9 @@
             // 
             this.dockSite5.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite5.Dock = System.Windows.Forms.DockStyle.Left;
-            this.dockSite5.Location = new System.Drawing.Point(0, 26);
+            this.dockSite5.Location = new System.Drawing.Point(0, 25);
             this.dockSite5.Name = "dockSite5";
-            this.dockSite5.Size = new System.Drawing.Size(0, 385);
+            this.dockSite5.Size = new System.Drawing.Size(0, 386);
             this.dockSite5.TabIndex = 4;
             this.dockSite5.TabStop = false;
             // 
@@ -600,9 +598,9 @@
             // 
             this.dockSite6.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite6.Dock = System.Windows.Forms.DockStyle.Right;
-            this.dockSite6.Location = new System.Drawing.Point(584, 26);
+            this.dockSite6.Location = new System.Drawing.Point(584, 25);
             this.dockSite6.Name = "dockSite6";
-            this.dockSite6.Size = new System.Drawing.Size(0, 385);
+            this.dockSite6.Size = new System.Drawing.Size(0, 386);
             this.dockSite6.TabIndex = 5;
             this.dockSite6.TabStop = false;
             // 
@@ -613,7 +611,7 @@
             this.dockSite7.Dock = System.Windows.Forms.DockStyle.Top;
             this.dockSite7.Location = new System.Drawing.Point(0, 0);
             this.dockSite7.Name = "dockSite7";
-            this.dockSite7.Size = new System.Drawing.Size(584, 26);
+            this.dockSite7.Size = new System.Drawing.Size(584, 25);
             this.dockSite7.TabIndex = 6;
             this.dockSite7.TabStop = false;
             // 
@@ -631,12 +629,10 @@
             this.btnCharac,
             this.btnReset,
             this.btnLock,
-            this.buttonItem1,
-            this.btnSave,
-            this.btnEffect});
+            this.buttonItem1});
             this.bar3.Location = new System.Drawing.Point(0, 0);
             this.bar3.Name = "bar3";
-            this.bar3.Size = new System.Drawing.Size(255, 27);
+            this.bar3.Size = new System.Drawing.Size(203, 26);
             this.bar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.bar3.TabIndex = 0;
             this.bar3.TabStop = false;
@@ -685,11 +681,12 @@
             this.btnLock.Name = "btnLock";
             this.btnLock.Tooltip = "鎖定";
             // 
-            // buttonItem1
+            // btnSaveAsGif
             // 
-            this.buttonItem1.Name = "buttonItem1";
-            this.buttonItem1.Text = "buttonItem1";
-            this.buttonItem1.Click += new System.EventHandler(this.buttonItem1_Click_1);
+            this.btnSaveAsGif.Image = global::WzComparerR2.Avatar.Properties.Resources.disk;
+            this.btnSaveAsGif.Name = "btnSaveAsGif";
+            this.btnSaveAsGif.Tooltip = "保存";
+            this.btnSaveAsGif.Click += new System.EventHandler(this.btnSaveAsGif_Click);
             // 
             // btnSave
             // 
@@ -710,7 +707,7 @@
             this.dockSite3.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
             this.dockSite3.Dock = System.Windows.Forms.DockStyle.Top;
             this.dockSite3.DocumentDockContainer = new DevComponents.DotNetBar.DocumentDockContainer();
-            this.dockSite3.Location = new System.Drawing.Point(0, 26);
+            this.dockSite3.Location = new System.Drawing.Point(0, 25);
             this.dockSite3.Name = "dockSite3";
             this.dockSite3.Size = new System.Drawing.Size(584, 0);
             this.dockSite3.TabIndex = 2;
@@ -725,10 +722,10 @@
             // 
             this.avatarContainer1.BackColor = System.Drawing.Color.White;
             this.avatarContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.avatarContainer1.Location = new System.Drawing.Point(0, 26);
+            this.avatarContainer1.Location = new System.Drawing.Point(0, 25);
             this.avatarContainer1.Name = "avatarContainer1";
             this.avatarContainer1.Origin = new System.Drawing.Point(0, 0);
-            this.avatarContainer1.Size = new System.Drawing.Size(368, 385);
+            this.avatarContainer1.Size = new System.Drawing.Size(368, 386);
             this.avatarContainer1.TabIndex = 8;
             this.avatarContainer1.Text = "avatarContainer1";
             // 
@@ -806,7 +803,7 @@
         private DevComponents.DotNetBar.ButtonItem btnLock;
         private DevComponents.DotNetBar.ButtonItem btnMale;
         private DevComponents.DotNetBar.ButtonItem btnFemale;
-        private DevComponents.DotNetBar.ButtonItem buttonItem1;
+        private DevComponents.DotNetBar.ButtonItem btnSaveAsGif;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cmbEar;
         private DevComponents.DotNetBar.LabelX labelX5;
         private DevComponents.DotNetBar.ButtonItem btnSave;
