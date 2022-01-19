@@ -525,7 +525,7 @@ namespace WzComparerR2.CharaSimControl
                 TextRenderer.DrawText(g, "Hammers Applied", GearGraphics.EquipDetailFont, new Point(13, picH), ((SolidBrush)GearGraphics.GreenBrush2).Color, TextFormatFlags.NoPadding);
                 g.DrawString("Hammers Applied", GearGraphics.ItemDetailFont, GearGraphics.GoldHammerBrush, 11, picH);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-                g.DrawString(": " + Gear.Hammer.ToString() + (Gear.Hammer == 2 ? "(MAX)" : null), GearGraphics.TahomaFont, GearGraphics.GoldHammerBrush, 145, picH - 2);
+                g.DrawString(": " + Gear.Hammer.ToString() + (Gear.Hammer == 2 ? "(MAX)" : null), GearGraphics.TahomaFont, GearGraphics.GoldHammerBrush, 145, picH);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
                 picH += 16;
                 hasPart2 = true;
@@ -566,6 +566,14 @@ namespace WzComparerR2.CharaSimControl
                     hasPart2 = true;
                 }
             }
+
+            if (hasTuc && Gear.PlatinumHammer > -1)
+            {
+                g.DrawString("白金锤强化次数：" + Gear.PlatinumHammer, GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
+                picH += 16;
+                hasPart2 = true;
+            }
+
             picH += 5;
 
             //绘制浮动属性

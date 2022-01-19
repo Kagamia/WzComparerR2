@@ -380,6 +380,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         weaponBelt = 135401,
         /// <summary>
+        /// Ornament 135402x
+        /// </summary>
+        ornament = 135402,
+        /// <summary>
         /// Cane 136
         /// </summary>
         cane = 136,

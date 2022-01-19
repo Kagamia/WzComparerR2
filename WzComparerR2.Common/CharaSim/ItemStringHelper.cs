@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -86,6 +86,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.damR:
                 case GearPropType.incDAMr: return "Damage: " + sign + value + "%";
                 case GearPropType.incCr: return "Critical Rate: " + sign + value + "%";
+                case GearPropType.incCDr: return "Critical Damage: " + sign + value + "%";
                 case GearPropType.knockback: return "Knockback Chance: " + value + "%";
                 case GearPropType.incPQEXPr: return "Party Quest EXP: +" + value + "%";
                 case GearPropType.incEXPr: return "EXP: " + value + "%";
@@ -339,6 +340,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.boxingCannon: return "拳炮";
                 case GearType.boxingSky: return "拳天";
 
+                case GearType.ornament: return "Ornament";
                 default: return null;
             }
         }
@@ -471,6 +473,8 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.boxingCannon:
                 case GearType.boxingSky: return GetExtraJobReqString(175);
+
+                case GearType.ornament: return GetExtraJobReqString(162);
                 default: return null;
             }
         }

@@ -136,6 +136,7 @@ namespace WzComparerR2.MapRender
                             return null;
                         }
                     }
+
                     while (bgmNode.Value is Wz_Uol uol)
                     {
                         bgmNode = uol.HandleUol(bgmNode);
