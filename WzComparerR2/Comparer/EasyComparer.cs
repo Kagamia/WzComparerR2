@@ -22,6 +22,8 @@ namespace WzComparerR2.Comparer
         public bool OutputPng { get; set; }
         public bool OutputAddedImg { get; set; }
         public bool OutputRemovedImg { get; set; }
+        public bool EnableDarkMode { get; set; }
+
 
         public string StateInfo
         {
@@ -214,6 +216,7 @@ namespace WzComparerR2.Comparer
                     this.OutputPng ? "-OutputPng" : null,
                     this.OutputAddedImg ? "-OutputAddedImg" : null,
                     this.OutputRemovedImg ? "-OutputRemovedImg" : null,
+                    this.EnableDarkMode ? "-EnableDarkMode" : null,
                     "-PngComparison " + this.Comparer.PngComparison,
                     this.Comparer.ResolvePngLink ? "-ResolvePngLink" : null,
                 }.Where(p => p != null)));
@@ -508,24 +511,46 @@ namespace WzComparerR2.Comparer
 
         public virtual void CreateStyleSheet(string outputDir)
         {
+
             string path = Path.Combine(outputDir, "style.css");
             if (File.Exists(path))
                 return;
             FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write);
             StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-            sw.WriteLine("body { font-size:12px; }");
-            sw.WriteLine("p.wzf { }");
-            sw.WriteLine("table, tr, th, td { border:1px solid #ff8000; border-collapse:collapse; }");
-            sw.WriteLine("table { margin-bottom:16px; }");
-            sw.WriteLine("th { text-align:left; }");
-            sw.WriteLine("table.lst0 { }");
-            sw.WriteLine("table.lst1 { }");
-            sw.WriteLine("table.lst2 { }");
-            sw.WriteLine("table.img { }");
-            sw.WriteLine("table.img tr.r0 { background-color:#fff4c4; }");
-            sw.WriteLine("table.img tr.r1 { background-color:#ebf2f8; }");
-            sw.WriteLine("table.img tr.r2 { background-color:#ffffff; }");
-            sw.WriteLine("table.img.noChange { display:none; }");
+            if (EnableDarkMode)
+            {
+
+                sw.WriteLine("body { font-size:12px; background-color:black; color:white; }");
+                sw.WriteLine("a { color:white; }");
+                sw.WriteLine("p.wzf { }");
+                sw.WriteLine("table, tr, th, td { border:1px solid #ff8000; border-collapse:collapse; }");
+                sw.WriteLine("table { margin-bottom:16px; }");
+                sw.WriteLine("th { text-align:left; }");
+                sw.WriteLine("table.lst0 { }");
+                sw.WriteLine("table.lst1 { }");
+                sw.WriteLine("table.lst2 { }");
+                sw.WriteLine("table.img { }");
+                sw.WriteLine("table.img tr.r0 { background-color:#003049; }");
+                sw.WriteLine("table.img tr.r1 { background-color:#000000; }");
+                sw.WriteLine("table.img tr.r2 { background-color:#462306; }");
+                sw.WriteLine("table.img.noChange { display:none; }");
+            }
+            else
+            {
+                sw.WriteLine("body { font-size:12px; }");
+                sw.WriteLine("p.wzf { }");
+                sw.WriteLine("table, tr, th, td { border:1px solid #ff8000; border-collapse:collapse; }");
+                sw.WriteLine("table { margin-bottom:16px; }");
+                sw.WriteLine("th { text-align:left; }");
+                sw.WriteLine("table.lst0 { }");
+                sw.WriteLine("table.lst1 { }");
+                sw.WriteLine("table.lst2 { }");
+                sw.WriteLine("table.img { }");
+                sw.WriteLine("table.img tr.r0 { background-color:#fff4c4; }");
+                sw.WriteLine("table.img tr.r1 { background-color:#ebf2f8; }");
+                sw.WriteLine("table.img tr.r2 { background-color:#ffffff; }");
+                sw.WriteLine("table.img.noChange { display:none; }");
+            }
             sw.Flush();
             sw.Close();
         }
