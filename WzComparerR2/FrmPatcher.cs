@@ -266,6 +266,11 @@ namespace WzComparerR2
             {
                 MessageBoxEx.Show("补丁中止。", "Patcher");
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                // File IO permission error
+                MessageBoxEx.Show(this, ex.ToString(), "Patcher");
+            }
             catch (Exception ex)
             {
                 AppendStateText(ex.ToString());
