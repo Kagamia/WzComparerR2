@@ -334,6 +334,7 @@ namespace WzComparerR2
                             comparer.OutputPng = chkOutputPng.Checked;
                             comparer.OutputAddedImg = chkOutputAddedImg.Checked;
                             comparer.OutputRemovedImg = chkOutputRemovedImg.Checked;
+                            comparer.EnableDarkMode = chkEnableDarkMode.Checked;
                             comparer.Comparer.PngComparison = (WzPngComparison)cmbComparePng.SelectedItem;
                             comparer.Comparer.ResolvePngLink = chkResolvePngLink.Checked;
                             wznew.Load(e.Part.TempFilePath, false);

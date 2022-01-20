@@ -44,6 +44,7 @@
             this.expandablePanel1 = new DevComponents.DotNetBar.ExpandablePanel();
             this.buttonXCheck = new DevComponents.DotNetBar.ButtonX();
             this.expandablePanel2 = new DevComponents.DotNetBar.ExpandablePanel();
+            this.chkEnableDarkMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.cmbComparePng = new DevComponents.DotNetBar.Controls.ComboBoxEx();
@@ -340,6 +341,7 @@
             this.expandablePanel2.CanvasColor = System.Drawing.SystemColors.Control;
             this.expandablePanel2.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.expandablePanel2.Controls.Add(this.chkResolvePngLink);
+            this.expandablePanel2.Controls.Add(this.chkEnableDarkMode);
             this.expandablePanel2.Controls.Add(this.chkOutputRemovedImg);
             this.expandablePanel2.Controls.Add(this.chkOutputAddedImg);
             this.expandablePanel2.Controls.Add(this.cmbComparePng);
@@ -378,6 +380,22 @@
             this.expandablePanel2.TitleStyle.GradientAngle = 90;
             this.expandablePanel2.TitleText = "Manual Patcher";
             // 
+            // chkEnableDarkMode
+            // 
+            this.chkEnableDarkMode.AutoSize = true;
+            this.chkEnableDarkMode.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkEnableDarkMode.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkEnableDarkMode.Location = new System.Drawing.Point(253, 135);
+            this.chkEnableDarkMode.Name = "chkEnableDarkMode";
+            this.chkEnableDarkMode.Size = new System.Drawing.Size(125, 16);
+            this.chkEnableDarkMode.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.superTooltip1.SetSuperTooltip(this.chkEnableDarkMode, new DevComponents.DotNetBar.SuperTooltipInfo("EnableDarkMode", "", "Outputs the comparison with dark mode HTML.", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 60)));
+            this.chkEnableDarkMode.TabIndex = 14;
+            this.chkEnableDarkMode.Text = "EnableDarkMode";
+            // 
             // chkOutputRemovedImg
             // 
             this.chkOutputRemovedImg.AutoSize = true;
@@ -386,7 +404,7 @@
             // 
             // 
             this.chkOutputRemovedImg.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkOutputRemovedImg.Location = new System.Drawing.Point(198, 135);
+            this.chkOutputRemovedImg.Location = new System.Drawing.Point(125, 135);
             this.chkOutputRemovedImg.Name = "chkOutputRemovedImg";
             this.chkOutputRemovedImg.Size = new System.Drawing.Size(125, 16);
             this.chkOutputRemovedImg.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -402,7 +420,7 @@
             // 
             // 
             this.chkOutputAddedImg.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkOutputAddedImg.Location = new System.Drawing.Point(79, 135);
+            this.chkOutputAddedImg.Location = new System.Drawing.Point(6, 135);
             this.chkOutputAddedImg.Name = "chkOutputAddedImg";
             this.chkOutputAddedImg.Size = new System.Drawing.Size(113, 16);
             this.chkOutputAddedImg.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -968,5 +986,6 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX chkOutputAddedImg;
         private DevComponents.DotNetBar.ButtonX buttonXCreate;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkResolvePngLink;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkEnableDarkMode;
     }
 }
