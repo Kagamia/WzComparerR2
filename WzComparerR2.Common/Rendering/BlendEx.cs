@@ -19,6 +19,16 @@ namespace WzComparerR2.Rendering
             ColorBlendFunction = BlendFunction.Add,
         };
 
+        public static BlendState SrcAlphaMask() => new BlendState()
+        {
+            AlphaSourceBlend = Blend.Zero,
+            AlphaDestinationBlend = Blend.InverseSourceAlpha,
+            AlphaBlendFunction = BlendFunction.Add,
+            ColorSourceBlend = Blend.Zero,
+            ColorDestinationBlend = Blend.InverseSourceAlpha,
+            ColorBlendFunction = BlendFunction.Add,
+        };
+
         public static RasterizerState Scissor() => new RasterizerState()
         {
             ScissorTestEnable = true,

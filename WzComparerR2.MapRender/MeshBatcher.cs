@@ -16,6 +16,7 @@ namespace WzComparerR2.MapRender
         {
             this.GraphicsDevice = graphicsDevice;
             this.alphaBlendState = StateEx.NonPremultipled_Hidef();
+            this.maskState = StateEx.SrcAlphaMask();
             this.meshPool = new Stack<MeshItem>();
         }
 
@@ -27,9 +28,12 @@ namespace WzComparerR2.MapRender
         SpriteBatchEx sprite;
         SkeletonMeshRenderer spineRender;
         D2DRenderer d2dRender;
-        BlendState alphaBlendState;
         ItemType lastItem;
         Stack<MeshItem> meshPool;
+
+        //innerState
+        private readonly BlendState alphaBlendState;
+        private readonly BlendState maskState;
 
         //start参数
         private Matrix? matrix;
@@ -313,6 +317,11 @@ namespace WzComparerR2.MapRender
                             break;
                     }
                 }
+                if (particleSystem.BlendFuncSrc == ParticleBlendFunc.ZERO && particleSystem.BlendFuncDst == ParticleBlendFunc.INV_SRC_ALPHA) //1,6
+                {
+                    itemType = ItemType.Sprite_BlendMask;
+                }
+
                 if (itemType == ItemType.Unknown)
                 {
                     throw new Exception($"Unknown particle blendfunc: {particleSystem.BlendFuncSrc}, {particleSystem.BlendFuncDst}");
@@ -439,6 +448,7 @@ namespace WzComparerR2.MapRender
                 case ItemType.D2DObject:
                 case ItemType.Sprite_BlendAdditive:
                 case ItemType.Sprite_BlendNonPremultiplied:
+                case ItemType.Sprite_BlendMask:
                     InnerFlush();
                     lastItem = itemType;
                     InnerBegin();
@@ -497,6 +507,13 @@ namespace WzComparerR2.MapRender
                     }
                     this.sprite.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, transformMatrix: this.matrix);
                     break;
+                case ItemType.Sprite_BlendMask:
+                    if (this.sprite == null)
+                    {
+                        this.sprite = new SpriteBatchEx(this.GraphicsDevice);
+                    }
+                    this.sprite.Begin(SpriteSortMode.Deferred, this.maskState, transformMatrix: this.matrix);
+                    break;
             }
         }
 
@@ -507,6 +524,7 @@ namespace WzComparerR2.MapRender
                 case ItemType.Sprite:
                 case ItemType.Sprite_BlendAdditive:
                 case ItemType.Sprite_BlendNonPremultiplied:
+                case ItemType.Sprite_BlendMask:
                     this.sprite.End();
                     break;
 
@@ -582,6 +600,7 @@ namespace WzComparerR2.MapRender
             this.sprite?.Dispose();
             this.spineRender?.Effect.Dispose();
             this.alphaBlendState.Dispose();
+            this.maskState.Dispose();
             this.meshPool.Clear();
         }
 
@@ -594,6 +613,7 @@ namespace WzComparerR2.MapRender
             Sprite_AlphaBlend = Sprite,
             Sprite_BlendAdditive = 4,
             Sprite_BlendNonPremultiplied = 5,
+            Sprite_BlendMask = 6,
         }
 
     }
