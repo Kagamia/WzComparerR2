@@ -170,6 +170,7 @@ namespace WzComparerR2.WzLib
                 // not sure if nexon will change this magic version, just hard coded.
                 this.Header.SetWzVersion(777);
                 this.Header.VersionChecked = true;
+                this.Header.Capabilities |= Wz_Capabilities.EncverMissing;
             }
             else
             {
@@ -362,7 +363,8 @@ namespace WzComparerR2.WzLib
                 switch ((int)this.BReader.ReadByte())
                 {
                     case 0x02:
-                        name = this.ReadStringAt(this.Header.HeaderSize + 1 + this.BReader.ReadInt32());
+                        int stringOffAdd = this.Header.HasCapabilities(Wz_Capabilities.EncverMissing) ? 2 : 1;
+                        name = this.ReadStringAt(this.Header.HeaderSize + stringOffAdd + this.BReader.ReadInt32());
                         goto case 0xffff;
                     case 0x04:
                         name = this.ReadString();
