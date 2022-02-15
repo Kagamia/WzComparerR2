@@ -48,7 +48,7 @@ namespace WzComparerR2.WzLib
 
         public bool HasCapabilities(Wz_Capabilities cap)
         {
-            return cap == (this.Capabilities | cap);
+            return cap == (this.Capabilities & cap);
         }
 
         public static int CalcHashVersion(int wzVersion)
