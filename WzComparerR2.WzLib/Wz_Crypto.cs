@@ -157,7 +157,7 @@ namespace WzComparerR2.WzLib
 
         private bool IsLegalNodeName(string nodeName)
         {
-            return nodeName.EndsWith(".img") || Regex.IsMatch(nodeName, @"^[A-Za-z-9_]+$");
+            return nodeName.EndsWith(".img") || nodeName.EndsWith(".lua") || Regex.IsMatch(nodeName, @"^[A-Za-z0-9_]+$");
         }
 
         static readonly byte[] iv_gms = { 0x4d, 0x23, 0xc7, 0x2b };
