@@ -1301,7 +1301,7 @@ namespace WzComparerR2
             {
                 foreach (Wz_Node child in parent.Nodes)
                 {
-                    if (child.Value != null) //只过滤文件夹 未来有需求再改
+                    if (child.Nodes.Count == 0) //只过滤文件夹 未来有需求再改
                     {
                         continue;
                     }
