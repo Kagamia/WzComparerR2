@@ -179,7 +179,7 @@ namespace WzComparerR2.WzLib
 
             return true;
 
-            __failed:
+        __failed:
             this.header = new Wz_Header(null, null, fileName, 0, 0, filesize, 0);
             return false;
         }
@@ -492,7 +492,7 @@ namespace WzComparerR2.WzLib
                     }
                 }
             }
-        
+
             parent.Nodes.Trim();
         }
 
@@ -577,7 +577,7 @@ namespace WzComparerR2.WzLib
             {
                 this.type = Wz_Type.UI;
             }
-            
+
             if (this.type == Wz_Type.Unknown) //用文件名来判断
             {
                 string wzName = this.node.Text;
@@ -593,112 +593,21 @@ namespace WzComparerR2.WzLib
 
         public void DetectWzVersion()
         {
-            bool DetectWithWzImage(Wz_Image testWzImg)
+            IWzVersionVerifier wzVersionVerifier;
+
+            switch (this.wzStructure?.WzVersionVerifyMode)
             {
-                while (this.header.TryGetNextVersion())
-                {
-                    uint offs = CalcOffset(testWzImg.HashedOffsetPosition, testWzImg.HashedOffset);
+                default:
+                case WzVersionVerifyMode.Default:
+                    wzVersionVerifier = new DefaultVersionVerifier();
+                    break;
 
-                    if (offs < this.header.HeaderSize || offs + testWzImg.Size > this.fileStream.Length)  //img块越界
-                    {
-                        continue;
-                    }
-
-                    this.fileStream.Position = offs;
-                    switch (this.fileStream.ReadByte())
-                    {
-                        case 0x73:
-                        case 0x1b:
-                            //试读img第一个string
-                            break;
-                        default:
-                            continue;
-                    }
-
-                    testWzImg.Offset = offs;
-                    if (testWzImg.TryExtract()) //试读成功
-                    {
-                        testWzImg.Unextract();
-                        this.header.VersionChecked = true;
-                        break;
-                    }
-                }
-                return this.header.VersionChecked;
+                case WzVersionVerifyMode.Fast:
+                    wzVersionVerifier = new FastVersionVerifier();
+                    break;
             }
 
-            bool DetectWithAllWzDir()
-            {
-                while (this.header.TryGetNextVersion())
-                {
-                    bool isSuccess = true;
-                    foreach (var testDir in this.directories)
-                    {
-                        uint offs = CalcOffset(testDir.HashedOffsetPosition, testDir.HashedOffset);
-
-                        if (offs < this.header.HeaderSize || offs + 1 > this.fileStream.Length) // dir offset out of file size.
-                        {
-                            isSuccess = false;
-                            break;
-                        }
-
-                        this.fileStream.Position = offs;
-                        if (this.fileStream.ReadByte() != 0) // dir data only contains one byte: 0x00
-                        {
-                            isSuccess = false;
-                            break;
-                        }
-                    }
-
-                    if (isSuccess)
-                    {
-                        this.header.VersionChecked = true;
-                        break;
-                    }
-                }
-
-                return this.header.VersionChecked;
-            }
-
-            List<Wz_Image> imgList = EnumerableAllWzImage(this.node).Where(_img => _img.WzFile == this).ToList();
-
-            if (this.header.VersionChecked)
-            {
-                foreach (var img in imgList)
-                {
-                    img.Offset = CalcOffset(img.HashedOffsetPosition, img.HashedOffset);
-                }
-            }
-            else
-            {
-                //选择最小的img作为实验品
-                Wz_Image minSizeImg = imgList.Where(_img => _img.Size >= 20).DefaultIfEmpty().Aggregate((_img1, _img2) => _img1.Size < _img2.Size ? _img1 : _img2);
-
-                if (minSizeImg == null && imgList.Count > 0)
-                {
-                    minSizeImg = imgList[0];
-                }
-
-                if (minSizeImg != null)
-                {
-                    DetectWithWzImage(minSizeImg);
-                }
-                else if (this.directories.Count > 0)
-                {
-                    DetectWithAllWzDir();
-                }
-
-                if (this.header.VersionChecked) //重新计算全部img
-                {
-                    foreach (var img in imgList)
-                    {
-                        img.Offset = CalcOffset(img.HashedOffsetPosition, img.HashedOffset);
-                    }
-                }
-                else //最终测试失败 那就失败吧..
-                {
-                    this.header.VersionChecked = true;
-                }
-            }
+            wzVersionVerifier.Verify(this);
         }
 
         public void MergeWzFile(Wz_File wz_File)
@@ -719,24 +628,257 @@ namespace WzComparerR2.WzLib
             wz_File.ownerWzFile = this;
         }
 
-        private IEnumerable<Wz_Image> EnumerableAllWzImage(Wz_Node parentNode)
-        {
-            foreach (var node in parentNode.Nodes)
-            {
-                Wz_Image img = node.Value as Wz_Image;
-                if (img != null)
-                {
-                    yield return img;
-                }
 
-                if (!(node.Value is Wz_File) && node.Nodes.Count > 0)
+        public interface IWzVersionVerifier
+        {
+            bool Verify(Wz_File wzFile);
+        }
+
+        public abstract class WzVersionVerifier
+        {
+            protected IEnumerable<Wz_Image> EnumerableAllWzImage(Wz_Node parentNode)
+            {
+                foreach (var node in parentNode.Nodes)
                 {
-                    foreach (var imgChild in EnumerableAllWzImage(node))
+                    Wz_Image img = node.Value as Wz_Image;
+                    if (img != null)
                     {
-                        yield return imgChild;
+                        yield return img;
+                    }
+
+                    if (!(node.Value is Wz_File) && node.Nodes.Count > 0)
+                    {
+                        foreach (var imgChild in EnumerableAllWzImage(node))
+                        {
+                            yield return imgChild;
+                        }
                     }
                 }
             }
+
+            protected bool FastCheckFirstByte(Wz_Image image, byte firstByte)
+            {
+                if (image.IsLuaImage)
+                {
+                    // for lua image, the first byte is always 01
+                    return firstByte == 0x01;
+                }
+                else
+                {
+                    // first element is always a string
+                    return firstByte == 0x73 || firstByte == 0x1b;
+                }
+            }
+
+            protected void CalcOffset(Wz_File wzFile, IEnumerable<Wz_Image> imgList)
+            {
+                foreach (var img in imgList)
+                {
+                    img.Offset = wzFile.CalcOffset(img.HashedOffsetPosition, img.HashedOffset);
+                }
+            }
+
+            protected bool DetectWithWzImage(Wz_File wzFile, Wz_Image testWzImg)
+            {
+                while (wzFile.header.TryGetNextVersion())
+                {
+                    uint offs = wzFile.CalcOffset(testWzImg.HashedOffsetPosition, testWzImg.HashedOffset);
+
+                    if (offs < wzFile.header.DirEndPosition || offs + testWzImg.Size > wzFile.fileStream.Length)  //img offset out of file size
+                    {
+                        continue;
+                    }
+
+                    wzFile.fileStream.Position = offs;
+                    var firstByte = (byte)wzFile.fileStream.ReadByte();
+                    if (!FastCheckFirstByte(testWzImg, firstByte))
+                    {
+                        continue;
+                    }
+
+                    testWzImg.Offset = offs;
+                    if (!testWzImg.TryExtract())
+                    {
+                        continue;
+                    }
+
+                    testWzImg.Unextract();
+                    wzFile.header.VersionChecked = true;
+                    break;
+                }
+
+                return wzFile.header.VersionChecked;
+            }
+
+            protected bool DetectWithAllWzDir(Wz_File wzFile)
+            {
+                while (wzFile.header.TryGetNextVersion())
+                {
+                    bool isSuccess = wzFile.directories.All(testDir =>
+                    {
+                        uint offs = wzFile.CalcOffset(testDir.HashedOffsetPosition, testDir.HashedOffset);
+
+                        if (offs < wzFile.header.DataStartPosition || offs + 1 > wzFile.header.DirEndPosition) // dir offset out of file size.
+                        {
+                            return false;
+                        }
+
+                        wzFile.fileStream.Position = offs;
+                        if (wzFile.fileStream.ReadByte() != 0) // for splitted wz format, dir data only contains one byte: 0x00
+                        {
+                            return false;
+                        }
+
+                        return true;
+                    });
+
+                    if (isSuccess)
+                    {
+                        wzFile.header.VersionChecked = true;
+                        break;
+                    }
+                }
+
+                return wzFile.header.VersionChecked;
+            }
+
+            protected bool FastDetectWithAllWzImages(Wz_File wzFile, IList<Wz_Image> imgList)
+            {
+                var imageSizes = new SizeRange[imgList.Count];
+                while (wzFile.header.TryGetNextVersion())
+                {
+                    int count = 0;
+                    bool isSuccess = imgList.All(img =>
+                    {
+                        uint offs = wzFile.CalcOffset(img.HashedOffsetPosition, img.HashedOffset);
+                        if (offs < wzFile.header.DirEndPosition || offs + img.Size > wzFile.fileStream.Length)  //img offset out of file size
+                        {
+                            return false;
+                        }
+
+                        imageSizes[count++] = new SizeRange()
+                        {
+                            Start = offs,
+                            End = offs + img.Size,
+                        };
+                        return true;
+                    });
+
+                    if (isSuccess)
+                    {
+                        // check if there's any image overlaps with another image.
+                        Array.Sort(imageSizes, 0, count);
+                        for (int i = 1; i < count; i++)
+                        {
+                            if (imageSizes[i - 1].End > imageSizes[i].Start)
+                            {
+                                isSuccess = false;
+                                break;
+                            }
+                        }
+
+                        if (isSuccess)
+                        {
+                            wzFile.header.VersionChecked = true;
+                            break;
+                        }
+                    }
+                }
+
+                return wzFile.header.VersionChecked;
+            }
+
+            private struct SizeRange : IComparable<SizeRange>
+            {
+                public long Start;
+                public long End;
+
+                public int CompareTo(SizeRange sr)
+                {
+                    int result = this.Start.CompareTo(sr.Start);
+                    if (result == 0)
+                    {
+                        result = this.End.CompareTo(sr.End);
+                    }
+                    return result;
+                }
+            }
         }
+
+        public class DefaultVersionVerifier : WzVersionVerifier, IWzVersionVerifier
+        {
+            public bool Verify(Wz_File wzFile)
+            {
+                List<Wz_Image> imgList = EnumerableAllWzImage(wzFile.node).Where(_img => _img.WzFile == wzFile).ToList();
+
+                if (wzFile.header.VersionChecked)
+                {
+                    this.CalcOffset(wzFile, imgList);
+                }
+                else
+                {
+                    // find the wzImage with minimum size.
+                    Wz_Image minSizeImg = imgList.DefaultIfEmpty().Aggregate((_img1, _img2) => _img1.Size < _img2.Size ? _img1 : _img2);
+
+                    if (minSizeImg == null && imgList.Count > 0)
+                    {
+                        minSizeImg = imgList[0];
+                    }
+
+                    if (minSizeImg != null)
+                    {
+                        this.DetectWithWzImage(wzFile, minSizeImg);
+                    }
+                    else if (wzFile.directories.Count > 0)
+                    {
+                        this.DetectWithAllWzDir(wzFile);
+                    }
+
+                    if (wzFile.header.VersionChecked)
+                    {
+                        this.CalcOffset(wzFile, imgList);
+                    }
+                }
+
+                return wzFile.header.VersionChecked;
+            }
+        }
+
+        public class FastVersionVerifier : WzVersionVerifier, IWzVersionVerifier
+        {
+            public bool Verify(Wz_File wzFile)
+            {
+                List<Wz_Image> imgList = EnumerableAllWzImage(wzFile.node).Where(_img => _img.WzFile == wzFile).ToList();
+
+                if (wzFile.header.VersionChecked)
+                {
+                    this.CalcOffset(wzFile, imgList);
+                }
+                else
+                {
+                    if (imgList.Count > 0)
+                    {
+                        this.FastDetectWithAllWzImages(wzFile, imgList);
+                    }
+                    else if (wzFile.directories.Count > 0)
+                    {
+                        this.DetectWithAllWzDir(wzFile);
+                    }
+
+                    if (wzFile.header.VersionChecked)
+                    {
+                        this.CalcOffset(wzFile, imgList);
+                    }
+                }
+
+                return wzFile.header.VersionChecked;
+            }
+        }
+    }
+
+    public enum WzVersionVerifyMode
+    {
+        Default = 0,
+        Fast = 1,
     }
 }

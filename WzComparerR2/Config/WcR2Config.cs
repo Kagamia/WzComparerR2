@@ -109,6 +109,16 @@ namespace WzComparerR2.Config
             set { this["imgCheckDisabled"] = value; }
         }
 
+        /// <summary>
+        /// 获取或设置一个值，指示读取wz是否跳过img检测。
+        /// </summary>
+        [ConfigurationProperty("wzVersionVerifyMode")]
+        public ConfigItem<WzLib.WzVersionVerifyMode> WzVersionVerifyMode
+        {
+            get { return (ConfigItem<WzLib.WzVersionVerifyMode>)this["wzVersionVerifyMode"]; }
+            set { this["wzVersionVerifyMode"] = value; }
+        }
+
         [ConfigurationProperty("patcherSettings")]
         [ConfigurationCollection(typeof(PatcherSetting), CollectionType = ConfigurationElementCollectionType.AddRemoveClearMap)]
         public PatcherSettingCollection PatcherSettings

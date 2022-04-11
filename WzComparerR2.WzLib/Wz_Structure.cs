@@ -17,6 +17,7 @@ namespace WzComparerR2.WzLib
             this.TextEncoding = Wz_Structure.DefaultEncoding;
             this.AutoDetectExtFiles = Wz_Structure.DefaultAutoDetectExtFiles;
             this.ImgCheckDisabled = Wz_Structure.DefaultImgCheckDisabled;
+            this.WzVersionVerifyMode = Wz_Structure.DefaultWzVersionVerifyMode;
         }
 
         public List<Wz_File> wz_files;
@@ -29,6 +30,7 @@ namespace WzComparerR2.WzLib
         public Encoding TextEncoding { get; set; }
         public bool AutoDetectExtFiles { get; set; }
         public bool ImgCheckDisabled { get; set; }
+        public WzVersionVerifyMode WzVersionVerifyMode {get;set;}
 
         public void Clear()
         {
@@ -92,6 +94,7 @@ namespace WzComparerR2.WzLib
                 file.Node = node;
                 file.FileStream.Position = file.Header.DataStartPosition;
                 file.GetDirTree(node, useBaseWz, loadWzAsFolder);
+                file.Header.DirEndPosition = file.FileStream.Position;
                 file.DetectWzType();
                 file.DetectWzVersion();
                 return file;
@@ -264,6 +267,8 @@ namespace WzComparerR2.WzLib
         public static bool DefaultAutoDetectExtFiles { get; set; }
 
         public static bool DefaultImgCheckDisabled { get; set; }
+
+        public static WzVersionVerifyMode DefaultWzVersionVerifyMode { get; set; }
         #endregion
     }
 }

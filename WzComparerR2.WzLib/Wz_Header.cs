@@ -26,6 +26,7 @@ namespace WzComparerR2.WzLib
         public long DataSize { get; private set; }
         public long FileSize { get; private set; }
         public long DataStartPosition { get; private set; }
+        public long DirEndPosition { get; set; }
 
         public bool VersionChecked { get; set; }
         public Wz_Capabilities Capabilities { get; internal set; }
