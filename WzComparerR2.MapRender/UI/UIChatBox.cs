@@ -90,22 +90,22 @@ namespace WzComparerR2.MapRender.UI
 
         public void AppendTextNormal(string msgText)
         {
-            this.AppendMessage(msgText, Color.White, Color.TransparentBlack);
+            this.AppendMessage(msgText, Color.White, Color.Transparent);
         }
 
         public void AppendTextSystem(string msgText)
         {
-            this.AppendMessage(msgText, new Color(255, 170, 170), Color.TransparentBlack);
+            this.AppendMessage(msgText, new Color(255, 170, 170), Color.Transparent);
         }
 
         public void AppendTextInfo(string msgText)
         {
-            this.AppendMessage(msgText, new Color(187, 187, 187), Color.TransparentBlack);
+            this.AppendMessage(msgText, new Color(187, 187, 187), Color.Transparent);
         }
 
         public void AppendTextHelp(string msgText)
         {
-            this.AppendMessage(msgText, new Color(255, 255, 0), Color.TransparentBlack);
+            this.AppendMessage(msgText, new Color(255, 255, 0), Color.Transparent);
         }
 
         public void AppendMessage(string msgText, Color foreColor, Color backColor)

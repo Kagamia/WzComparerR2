@@ -515,6 +515,8 @@ namespace WzComparerR2.MapRender
                     this.ui.ChatBox.AppendTextHelp(@"/back 回到上一地图。");
                     this.ui.ChatBox.AppendTextHelp(@"/home 回城。");
                     this.ui.ChatBox.AppendTextHelp(@"/history [maxCount] 查看历史地图。");
+                    this.ui.ChatBox.AppendTextHelp(@"/minimap 设置迷你地图状态。");
+                    this.ui.ChatBox.AppendTextHelp(@"/scene 设置地图场景显示状态。");
                     break;
 
                 case "/map":
@@ -573,6 +575,93 @@ namespace WzComparerR2.MapRender
                         
                         node = node.Previous;
                         historyCount--;
+                    }
+                    break;
+
+                case "/minimap":
+                    var canvasList = this.mapData?.MiniMap?.ExtraCanvas;
+                    switch (arguments.ElementAtOrDefault(1))
+                    {
+                        case "list":
+                            this.ui.ChatBox.AppendTextHelp($"minimap: {string.Join(", ", canvasList?.Keys)}");
+                            break;
+
+                        case "set":
+                            string canvasName = arguments.ElementAtOrDefault(2);
+                            if (canvasList?.TryGetValue(canvasName, out Texture2D canvas) ?? false)
+                            {
+                                this.ui.Minimap.MinimapCanvas = engine.Renderer.CreateTexture(canvas);
+                                this.ui.ChatBox.AppendTextHelp($"设置迷你地图：{canvasName}");
+                            }
+                            else
+                            {
+                                this.ui.ChatBox.AppendTextSystem($"找不到迷你地图：{canvasName}");
+                            }
+                            break;
+
+                        default:
+                            this.ui.ChatBox.AppendTextHelp(@"/minimap list 显示所有迷你地图名称。");
+                            this.ui.ChatBox.AppendTextHelp(@"/minimap set (canvasName) 设置迷你地图。");
+                            break;
+                    }
+                    break;
+
+                case "/scene":
+                    switch (arguments.ElementAtOrDefault(1))
+                    {
+                        case "tag":
+                            switch (arguments.ElementAtOrDefault(2))
+                            {
+                                case "list":
+                                    var tags = GetSceneContainers(this.mapData?.Scene)
+                                        .SelectMany(container => container.Slots)
+                                        .Select(sceneItem => sceneItem.Tag)
+                                        .Where(tag => !string.IsNullOrEmpty(tag))
+                                        .Distinct()
+                                        .OrderBy(tag => tag)
+                                        .ToList();
+                                    this.ui.ChatBox.AppendTextHelp($"tags: {string.Join(", ",tags)}");
+                                    break;
+                                case "show":
+                                    string tagName = arguments.ElementAtOrDefault(3);
+                                    if (!string.IsNullOrEmpty(tagName))
+                                    {
+                                        this.patchVisibility.SetTagVisible(tagName, true);
+                                        this.ui.ChatBox.AppendTextHelp($"显示tag: {tagName}");
+                                    }
+                                    else
+                                    {
+                                        this.ui.ChatBox.AppendTextSystem("没有输入tagName。");
+                                    }
+                                    break;
+                                case "hide":
+                                    tagName = arguments.ElementAtOrDefault(3);
+                                    this.patchVisibility.SetTagVisible(tagName, false);
+                                    if (!string.IsNullOrEmpty(tagName))
+                                    {
+                                        this.patchVisibility.SetTagVisible(tagName, false);
+                                        this.ui.ChatBox.AppendTextHelp($"隐藏tag: {tagName}");
+                                    }
+                                    else
+                                    {
+                                        this.ui.ChatBox.AppendTextSystem("没有输入tagName。");
+                                    }
+                                    break;
+                                case "reset":
+                                    this.patchVisibility.ResetTagVisible();
+                                    break;
+                                default:
+                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag list 获取场景中所有物体的tag。");
+                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag show (tagName) 显示tagName的物体。");
+                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag hide (tagName) 隐藏tagName的物体。");
+                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag reset 重置所有物体为显示状态。");
+                                    break;
+                            }
+                            break;
+
+                        default:
+                            this.ui.ChatBox.AppendTextHelp(@"/scene tag 设置tag相关的显示状态。");
+                            break;
                     }
                     break;
 

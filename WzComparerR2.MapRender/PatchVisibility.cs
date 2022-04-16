@@ -10,6 +10,7 @@ namespace WzComparerR2.MapRender
         public PatchVisibility()
         {
             this.dictVisible = new Dictionary<RenderObjectType, bool>();
+            this.hiddenTags = new HashSet<string>();
             foreach (RenderObjectType type in Enum.GetValues(typeof(RenderObjectType)))
             {
                 this.dictVisible[type] = true;
@@ -94,12 +95,38 @@ namespace WzComparerR2.MapRender
         }
 
         private Dictionary<RenderObjectType, bool> dictVisible;
+        private HashSet<string> hiddenTags;
 
         public bool IsVisible(RenderObjectType type)
         {
             bool visible;
             dictVisible.TryGetValue(type, out visible);
             return visible;
+        }
+
+        public bool IsTagVisible(string tag)
+        {
+            return !string.IsNullOrEmpty(tag) && !this.hiddenTags.Contains(tag);
+        }
+
+        public void SetTagVisible(string tag, bool isVisible)
+        {
+            if (!string.IsNullOrEmpty(tag))
+            {
+                if (isVisible)
+                {
+                    this.hiddenTags.Remove(tag);
+                }
+                else
+                {
+                    this.hiddenTags.Add(tag);
+                }
+            }
+        }
+
+        public void ResetTagVisible()
+        {
+            this.hiddenTags.Clear();
         }
 
         private void SetVisible(RenderObjectType type, bool visible)

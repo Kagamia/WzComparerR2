@@ -178,13 +178,32 @@ namespace WzComparerR2.MapRender
                    centerX = miniMapNode.FindNodeByPath("centerX"),
                    centerY = miniMapNode.FindNodeByPath("centerY"),
                    mag = miniMapNode.FindNodeByPath("mag");
+            this.MiniMap.ExtraCanvas.Clear();
 
             canvas = canvas.GetLinkedSourceNode(PluginManager.FindWz);
-
             if (canvas != null)
             {
                 this.MiniMap.Canvas = resLoader.Load<Texture2D>(canvas);
+                this.MiniMap.ExtraCanvas.Add("canvas", this.MiniMap.Canvas);
             }
+            else
+            {
+                this.MiniMap.Canvas = null;
+            }
+
+            // example mapID: 993200000, KMST1140
+            for (int i = 1; ; i++)
+            {
+                string canvasName = $"canvas{i}";
+                var extraCanvas = miniMapNode.FindNodeByPath(canvasName);
+                if (extraCanvas == null)
+                {
+                    break;
+                }
+                extraCanvas = extraCanvas.GetLinkedSourceNode(PluginManager.FindWz);
+                this.MiniMap.ExtraCanvas.Add(canvasName, resLoader.Load<Texture2D>(extraCanvas));
+            }
+
             this.MiniMap.Width = width.GetValueEx(0);
             this.MiniMap.Height = height.GetValueEx(0);
             this.MiniMap.CenterX = centerX.GetValueEx(0);

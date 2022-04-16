@@ -528,6 +528,11 @@ namespace WzComparerR2.MapRender
 
         private MeshItem GetMesh(SceneItem item)
         {
+            if (!string.IsNullOrEmpty(item.Tag) && !patchVisibility.IsTagVisible(item.Tag))
+            {
+                return null;
+            }
+
             if (item is BackItem)
             {
                 var back = (BackItem)item;

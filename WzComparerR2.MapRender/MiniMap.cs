@@ -9,10 +9,11 @@ namespace WzComparerR2.MapRender
     {
         public MiniMap()
         {
-
+            this.ExtraCanvas = new Dictionary<string, Texture2D>();
         }
 
         public Texture2D Canvas { get; set; }
+        public Dictionary<string, Texture2D> ExtraCanvas { get; private set; }
         public int Width { get; set; }
         public int Height { get; set; }
         public int CenterX { get; set; }
