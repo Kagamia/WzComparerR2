@@ -306,6 +306,7 @@ namespace WzComparerR2.MapRender
                 };
 
                 EmptyKeys.UserInterface.Input.KeyEventHandler keyEv;
+                var keyApplied = new Dictionary<KeyCode, bool>();
 
                 keyEv = (o, e) =>
                 {
@@ -330,15 +331,31 @@ namespace WzComparerR2.MapRender
                         case KeyCode.RightControl:
                             boostMoveFlag |= 0x02;
                             break;
+
+                        default:
+                            return;
                     }
+                    keyApplied[e.Key] = true;
+                    e.Handled = true;
                 };
-                this.ui.KeyDown += keyEv;
-                this.attachedEvent.Add(EventDisposable(keyEv, _ev => this.ui.KeyDown -= _ev));
+                this.ui.PreviewKeyDown += keyEv;
+                this.attachedEvent.Add(EventDisposable(keyEv, _ev => this.ui.PreviewKeyDown -= _ev));
 
                 keyEv = (o, e) =>
                 {
                     switch (e.Key)
                     {
+                        case KeyCode.Up:
+                        case KeyCode.Down:
+                        case KeyCode.Left:
+                        case KeyCode.Right:
+                            if (keyApplied.TryGetValue(e.Key, out bool pressed) && pressed)
+                            {
+                                keyApplied[e.Key] = false;
+                                e.Handled = true;
+                            }
+                            break;
+
                         case KeyCode.LeftControl:
                             boostMoveFlag &= ~0x01;
                             break;
