@@ -10,12 +10,13 @@ namespace WzComparerR2.MapRender
         public PatchVisibility()
         {
             this.dictVisible = new Dictionary<RenderObjectType, bool>();
-            this.hiddenTags = new HashSet<string>();
+            this.tagsVisible = new SortedDictionary<string, bool>();
             foreach (RenderObjectType type in Enum.GetValues(typeof(RenderObjectType)))
             {
                 this.dictVisible[type] = true;
             }
             this.PortalInEditMode = false;
+            this.DefaultTagVisible = true;
         }
 
         public bool BackVisible
@@ -94,8 +95,15 @@ namespace WzComparerR2.MapRender
             set { this.SetVisible(RenderObjectType.MobName, value); }
         }
 
+        public IReadOnlyDictionary<string, bool> TagsVisible
+        {
+            get { return this.tagsVisible; }
+        }
+
+        public bool DefaultTagVisible { get; set; }
+
         private Dictionary<RenderObjectType, bool> dictVisible;
-        private HashSet<string> hiddenTags;
+        private SortedDictionary<string, bool> tagsVisible;
 
         public bool IsVisible(RenderObjectType type)
         {
@@ -106,27 +114,25 @@ namespace WzComparerR2.MapRender
 
         public bool IsTagVisible(string tag)
         {
-            return !string.IsNullOrEmpty(tag) && !this.hiddenTags.Contains(tag);
+            return this.tagsVisible.TryGetValue(tag, out var isVisible) ? isVisible : this.DefaultTagVisible;
         }
 
         public void SetTagVisible(string tag, bool isVisible)
         {
-            if (!string.IsNullOrEmpty(tag))
-            {
-                if (isVisible)
-                {
-                    this.hiddenTags.Remove(tag);
-                }
-                else
-                {
-                    this.hiddenTags.Add(tag);
-                }
-            }
+            this.tagsVisible[tag] = isVisible;
         }
 
         public void ResetTagVisible()
         {
-            this.hiddenTags.Clear();
+            this.tagsVisible.Clear();
+        }
+
+        public void ResetTagVisible(string[] tags)
+        {
+            foreach(var tag in tags)
+            {
+                this.tagsVisible.Remove(tag);
+            }
         }
 
         private void SetVisible(RenderObjectType type, bool visible)

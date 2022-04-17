@@ -528,7 +528,7 @@ namespace WzComparerR2.MapRender
 
         private MeshItem GetMesh(SceneItem item)
         {
-            if (!string.IsNullOrEmpty(item.Tag) && !patchVisibility.IsTagVisible(item.Tag))
+            if (item.Tags != null && item.Tags.Any(tag => !patchVisibility.IsTagVisible(tag)))
             {
                 return null;
             }

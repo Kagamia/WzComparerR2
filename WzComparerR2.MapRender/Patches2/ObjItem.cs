@@ -33,7 +33,7 @@ namespace WzComparerR2.MapRender.Patches2
                 Z = node.Nodes["z"].GetValueEx(0),
 
                 Flip = node.Nodes["f"].GetValueEx(false),
-                Tag = node.Nodes["tags"].GetValueEx<string>(null),
+                Tags = node.Nodes["tags"].GetValueEx<string>(null)?.Split(',').Select(tag => tag.Trim()).ToArray(),
             };
             return item;
         }

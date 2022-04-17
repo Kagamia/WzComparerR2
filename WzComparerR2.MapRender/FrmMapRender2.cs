@@ -630,21 +630,31 @@ namespace WzComparerR2.MapRender
                             switch (arguments.ElementAtOrDefault(2))
                             {
                                 case "list":
-                                    var tags = GetSceneContainers(this.mapData?.Scene)
+                                    var mapTags = GetSceneContainers(this.mapData?.Scene)
                                         .SelectMany(container => container.Slots)
-                                        .Select(sceneItem => sceneItem.Tag)
-                                        .Where(tag => !string.IsNullOrEmpty(tag))
+                                        .Where(sceneItem => sceneItem.Tags != null && sceneItem.Tags.Length > 0)
+                                        .SelectMany(sceneItem => sceneItem.Tags)
                                         .Distinct()
                                         .OrderBy(tag => tag)
                                         .ToList();
-                                    this.ui.ChatBox.AppendTextHelp($"tags: {string.Join(", ",tags)}");
+                                    this.ui.ChatBox.AppendTextHelp($"当前地图tags: {string.Join(", ", mapTags)}");
+                                    break;
+                                case "info":
+                                    var visibleTags = this.patchVisibility.TagsVisible.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
+                                    var hiddenTags = this.patchVisibility.TagsVisible.Where(kv => !kv.Value).Select(kv => kv.Key).ToList();
+                                    this.ui.ChatBox.AppendTextHelp($"默认tag显示状态: {this.patchVisibility.DefaultTagVisible}");
+                                    this.ui.ChatBox.AppendTextHelp($"显示tags: {string.Join(", ", visibleTags)}");
+                                    this.ui.ChatBox.AppendTextHelp($"隐藏tags: {string.Join(", ", hiddenTags)}");
                                     break;
                                 case "show":
-                                    string tagName = arguments.ElementAtOrDefault(3);
-                                    if (!string.IsNullOrEmpty(tagName))
+                                    string[] tags = arguments.Skip(3).ToArray();
+                                    if (tags.Length > 0)
                                     {
-                                        this.patchVisibility.SetTagVisible(tagName, true);
-                                        this.ui.ChatBox.AppendTextHelp($"显示tag: {tagName}");
+                                        foreach (var tag in tags)
+                                        {
+                                            this.patchVisibility.SetTagVisible(tag, true);
+                                        }
+                                        this.ui.ChatBox.AppendTextHelp($"显示tag: {string.Join(", ", tags)}");
                                     }
                                     else
                                     {
@@ -652,12 +662,14 @@ namespace WzComparerR2.MapRender
                                     }
                                     break;
                                 case "hide":
-                                    tagName = arguments.ElementAtOrDefault(3);
-                                    this.patchVisibility.SetTagVisible(tagName, false);
-                                    if (!string.IsNullOrEmpty(tagName))
+                                    tags = arguments.Skip(3).ToArray();
+                                    if (tags.Length > 0)
                                     {
-                                        this.patchVisibility.SetTagVisible(tagName, false);
-                                        this.ui.ChatBox.AppendTextHelp($"隐藏tag: {tagName}");
+                                        foreach (var tag in tags)
+                                        {
+                                            this.patchVisibility.SetTagVisible(tag, false);
+                                        }
+                                        this.ui.ChatBox.AppendTextHelp($"隐藏tag: {string.Join(", ", tags)}");
                                     }
                                     else
                                     {
@@ -665,13 +677,40 @@ namespace WzComparerR2.MapRender
                                     }
                                     break;
                                 case "reset":
+                                    tags = arguments.Skip(3).ToArray();
+                                    if (tags.Length > 0)
+                                    {
+                                        this.patchVisibility.ResetTagVisible(tags);
+                                        this.ui.ChatBox.AppendTextHelp($"重置tag: {string.Join(", ", tags)}");
+                                    }
+                                    else
+                                    {
+                                        this.ui.ChatBox.AppendTextSystem("没有输入tagName。");
+                                    }
+                                    break;
+                                case "reset-all":
                                     this.patchVisibility.ResetTagVisible();
+                                    this.ui.ChatBox.AppendTextHelp($"重置已设置tag。");
+                                    break;
+                                case "set-default":
+                                    if (bool.TryParse(arguments.ElementAtOrDefault(3), out bool isVisible))
+                                    {
+                                        this.patchVisibility.DefaultTagVisible = isVisible;
+                                        this.ui.ChatBox.AppendTextHelp($"设置tag默认显示状态：{isVisible}");
+                                    }
+                                    else
+                                    {
+                                        this.ui.ChatBox.AppendTextSystem("参数错误。");
+                                    }
                                     break;
                                 default:
                                     this.ui.ChatBox.AppendTextHelp(@"/scene tag list 获取场景中所有物体的tag。");
-                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag show (tagName) 显示tagName的物体。");
-                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag hide (tagName) 隐藏tagName的物体。");
-                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag reset 重置所有物体为显示状态。");
+                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag info 获取当前自定义显示状态。");
+                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag show (tagName)... 显示tagName的物体。");
+                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag hide (tagName)... 隐藏tagName的物体。");
+                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag reset (tagName)... 重置指定tagName的显示状态。");
+                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag reset-all 重置所有物体为显示状态。");
+                                    this.ui.ChatBox.AppendTextHelp(@"/scene tag set-default (true/false) 设置所有tag的默认显示状态。");
                                     break;
                             }
                             break;
