@@ -605,7 +605,7 @@ namespace WzComparerR2.MapRender
 
                         case "set":
                             string canvasName = arguments.ElementAtOrDefault(2);
-                            if (canvasList?.TryGetValue(canvasName, out Texture2D canvas) ?? false)
+                            if (canvasList != null && canvasList.TryGetValue(canvasName, out Texture2D canvas))
                             {
                                 this.ui.Minimap.MinimapCanvas = engine.Renderer.CreateTexture(canvas);
                                 this.ui.ChatBox.AppendTextHelp($"设置迷你地图：{canvasName}");
