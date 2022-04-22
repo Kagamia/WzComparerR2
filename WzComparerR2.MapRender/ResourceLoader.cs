@@ -100,7 +100,19 @@ namespace WzComparerR2.MapRender
             return node != null ? LoadAnimationData(node) : null;
         }
 
-        public ParticleDesc LoadParticleDesc(Wz_Node node)
+        public object LoadParticleDesc(Wz_Node node)
+        {
+            int dataType = node.Nodes["data_type"].GetValueEx<int>(0);
+            switch (dataType)
+            {
+                case 0: return LoadParticleDesc0(node);
+                case 1: return LoadParticleDesc1(node);
+                case 3: return LoadParticleDesc3(node);
+                default: throw new Exception($"Unknown particle data type {dataType}.");
+            }
+        }
+
+        public ParticleDesc LoadParticleDesc0(Wz_Node node)
         {
             var desc = new ParticleDesc();
             desc.Name = node.Text;
@@ -183,6 +195,16 @@ namespace WzComparerR2.MapRender
                 }
             }
             return desc;
+        }
+
+        public ParticleDesc1 LoadParticleDesc1(Wz_Node node)
+        {
+            return new ParticleDesc1();
+        }
+
+        public ParticleDesc3 LoadParticleDesc3(Wz_Node node)
+        {
+            return new ParticleDesc3();
         }
 
         public void BeginCounting()

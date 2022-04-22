@@ -90,6 +90,8 @@
     <Compile Include="Music.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleDesc.cs" />
+    <Compile Include="ParticleDesc3.cs" />
+    <Compile Include="ParticleDesc1.cs" />
     <Compile Include="ParticleEmitter.cs" />
     <Compile Include="ParticleRandom.cs" />
     <Compile Include="ParticleSystem.cs" />
