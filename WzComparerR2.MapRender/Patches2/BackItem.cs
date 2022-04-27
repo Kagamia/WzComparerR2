@@ -48,8 +48,12 @@ namespace WzComparerR2.MapRender.Patches2
                 ScreenMode = node.Nodes["screenMode"].GetValueEx(0),
                 Flip = node.Nodes["f"].GetValueEx(false),
                 IsFront = node.Nodes["front"].GetValueEx(false),
-                Tags = node.Nodes["backTags"].GetValueEx<string>(null)?.Split(',').Select(tag => tag.Trim()).ToArray(),
             };
+            string backTags = node.Nodes["backTags"].GetValueEx<string>(null);
+            if (!string.IsNullOrWhiteSpace(backTags))
+            {
+                item.Tags = backTags.Split(',').Select(tag => tag.Trim()).ToArray();
+            }
             return item;
         }
 

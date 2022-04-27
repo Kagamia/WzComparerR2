@@ -33,8 +33,13 @@ namespace WzComparerR2.MapRender.Patches2
                 Z = node.Nodes["z"].GetValueEx(0),
 
                 Flip = node.Nodes["f"].GetValueEx(false),
-                Tags = node.Nodes["tags"].GetValueEx<string>(null)?.Split(',').Select(tag => tag.Trim()).ToArray(),
             };
+
+            string objTags = node.Nodes["tags"].GetValueEx<string>(null);
+            if (!string.IsNullOrWhiteSpace(objTags))
+            {
+                item.Tags = objTags.Split(',').Select(tag => tag.Trim()).ToArray();
+            }
             return item;
         }
 
