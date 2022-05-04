@@ -145,6 +145,7 @@
     <Compile Include="TextureAtlas.cs" />
     <Compile Include="TextureLoader.cs" />
     <Compile Include="TileMode.cs" />
+    <Compile Include="UI\ColorWConverter.cs" />
     <Compile Include="UI\HitMap.cs" />
     <Compile Include="UI\ITooltipTarget.cs" />
     <Compile Include="UI\MapRenderButtonStyle.cs" />

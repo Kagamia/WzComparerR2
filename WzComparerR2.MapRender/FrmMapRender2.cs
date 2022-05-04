@@ -310,6 +310,11 @@ namespace WzComparerR2.MapRender
 
                 keyEv = (o, e) =>
                 {
+                    if (EmptyKeys.UserInterface.Input.InputManager.Current.FocusedElement is EmptyKeys.UserInterface.Controls.Primitives.TextBoxBase)
+                    {
+                        return;
+                    }
+
                     switch (e.Key)
                     {
                         case KeyCode.Up:
@@ -802,6 +807,13 @@ namespace WzComparerR2.MapRender
 
             var target2d = new RenderTarget2D(this.GraphicsDevice, width, height, false, SurfaceFormat.Bgra32, DepthFormat.None);
 
+            Color bgColor = Color.Black;
+            var config = MapRenderConfig.Default;
+            if (ColorWConverter.TryParse(config?.ScreenshotBackgroundColor?.Value, out var colorW))
+            {
+                bgColor = new Color(colorW.PackedValue);
+            }
+
             //计算一组截图区
             int horizonBlock = (int)Math.Ceiling(1.0 * oldRect.Width / width);
             int verticalBlock = (int)Math.Ceiling(1.0 * oldRect.Height / height);
@@ -819,7 +831,7 @@ namespace WzComparerR2.MapRender
 
                     //绘制
                     GraphicsDevice.SetRenderTarget(target2d);
-                    GraphicsDevice.Clear(Color.Black);
+                    GraphicsDevice.Clear(bgColor);
                     DrawScene(gameTime);
                     GraphicsDevice.SetRenderTarget(null);
                     //保存
@@ -937,6 +949,7 @@ namespace WzComparerR2.MapRender
             model.NpcNameVisible = this.patchVisibility.NpcNameVisible;
             model.MobNameVisible = this.patchVisibility.MobNameVisible;
             model.TopBarVisible = this.ui.TopBar.Visibility == EmptyKeys.UserInterface.Visibility.Visible;
+            model.ScreenshotBackgroundColor = config.ScreenshotBackgroundColor;
             model.Minimap_CameraRegionVisible = this.ui.Minimap.CameraRegionVisible;
             model.WorldMap_UseImageNameAsInfoName = this.ui.WorldMap.UseImageNameAsInfoName;
         }
@@ -953,6 +966,7 @@ namespace WzComparerR2.MapRender
             this.patchVisibility.NpcNameVisible = model.NpcNameVisible;
             this.patchVisibility.MobNameVisible = model.MobNameVisible;
             config.TopBarVisible = model.TopBarVisible;
+            config.ScreenshotBackgroundColor = model.ScreenshotBackgroundColor;
             config.Minimap_CameraRegionVisible = model.Minimap_CameraRegionVisible;
             config.WorldMap_UseImageNameAsInfoName = model.WorldMap_UseImageNameAsInfoName;
             WzComparerR2.Config.ConfigManager.Save();

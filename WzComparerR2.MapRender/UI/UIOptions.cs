@@ -144,6 +144,8 @@ namespace WzComparerR2.MapRender.UI
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(24, GridUnitType.Pixel) });
             grid.ColumnDefinitions.Add(new ColumnDefinition());
             grid.ColumnDefinitions.Add(new ColumnDefinition());
 
@@ -264,6 +266,46 @@ namespace WzComparerR2.MapRender.UI
             Grid.SetColumn(chk5, 0);
             Grid.SetColumnSpan(chk5, 2);
             grid.Children.Add(chk5);
+
+            TextBlock lbl6 = new TextBlock();
+            lbl6.VerticalAlignment = VerticalAlignment.Center;
+            lbl6.Text = "截图";
+            lbl6.Foreground = Brushes.Yellow;
+            Grid.SetRow(lbl6, 10);
+            Grid.SetColumn(lbl6, 0);
+            grid.Children.Add(lbl6);
+
+            StackPanel pnl2 = new StackPanel();
+            pnl2.Orientation = Orientation.Horizontal;
+            Grid.SetRow(pnl2, 11);
+            Grid.SetColumn(pnl2, 0);
+            Grid.SetColumnSpan(pnl2, 2);
+            grid.Children.Add(pnl2);
+
+            TextBlock lbl7 = new TextBlock();
+            lbl7.TextAlignment = TextAlignment.Center;
+            lbl7.HorizontalAlignment = HorizontalAlignment.Center;
+            lbl7.VerticalAlignment = VerticalAlignment.Center;
+            lbl7.Padding = new Thickness(24, 0, 0, 0);
+            lbl7.Text = "背景色(argb)";
+            pnl2.Children.Add(lbl7);
+
+            TextBox tb1 = new TextBox();
+            tb1.Width = 60;
+            tb1.HorizontalAlignment = HorizontalAlignment.Center;
+            tb1.VerticalAlignment = VerticalAlignment.Center;
+            tb1.MaxLength = 8;
+            tb1.SetBinding(TextBox.TextProperty, new Binding(nameof(UIOptionsDataModel.ScreenshotBackgroundColor)));
+            pnl2.Children.Add(tb1);
+
+            Canvas img1 = new Canvas();
+            img1.Width = 20;
+            img1.Height = 20;
+            img1.Margin = new Thickness(2);
+            img1.SetBinding(Canvas.BackgroundProperty, new Binding(nameof(UIOptionsDataModel.ScreenshotBackgroundColor)) {
+                Converter = UIHelper.CreateConverter((string s) => ColorWConverter.TryParse(s, out var color) ? new SolidColorBrush(color) : null)
+            });
+            pnl2.Children.Add(img1);
 
             ScrollViewer viewer = new ScrollViewer();
             viewer.Content = grid;
@@ -400,7 +442,7 @@ namespace WzComparerR2.MapRender.UI
         private bool _topBarVisible;
         private bool _minimap_cameraRegionVisible;
         private bool _worldmap_useImageNameAsInfoName;
-
+        private string _screenshotBackgroundColor;
 
         public bool MuteOnLeaveFocus
         {
@@ -442,6 +484,12 @@ namespace WzComparerR2.MapRender.UI
         {
             get { return this._mobNameVisible; }
             set { base.SetProperty(ref this._mobNameVisible, value); }
+        }
+
+        public string ScreenshotBackgroundColor
+        {
+            get { return this._screenshotBackgroundColor; }
+            set { base.SetProperty(ref this._screenshotBackgroundColor, value); }
         }
 
         public bool TopBarVisible

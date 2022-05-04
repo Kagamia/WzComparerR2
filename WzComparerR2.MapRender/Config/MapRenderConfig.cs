@@ -73,5 +73,12 @@ namespace WzComparerR2.MapRender.Config
             get { return (ConfigItem<bool>)this["worldMap.UseImageNameAsInfoName"]; }
             set { this["worldMap.UseImageNameAsInfoName"] = value; }
         }
+
+        [ConfigurationProperty("screenshotBackgroundColor")]
+        public ConfigItem<string> ScreenshotBackgroundColor
+        {
+            get { return (ConfigItem<string>)this["screenshotBackgroundColor"]; }
+            set { this["screenshotBackgroundColor"] = value; }
+        }
     }
 }
