@@ -17,18 +17,15 @@ namespace WzComparerR2.MapRender.UI
                 {
                     if (uint.TryParse(s, System.Globalization.NumberStyles.HexNumber,null, out uint rgb))
                     {
-                        colorW = new ColorW(rgb)
-                        {
-                            A = 255
-                        };
+                        colorW = new ColorW((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)(rgb), 0xff);
                         return true;
                     }
                 }
                 else if (s.Length == 8) //ARGB
                 {
-                    if (uint.TryParse(s, System.Globalization.NumberStyles.HexNumber, null, out uint packedValue))
+                    if (uint.TryParse(s, System.Globalization.NumberStyles.HexNumber, null, out uint argb))
                     {
-                        colorW = new ColorW(packedValue);
+                        colorW = new ColorW((byte)(argb >> 16), (byte)(argb >> 8), (byte)(argb), (byte)(argb>>24));
                         return true;
                     }
                 }
