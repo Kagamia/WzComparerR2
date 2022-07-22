@@ -87,12 +87,7 @@ for n in enumAllWzNodes(topNode) do
           
           --save sound
           env:WriteLine('(output)'..fn)
-          local file = io.open(fn, "wb")
-          local bytes = sound:ExtractSound()
-          for i = 0, (sound.DataLength - 1) / 4096 do
-            file:write(string.char(table.unpack(bytes, i * 4096, math.min(i * 4096 + 4095, sound.DataLength - 1))))
-          end
-          file:close()
+          File.WriteAllBytes(fn, sound:ExtractSound())
           env:WriteLine('(close)'..fn)
           
         end
