@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Diagnostics;
 
 namespace WzComparerR2.WzLib
 {
@@ -25,6 +26,7 @@ namespace WzComparerR2.WzLib
         private bool extr;
         private bool chec;
         private bool checEnc;
+        private Wz_CryptoKeyType encType;
 
         public string Name { get; set; }
         public Wz_File WzFile { get; set; }
@@ -46,6 +48,19 @@ namespace WzComparerR2.WzLib
         public bool IsLuaImage
         {
             get { return this.Name.EndsWith(".lua"); }
+        }
+
+        public Wz_Crypto.Wz_CryptoKey EncKeys
+        {
+            get
+            {
+                var crypto = this.WzFile.WzStructure.encryption;
+                if (this.checEnc && this.encType != default)
+                {
+                    return crypto.GetKeys(this.encType);
+                }
+                return crypto.keys;
+            }
         }
 
         public bool TryExtract()
@@ -159,7 +174,7 @@ namespace WzComparerR2.WzLib
         private void ExtractImg(long offset, Wz_Node parent, long eob)
         {
             int entries = 0;
-            string tag = this.WzFile.ReadString(offset);
+            string tag = this.WzFile.ReadString(offset, this.EncKeys);
             switch (tag)
             {
                 case "Property":
@@ -191,7 +206,7 @@ namespace WzComparerR2.WzLib
                     int form = this.WzFile.ReadInt32() + this.WzFile.BReader.ReadByte();
                     this.WzFile.FileStream.Position += 4;
                     int bufsize = this.WzFile.BReader.ReadInt32();
-                    parent.Value = new Wz_Png(w, h, bufsize - 1, form, (uint)this.WzFile.FileStream.Position + 1, this.WzFile);
+                    parent.Value = new Wz_Png(w, h, bufsize - 1, form, (uint)this.WzFile.FileStream.Position + 1, this);
                     this.WzFile.FileStream.Position += bufsize;
                     break;
 
@@ -209,13 +224,13 @@ namespace WzComparerR2.WzLib
                     int ms = this.WzFile.ReadInt32();
                     int headerLen = (int)(eob - len - this.WzFile.FileStream.Position);
                     byte[] header = this.WzFile.BReader.ReadBytes(headerLen);
-                    parent.Value = new Wz_Sound((uint)(eob - len), len, header, ms, this.WzFile);
+                    parent.Value = new Wz_Sound((uint)(eob - len), len, header, ms, this);
                     this.WzFile.FileStream.Position = eob;
                     break;
 
                 case "UOL":
                     this.WzFile.FileStream.Position++;
-                    parent.Value = new Wz_Uol(this.WzFile.ReadString(offset));
+                    parent.Value = new Wz_Uol(this.WzFile.ReadString(offset, this.EncKeys));
                     break;
 
                 default:
@@ -225,47 +240,40 @@ namespace WzComparerR2.WzLib
 
         private void TryDetectEnc()
         {
-            Wz_Crypto crypto = this.WzFile.WzStructure.encryption;
+            this.encType = default;
+            this.checEnc = false;
 
-            if (crypto.EncType != Wz_Crypto.Wz_CryptoKeyType.Unknown)
+            var wzsEncType = this.WzFile.WzStructure.encryption.EncType;
+            if (wzsEncType != default)
             {
-                if (IsIllegalTag())
+                if (this.IsIllegalTag(wzsEncType))
                 {
+                    this.encType = wzsEncType;
                     this.checEnc = true;
                     return;
                 }
             }
-            var oldenc = crypto.EncType;
-            crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.KMS;
-            if (IsIllegalTag())
-            {
-                this.checEnc = true;
-                return;
-            }
 
-            crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.GMS;
-            if (IsIllegalTag())
+            foreach (var enc in new[] {
+                Wz_CryptoKeyType.BMS,
+                Wz_CryptoKeyType.KMS,
+                Wz_CryptoKeyType.GMS,
+            })
             {
-                this.checEnc = true;
-                return;
+                if (this.IsIllegalTag(enc))
+                {
+                    this.encType = enc;
+                    this.checEnc = true;
+                    return;
+                }
             }
-
-            crypto.EncType = Wz_Crypto.Wz_CryptoKeyType.BMS;
-            if (IsIllegalTag())
-            {
-                this.checEnc = true;
-                return;
-            }
-
-            crypto.EncType = oldenc;
-            this.checEnc = false;
         }
 
-        private bool IsIllegalTag()
+        private bool IsIllegalTag(Wz_CryptoKeyType keyType)
         {
             this.WzFile.FileStream.Position = this.Offset;
             this.WzFile.stringTable.Remove(Offset);
-            switch (this.WzFile.ReadString(Offset))
+            switch (this.WzFile.ReadString(Offset, keyType))
             {
                 case "Property":
                 case "Shape2D#Vector2D":
@@ -278,11 +286,10 @@ namespace WzComparerR2.WzLib
                     return false;
             }
         }
-        
 
         private void ExtractValue(long offset, Wz_Node parent)
         {
-            parent = parent.Nodes.Add(this.WzFile.ReadString(offset));
+            parent = parent.Nodes.Add(this.WzFile.ReadString(offset, this.EncKeys));
             byte flag = this.WzFile.BReader.ReadByte();
             switch (flag)
             {
@@ -314,7 +321,7 @@ namespace WzComparerR2.WzLib
                     break;
 
                 case 0x08:
-                    parent.Value = this.WzFile.ReadString(offset);
+                    parent.Value = this.WzFile.ReadString(offset, this.EncKeys);
                     break;
 
                 case 0x09:
@@ -352,30 +359,29 @@ namespace WzComparerR2.WzLib
             {
                 TryDetectLuaEnc(data);
             }
-            this.WzFile.WzStructure.encryption.keys.Decrypt(data, 0, data.Length);
+            this.EncKeys.Decrypt(data, 0, data.Length);
             string luaCode = Encoding.UTF8.GetString(data);
             parent.Value = luaCode;
         }
 
         private void TryDetectLuaEnc(byte[] luaBinary)
         {
-            Wz_Crypto crypto = this.WzFile.WzStructure.encryption;
             byte[] tempBuffer = new byte[Math.Min(luaBinary.Length, 64)];
             char[] tempStr = new char[tempBuffer.Length];
 
             //测试各种加密方式 判断符合度最高的
             int maxCharCount = 0;
-            var maxCharEnc = Wz_Crypto.Wz_CryptoKeyType.Unknown;
+            var maxCharEnc = Wz_CryptoKeyType.Unknown;
 
             foreach (var enc in new[] {
-                Wz_Crypto.Wz_CryptoKeyType.GMS,
-                Wz_Crypto.Wz_CryptoKeyType.KMS,
-                Wz_Crypto.Wz_CryptoKeyType.BMS
+                Wz_CryptoKeyType.BMS,
+                Wz_CryptoKeyType.KMS,
+                Wz_CryptoKeyType.GMS,
             })
             {
                 Buffer.BlockCopy(luaBinary, 0, tempBuffer, 0, tempBuffer.Length);
-                crypto.EncType = enc;
-                crypto.keys.Decrypt(tempBuffer, 0, tempBuffer.Length);
+
+                this.WzFile.WzStructure.encryption.GetKeys(enc).Decrypt(tempBuffer, 0, tempBuffer.Length);
                 int count = Encoding.UTF8.GetChars(tempBuffer, 0, tempBuffer.Length, tempStr, 0);
                 int asciiCount = tempStr.Take(count).Count(chr => 32 <= chr && chr <= 127);
 
@@ -385,8 +391,7 @@ namespace WzComparerR2.WzLib
                     maxCharCount = asciiCount;
                 }
             }
-
-            crypto.EncType = maxCharEnc;
+            this.encType = maxCharEnc;
             this.checEnc = true;
         }
         

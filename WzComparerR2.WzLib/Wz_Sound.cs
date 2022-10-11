@@ -6,13 +6,13 @@ namespace WzComparerR2.WzLib
 {
     public class Wz_Sound
     {
-        public Wz_Sound(uint offset, int length, byte[] header, int ms, Wz_File wz_f)
+        public Wz_Sound(uint offset, int length, byte[] header, int ms, Wz_Image wz_i)
         {
             this.offset = offset;
             this.dataLength = length;
             this.header = header;
             this.ms = ms;
-            this.wz_f = wz_f;
+            this.wz_i = wz_i;
             TryDecryptHeader();
         }
 
@@ -21,7 +21,7 @@ namespace WzComparerR2.WzLib
         private int dataLength;
         private int ms;
 
-        private Wz_File wz_f;
+        private Wz_Image wz_i;
 
         /// <summary>
         /// 获取或设置数据块对于文件的偏移。
@@ -76,8 +76,17 @@ namespace WzComparerR2.WzLib
         /// </summary>
         public Wz_File WzFile
         {
-            get { return wz_f; }
-            set { wz_f = value; }
+            get { return wz_i.WzFile; }
+            set { wz_i.WzFile = value; }
+        }
+
+        /// <summary>
+        /// 获取或设置图片所属的WzImage。
+        /// </summary>
+        public Wz_Image WzImage
+        {
+            get { return wz_i; }
+            set { wz_i = value; }
         }
 
         public Wz_SoundType SoundType
@@ -125,14 +134,14 @@ namespace WzComparerR2.WzLib
                     {
                         byte[] data = new byte[this.dataLength];
                         this.WzFile.FileStream.Seek(this.offset, System.IO.SeekOrigin.Begin);
-                        this.wz_f.FileStream.Read(data, 0, this.dataLength);
+                        this.WzFile.FileStream.Read(data, 0, this.dataLength);
                         return data;
                     }
                 case Wz_SoundType.WavRaw:
                     {
                         byte[] data = new byte[this.dataLength + 44];
                         this.WzFile.FileStream.Seek(this.offset, System.IO.SeekOrigin.Begin);
-                        this.wz_f.FileStream.Read(data, 44, this.dataLength);
+                        this.WzFile.FileStream.Read(data, 44, this.dataLength);
                         byte[] wavHeader = new byte[44]{
                           0x52,0x49,0x46,0x46, //"RIFF"
                           0,0,0,0, //ChunkSize
@@ -173,8 +182,8 @@ namespace WzComparerR2.WzLib
                 {
                     byte[] tempHeader = new byte[waveFormatLen];
                     Buffer.BlockCopy(this.header, 52, tempHeader, 0, tempHeader.Length);
-                    var enc = this.WzFile.WzStructure.encryption;
-                    enc.keys.Decrypt(tempHeader, 0, tempHeader.Length); //解密
+                    var encKeys = this.WzImage.EncKeys;
+                    encKeys.Decrypt(tempHeader, 0, tempHeader.Length); //解密
                     cbSize = BitConverter.ToUInt16(tempHeader, 16); //重新验证
                     if (cbSize + 18 == waveFormatLen)
                     {

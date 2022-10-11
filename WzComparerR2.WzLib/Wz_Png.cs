@@ -11,14 +11,14 @@ namespace WzComparerR2.WzLib
 {
     public class Wz_Png
     {
-        public Wz_Png(int w, int h, int data_length, int form, uint offs, Wz_File wz_f)
+        public Wz_Png(int w, int h, int data_length, int form, uint offs, Wz_Image wz_i)
         {
             this.w = w;
             this.h = h;
             this.data_length = data_length;
             this.form = form;
             this.offs = offs;
-            this.wz_f = wz_f;
+            this.wz_i = wz_i;
         }
 
         private int w;
@@ -26,7 +26,7 @@ namespace WzComparerR2.WzLib
         private int data_length;
         private int form;
         private uint offs;
-        private Wz_File wz_f;
+        private Wz_Image wz_i;
 
         /// <summary>
         /// 获取或设置图片的宽度。
@@ -78,8 +78,17 @@ namespace WzComparerR2.WzLib
         /// </summary>
         public Wz_File WzFile
         {
-            get { return wz_f; }
-            set { wz_f = value; }
+            get { return wz_i.WzFile; }
+            set { wz_i.WzFile = value; }
+        }
+
+        /// <summary>
+        /// 获取或设置图片所属的WzImage
+        /// </summary>
+        public Wz_Image WzImage
+        {
+            get { return wz_i; }
+            set { wz_i = value; }
         }
 
         public byte[] GetRawData()
@@ -105,7 +114,7 @@ namespace WzComparerR2.WzLib
                     int blocksize = 0;
                     int endPosition = (int)(this.DataLength + this.WzFile.FileStream.Position);
 
-                    var encKeys = this.WzFile.WzStructure.encryption.keys;
+                    var encKeys = this.WzImage.EncKeys;
 
                     while (this.WzFile.FileStream.Position < endPosition)
                     {

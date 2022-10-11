@@ -204,16 +204,26 @@ namespace WzComparerR2.WzLib
 
         public string ReadString(long offset)
         {
+            return this.ReadString(offset, this.WzStructure.encryption.keys);
+        }
+
+        public string ReadString(long offset, Wz_CryptoKeyType keyType)
+        {
+            return this.ReadString(offset, this.WzStructure.encryption.GetKeys(keyType));
+        }
+
+        public string ReadString(long offset, Wz_Crypto.Wz_CryptoKey cryptoKey)
+        {
             byte b = this.BReader.ReadByte();
             switch (b)
             {
                 case 0x00:
                 case 0x73:
-                    return ReadString();
+                    return ReadString(cryptoKey);
 
                 case 0x01:
                 case 0x1B:
-                    return ReadStringAt(offset + this.BReader.ReadInt32());
+                    return ReadStringAt(offset + this.BReader.ReadInt32(), cryptoKey);
 
                 case 0x04:
                     this.FileStream.Position += 8;
@@ -225,21 +235,21 @@ namespace WzComparerR2.WzLib
             return string.Empty;
         }
 
-        public string ReadStringAt(long offset)
+        private string ReadStringAt(long offset, Wz_Crypto.Wz_CryptoKey cryptoKey)
         {
             long oldoffset = this.FileStream.Position;
             string str;
             if (!stringTable.TryGetValue(offset, out str))
             {
                 this.FileStream.Position = offset;
-                str = ReadString();
+                str = ReadString(cryptoKey);
                 stringTable[offset] = str;
                 this.FileStream.Position = oldoffset;
             }
             return str;
         }
 
-        public unsafe string ReadString()
+        private unsafe string ReadString(Wz_Crypto.Wz_CryptoKey cryptoKey)
         {
             int size = this.BReader.ReadSByte();
             string result = null;
@@ -250,7 +260,7 @@ namespace WzComparerR2.WzLib
 
                 var buffer = GetStringBuffer(size);
                 this.fileStream.Read(buffer, 0, size);
-                this.WzStructure.encryption.keys.Decrypt(buffer, 0, size);
+                cryptoKey.Decrypt(buffer, 0, size);
 
                 fixed (byte* pData = buffer)
                 {
@@ -274,7 +284,7 @@ namespace WzComparerR2.WzLib
 
                 var buffer = GetStringBuffer(size * 2);
                 this.fileStream.Read(buffer, 0, size * 2);
-                this.WzStructure.encryption.keys.Decrypt(buffer, 0, size * 2);
+                cryptoKey.Decrypt(buffer, 0, size * 2);
 
                 fixed (byte* pData = buffer)
                 {
@@ -357,6 +367,7 @@ namespace WzComparerR2.WzLib
             //int offs = 0;
 
             int count = ReadInt32();
+            var cryptoKey = this.WzStructure.encryption.keys;
 
             for (int i = 0; i < count; i++)
             {
@@ -364,10 +375,10 @@ namespace WzComparerR2.WzLib
                 {
                     case 0x02:
                         int stringOffAdd = this.Header.HasCapabilities(Wz_Capabilities.EncverMissing) ? 2 : 1;
-                        name = this.ReadStringAt(this.Header.HeaderSize + stringOffAdd + this.BReader.ReadInt32());
+                        name = this.ReadStringAt(this.Header.HeaderSize + stringOffAdd + this.BReader.ReadInt32(), cryptoKey);
                         goto case 0xffff;
                     case 0x04:
-                        name = this.ReadString();
+                        name = this.ReadString(cryptoKey);
                         goto case 0xffff;
 
                     case 0xffff:
@@ -385,7 +396,7 @@ namespace WzComparerR2.WzLib
                         break;
 
                     case 0x03:
-                        name = this.ReadString();
+                        name = this.ReadString(cryptoKey);
                         size = this.ReadInt32();
                         cs32 = this.ReadInt32();
                         pos = (uint)this.bReader.BaseStream.Position;
