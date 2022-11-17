@@ -262,6 +262,17 @@ namespace WzComparerR2.CharaSimControl
                 picH = 10;
             }
 
+            if (sr["fixWidth"] != null)
+            {
+                //重构大小
+                g.Dispose();
+                tooltip.Dispose();
+
+                tooltip = new Bitmap(Int32.Parse(sr["fixWidth"]), DefaultPicHeight);
+                g = Graphics.FromImage(tooltip);
+                picH = 10;
+            }
+
             //绘制标题
             bool hasPart2 = false;
             format.Alignment = StringAlignment.Center;
