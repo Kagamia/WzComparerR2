@@ -235,12 +235,9 @@ namespace WzComparerR2.CharaSimControl
 
         private Bitmap RenderItem(out int picH)
         {
-            Bitmap tooltip = new Bitmap(290, DefaultPicHeight);
-            Graphics g = Graphics.FromImage(tooltip);
             StringFormat format = (StringFormat)StringFormat.GenericDefault.Clone();
             int value;
 
-            picH = 10;
             //物品标题
             StringResult sr;
             if (StringLinker == null || !StringLinker.StringItem.TryGetValue(item.ItemID, out sr))
@@ -249,18 +246,31 @@ namespace WzComparerR2.CharaSimControl
                 sr.Name = "(null)";
             }
 
-            SizeF titleSize = g.MeasureString(sr.Name, GearGraphics.ItemNameFont2, short.MaxValue, format);
-            titleSize.Width += 12 * 2;
-            if (titleSize.Width > 290)
-            {
-                //重构大小
-                g.Dispose();
-                tooltip.Dispose();
+            // calculate image width
+            const int DefualtWidth = 290;
+            int tooltipWidth = DefualtWidth;
 
-                tooltip = new Bitmap((int)Math.Ceiling(titleSize.Width), DefaultPicHeight);
-                g = Graphics.FromImage(tooltip);
-                picH = 10;
+            if (int.TryParse(sr["fixWidth"], out int fixWidth) && fixWidth > 0)
+            {
+                tooltipWidth = fixWidth;
             }
+            else
+            {
+                using (Bitmap dummyImg = new Bitmap(1, 1))
+                using (Graphics tempG = Graphics.FromImage(dummyImg))
+                {
+                    SizeF titleSize = tempG.MeasureString(sr.Name, GearGraphics.ItemNameFont2, short.MaxValue, format);
+                    titleSize.Width += 12 * 2;
+                    if (titleSize.Width > DefualtWidth)
+                    {
+                        tooltipWidth = (int)Math.Ceiling(titleSize.Width);
+                    }
+                }
+            }
+
+            Bitmap tooltip = new Bitmap(tooltipWidth, DefaultPicHeight);
+            Graphics g = Graphics.FromImage(tooltip);
+            picH = 10;
 
             //绘制标题
             bool hasPart2 = false;
