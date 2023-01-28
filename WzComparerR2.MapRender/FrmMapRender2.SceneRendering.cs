@@ -697,7 +697,7 @@ namespace WzComparerR2.MapRender
 
         private MeshItem GetMeshObj(ObjItem obj)
         {
-            var renderObj = GetRenderObject(obj.View.Animator, obj.Flip);
+            var renderObj = GetRenderObject(obj.View.Animator, flip: obj.Flip, blend: obj.Light);
             if (renderObj == null)
             {
                 return null;
@@ -792,7 +792,7 @@ namespace WzComparerR2.MapRender
             return mesh;
         }
 
-        private object GetRenderObject(object animator, bool flip = false, int alpha = 255)
+        private object GetRenderObject(object animator, bool flip = false, int alpha = 255, bool blend = false)
         {
             if (animator is FrameAnimator)
             {
@@ -802,6 +802,10 @@ namespace WzComparerR2.MapRender
                     if (alpha < 255) //理论上应该返回一个新的实例
                     {
                         frame.A0 = frame.A0 * alpha / 255;
+                    }
+                    if (blend)
+                    {
+                        frame.Blend = blend;
                     }
                     return frame;
                 }
