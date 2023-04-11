@@ -2,6 +2,10 @@
 
 [![Build Status](https://dev.azure.com/kagamiastudio/WzComparerR2/_apis/build/status/Kagamia.WzComparerR2?branchName=master)](https://dev.azure.com/kagamiastudio/WzComparerR2/_build/latest?definitionId=4&branchName=master)
 
+# Maintenance Status
+
+⚠️ The WzComparerR2 project is now in deep maintenance status. This means that only critical bugs or wz file format breaking changes are being considered for inclusion by owner. Expect slow replies to issues.
+
 # WzComparerR2
 这是一个用C#7/.Net4.6.2组装的冒险岛提取器...  
 包含了一些奇怪的机能比如stringWZ搜索 客户端对比 装备模拟 地图模拟等等..  
