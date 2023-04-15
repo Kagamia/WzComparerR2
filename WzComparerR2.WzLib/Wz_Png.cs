@@ -134,28 +134,28 @@ namespace WzComparerR2.WzLib
                     case 257:
                     case 513:
                         plainData = new byte[this.w * this.h * 2];
-                        zlib.Read(plainData, 0, plainData.Length);
+                        ReadAvailableBytes(zlib, plainData, 0, plainData.Length);
                         break;
 
                     case 2:
                         plainData = new byte[this.w * this.h * 4];
-                        zlib.Read(plainData, 0, plainData.Length);
+                        ReadAvailableBytes(zlib, plainData, 0, plainData.Length);
                         break;
 
                     case 3:
                         plainData = new byte[((int)Math.Ceiling(this.w / 4.0)) * 4 * ((int)Math.Ceiling(this.h / 4.0)) * 4 / 8];
-                        zlib.Read(plainData, 0, plainData.Length);
+                        ReadAvailableBytes(zlib, plainData, 0, plainData.Length);
                         break;
 
                     case 517:
                         plainData = new byte[this.w * this.h / 128];
-                        zlib.Read(plainData, 0, plainData.Length);
+                        ReadAvailableBytes(zlib, plainData, 0, plainData.Length);
                         break;
 
                     case 1026:
                     case 2050:
                         plainData = new byte[this.w * this.h];
-                        zlib.Read(plainData, 0, plainData.Length);
+                        ReadAvailableBytes(zlib, plainData, 0, plainData.Length);
                         break;
 
                     default:
@@ -556,7 +556,22 @@ namespace WzComparerR2.WzLib
                     Marshal.Copy(source, stride * y, bmpData.Scan0 + bmpData.Stride * y, stride);
                 }
             }
+        }
 
+        private static int ReadAvailableBytes(Stream inputStream, byte[] array, int offset, int count)
+        {
+            // this is a wrapper function that to make sure always reading as much as requested from zlib stream;
+            // https://github.com/Kagamia/WzComparerR2/issues/195
+            int totalRead = 0;
+            while (count > 0)
+            {
+                int bytesRead = inputStream.Read(array, offset, count);
+                if (bytesRead == 0) break;
+                totalRead += bytesRead;
+                offset += bytesRead;
+                count -= bytesRead;
+            }
+            return totalRead;
         }
     }
 }
