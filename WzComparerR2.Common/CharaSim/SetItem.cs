@@ -65,7 +65,6 @@ namespace WzComparerR2.CharaSim
                             else
                             {
                                 SetItemIDPart part = new SetItemIDPart();
-                                int num;
                                 foreach (Wz_Node itemNode2 in itemNode.Nodes)
                                 {
                                     switch (itemNode2.Text)
@@ -77,7 +76,7 @@ namespace WzComparerR2.CharaSim
                                             part.TypeName = Convert.ToString(itemNode2.Value);
                                             break;
                                         default:
-                                            if (Int32.TryParse(itemNode2.Text, out num) && num > 0)
+                                            if (Int32.TryParse(itemNode2.Text, out int index) && index >= 0) // the key can start from 0
                                             {
                                                 part.ItemIDs[Convert.ToInt32(itemNode2.Value)] = false;
                                             }
@@ -270,6 +269,11 @@ namespace WzComparerR2.CharaSim
                         case "pocket":
                             combinePart = CombinePart(setItem, gearID => Gear.GetGearType(gearID) == GearType.pocket);
                             combineTypeName = ItemStringHelper.GetSetItemGearTypeString(GearType.pocket);
+                            break;
+
+                        case "emblem":
+                            combinePart = CombinePart(setItem, gearID => Gear.GetGearType(gearID) == GearType.emblem);
+                            combineTypeName = ItemStringHelper.GetSetItemGearTypeString(GearType.emblem);
                             break;
                     }
 

@@ -87,10 +87,11 @@ namespace WzComparerR2.CharaSimControl
                 string itemName = setItemPart.Value.RepresentName;
                 string typeName = setItemPart.Value.TypeName;
 
-                if (string.IsNullOrEmpty(typeName) && SetItem.Parts)
-                {
-                    typeName = "特殊";
-                }
+                // for 'parts' setitem, detect typeName by the first itemID per part
+                //if (string.IsNullOrEmpty(typeName) && SetItem.Parts)
+                //{
+                //    typeName = "特殊";
+                //}
 
                 ItemBase itemBase = null;
                 bool cash = false;
