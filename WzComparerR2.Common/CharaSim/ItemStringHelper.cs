@@ -347,6 +347,10 @@ namespace WzComparerR2.CharaSim
                 case GearType.weaponBelt: return "武器腰带";
 
                 case GearType.ornament: return "饰品";
+
+                case GearType.chakram: return "环刃";
+                case GearType.hexSeeker: return "索魂器";
+
                 default: return null;
             }
         }
@@ -478,6 +482,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.boxingSky: return GetExtraJobReqString(175);
 
                 case GearType.ornament: return GetExtraJobReqString(162);
+
+                case GearType.chakram:
+                case GearType.hexSeeker: return GetExtraJobReqString(154);
                 default: return null;
             }
         }
@@ -512,6 +519,7 @@ namespace WzComparerR2.CharaSim
                 case 142: return "超能力者可穿戴装备";
                 case 151: return "御剑骑士可穿戴装备";
                 case 152: return "圣晶使徒可穿戴装备";
+                case 154: return "卡里可穿戴装备";
                 case 155: return "影魂异人可穿戴装备";
                 case 162: return "元素师可穿戴装备";
                 case 164: return "虎影可穿戴装备";
