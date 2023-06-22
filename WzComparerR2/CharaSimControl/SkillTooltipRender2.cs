@@ -27,6 +27,7 @@ namespace WzComparerR2.CharaSimControl
         public bool ShowReqSkill { get; set; } = true;
         public bool DisplayCooltimeMSAsSec { get; set; } = true;
         public bool DisplayPermyriadAsPercent { get; set; } = true;
+        public bool IgnoreEvalError { get; set; } = false;
         public bool IsWideMode { get; set; } = true;
 
         public override Bitmap Render()
@@ -123,7 +124,8 @@ namespace WzComparerR2.CharaSimControl
                 string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default, new SkillSummaryOptions
                 {
                     ConvertCooltimeMS = this.DisplayCooltimeMSAsSec,
-                    ConvertPerM = this.DisplayPermyriadAsPercent
+                    ConvertPerM = this.DisplayPermyriadAsPercent,
+                    IgnoreEvalError = this.IgnoreEvalError,
                 });
                 GearGraphics.DrawString(g, "[现在等级 " + Skill.Level + "]", GearGraphics.ItemDetailFont, region.LevelDescLeft, region.TextRight, ref picH, 16);
                 if (hStr != null)
@@ -137,7 +139,8 @@ namespace WzComparerR2.CharaSimControl
                 string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level + 1, sr, SummaryParams.Default, new SkillSummaryOptions
                 {
                     ConvertCooltimeMS = this.DisplayCooltimeMSAsSec,
-                    ConvertPerM = this.DisplayPermyriadAsPercent
+                    ConvertPerM = this.DisplayPermyriadAsPercent,
+                    IgnoreEvalError = this.IgnoreEvalError,
                 });
                 GearGraphics.DrawString(g, "[下次等级 " + (Skill.Level + 1) + "]", GearGraphics.ItemDetailFont, region.LevelDescLeft, region.TextRight, ref picH, 16);
                 if (hStr != null)

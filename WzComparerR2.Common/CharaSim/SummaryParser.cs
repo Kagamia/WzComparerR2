@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using WzComparerR2.Common;
@@ -57,19 +58,34 @@ namespace WzComparerR2.CharaSim
                     }
                     if (prop != null)
                     {
-                        var val = Calculator.Parse(prop, Level);
-                        if (options.ConvertCooltimeMS && propKey == "cooltimeMS")
+                        try
                         {
-                            sb.Append((val / 1000).ToString("f2"));
+                            decimal val = Calculator.Parse(prop, Level);
+                            if (options.ConvertCooltimeMS && propKey == "cooltimeMS")
+                            {
+                                sb.AppendFormat("{0:f2}", val / 1000);
+                            }
+                            else if (options.ConvertPerM && propKey.EndsWith("PerM", StringComparison.Ordinal))
+                            {
+                                sb.AppendFormat("{0:f1}", val / 100);
+                            }
+                            else
+                            {
+                                sb.Append(val);
+                            }
                         }
-                        else if (options.ConvertPerM && propKey.EndsWith("PerM", StringComparison.Ordinal))
+                        catch
                         {
-                            sb.Append((val / 100).ToString("f1"));
+                            if (options.IgnoreEvalError)
+                            {
+                                sb.Append("NaN");
+                            }
+                            else
+                            {
+                                throw;
+                            }
                         }
-                        else
-                        {
-                            sb.Append(val);
-                        }
+
                         idx += len + 1;
                         continue;
                     }
@@ -88,8 +104,22 @@ namespace WzComparerR2.CharaSim
                         {
                             if (prop != "" && GetValueIgnoreCase(CommonProps, prop, out prop))
                             {
-                                var val = Calculator.Parse(prop, Level);
-                                sb.Append(val);
+                                try
+                                {
+                                    decimal val = Calculator.Parse(prop, Level);
+                                    sb.Append(val);
+                                }
+                                catch
+                                {
+                                    if (options.IgnoreEvalError)
+                                    {
+                                        sb.Append("NaN");
+                                    }
+                                    else
+                                    {
+                                        throw;
+                                    }
+                                }
                             }
                             else
                             {
@@ -121,7 +151,7 @@ namespace WzComparerR2.CharaSim
                     else //无法匹配 取最长的common段
                     {
                         string key = H.Substring(idx + 1, len);
-                        if (System.Text.RegularExpressions.Regex.IsMatch(key, @"^\d+$"))
+                        if (Regex.IsMatch(key, @"^\d+$"))
                         {
                             sb.Append(key);
                         }
@@ -217,5 +247,6 @@ namespace WzComparerR2.CharaSim
     {
         public bool ConvertCooltimeMS { get; set; }
         public bool ConvertPerM { get; set; }
+        public bool IgnoreEvalError { get; set; }
     }
 }

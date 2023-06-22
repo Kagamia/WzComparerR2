@@ -83,6 +83,13 @@ namespace WzComparerR2
         }
 
         [Link]
+        public bool Skill_IgnoreEvalError
+        {
+            get { return checkBoxX15.Checked; }
+            set { checkBoxX15.Checked = value; }
+        }
+
+        [Link]
         public bool Gear_ShowID
         {
             get { return checkBoxX3.Checked; }
