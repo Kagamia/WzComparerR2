@@ -417,8 +417,14 @@ namespace WzComparerR2.CharaSimControl
             //  if (gear.Props.TryGetValue(GearPropType.attackSpeed, out value) && value > 0)
             if (value > 0)
             {
-                g.DrawString("攻击速度 : " + ItemStringHelper.GetAttackSpeedString(value) + (ShowSpeed ? (" (" + value + ")") : null),
-                    GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
+                bool isValidSpeed = (2 <= value && value <= 9);
+                string speedStr = string.Format("攻击速度 : {0}{1}{2}",
+                    ItemStringHelper.GetAttackSpeedString(value),
+                    isValidSpeed ? $"（{10 - value}阶段）" : null,
+                    ShowSpeed ? $"({value})" : null
+                );
+
+                g.DrawString(speedStr, GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
                 picH += 16;
                 hasPart2 = true;
             }

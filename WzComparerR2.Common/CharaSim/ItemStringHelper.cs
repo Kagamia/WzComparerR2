@@ -365,17 +365,15 @@ namespace WzComparerR2.CharaSim
             switch (attackSpeed)
             {
                 case 2:
-                case 3: return "比较快";
+                case 3: return "极快";
                 case 4:
                 case 5: return "快";
                 case 6: return "普通";
                 case 7:
-                case 8: return "慢";
-                case 9: return "比较慢";
+                case 8: return "缓慢";
+                case 9: return "较慢";
                 default:
-                    if (attackSpeed < 2) return "吃屎一样快";
-                    else if (attackSpeed > 9) return "吃屎一样慢";
-                    else return attackSpeed.ToString();
+                    return attackSpeed.ToString();
             }
         }
 
@@ -519,7 +517,7 @@ namespace WzComparerR2.CharaSim
                 case 142: return "超能力者可穿戴装备";
                 case 151: return "御剑骑士可穿戴装备";
                 case 152: return "圣晶使徒可穿戴装备";
-                case 154: return "卡里可穿戴装备";
+                case 154: return "飞刃沙士可穿戴装备";
                 case 155: return "影魂异人可穿戴装备";
                 case 162: return "元素师可穿戴装备";
                 case 164: return "虎影可穿戴装备";
