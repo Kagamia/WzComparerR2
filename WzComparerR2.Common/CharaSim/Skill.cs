@@ -59,6 +59,7 @@ namespace WzComparerR2.CharaSim
         public bool CombatOrders { get; set; }
         public bool NotRemoved { get; set; }
         public bool VSkill { get; set; }
+        public bool Origin { get; set; }
         public int MasterLevel { get; set; }
         public Dictionary<int, int> ReqSkill { get; private set; }
         public List<string> Action { get; private set; }
@@ -148,6 +149,9 @@ namespace WzComparerR2.CharaSim
                         break;
                     case "vSkill":
                         skill.VSkill = childNode.GetValue<int>() != 0;
+                        break;
+                    case "origin":
+                        skill.Origin = childNode.GetValue<int>() != 0;
                         break;
                     case "masterLevel":
                         skill.MasterLevel = childNode.GetValue<int>();

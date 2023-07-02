@@ -94,6 +94,12 @@ namespace WzComparerR2.CharaSimControl
                 picH + (33 - Skill.Icon.Bitmap.Height) * 2);
             }
 
+            // for 6th job skills
+            if (Skill.Origin)
+            {
+                g.DrawImage(Resource.UIWindow2_img_Skill_skillTypeIcon_origin, 15, 11);
+            }
+
             //绘制desc
             picH = 35;
             if (!Skill.PreBBSkill)
