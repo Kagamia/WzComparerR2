@@ -185,7 +185,7 @@ namespace WzComparerR2.WzLib
 
             switch (this.form)
             {
-                case 1: //16位argba4444
+                case 1: //16位argb4444
                     argb = GetPixelDataBgra4444(pixel, this.w, this.h);
                     pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format32bppArgb);
                     bmpdata = pngDecoded.LockBits(new Rectangle(Point.Empty, pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
@@ -226,7 +226,7 @@ namespace WzComparerR2.WzLib
                     argb = GetPixelDataForm517(pixel, this.w, this.h);
                     pngDecoded = new Bitmap(this.w, this.h, PixelFormat.Format16bppRgb565);
                     bmpdata = pngDecoded.LockBits(new Rectangle(0, 0, this.w, this.h), ImageLockMode.WriteOnly, PixelFormat.Format16bppRgb565);
-                    CopyBmpDataWithStride(pixel, pngDecoded.Width * 2, bmpdata);
+                    Marshal.Copy(argb, 0, bmpdata.Scan0, argb.Length);
                     pngDecoded.UnlockBits(bmpdata);
                     break;
                    /* pngDecoded = new Bitmap(this.w, this.h);
