@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
 using WzComparerR2.WzLib;
 
 namespace WzComparerR2.Comparer
@@ -23,6 +24,8 @@ namespace WzComparerR2.Comparer
         public bool OutputAddedImg { get; set; }
         public bool OutputRemovedImg { get; set; }
         public bool EnableDarkMode { get; set; }
+        public bool HashPngFileName { get; set; }
+
         public string StateInfo
         {
             get { return stateInfo; }
@@ -451,65 +454,61 @@ namespace WzComparerR2.Comparer
 
         protected virtual string OutputNodeValue(string fullPath, object value, int col, string outputDir)
         {
-
             if (value == null)
                 return null;
 
-            Wz_Png png;
-            Wz_Uol uol;
-            Wz_Sound sound;
-            Wz_Vector vector;
-            
-            if ((png = value as Wz_Png) != null)
+            switch (value)
             {
-                if (OutputPng)
-                {
-                    char[] invalidChars = Path.GetInvalidFileNameChars();
-                    string colName = col == 0 ? "new" : (col == 1 ? "old" : col.ToString());
-                    string filePath = fullPath.Replace('\\', '.') + "_" + colName + ".png";
-
-                    for (int i = 0; i < invalidChars.Length; i++)
+                case Wz_Png png:
+                    if (OutputPng)
                     {
-                        filePath = filePath.Replace(invalidChars[i].ToString(), null);
+                        char[] invalidChars = Path.GetInvalidFileNameChars();
+                        string colName = col == 0 ? "new" : (col == 1 ? "old" : col.ToString());
+                        string fileName = fullPath.Replace('\\', '.');
+
+                        if (this.HashPngFileName)
+                        {
+                            fileName = ToHexString(MD5Hash(fileName));
+                            // TODO: save file name mapping to another file? 
+                        }
+                        else
+                        {
+                            for (int i = 0; i < invalidChars.Length; i++)
+                            {
+                                fileName = fileName.Replace(invalidChars[i], '_');
+                            }
+                        }
+
+                        fileName = fileName + "_" + colName + ".png";
+                        using (Bitmap bmp = png.ExtractPng())
+                        {
+                            bmp.Save(Path.Combine(outputDir, fileName), System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                        return string.Format("<img src=\"{0}/{1}\" />", new DirectoryInfo(outputDir).Name, WebUtility.UrlEncode(fileName));
+                    }
+                    else
+                    {
+                        return string.Format("png {0}*{1} ({2} bytes)", png.Width, png.Height, png.DataLength);
                     }
 
-                    Bitmap bmp = png.ExtractPng();
-                    if (bmp != null)
-                    {
-                        bmp.Save(Path.Combine(outputDir, filePath), System.Drawing.Imaging.ImageFormat.Png);
-                        bmp.Dispose();
-                    }
-                    return string.Format("<img src=\"{0}/{1}\" />", new DirectoryInfo(outputDir).Name, WebUtility.UrlEncode(filePath));
-                }
-                else
-                {
-                    return string.Format("png {0}*{1} ({2} bytes)", png.Width, png.Height, png.DataLength);
-                }
+                case Wz_Uol uol:
+                    return uol.Uol;
 
+                case Wz_Vector vector:
+                    return string.Format("({0}, {1})", vector.X, vector.Y);
+
+                case Wz_Sound sound:
+                    return string.Format("sound {0}ms", sound.Ms);
+
+                case Wz_Image _:
+                    return "{ img }";
             }
-            else if ((uol = value as Wz_Uol) != null)
-            {
-                return uol.Uol;
-            }
-            else if ((vector = value as Wz_Vector) != null)
-            {
-                return string.Format("({0}, {1})", vector.X, vector.Y);
-            }
-            else if ((sound = value as Wz_Sound) != null)
-            {
-                return string.Format("sound {0}ms", sound.Ms);
-            }
-            else if (value is Wz_Image)
-            {
-                return "{ img }";
-            }
+
             return WebUtility.HtmlEncode(Convert.ToString(value));
-
         }
 
         public virtual void CreateStyleSheet(string outputDir)
         {
-
             string path = Path.Combine(outputDir, "style.css");
             if (File.Exists(path))
                 return;
@@ -551,6 +550,24 @@ namespace WzComparerR2.Comparer
             }
             sw.Flush();
             sw.Close();
+        }
+
+        private static byte[] MD5Hash(string text)
+        {
+            using (var md5 = MD5.Create())
+            {
+                return md5.ComputeHash(Encoding.UTF8.GetBytes(text));
+            }
+        }
+
+        private static string ToHexString(byte[] inArray)
+        {
+            StringBuilder hex = new StringBuilder(inArray.Length * 2);
+            foreach (byte b in inArray)
+            {
+                hex.AppendFormat("{0:x2}", b);
+            }
+            return hex.ToString();
         }
     }
 }
