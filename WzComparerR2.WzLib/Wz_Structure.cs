@@ -133,7 +133,9 @@ namespace WzComparerR2.WzLib
                     IsChecksumChecked = true
                 };
                 imgNode.Value = img;
+
                 node.Nodes.Add(imgNode);
+                node.Value = file;
                 this.wz_files.Add(file);
             }
             catch
