@@ -141,6 +141,8 @@ namespace WzComparerR2.CharaSim
 
                 case GearPropType.incARC: return "神秘之力 : " + sign + value;
                 case GearPropType.incAUT: return "原初之力 : " + sign + value;
+
+                case GearPropType.Etuc: return "可进行卓越强化。（最多：" + value + "次）";
                 default: return null;
             }
         }
