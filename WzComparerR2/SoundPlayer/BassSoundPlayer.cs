@@ -53,6 +53,7 @@ namespace WzComparerR2
             {
                 try
                 {
+                    Bass.Configure(Configuration.IncludeDefaultDevice, true);
                     if (inited = Bass.Init(-1, 44100, DeviceInitFlags.Default, IntPtr.Zero))
                     {
                         if (Directory.Exists(Program.LibPath))
