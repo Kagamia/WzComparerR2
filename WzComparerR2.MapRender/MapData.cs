@@ -866,11 +866,33 @@ namespace WzComparerR2.MapRender
 
         private void AddMobAI(StateMachineAnimator ani)
         {
+            var actions = new[] { "stand", "say", "mouse", "move", "hand", "laugh", "eye" };
             ani.AnimationEnd += (o, e) =>
             {
-                if (e.CurrentState == "regen" && ani.Data.States.Contains("stand"))
+                switch(e.CurrentState)
                 {
-                    e.NextState = "stand";
+                    case "regen":
+                        if (ani.Data.States.Contains("stand")) e.NextState = "stand";
+                        else if (ani.Data.States.Contains("fly")) e.NextState = "fly";
+                        break;
+
+                    case "stand":
+                        if (ani.Data.States.Contains("jump") && this.random.NextPercent(0.05f))
+                        {
+                            e.NextState = "jump";
+                        }
+                        else if (ani.Data.States.Contains("move") && this.random.NextPercent(0.3f))
+                        {
+                            e.NextState = "move";
+                        }
+                        else
+                        {
+                            e.NextState = e.CurrentState;
+                        }
+                        break;
+
+                    default: 
+                        goto case "regen";
                 }
             };
         }
