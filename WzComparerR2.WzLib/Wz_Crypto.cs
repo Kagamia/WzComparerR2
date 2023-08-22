@@ -165,7 +165,9 @@ namespace WzComparerR2.WzLib
 
         private bool IsLegalNodeName(string nodeName)
         {
-            return nodeName.EndsWith(".img") || nodeName.EndsWith(".lua") || Regex.IsMatch(nodeName, @"^[A-Za-z0-9_]+$");
+            // MSEA 225 has a node in Base.wz named "Base,Character,Effect,Etc,Item,Map,Mob,Morph,Npc,Quest,Reactor,Skill,Sound,String,TamingMob,UI"
+            // It is so funny but wzlib have to be compatible with it.
+            return nodeName.EndsWith(".img") || nodeName.EndsWith(".lua") || Regex.IsMatch(nodeName, @"^[A-Za-z0-9_,]+$");
         }
 
         static readonly byte[] iv_gms = { 0x4d, 0x23, 0xc7, 0x2b };
