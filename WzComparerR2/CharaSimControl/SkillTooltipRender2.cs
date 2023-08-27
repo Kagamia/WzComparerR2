@@ -80,6 +80,11 @@ namespace WzComparerR2.CharaSimControl
             Bitmap bitmap = new Bitmap(region.Width, DefaultPicHeight);
             Graphics g = Graphics.FromImage(bitmap);
             StringFormat format = (StringFormat)StringFormat.GenericDefault.Clone();
+            var v6SkillSummaryFontColorTable = new Dictionary<string, Color>()
+            {
+                { "c", GearGraphics.SkillSummaryOrangeTextColor },
+            };
+
             picH = 0;
             splitterH = new List<int>();
 
@@ -121,7 +126,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 string hdesc = SummaryParser.GetSkillSummary(sr.Desc, Skill.Level, Skill.Common, SummaryParams.Default);
                 //string hStr = SummaryParser.GetSkillSummary(skill, skill.Level, sr, SummaryParams.Default);
-                GearGraphics.DrawString(g, hdesc, GearGraphics.ItemDetailFont2, region.SkillDescLeft, region.TextRight, ref picH, 16);
+                GearGraphics.DrawString(g, hdesc, GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, region.SkillDescLeft, region.TextRight, ref picH, 16);
             }
             if (Skill.ReqLevel > 0)
             {
@@ -149,7 +154,7 @@ namespace WzComparerR2.CharaSimControl
                 GearGraphics.DrawString(g, "[现在等级 " + Skill.Level + "]", GearGraphics.ItemDetailFont, region.LevelDescLeft, region.TextRight, ref picH, 16);
                 if (hStr != null)
                 {
-                    GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, region.LevelDescLeft, region.TextRight, ref picH, 16);
+                    GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, region.LevelDescLeft, region.TextRight, ref picH, 16);
                 }
             }
 
@@ -164,7 +169,7 @@ namespace WzComparerR2.CharaSimControl
                 GearGraphics.DrawString(g, "[下次等级 " + (Skill.Level + 1) + "]", GearGraphics.ItemDetailFont, region.LevelDescLeft, region.TextRight, ref picH, 16);
                 if (hStr != null)
                 {
-                    GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, region.LevelDescLeft, region.TextRight, ref picH, 16);
+                    GearGraphics.DrawString(g, hStr, GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, region.LevelDescLeft, region.TextRight, ref picH, 16);
                 }
             }
             picH += 9;

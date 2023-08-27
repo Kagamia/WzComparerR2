@@ -154,6 +154,9 @@ namespace WzComparerR2.CharaSimControl
         /// </summary>
         public static readonly Brush GearPropChangeBrush = new SolidBrush(gearCyanColor);
 
+        public static readonly Color SkillSummaryOrangeTextColor = Color.FromArgb(255, 204, 0);
+        public static readonly Brush SkillSummaryOrangeTextBrush = new SolidBrush(SkillSummaryOrangeTextColor);
+
         public static Brush GetGearNameBrush(int diff, bool up)
         {
             if (diff < 0)
@@ -221,6 +224,11 @@ namespace WzComparerR2.CharaSimControl
         /// <param Name="y">起始行的y坐标。</param>
         public static void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height)
         {
+            DrawString(g, s, font, null, x, x1, ref y, height);
+        }
+
+        public static void DrawString(Graphics g, string s, Font font, IDictionary<string, Color> fontColorTable, int x, int x1, ref int y, int height)
+        {
             if (s == null)
                 return;
 
@@ -228,6 +236,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 r.WordWrapEnabled = false;
                 r.UseGDIRenderer = false;
+                r.FontColorTable = fontColorTable;
                 r.DrawString(g, s, font, x, x1, ref y, height);
             }
         }
@@ -501,6 +510,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             public bool UseGDIRenderer { get; set; }
+            public IDictionary<string, Color> FontColorTable { get; set; }
 
             const int MAX_RANGES = 32;
             StringFormat fmt;
@@ -641,13 +651,17 @@ namespace WzComparerR2.CharaSimControl
             protected override void Flush(StringBuilder sb, int startIndex, int length, int x, int y, string colorID)
             {
                 string content = sb.ToString(startIndex, length);
+                colorID = colorID ?? string.Empty;
                 Color color;
-                switch (colorID)
+                if (!(this.FontColorTable?.TryGetValue(colorID, out color) ?? false))
                 {
-                    case "c": color = GearGraphics.OrangeBrushColor; break;
-                    case "g": color = GearGraphics.gearGreenColor; break;
-                    case "$": color = GearGraphics.gearCyanColor; break;
-                    default: color = this.defaultColor; break;
+                    switch (colorID)
+                    {
+                        case "c": color = GearGraphics.OrangeBrushColor; break;
+                        case "g": color = GearGraphics.gearGreenColor; break;
+                        case "$": color = GearGraphics.gearCyanColor; break;
+                        default: color = this.defaultColor; break;
+                    }
                 }
                 if (this.UseGDIRenderer)
                 {
