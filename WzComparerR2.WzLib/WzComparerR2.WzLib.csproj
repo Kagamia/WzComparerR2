@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Wz_Capabilities.cs" />
     <Compile Include="Wz_Directory.cs" />
+    <Compile Include="Wz_RawData.cs" />
     <Compile Include="Wz_SoundType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Wz_Crypto.cs" />

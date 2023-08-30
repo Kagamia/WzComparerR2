@@ -341,6 +341,7 @@
     <None Include="Resources\Stop.png" />
     <None Include="Resources\Save.png" />
     <None Include="Resources\Open.png" />
+    <None Include="Resources\rawdata.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CharaSimResource\CharaSimResource.csproj">

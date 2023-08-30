@@ -233,6 +233,14 @@ namespace WzComparerR2.WzLib
                     parent.Value = new Wz_Uol(this.WzFile.ReadString(offset, this.EncKeys));
                     break;
 
+                case "RawData": // introduced in GMS v243
+                    this.WzFile.FileStream.Position++;
+                    int rawDataLen = this.WzFile.ReadInt32();
+                    uint rawDataOffset = (uint)this.WzFile.FileStream.Position;
+                    parent.Value = new Wz_RawData(rawDataOffset, rawDataLen, this);
+                    this.WzFile.FileStream.Position += rawDataLen;
+                    break;
+
                 default:
                     throw new Exception("unknown wz tag: " + tag);
             }
