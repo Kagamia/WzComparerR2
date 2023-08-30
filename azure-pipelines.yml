@@ -14,8 +14,8 @@ variables:
   buildPlatform_anycpu: 'Any CPU'
   buildPlatform_x86: 'x86'
   buildConfiguration: 'Release'
-  outputDir_anycpu: 'WzComparerR2/bin/release'
-  outputDir_x86: 'WzComparerR2/bin/x86/release'
+  outputDir_netfx_anycpu: 'WzComparerR2/bin/release/net462'
+  outputDir_netfx_x86: 'WzComparerR2/bin/x86/release/net462'
   outputFileName: 'WcR2_With_Plugins_$(Build.BuildNumber)'
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   accountName: 'wcr2publish'
@@ -59,17 +59,17 @@ steps:
   displayName: Prepare output files
   inputs:
     script: |
-      move "$(outputDir_anycpu)\*.dll" "$(outputDir_anycpu)\Lib"
-      del "$(outputDir_anycpu)\*.pdb"
-      rename "$(outputDir_anycpu)\WzComparerR2.exe" "WzComparerR2.anycpu.exe"
-      rename "$(outputDir_anycpu)\WzComparerR2.exe.config" "WzComparerR2.anycpu.exe.config"
-      copy /y "$(outputDir_x86)\WzComparerR2.exe" "$(outputDir_anycpu)"
-      copy /y "$(outputDir_x86)\WzComparerR2.exe.config" "$(outputDir_anycpu)"
+      move "$(outputDir_netfx_anycpu)\*.dll" "$(outputDir_netfx_anycpu)\Lib"
+      del "$(outputDir_netfx_anycpu)\*.pdb"
+      rename "$(outputDir_netfx_anycpu)\WzComparerR2.exe" "WzComparerR2.anycpu.exe"
+      rename "$(outputDir_netfx_anycpu)\WzComparerR2.exe.config" "WzComparerR2.anycpu.exe.config"
+      copy /y "$(outputDir_netfx_x86)\WzComparerR2.exe" "$(outputDir_netfx_anycpu)"
+      copy /y "$(outputDir_netfx_x86)\WzComparerR2.exe.config" "$(outputDir_netfx_anycpu)"
     failOnStderr: true
 
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: '$(outputDir_anycpu)'
+    rootFolderOrFile: '$(outputDir_netfx_anycpu)'
     includeRootFolder: false
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/$(outputFileName).zip'
@@ -128,6 +128,6 @@ steps:
     releaseNotesSource: 'inline'
     releaseNotesInline: |
       Automation build from azure-pipeline.
-      Binaries: [Zip]($(sasurl))
-    isPreRelease: true
+      Mirror: [Zip]($(sasurl))
+    isPreRelease: false
     addChangeLog: false
