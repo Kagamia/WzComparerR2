@@ -260,7 +260,7 @@ namespace WzComparerR2.WzLib
                     Array.Resize(ref this.keys, size);
                 }
 
-                Rijndael aes = Rijndael.Create();
+                var aes = Aes.Create();
                 aes.KeySize = 256;
                 aes.BlockSize = 128;
                 aes.Key = aesKey;

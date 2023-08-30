@@ -68,7 +68,7 @@ namespace WzComparerR2.Patcher
 
                             BuildInstruction inst;
                             int filePos = 0;
-                            while ((inst = reader.ReadInst()).Type != null)
+                            while ((inst = reader.ReadInst())?.Type != null)
                             {
                                 if (inst.Type == BuildType.Ending)
                                 {

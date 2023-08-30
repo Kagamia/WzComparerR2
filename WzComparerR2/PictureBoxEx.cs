@@ -231,7 +231,7 @@ namespace WzComparerR2
             {
                 default:
                 case ImageBackgroundType.Transparent:
-                    rec.BackgroundColor = Color.TransparentBlack;
+                    rec.BackgroundColor = Color.Transparent;
                     break;
 
                 case ImageBackgroundType.Color:

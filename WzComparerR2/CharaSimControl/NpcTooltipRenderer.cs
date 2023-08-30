@@ -50,7 +50,7 @@ namespace WzComparerR2.CharaSimControl
             }
 
             propBlocks.Add(PrepareText(g, "出没地区：", GearGraphics.ItemDetailFont, GearGraphics.GearNameBrushG, 0, 0));
-            if (NpcInfo.ID != null)
+            if (NpcInfo?.ID != null)
             {
                 var locNode = PluginBase.PluginManager.FindWz("Etc\\NpcLocation.img\\" + NpcInfo.ID.ToString());
                 if (locNode != null)

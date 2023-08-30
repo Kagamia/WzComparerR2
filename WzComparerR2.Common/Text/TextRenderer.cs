@@ -14,7 +14,6 @@ namespace WzComparerR2.Text
         }
 
         public bool WordWrapEnabled { get; set; }
-        public bool UseGDIRenderer { get; set; }
 
         const int MAX_RANGES = 32;
 
