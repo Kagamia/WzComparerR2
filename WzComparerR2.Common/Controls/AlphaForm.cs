@@ -52,7 +52,7 @@ namespace WzComparerR2.Controls
                         Point hitPoint = this.PointToClient(new Point((int)m.LParam));
                         if (captionHitTest(hitPoint))
                         {
-                            m.Result = (IntPtr)2;	//HTCAPTION
+                            m.Result = (IntPtr)2; //HTCAPTION
                             return;
                         }
                     }

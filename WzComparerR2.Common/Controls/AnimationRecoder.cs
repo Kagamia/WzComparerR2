@@ -16,7 +16,7 @@ namespace WzComparerR2.Controls
             this._device = graphicsDevice;
             this._graphics = new AnimationGraphics(_device);
             this.Items = new List<AnimationItem>();
-            this.BackgroundColor = Color.TransparentBlack;
+            this.BackgroundColor = Color.Transparent;
         }
 
         public List<AnimationItem> Items { get; private set; }
@@ -130,7 +130,7 @@ namespace WzComparerR2.Controls
                 _device.SetRenderTarget(texture);
                 _eff.AlphaMixEnabled = false;
 
-                _device.Clear(Color.TransparentBlack);
+                _device.Clear(Color.Transparent);
                 _sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, _eff, null);
                 _sb.Draw(_rt2d, Vector2.Zero, Color.White);
                 _sb.End();
@@ -155,7 +155,7 @@ namespace WzComparerR2.Controls
                 _eff.MixedColor = mixColor;
                 _eff.MinMixedAlpha = minMixedAlpha;
 
-                _device.Clear(Color.TransparentBlack);
+                _device.Clear(Color.Transparent);
                 _sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.LinearClamp, null, null, _eff, null);
                 _sb.Draw(_rt2d, Vector2.Zero, Color.White);
                 _sb.End();

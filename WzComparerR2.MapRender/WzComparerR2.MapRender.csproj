@@ -1,44 +1,52 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{11E362E4-B8FB-4BD4-B0D3-BA078D5FB002}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WzComparerR2.MapRender</RootNamespace>
+    <TargetFramework>net462</TargetFramework>
     <AssemblyName>WzComparerR2.MapRender</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <RootNamespace>WzComparerR2.MapRender</RootNamespace>
+    <IsPublishable>false</IsPublishable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
+  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
+    <ImplicitUsings>disable</ImplicitUsings>
+    <NoWarn>CA1416</NoWarn>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
+  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
+  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.303" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Configuration" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1641" ExcludeAssets="runtime" />
+  </ItemGroup>
   <ItemGroup>
-    <Reference Include="DevComponents.DotNetBar2, Version=12.1.0.0, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\CharaSimResource\CharaSimResource.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
+    <Reference Include="DevComponents.DotNetBar2">
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
-      <Private>False</Private>
+      <Private>false</Private>
     </Reference>
     <Reference Include="EmptyKeys.UserInterface">
       <HintPath>..\References\EmptyKeys.UserInterface.dll</HintPath>
@@ -56,227 +64,16 @@
       <HintPath>..\References\spine-monogame.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="TSF">
-      <HintPath>..\References\TSF.dll</HintPath>
-    </Reference>
+    <PackageReference Include="ManagedBass" Version="3.1.1" ExcludeAssets="runtime" />
+    <PackageReference Include="SharpDX" Version="4.0.1" ExcludeAssets="runtime" />
+    <PackageReference Include="SharpDX.RawInput" Version="4.0.1" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
     <Compile Include="..\Build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Animation\IStateMachineAnimationData.cs" />
-    <Compile Include="Animation\RepeatableFrameAnimationData.cs" />
-    <Compile Include="Animation\RepeatableFrameAnimator.cs" />
-    <Compile Include="Animation\StateMachineAnimator.cs" />
-    <Compile Include="Config\MapRenderConfig.cs" />
-    <Compile Include="Coroutine.cs" />
-    <Compile Include="FrmMapRender2.cs" />
-    <Compile Include="FrmMapRender2.SceneManager.cs" />
-    <Compile Include="FrmMapRender2.SceneRendering.cs" />
-    <Compile Include="GameExt.cs" />
-    <Compile Include="IRandom.cs" />
-    <Compile Include="IWcR2Font.cs" />
-    <Compile Include="LineListMesh.cs" />
-    <Compile Include="MapData.cs" />
-    <Compile Include="MapScene.cs" />
-    <Compile Include="MeshBatcher.cs" />
-    <Compile Include="MeshItem.cs" />
-    <Compile Include="Music.cs" />
-    <Compile Include="Particle.cs" />
-    <Compile Include="ParticleDesc.cs" />
-    <Compile Include="ParticleDesc3.cs" />
-    <Compile Include="ParticleDesc1.cs" />
-    <Compile Include="ParticleEmitter.cs" />
-    <Compile Include="ParticleRandom.cs" />
-    <Compile Include="ParticleSystem.cs" />
-    <Compile Include="Patches2\BackItem.cs" />
-    <Compile Include="Patches2\FootholdItem.cs" />
-    <Compile Include="Patches2\LadderRopeItem.cs" />
-    <Compile Include="Patches2\LifeItem.cs" />
-    <Compile Include="Patches2\ObjItem.cs" />
-    <Compile Include="Patches2\ParticleItem.cs" />
-    <Compile Include="Patches2\PortalItem.cs" />
-    <Compile Include="Patches2\ReactorItem.cs" />
-    <Compile Include="Patches2\SceneItem.cs" />
-    <Compile Include="Patches2\SkyWhaleItem.cs" />
-    <Compile Include="Patches2\TileItem.cs" />
-    <Compile Include="Patches2\TooltipItem.cs" />
-    <Compile Include="Patches\BackPatch.cs" />
-    <Compile Include="Camera.cs" />
-    <Compile Include="Chat.cs" />
-    <Compile Include="Entry.cs" />
-    <Compile Include="Patches\FootholdPatch.cs" />
-    <Compile Include="FpsCounter.cs" />
-    <Compile Include="FrmMapRender.cs" />
-    <Compile Include="InputState.cs" />
-    <Compile Include="ITooltip.cs" />
-    <Compile Include="Patches\LadderRopePatch.cs" />
-    <Compile Include="LifeInfo.cs" />
-    <Compile Include="Patches\LifePatch.cs" />
-    <Compile Include="MapRenderFonts.cs" />
-    <Compile Include="MathHelper2.cs" />
-    <Compile Include="MiniMap.cs" />
-    <Compile Include="MouseButton.cs" />
-    <Compile Include="Patches\ObjTilePatch.cs" />
-    <Compile Include="PatchVisibility.cs" />
-    <Compile Include="Patches\PortalPatch.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Patches\ReactorPatch.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="RenderAnimate.cs" />
-    <Compile Include="RenderArgs.cs" />
-    <Compile Include="RenderEnv.cs" />
-    <Compile Include="RenderFrame.cs" />
-    <Compile Include="Patches\RenderObjectType.cs" />
-    <Compile Include="Patches\RenderPatch.cs" />
-    <Compile Include="ResourceLoader.cs" />
-    <Compile Include="SceneNode.cs" />
-    <Compile Include="TextMesh.cs" />
-    <Compile Include="TextureAtlas.cs" />
-    <Compile Include="TextureLoader.cs" />
-    <Compile Include="TileMode.cs" />
-    <Compile Include="UI\ColorWConverter.cs" />
-    <Compile Include="UI\HitMap.cs" />
-    <Compile Include="UI\ITooltipTarget.cs" />
-    <Compile Include="UI\MapRenderButtonStyle.cs" />
-    <Compile Include="UI\MessageBoxBackgroundBrush.cs" />
-    <Compile Include="UI\TCBBrush.cs" />
-    <Compile Include="UI\LCRBrush.cs" />
-    <Compile Include="UI\MapRenderResourceKey.cs" />
-    <Compile Include="UI\MapRenderUIRoot.cs" />
-    <Compile Include="UI\MessageBoxStyle.cs" />
-    <Compile Include="UI\NinePatchBrush.cs" />
-    <Compile Include="UI\TextBoxEx.cs" />
-    <Compile Include="UI\Tooltip.cs" />
-    <Compile Include="Patches\TooltipPatch.cs" />
-    <Compile Include="UI\NineFormResource.cs" />
-    <Compile Include="UI\Tooltip2.cs" />
-    <Compile Include="UI\TooltipHelper.cs" />
-    <Compile Include="UI\UIChatBox.cs" />
-    <Compile Include="UI\UIDanmaku.cs" />
-    <Compile Include="UI\UIGraphics.cs" />
-    <Compile Include="UI\UIHelper.cs" />
-    <Compile Include="UI\UIMiniMap.cs" />
-    <Compile Include="UI\UIMinimap2.cs" />
-    <Compile Include="UI\UIOptions.cs" />
-    <Compile Include="UI\UITopBar.cs" />
-    <Compile Include="UI\UIWorldMap.cs" />
-    <Compile Include="UI\WcR2Engine.cs" />
-    <Compile Include="UI\WcR2Renderer.cs" />
-    <Compile Include="UI\WindowEx.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CharaSimResource\CharaSimResource.csproj">
-      <Project>{54797f38-a12c-4202-92a4-1a3ddce914b7}</Project>
-      <Name>CharaSimResource</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj">
-      <Project>{818060bc-404c-470a-94b3-5160716c5247}</Project>
-      <Name>WzComparerR2.Common</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj">
-      <Project>{fa74a2fd-0250-4182-845d-dd98d829b525}</Project>
-      <Name>WzComparerR2.PluginBase</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj">
-      <Project>{0e9801fd-44a2-4af8-ae91-d6e74bad56b2}</Project>
-      <Name>WzComparerR2.WzLib</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Basic.img.ComboBox.normal.0.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Basic.img.ComboBox.normal.1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Basic.img.ComboBox.normal.2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\UIWindow2.img.WorldMap.Border.0.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Basic.img.BtCancel4.disabled.0.png" />
-    <None Include="Resources\Basic.img.BtCancel4.mouseOver.0.png" />
-    <None Include="Resources\Basic.img.BtCancel4.normal.0.png" />
-    <None Include="Resources\Basic.img.BtCancel4.pressed.0.png" />
-    <None Include="Resources\Basic.img.BtClose3.disabled.0.png" />
-    <None Include="Resources\Basic.img.BtClose3.mouseOver.0.png" />
-    <None Include="Resources\Basic.img.BtClose3.normal.0.png" />
-    <None Include="Resources\Basic.img.BtClose3.pressed.0.png" />
-    <None Include="Resources\Basic.img.BtNo3.disabled.0.png" />
-    <None Include="Resources\Basic.img.BtNo3.mouseOver.0.png" />
-    <None Include="Resources\Basic.img.BtNo3.normal.0.png" />
-    <None Include="Resources\Basic.img.BtNo3.pressed.0.png" />
-    <None Include="Resources\Basic.img.BtOK4.disabled.0.png" />
-    <None Include="Resources\Basic.img.BtOK4.mouseOver.0.png" />
-    <None Include="Resources\Basic.img.BtOK4.normal.0.png" />
-    <None Include="Resources\Basic.img.BtOK4.pressed.0.png" />
-    <Content Include="Resources\Basic.img.Notice6.box.png" />
-    <Content Include="Resources\Basic.img.Notice6.c.png" />
-    <Content Include="Resources\Basic.img.Notice6.c_box.png" />
-    <Content Include="Resources\Basic.img.Notice6.s.png" />
-    <Content Include="Resources\Basic.img.Notice6.s_box.png" />
-    <Content Include="Resources\Basic.img.Notice6.t.png" />
-    <Content Include="Resources\StatusBar3.img.chat.ingame.input.layer_backgrnd.png" />
-    <Content Include="Resources\StatusBar3.img.chat.ingame.input.layer_chatEnter.png" />
-    <Content Include="Resources\StatusBar3.img.chat.ingame.view.max.bottom.png" />
-    <Content Include="Resources\StatusBar3.img.chat.ingame.view.max.center.png" />
-    <Content Include="Resources\StatusBar3.img.chat.ingame.view.max.top.png" />
-    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.ArcaneForce.png" />
-    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.AuthenticForce.png" />
-    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.enchantMob.png" />
-    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Line.png" />
-    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Mob.png" />
-    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.Npc.png" />
-    <Content Include="Resources\UIWindow.img.ToolTip.WorldMap.StarForce.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="ManagedBass">
-      <Version>3.1.0</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="MonoGame.Framework.WindowsDX">
-      <Version>3.8.0.1641</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="SharpDX">
-      <Version>4.0.1</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="SharpDX.RawInput">
-      <Version>4.0.1</Version>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetDir)*.dll" "$(SolutionDir)WzComparerR2\bin\$(ConfigurationName)\Plugin\$(ProjectName)" /I /Y</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <Exec Command="xcopy &quot;$(TargetDir)*.dll&quot; &quot;$(SolutionDir)WzComparerR2\bin\$(ConfigurationName)\$(TargetFramework)\Plugin\$(ProjectName)&quot; /I /Y" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

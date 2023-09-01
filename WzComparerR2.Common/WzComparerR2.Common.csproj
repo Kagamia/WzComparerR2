@@ -1,208 +1,51 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{818060BC-404C-470A-94B3-5160716C5247}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WzComparerR2</RootNamespace>
+    <TargetFramework>net462</TargetFramework>
     <AssemblyName>WzComparerR2.Common</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <RootNamespace>WzComparerR2.Common</RootNamespace>
+    <IsPublishable>false</IsPublishable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
+  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
+    <ImplicitUsings>disable</ImplicitUsings>
+    <NoWarn>CA1416</NoWarn>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
+  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
+  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.303" />
+  </ItemGroup>
+  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1641" />
+  </ItemGroup>
   <ItemGroup>
-    <Reference Include="DevComponents.DotNetBar2, Version=12.1.0.0, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="ImageManipulation">
       <HintPath>..\References\ImageManipulation.dll</HintPath>
-      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="spine-monogame">
       <HintPath>..\References\spine-monogame.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
+    <Reference Include="DevComponents.DotNetBar2">
+      <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
     <Compile Include="..\Build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Animation\KeyFrame.cs" />
-    <Compile Include="BuildInApngEncoder.cs" />
-    <Compile Include="BuildInGifEncoder.cs" />
-    <Compile Include="CharaSim\ExclusiveEquip.cs" />
-    <Compile Include="CharaSim\SetItemBonusByTime.cs" />
-    <Compile Include="Controls\AnimationClipOptions.cs" />
-    <Compile Include="Controls\AnimationItemEventArgs.cs" />
-    <Compile Include="Controls\AnimationRecoder.cs" />
-    <Compile Include="Animation\Frame.cs" />
-    <Compile Include="Animation\FrameAnimator.cs" />
-    <Compile Include="Animation\FrameAnimationData.cs" />
-    <Compile Include="Animation\ModelBound.cs" />
-    <Compile Include="Animation\SpineAnimator.cs" />
-    <Compile Include="Animation\SpineAnimationData.cs" />
-    <Compile Include="Animation\WzSpineTextureLoader.cs" />
-    <Compile Include="CharaSim\MobElemAttr.cs" />
-    <Compile Include="CharaSim\Mob.cs" />
-    <Compile Include="CharaSim\Npc.cs" />
-    <Compile Include="Config\ConfigItem.cs" />
-    <Compile Include="Config\ConfigItemCollectionBase.cs" />
-    <Compile Include="Config\ConfigArrayList.cs" />
-    <Compile Include="Config\ConfigManager.cs" />
-    <Compile Include="Config\ConfigSectionBase.cs" />
-    <Compile Include="Config\SectionNameAttribute.cs" />
-    <Compile Include="Controls\AlphaForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BitmapOrigin.cs" />
-    <Compile Include="Calculator.cs" />
-    <Compile Include="CharaSim\Addition.cs" />
-    <Compile Include="CharaSim\AdditionType.cs" />
-    <Compile Include="CharaSim\AlienStone.cs" />
-    <Compile Include="CharaSim\AlienStoneGrade.cs" />
-    <Compile Include="CharaSim\FormulaVersion.cs" />
-    <Compile Include="CharaSim\Gear.cs" />
-    <Compile Include="CharaSim\GearGrade.cs" />
-    <Compile Include="CharaSim\GearLevelInfo.cs" />
-    <Compile Include="CharaSim\GearPropType.cs" />
-    <Compile Include="CharaSim\GearSealedInfo.cs" />
-    <Compile Include="CharaSim\GearState.cs" />
-    <Compile Include="CharaSim\GearType.cs" />
-    <Compile Include="Controls\AnimationControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\AnimationControl.Designer.cs">
-      <DependentUpon>AnimationControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\AnimationItem.cs" />
-    <Compile Include="Controls\FrmProgressDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\FrmProgressDialog.Designer.cs">
-      <DependentUpon>FrmProgressDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\GraphicsDeviceControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\GraphicsDeviceService.cs" />
-    <Compile Include="Controls\ProgressDialog.cs" />
-    <Compile Include="Controls\ProgressDialogContext.cs" />
-    <Compile Include="Controls\ServiceContainer.cs" />
-    <Compile Include="GifCanvas.cs" />
-    <Compile Include="GifEncoder.cs" />
-    <Compile Include="GifLayer.cs" />
-    <Compile Include="GlobalFindNodeFunction.cs" />
-    <Compile Include="CharaSim\HyperSkillType.cs" />
-    <Compile Include="CharaSim\Item.cs" />
-    <Compile Include="CharaSim\ItemBase.cs" />
-    <Compile Include="CharaSim\ItemBaseType.cs" />
-    <Compile Include="CharaSim\ItemPropType.cs" />
-    <Compile Include="CharaSim\ItemSpecType.cs" />
-    <Compile Include="CharaSim\ItemStringHelper.cs" />
-    <Compile Include="CharaSim\Potential.cs" />
-    <Compile Include="CharaSim\Recipe.cs" />
-    <Compile Include="CharaSim\RecipeItemInfo.cs" />
-    <Compile Include="CharaSim\RecipePropType.cs" />
-    <Compile Include="CharaSim\SetItem.cs" />
-    <Compile Include="CharaSim\SetItemActiveSkill.cs" />
-    <Compile Include="CharaSim\SetItemEffect.cs" />
-    <Compile Include="CharaSim\SetItemIDList.cs" />
-    <Compile Include="CharaSim\SetItemIDPart.cs" />
-    <Compile Include="CharaSim\SetItemOptionToMob.cs" />
-    <Compile Include="CharaSim\Skill.cs" />
-    <Compile Include="CharaSim\SummaryParams.cs" />
-    <Compile Include="CharaSim\SummaryParser.cs" />
-    <Compile Include="Gif.cs" />
-    <Compile Include="IndexGifEncoder.cs" />
-    <Compile Include="GifFrame.cs" />
-    <Compile Include="Rendering\AnimationGraphics.cs" />
-    <Compile Include="Rendering\BlendEx.cs" />
-    <Compile Include="Rendering\D2DContext.cs" />
-    <Compile Include="Rendering\D2DRenderer.cs" />
-    <Compile Include="Rendering\D2DFactory.cs" />
-    <Compile Include="Rendering\D2DFont.cs" />
-    <Compile Include="Rendering\DxExtension.cs" />
-    <Compile Include="Rendering\PngEffect.cs" />
-    <Compile Include="Rendering\MonogameUtils.cs" />
-    <Compile Include="Rendering\SpriteBatchEx.cs" />
-    <Compile Include="Rendering\TextUtils.cs" />
-    <Compile Include="Rendering\WzLibExtension.cs" />
-    <Compile Include="IGifFrame.cs" />
-    <Compile Include="ImageDataObject.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rendering\XnaFont.cs" />
-    <Compile Include="Rendering\XnaFontRenderer.cs" />
-    <Compile Include="SpineLoader.cs" />
-    <Compile Include="StringLinker.cs" />
-    <Compile Include="StringResult.cs" />
-    <Compile Include="Text\DocumentElements.cs" />
-    <Compile Include="Text\Parser.cs" />
-    <Compile Include="Text\TextRenderer.cs" />
-    <Compile Include="Wz_NodeExtension2.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj">
-      <Project>{0e9801fd-44a2-4af8-ae91-d6e74bad56b2}</Project>
-      <Name>WzComparerR2.WzLib</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Rendering\Effect\PngEffect.fx" />
-    <EmbeddedResource Include="Controls\FrmProgressDialog.resx">
-      <DependentUpon>FrmProgressDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Rendering\Effect\PngEffect.mgfxo" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.WindowsDX">
-      <Version>3.8.0.1641</Version>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="SharpDX.Mathematics">
-      <Version>4.0.1</Version>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

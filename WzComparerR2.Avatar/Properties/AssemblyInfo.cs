@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kagamia Studio")]
 [assembly: AssemblyProduct("WzComparerR2.Avatar")]
-[assembly: AssemblyCopyright("Copyright © Kagamia Studio 2015-2021")]
+[assembly: AssemblyCopyright("Copyright © Kagamia Studio 2015-2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

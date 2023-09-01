@@ -1,114 +1,53 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EBDA4AE9-4BCE-4824-84B5-B15660437141}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WzComparerR2.Network</RootNamespace>
+    <TargetFramework>net462</TargetFramework>
     <AssemblyName>WzComparerR2.Network</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <RootNamespace>WzComparerR2.Network</RootNamespace>
+    <IsPublishable>false</IsPublishable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
+    <ImplicitUsings>disable</ImplicitUsings>
+    <NoWarn>CA1416</NoWarn>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="DevComponents.DotNetBar2, Version=12.5.0.2, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
+
+  </ItemGroup>
+  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
+    <Reference Include="DevComponents.DotNetBar2">
+      <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
     <Compile Include="..\Build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Contracts\ByteArrayConverter.cs" />
-    <Compile Include="Contracts\PackCryptReq.cs" />
-    <Compile Include="Contracts\PackCryptResp.cs" />
-    <Compile Include="Contracts\PackCustomPackage.cs" />
-    <Compile Include="Contracts\PackGetAllUsersReq.cs" />
-    <Compile Include="Contracts\PackGetAllUsersResp.cs" />
-    <Compile Include="Contracts\PackGetServerInfoReq.cs" />
-    <Compile Include="Contracts\PackGetServerInfoResp.cs" />
-    <Compile Include="Contracts\PackHeartBeat.cs" />
-    <Compile Include="Contracts\PackLoginReq.cs" />
-    <Compile Include="Contracts\PackLoginResp.cs" />
-    <Compile Include="Contracts\PackOnChat.cs" />
-    <Compile Include="Contracts\PackOnCustomPackage.cs" />
-    <Compile Include="Contracts\PackOnServerMessage.cs" />
-    <Compile Include="Contracts\PackOnUserUpdate.cs" />
-    <Compile Include="Contracts\PackSendChat.cs" />
-    <Compile Include="Contracts\PackUserProfileUpdateReq.cs" />
-    <Compile Include="Contracts\TypeNameBinder.cs" />
-    <Compile Include="Entry.cs" />
-    <Compile Include="LoggerForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="LoggerForm.Designer.cs">
-      <DependentUpon>LoggerForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Log.cs" />
-    <Compile Include="NativeMethods.cs" />
-    <Compile Include="NetworkConfig.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RC4CryptoServiceProvider.cs" />
-    <Compile Include="RingBufferStream.cs" />
-    <Compile Include="WcClient.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="LoggerForm.resx">
-      <DependentUpon>LoggerForm.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj">
-      <Project>{818060bc-404c-470a-94b3-5160716c5247}</Project>
-      <Name>WzComparerR2.Common</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj">
-      <Project>{fa74a2fd-0250-4182-845d-dd98d829b525}</Project>
-      <Name>WzComparerR2.PluginBase</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.2</Version>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetDir)*.dll" "$(SolutionDir)WzComparerR2\bin\$(ConfigurationName)\Plugin\$(ProjectName)" /I /Y</PostBuildEvent>
-  </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <Exec Command="xcopy &quot;$(TargetDir)*.dll&quot; &quot;$(SolutionDir)WzComparerR2\bin\$(ConfigurationName)\$(TargetFramework)\Plugin\$(ProjectName)&quot; /I /Y" />
+  </Target>
 </Project>
