@@ -8,6 +8,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
   </PropertyGroup>
   <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
     <ImplicitUsings>disable</ImplicitUsings>
@@ -65,8 +66,9 @@
       <Private>False</Private>
     </Reference>
     <PackageReference Include="ManagedBass" Version="3.1.1" ExcludeAssets="runtime" />
-    <PackageReference Include="SharpDX" Version="4.0.1" ExcludeAssets="runtime" />
-    <PackageReference Include="SharpDX.RawInput" Version="4.0.1" />
+    <PackageReference Include="SharpDX" Version="4.2.0" ExcludeAssets="runtime" />
+    <PackageReference Include="SharpDX.RawInput" Version="4.2.0" />
+    <PackageReference Include="System.Resources.Extensions" Version="7.0.0" ExcludeAssets="runtime" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
     <Compile Include="..\Build\CommonAssemblyInfo.cs">

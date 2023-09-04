@@ -8,6 +8,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
   </PropertyGroup>
   <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
     <ImplicitUsings>disable</ImplicitUsings>
@@ -48,6 +49,7 @@
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <PackageReference Include="System.Resources.Extensions" Version="7.0.0" ExcludeAssets="runtime" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
     <Compile Include="..\Build\CommonAssemblyInfo.cs">

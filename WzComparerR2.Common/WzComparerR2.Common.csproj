@@ -42,6 +42,7 @@
     <Reference Include="DevComponents.DotNetBar2">
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
     </Reference>
+    <PackageReference Include="SharpDX" Version="4.2.0" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
     <Compile Include="..\Build\CommonAssemblyInfo.cs">
