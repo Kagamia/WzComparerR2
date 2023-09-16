@@ -45,7 +45,7 @@ namespace WzComparerR2.CharaSim
                     {
                         case "shop": npcInfo.Shop = propNode.GetValueEx<int>(0) != 0; break;
                         case "link": npcInfo.Link = propNode.GetValueEx<int>(0); break;
-                        case "default": npcInfo.Default = BitmapOrigin.CreateFromNode(propNode, null); break;
+                        case "default": npcInfo.Default = BitmapOrigin.CreateFromNode(propNode, findNode); break;
                     }
                 }
             }
