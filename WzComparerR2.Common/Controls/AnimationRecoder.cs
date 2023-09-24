@@ -114,7 +114,7 @@ namespace WzComparerR2.Controls
                 {
                     _graphics.Draw(framAni, world);
                 }
-                else if (animation is SpineAnimator spineAni)
+                else if (animation is ISpineAnimator spineAni)
                 {
                     _graphics.Draw(spineAni, world);
                 }
@@ -255,9 +255,8 @@ namespace WzComparerR2.Controls
 
                     return timeline.ToArray();
                 }
-                else if (animation is SpineAnimator)
+                else if (animation is ISpineAnimator)
                 {
-                    var m = ((SpineAnimator)animation).GetKeyFrames();
                     return null;
                 }
             }

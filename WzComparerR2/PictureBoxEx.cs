@@ -79,9 +79,17 @@ namespace WzComparerR2
             return FrameAnimationData.CreateFromNode(node, this.GraphicsDevice, PluginBase.PluginManager.FindWz);
         }
 
-        public SpineAnimationData LoadSpineAnimation(Wz_Node node)
+        public ISpineAnimationData LoadSpineAnimation(Wz_Node node)
         {
-            return SpineAnimationData.CreateFromNode(node, null, this.GraphicsDevice, PluginBase.PluginManager.FindWz);
+            var detectionResult = SpineLoader.Detect(node);
+            if (!detectionResult.Success)
+                return null;
+            if (detectionResult.Version == SpineVersion.V2)
+                return SpineAnimationDataV2.CreateFromNode(node, this.GraphicsDevice, PluginBase.PluginManager.FindWz);
+            else if (detectionResult.Version == SpineVersion.V4)
+                return SpineAnimationDataV4.CreateFromNode(node, this.GraphicsDevice, PluginBase.PluginManager.FindWz);
+            else
+                return null;
         }
 
         public void ShowAnimation(FrameAnimationData data)
@@ -89,9 +97,18 @@ namespace WzComparerR2
             this.ShowAnimation(new FrameAnimator(data));
         }
 
-        public void ShowAnimation(SpineAnimationData data)
+        public void ShowAnimation(ISpineAnimationData data)
         {
-            this.ShowAnimation(new SpineAnimator(data));
+            switch (data)
+            {
+                case SpineAnimationDataV2 dataV2:
+                    this.ShowAnimation(new SpineAnimatorV2(dataV2));
+                    break;
+
+                case SpineAnimationDataV4 dataV4:
+                    this.ShowAnimation(new SpineAnimatorV4(dataV4));
+                    break;
+            }
         }
 
         public void ShowAnimation(AnimationItem animator)
@@ -124,9 +141,8 @@ namespace WzComparerR2
                 var rect = aniItem.Data.GetBound();
                 aniItem.Position = new Point(-rect.Left, -rect.Top);
             }
-            else if (animator is SpineAnimator)
+            else if (animator is AnimationItem aniItem)
             {
-                var aniItem = (SpineAnimator)animator;
                 var rect = aniItem.Measure();
                 aniItem.Position = new Point(-rect.Left, -rect.Top);
             }
@@ -516,13 +532,13 @@ namespace WzComparerR2
             {
                 var aniItem = this.Items[0];
                 int time = 0;
-                if (aniItem is FrameAnimator)
+                if (aniItem is FrameAnimator frameAni)
                 {
-                    time = ((FrameAnimator)aniItem).CurrentTime;
+                    time = frameAni.CurrentTime;
                 }
-                else if (aniItem is SpineAnimator)
+                else if (aniItem is ISpineAnimator spineAni)
                 {
-                    time = ((SpineAnimator)aniItem).CurrentTime;
+                    time = spineAni.CurrentTime;
                 }
                 this.sbInfo.AppendFormat("pos: {0}, scale: {1:p0}, play: {2} / {3}",
                     aniItem.Position,

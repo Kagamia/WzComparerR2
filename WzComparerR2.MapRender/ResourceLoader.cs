@@ -307,13 +307,8 @@ namespace WzComparerR2.MapRender
 
         private object InnerLoadAnimationData(Wz_Node node)
         {
-            if (node != null)
+            if (node != null && (node = node.ResolveUol()) != null)
             {
-                while (node.Value is Wz_Uol)
-                {
-                    node = ((Wz_Uol)node.Value).HandleUol(node);
-                }
-
                 if (node.Value is Wz_Png) //单帧动画
                 {
                     var aniData = new FrameAnimationData();
@@ -326,10 +321,21 @@ namespace WzComparerR2.MapRender
                     string spine = node.Nodes["spine"].GetValueEx<string>(null);
                     if (spine != null) //读取spine动画
                     {
-                        var loader = new SpineTextureLoader(this, node);
+                        var textureLoader = new SpineTextureLoader(this, node);
                         var atlasNode = node.Nodes[spine + ".atlas"];
-                        var aniData = SpineAnimationData.CreateFromNode(atlasNode, null, loader);
-                        return aniData;
+
+                        var detectionResult = SpineLoader.Detect(atlasNode);
+                        if (detectionResult.Success)
+                        {
+                            if (detectionResult.Version == SpineVersion.V2)
+                            {
+                                return SpineAnimationDataV2.CreateFromNode(atlasNode, textureLoader);
+                            }
+                            else if (detectionResult.Version == SpineVersion.V4)
+                            {
+                                return SpineAnimationDataV4.CreateFromNode(atlasNode, textureLoader);
+                            }
+                        }
                     }
                     else //读取序列帧动画
                     {
@@ -397,7 +403,7 @@ namespace WzComparerR2.MapRender
             public int Count { get; set; }
         }
 
-        private class SpineTextureLoader : Spine.TextureLoader
+        private class SpineTextureLoader : Spine.TextureLoader, Spine.V2.TextureLoader
         {
             public SpineTextureLoader(ResourceLoader resLoader, Wz_Node topNode)
             {
@@ -410,31 +416,51 @@ namespace WzComparerR2.MapRender
 
             public void Load(AtlasPage page, string path)
             {
-                var frameNode = this.TopNode.FindNodeByPath(path);
-
-                if (frameNode == null || frameNode.Value == null)
+                if (this.TryLoadTexture(path, out var texture))
                 {
-                    return;
+                    page.rendererObject = texture;
+                    page.width = texture.Width;
+                    page.height = texture.Height;
                 }
+            }
 
-                //处理uol
-                while (frameNode.Value is Wz_Uol)
+            public void Load(Spine.V2.AtlasPage page, string path)
+            {
+                if (this.TryLoadTexture(path, out var texture))
                 {
-                    frameNode = ((Wz_Uol)frameNode.Value).HandleUol(frameNode);
+                    page.rendererObject = texture;
+                    page.width = texture.Width;
+                    page.height = texture.Height;
                 }
-                //寻找link
-                var linkNode = frameNode.GetLinkedSourceNode(PluginManager.FindWz);
-                //加载资源
-                var texture = BaseLoader.Load<Texture2D>(linkNode);
-
-                page.rendererObject = texture;
-                page.width = texture.Width;
-                page.height = texture.Height;
             }
 
             public void Unload(object texture)
             {
                 //什么都不做
+            }
+
+            private bool TryLoadTexture(string path, out Texture2D texture)
+            {
+                texture = null;
+                var frameNode = this.TopNode.FindNodeByPath(path);
+
+                while (frameNode.Value is Wz_Uol uol)
+                {
+                    Wz_Node uolNode = uol.HandleUol(frameNode);
+                    if (uolNode != null)
+                    {
+                        frameNode = uolNode;
+                    }
+                }
+
+                if (frameNode.Value is Wz_Png)
+                {
+                    var linkNode = frameNode.GetLinkedSourceNode(PluginManager.FindWz);
+                    texture = BaseLoader.Load<Texture2D>(linkNode);
+                    return true;
+                }
+
+                return false;
             }
         }
     }

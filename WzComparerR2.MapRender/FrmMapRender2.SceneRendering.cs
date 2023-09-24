@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using WzComparerR2.Common;
-using WzComparerR2.Rendering;
 using WzComparerR2.MapRender.UI;
 using WzComparerR2.MapRender.Patches2;
 using WzComparerR2.Animation;
 
 using Microsoft.Xna.Framework;
-using System.Runtime.InteropServices;
+using WzComparerR2.Controls;
 
 namespace WzComparerR2.MapRender
 {
@@ -595,17 +594,14 @@ namespace WzComparerR2.MapRender
 
             //计算坐标
             Point renderSize;
-            if (back.View.Animator is FrameAnimator)
+            if (back.View.Animator is FrameAnimator frameAni)
             {
-                var ani = (FrameAnimator)back.View.Animator;
-                renderSize = ani.CurrentFrame.Rectangle.Size;
+                renderSize = frameAni.CurrentFrame.Rectangle.Size;
             }
-            else if (back.View.Animator is SpineAnimator)
+            else if (back.View.Animator is AnimationItem aniItem)
             {
-                var ani = (SpineAnimator)back.View.Animator;
-                var data = ani.Data.SkeletonData;
-                var rect = ani.Measure();
-                renderSize = rect.Size; // new Point((int)data.Width, (int)data.Height);
+                var rect = aniItem.Measure();
+                renderSize = rect.Size;
             }
             else
             {
@@ -794,9 +790,9 @@ namespace WzComparerR2.MapRender
 
         private object GetRenderObject(object animator, bool flip = false, int alpha = 255, bool blend = false)
         {
-            if (animator is FrameAnimator)
+            if (animator is FrameAnimator frameAni)
             {
-                var frame = ((FrameAnimator)animator).CurrentFrame;
+                var frame = frameAni.CurrentFrame;
                 if (frame != null)
                 {
                     if (alpha < 255) //理论上应该返回一个新的实例
@@ -810,9 +806,9 @@ namespace WzComparerR2.MapRender
                     return frame;
                 }
             }
-            else if (animator is SpineAnimator)
+            else if (animator is SpineAnimatorV2 spineAniV2)
             {
-                var skeleton = ((SpineAnimator)animator).Skeleton;
+                var skeleton = spineAniV2.Skeleton;
                 if (skeleton != null)
                 {
                     if (alpha < 255)
@@ -822,13 +818,23 @@ namespace WzComparerR2.MapRender
                     return skeleton;
                 }
             }
-            else if (animator is StateMachineAnimator)
+            else if (animator is SpineAnimatorV4 spineAniV4)
             {
-                var smAni = (StateMachineAnimator)animator;
+                var skeleton = spineAniV4.Skeleton;
+                if (skeleton != null)
+                {
+                    if (alpha < 255)
+                    {
+                        skeleton.A = alpha / 255.0f;
+                    }
+                    return skeleton;
+                }
+            }
+            else if (animator is StateMachineAnimator smAni)
+            {
                 return smAni.Data.GetMesh();
             }
 
-            //各种意外
             return null;
         }
     }

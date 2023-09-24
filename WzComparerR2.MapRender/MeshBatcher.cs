@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using WzComparerR2.Animation;
 using WzComparerR2.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Spine;
 
 namespace WzComparerR2.MapRender
 {
@@ -26,7 +23,7 @@ namespace WzComparerR2.MapRender
 
         //内部batcher
         SpriteBatchEx sprite;
-        SkeletonMeshRenderer spineRender;
+        Spine.SkeletonRenderer spineRender;
         D2DRenderer d2dRender;
         ItemType lastItem;
         Stack<MeshItem> meshPool;
@@ -88,26 +85,29 @@ namespace WzComparerR2.MapRender
 
         public void Draw(MeshItem mesh)
         {
-            if (mesh.RenderObject is Frame)
+            if (mesh.RenderObject is Frame frame)
             {
-                this.DrawItem(mesh, (Frame)mesh.RenderObject);
+                this.DrawItem(mesh, frame);
             }
-            else if (mesh.RenderObject is Skeleton)
+            else if (mesh.RenderObject is Spine.V2.Skeleton skeletonV2)
             {
-                this.DrawItem(mesh, (Skeleton)mesh.RenderObject);
+                this.DrawItem(mesh, skeletonV2);
             }
-            else if (mesh.RenderObject is TextMesh)
+            else if (mesh.RenderObject is Spine.Skeleton skeletonV4)
             {
-                var textmesh = (TextMesh)mesh.RenderObject;
-                this.DrawItem(mesh, textmesh);
+                this.DrawItem(mesh, skeletonV4);
             }
-            else if (mesh.RenderObject is LineListMesh)
+            else if (mesh.RenderObject is TextMesh text)
             {
-                this.DrawItem((LineListMesh)mesh.RenderObject);
+                this.DrawItem(mesh, text);
             }
-            else if (mesh.RenderObject is ParticleSystem)
+            else if (mesh.RenderObject is LineListMesh lineList)
             {
-                this.DrawItem(mesh, (ParticleSystem)mesh.RenderObject);
+                this.DrawItem(lineList);
+            }
+            else if (mesh.RenderObject is ParticleSystem particle)
+            {
+                this.DrawItem(mesh, particle);
             }
         }
 
@@ -176,9 +176,40 @@ namespace WzComparerR2.MapRender
             }
         }
 
-        private void DrawItem(MeshItem mesh, Skeleton skeleton)
+        private void DrawItem(MeshItem mesh, Spine.V2.Skeleton skeleton)
         {
             skeleton.FlipX = mesh.FlipX;
+
+            //兼容平铺
+            if (mesh.TileRegion != null)
+            {
+                var region = mesh.TileRegion.Value;
+                for (int y = region.Top; y < region.Bottom; y++)
+                {
+                    for (int x = region.Left; x < region.Right; x++)
+                    {
+                        Vector2 pos = mesh.Position + mesh.TileOffset * new Vector2(x, y);
+                        skeleton.X = pos.X;
+                        skeleton.Y = pos.Y;
+                        skeleton.UpdateWorldTransform();
+                        Prepare(ItemType.Skeleton);
+                        this.spineRender.Draw(skeleton);
+                    }
+                }
+            }
+            else
+            {
+                skeleton.X = mesh.Position.X;
+                skeleton.Y = mesh.Position.Y;
+                skeleton.UpdateWorldTransform();
+                Prepare(ItemType.Skeleton);
+                this.spineRender.Draw(skeleton);
+            }
+        }
+
+        private void DrawItem(MeshItem mesh, Spine.Skeleton skeleton)
+        {
+            skeleton.ScaleX = mesh.FlipX ? -1 : 1;
 
             //兼容平铺
             if (mesh.TileRegion != null)
@@ -471,9 +502,13 @@ namespace WzComparerR2.MapRender
                 case ItemType.Skeleton:
                     if (this.spineRender == null)
                     {
-                        this.spineRender = new SkeletonMeshRenderer(this.GraphicsDevice);
+                        this.spineRender = new Spine.SkeletonRenderer(this.GraphicsDevice);
                     }
-                    this.spineRender.Effect.World = matrix ?? Matrix.Identity;
+                    if (this.spineRender.Effect is BasicEffect basicEff)
+                    {
+                        basicEff.World = matrix ?? Matrix.Identity;
+                        basicEff.Projection = Matrix.CreateOrthographicOffCenter(0, this.GraphicsDevice.Viewport.Width, this.GraphicsDevice.Viewport.Height, 0, 1, 0);
+                    }
                     this.spineRender.Begin();
                     break;
 
@@ -615,6 +650,5 @@ namespace WzComparerR2.MapRender
             Sprite_BlendNonPremultiplied = 5,
             Sprite_BlendMask = 6,
         }
-
     }
 }

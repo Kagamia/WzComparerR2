@@ -17,6 +17,7 @@ namespace WzComparerR2.MapRender.Patches2
         public int Z { get; set; }
         public bool Flip { get; set; }
         public bool Light { get; set; }
+        public string SpineAni { get; set; }
 
         public ItemView View { get; set; }
 
@@ -35,6 +36,7 @@ namespace WzComparerR2.MapRender.Patches2
 
                 Flip = node.Nodes["f"].GetValueEx(false),
                 Light = node.Nodes["light"].GetValueEx(false),
+                SpineAni = node.Nodes["spineAni"].GetValueEx<string>(null),
             };
 
             string objTags = node.Nodes["tags"].GetValueEx<string>(null);

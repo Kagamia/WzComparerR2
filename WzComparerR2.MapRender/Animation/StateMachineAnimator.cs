@@ -14,8 +14,9 @@ namespace WzComparerR2.Animation
         {
         }
 
-        public StateMachineAnimator(SpineAnimationData data)
+        public StateMachineAnimator(ISpineAnimationData data)
         {
+            throw new NotImplementedException();
         }
 
         private StateMachineAnimator(IStateMachineAnimationData data)
@@ -23,7 +24,6 @@ namespace WzComparerR2.Animation
             this.Data = data;
             this.Data.AnimationEnd += Data_AnimationEnd;
         }
-
 
         public IStateMachineAnimationData Data { get; private set; }
 

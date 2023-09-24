@@ -356,8 +356,7 @@ namespace WzComparerR2
         {
             if (this.cmbItemAniNames.SelectedIndex > -1 && this.pictureBoxEx1.Items.Count > 0)
             {
-                var aniItem = this.pictureBoxEx1.Items[0] as Animation.SpineAnimator;
-                if (aniItem != null)
+                if (this.pictureBoxEx1.Items[0] is ISpineAnimator aniItem)
                 {
                     string aniName = this.cmbItemAniNames.SelectedItem as string;
                     aniItem.SelectedAnimationName = aniName;
@@ -370,8 +369,7 @@ namespace WzComparerR2
         {
             if (this.cmbItemSkins.SelectedIndex > -1 && this.pictureBoxEx1.Items.Count > 0)
             {
-                var aniItem = this.pictureBoxEx1.Items[0] as Animation.SpineAnimator;
-                if (aniItem != null)
+                if (this.pictureBoxEx1.Items[0] is ISpineAnimator aniItem)
                 {
                     string skinName = this.cmbItemSkins.SelectedItem as string;
                     aniItem.SelectedSkin = skinName;
@@ -450,7 +448,7 @@ namespace WzComparerR2
                 if (spineData != null)
                 {
                     this.pictureBoxEx1.ShowAnimation(spineData);
-                    var aniItem = this.pictureBoxEx1.Items[0] as Animation.SpineAnimator;
+                    var aniItem = this.pictureBoxEx1.Items[0] as ISpineAnimator;
 
                     this.cmbItemAniNames.Items.Clear();
                     this.cmbItemAniNames.Items.Add("");

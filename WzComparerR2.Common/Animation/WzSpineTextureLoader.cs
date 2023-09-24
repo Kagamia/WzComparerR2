@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Spine;
-using WzComparerR2.WzLib;
 using WzComparerR2.Common;
 using WzComparerR2.Rendering;
+using WzComparerR2.WzLib;
+
 using Microsoft.Xna.Framework.Graphics;
 
 namespace WzComparerR2.Animation
 {
-    public class WzSpineTextureLoader : TextureLoader
+    public class WzSpineTextureLoader : Spine.TextureLoader, Spine.V2.TextureLoader
     {
         public WzSpineTextureLoader(Wz_Node topNode, GraphicsDevice graphicsDevice)
             : this(topNode, graphicsDevice, null)
@@ -30,38 +27,46 @@ namespace WzComparerR2.Animation
 
         public GlobalFindNodeFunction FindNodeFunction { get; set; }
 
-        public void Load(AtlasPage page, string path)
+        public void Load(Spine.AtlasPage page, string path)
         {
-            var frameNode = this.TopNode.FindNodeByPath(path);
-
-            if (frameNode == null || frameNode.Value == null)
+            if (this.TryLoadTexture(path, out var texture))
             {
-                return;
+                page.rendererObject = texture;
+                page.width = texture.Width;
+                page.height = texture.Height;
             }
+        }
 
-            while (frameNode.Value is Wz_Uol)
+        public void Load(Spine.V2.AtlasPage page, string path)
+        {
+            if (this.TryLoadTexture(path, out var texture))
             {
-                Wz_Uol uol = frameNode.Value as Wz_Uol;
-                Wz_Node uolNode = uol.HandleUol(frameNode);
-                if (uolNode != null)
-                {
-                    frameNode = uolNode;
-                }
-            }
-
-            if (frameNode.Value is Wz_Png)
-            {
-                var linkNode = frameNode.GetLinkedSourceNode(FindNodeFunction);
-                Wz_Png png = linkNode?.GetValue<Wz_Png>() ?? (Wz_Png)frameNode.Value;
-                page.rendererObject = png.ToTexture(this.GraphicsDevice);
-                page.width = png.Width;
-                page.height = png.Height;
+                page.rendererObject = texture;
+                page.width = texture.Width;
+                page.height = texture.Height;
             }
         }
 
         public void Unload(object texture)
         {
             (texture as Texture2D)?.Dispose();
+        }
+
+        private bool TryLoadTexture(string path, out Texture2D texture)
+        {
+            texture = null;
+            var frameNode = this.TopNode.FindNodeByPath(path);
+            frameNode = frameNode.ResolveUol();
+
+            if (frameNode.Value is Wz_Png)
+            {
+                var linkNode = frameNode.GetLinkedSourceNode(FindNodeFunction);
+                Wz_Png png = (linkNode ?? frameNode).GetValue<Wz_Png>();
+                texture = png.ToTexture(this.GraphicsDevice);
+                return true;
+            }
+
+            return false;
         }
     }
 }

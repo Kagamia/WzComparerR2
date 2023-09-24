@@ -2,24 +2,23 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using Spine;
-using WzComparerR2.WzLib;
 using WzComparerR2.Controls;
+
 using Microsoft.Xna.Framework;
+using Spine.V2;
 
 namespace WzComparerR2.Animation
 {
-    public class SpineAnimator : AnimationItem
+    public class SpineAnimatorV2 : AnimationItem, ISpineAnimator
     {
-        public SpineAnimator(SpineAnimationData data)
+        public SpineAnimatorV2(SpineAnimationDataV2 data)
         {
             this.Data = data;
             this._selectedAniIndex = -1;
             this.Load();
         }
 
-        public SpineAnimationData Data { get; private set; }
+        public SpineAnimationDataV2 Data { get; private set; }
 
         public Skeleton Skeleton { get; private set; }
 
@@ -39,7 +38,7 @@ namespace WzComparerR2.Animation
                 {
                     string aniName = this.Animations[value];
                     var ani = this.Data.SkeletonData.FindAnimation(aniName);
-                    this._animationState.SetAnimation(0, aniName, true);
+                    this._animationState.SetAnimation(0, ani, true);
                     this._selectedAniIndex = value;
                 }
                 else
@@ -88,7 +87,7 @@ namespace WzComparerR2.Animation
             get { return (int)((this._animationState?.GetCurrent(0)?.Time ?? 0) * 1000); }
         }
 
-        internal Spine.Animation SelectedAnimation
+        internal Spine.V2.Animation SelectedAnimation
         {
             get
             {
@@ -163,119 +162,9 @@ namespace WzComparerR2.Animation
             }
         }
 
-        public KeyFrame[] GetKeyFrames()
-        {
-            //放弃了 算法太麻烦还不如直接对比。。
-            return null;
-            var frames = new LinkedList<KeyFrame>();
-            var track = this._animationState.GetCurrent(0);
-            if (track != null)
-            {
-                foreach (var timeLine in track.Animation.Timelines)
-                {
-                    var tlFrames = GetTimeLineKeyFrames(timeLine);
-                    if (tlFrames.Count > 0)
-                    {
-                        if (frames.Count <= 0) //直接加入
-                        {
-                            foreach(var frame in tlFrames)
-                            {
-                                frames.AddLast(frame);
-                            }
-                        }
-                        else //合并关键帧
-                        {
-
-                        }
-                    }
-                }
-            }
-            return frames.ToArray();
-        }
-
-        private LinkedList<KeyFrame> GetTimeLineKeyFrames(Timeline timeLine)
-        {
-            float[] frameTimes;
-            int interval = 0;
-            bool animated = false;
-            try
-            {
-                //懒得反射了。。。
-                dynamic m = timeLine;
-                frameTimes = (float[])((dynamic)m).Frames;
-            }
-            catch
-            {
-                frameTimes = null;
-            }
-
-            if (timeLine is AttachmentTimeline)
-            {
-                interval = 1;
-                animated = false;
-            }
-            else if (timeLine is CurveTimeline)
-            {
-                animated = true;
-
-                if (timeLine is ColorTimeline)
-                {
-                    interval = 5;
-                }
-                else if (timeLine is FFDTimeline)
-                {
-                    interval = 1;
-                }
-                else if (timeLine is IkConstraintTimeline)
-                {
-                    interval = 3;
-                }
-                else if (timeLine is RotateTimeline)
-                {
-                    interval = 2;
-                }
-                else if (timeLine is TranslateTimeline)
-                {
-                    interval = 3;
-                }
-            }
-            else if (timeLine is DrawOrderTimeline)
-            {
-                interval = 1;
-                animated = false;
-            }
-            else if (timeLine is EventTimeline)
-            {
-                //对模型好像没啥变化 忽略
-            }
-            else if (timeLine is FlipXTimeline)
-            {
-                interval = 2;
-                animated = false;
-            }
-
-            var frameList = new LinkedList<KeyFrame>();
-
-            if (frameTimes != null && frameTimes.Length > 0 && interval > 0)
-            {
-                if (frameTimes[0] > 0)
-                {
-                    frameList.AddFirst(new KeyFrame() { Length = (int)(frameTimes[0] * 1000), Animated = false });
-                }
-
-                for (int i = 0; i < frameTimes.Length; i += interval)
-                {
-                    float length = i < frameTimes.Length - interval ? (frameTimes[i + interval] - frameTimes[i]) : 0;
-                    frameList.AddLast(new KeyFrame() { Length = (int)(length * 1000), Animated = animated });
-                }
-            }
-
-            return frameList;
-        }
-
         public override object Clone()
         {
-            var clonedAnimator = new SpineAnimator(this.Data);
+            var clonedAnimator = new SpineAnimatorV2(this.Data);
             clonedAnimator.SelectedAnimationIndex = this.SelectedAnimationIndex;
             if (this.SelectedSkin != null)
             {
@@ -286,20 +175,11 @@ namespace WzComparerR2.Animation
 
         private void Load()
         {
-            this.Skeleton = new Skeleton(this.Data.SkeletonData);
-            IList<string> aniNames = this.Data.SkeletonData.Animations.Select(ani => ani.Name).ToList();
-            this.Animations = new ReadOnlyCollection<string>(aniNames);
-            this._animationState = new AnimationState(new AnimationStateData(this.Data.SkeletonData));
-            this.Skins = new ReadOnlyCollection<string>(this.Data.SkeletonData.Skins.Select(skin => skin.Name).ToList());
-
-            if (!string.IsNullOrEmpty(this.Data.DefaultSkin))
-            {
-                var skin = this.Skeleton.Data.FindSkin(this.Data.DefaultSkin);
-                if (skin != null)
-                {
-                    this.Skeleton.SetSkin(skin);
-                }
-            }
+            var skeletonData = this.Data.SkeletonData;
+            this.Skeleton = new Skeleton(skeletonData);
+            this.Animations = new ReadOnlyCollection<string>(skeletonData.Animations.Select(ani => ani.Name).ToList());
+            this.Skins = new ReadOnlyCollection<string>(skeletonData.Skins.Select(skin => skin.Name).ToList());
+            this._animationState = new AnimationState(new AnimationStateData(skeletonData));
 
             if (this.Animations.Count > 0)
             {
@@ -310,5 +190,16 @@ namespace WzComparerR2.Animation
                 this.SelectedAnimationIndex = -1;
             }
         }
+
+        #region
+        ISpineAnimationData ISpineAnimator.Data => this.Data;
+        object ISpineAnimator.Skeleton => this.Skeleton;
+        ReadOnlyCollection<string> ISpineAnimator.Animations => this.Animations;
+        ReadOnlyCollection<string> ISpineAnimator.Skins => this.Skins;
+        int ISpineAnimator.SelectedAnimationIndex { get => this.SelectedAnimationIndex; set => this.SelectedAnimationIndex = value; }
+        string ISpineAnimator.SelectedAnimationName { get => this.SelectedAnimationName; set => this.SelectedAnimationName = value; }
+        string ISpineAnimator.SelectedSkin { get => this.SelectedSkin; set => this.SelectedSkin = value; }
+        int ISpineAnimator.CurrentTime { get => this.CurrentTime; }
+        #endregion
     }
 }

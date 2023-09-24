@@ -60,7 +60,7 @@ namespace WzComparerR2.MapRender
         {
             if (colors == null || colors.Length <= 0)
             {
-                return Color.TransparentBlack;
+                return Color.Transparent;
             }
             if (colors.Length == 1)
             {

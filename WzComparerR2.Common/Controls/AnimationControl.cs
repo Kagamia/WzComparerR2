@@ -113,13 +113,13 @@ namespace WzComparerR2.Controls
 
                     mt = Matrix.CreateScale(GlobalScale, GlobalScale, 1);
 
-                    if (animation is FrameAnimator)
+                    if (animation is FrameAnimator frameAni)
                     {
-                        graphics.Draw((FrameAnimator)animation, mt);
+                        graphics.Draw(frameAni, mt);
                     }
-                    else if (animation is SpineAnimator)
+                    else if (animation is ISpineAnimator spineAni)
                     {
-                        graphics.Draw((SpineAnimator)animation, mt);
+                        graphics.Draw(spineAni, mt);
                     }
                 }
             }

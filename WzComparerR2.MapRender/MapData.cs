@@ -580,7 +580,7 @@ namespace WzComparerR2.MapRender
             var aniItem = resLoader.LoadAnimationData(path);
             obj.View = new ObjItem.ItemView()
             {
-                Animator = CreateAnimator(aniItem)
+                Animator = CreateAnimator(aniItem, obj.SpineAni)
             };
         }
 
@@ -839,29 +839,32 @@ namespace WzComparerR2.MapRender
 
         private object CreateAnimator(object animationData, string aniName = null)
         {
-            if (animationData is RepeatableFrameAnimationData)
-            {
-                var aniData = (RepeatableFrameAnimationData)animationData;
-                var animator = new RepeatableFrameAnimator(aniData);
-                return animator;
+            switch (animationData) {
+                case RepeatableFrameAnimationData repFrameAni:
+                    return new RepeatableFrameAnimator(repFrameAni);
+
+                case FrameAnimationData frameAni:
+                    return new FrameAnimator(frameAni);
+
+                case SpineAnimationDataV2 spineAniV2:
+                    var spineAnimatorV2 = new SpineAnimatorV2(spineAniV2);
+                    if (aniName != null)
+                    {
+                        spineAnimatorV2.SelectedAnimationName = aniName;
+                    }
+                    return spineAnimatorV2;
+
+                case SpineAnimationDataV4 spineAniV4:
+                    var spineAnimatorV4 = new SpineAnimatorV4(spineAniV4);
+                    if (aniName != null)
+                    {
+                        spineAnimatorV4.SelectedAnimationName = aniName;
+                    }
+                    return spineAnimatorV4;
+
+                default:
+                    return null;
             }
-            else if (animationData is FrameAnimationData)
-            {
-                var aniData = (FrameAnimationData)animationData;
-                var animator = new FrameAnimator(aniData);
-                return animator;
-            }
-            else if (animationData is SpineAnimationData)
-            {
-                var aniData = (SpineAnimationData)animationData;
-                var animator = new SpineAnimator(aniData);
-                if (aniName != null)
-                {
-                    animator.SelectedAnimationName = aniName;
-                }
-                return animator;
-            }
-            return null;
         }
 
         private void AddMobAI(StateMachineAnimator ani)
