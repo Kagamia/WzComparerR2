@@ -56,39 +56,21 @@ namespace WzComparerR2.Rendering
 
         public void Draw(ISpineAnimator animator, Matrix world)
         {
-            object skeleton = animator.Skeleton;
-
-            if (skeleton != null)
+            if (animator is AnimationItem aniItem && aniItem.Position != Point.Zero)
             {
-                if (animator is AnimationItem aniItem && aniItem.Position != Point.Zero)
-                {
-                    world *= Matrix.CreateTranslation(aniItem.Position.X, aniItem.Position.Y, 0);
-                }
-
-                spineRenderer.PremultipliedAlpha = animator.Data.PremultipliedAlpha;
-                if (spineRenderer.Effect is BasicEffect basicEff)
-                {
-                    basicEff.World = world;
-                    basicEff.Projection = Matrix.CreateOrthographicOffCenter(0, this.GraphicsDevice.Viewport.Width, this.GraphicsDevice.Viewport.Height, 0, 1, 0);
-                }
-
-                spineRenderer.Begin();
-                switch (skeleton)
-                {
-                    case Spine.V2.Skeleton skeletonV2:
-                        skeletonV2.X = 0;
-                        skeletonV2.Y = 0;
-                        spineRenderer.Draw(skeletonV2);
-                        break;
-
-                    case Spine.Skeleton skeletonV4:
-                        skeletonV4.X = 0;
-                        skeletonV4.Y = 0;
-                        spineRenderer.Draw(skeletonV4);
-                        break;
-                }
-                spineRenderer.End();
+                world *= Matrix.CreateTranslation(aniItem.Position.X, aniItem.Position.Y, 0);
             }
+
+            spineRenderer.PremultipliedAlpha = animator.Data.PremultipliedAlpha;
+            if (spineRenderer.Effect is BasicEffect basicEff)
+            {
+                basicEff.World = world;
+                basicEff.Projection = Matrix.CreateOrthographicOffCenter(0, this.GraphicsDevice.Viewport.Width, this.GraphicsDevice.Viewport.Height, 0, 1, 0);
+            }
+
+            spineRenderer.Begin();
+            animator.Render(spineRenderer);
+            spineRenderer.End();
         }
     }
 }

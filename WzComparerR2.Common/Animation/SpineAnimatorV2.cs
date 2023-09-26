@@ -191,7 +191,7 @@ namespace WzComparerR2.Animation
             }
         }
 
-        #region
+        #region ISpineAnimator
         ISpineAnimationData ISpineAnimator.Data => this.Data;
         object ISpineAnimator.Skeleton => this.Skeleton;
         ReadOnlyCollection<string> ISpineAnimator.Animations => this.Animations;
@@ -200,6 +200,7 @@ namespace WzComparerR2.Animation
         string ISpineAnimator.SelectedAnimationName { get => this.SelectedAnimationName; set => this.SelectedAnimationName = value; }
         string ISpineAnimator.SelectedSkin { get => this.SelectedSkin; set => this.SelectedSkin = value; }
         int ISpineAnimator.CurrentTime { get => this.CurrentTime; }
+        void ISpineAnimator.Render(Spine.SkeletonRenderer renderer) => renderer.Draw(this.Skeleton);
         #endregion
     }
 }

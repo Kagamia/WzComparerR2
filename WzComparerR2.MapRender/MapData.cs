@@ -846,21 +846,13 @@ namespace WzComparerR2.MapRender
                 case FrameAnimationData frameAni:
                     return new FrameAnimator(frameAni);
 
-                case SpineAnimationDataV2 spineAniV2:
-                    var spineAnimatorV2 = new SpineAnimatorV2(spineAniV2);
+                case ISpineAnimationData spineAniData:
+                    var spineAni = spineAniData.CreateAnimator();
                     if (aniName != null)
                     {
-                        spineAnimatorV2.SelectedAnimationName = aniName;
+                        spineAni.SelectedAnimationName = aniName;
                     }
-                    return spineAnimatorV2;
-
-                case SpineAnimationDataV4 spineAniV4:
-                    var spineAnimatorV4 = new SpineAnimatorV4(spineAniV4);
-                    if (aniName != null)
-                    {
-                        spineAnimatorV4.SelectedAnimationName = aniName;
-                    }
-                    return spineAnimatorV4;
+                    return spineAni;
 
                 default:
                     return null;

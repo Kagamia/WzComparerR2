@@ -14,5 +14,6 @@ namespace WzComparerR2.Animation
         string SelectedAnimationName { get; set; }
         string SelectedSkin { get; set; }
         int CurrentTime { get; }
+        void Render(Spine.SkeletonRenderer renderer);
     }
 }

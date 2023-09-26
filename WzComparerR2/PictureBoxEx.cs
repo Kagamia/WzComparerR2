@@ -99,16 +99,7 @@ namespace WzComparerR2
 
         public void ShowAnimation(ISpineAnimationData data)
         {
-            switch (data)
-            {
-                case SpineAnimationDataV2 dataV2:
-                    this.ShowAnimation(new SpineAnimatorV2(dataV2));
-                    break;
-
-                case SpineAnimationDataV4 dataV4:
-                    this.ShowAnimation(new SpineAnimatorV4(dataV4));
-                    break;
-            }
+            this.ShowAnimation(data.CreateAnimator() as AnimationItem);
         }
 
         public void ShowAnimation(AnimationItem animator)

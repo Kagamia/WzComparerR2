@@ -43,6 +43,7 @@ namespace WzComparerR2.Animation
         bool ISpineAnimationData.PremultipliedAlpha => this.PremultipliedAlpha;
         object ISpineAnimationData.SkeletonData => this.SkeletonData;
         SpineVersion ISpineAnimationData.SpineVersion => SpineVersion.V4;
+        ISpineAnimator ISpineAnimationData.CreateAnimator() => new SpineAnimatorV4(this);
         #endregion
     }
 }
