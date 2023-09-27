@@ -163,50 +163,44 @@ namespace WzComparerR2.MapRender.UI
             {
                 if (this.CmbQuestList != null)
                 {
-                    try
+                    var quests = this.CurrentWorldMap?.QuestLimit;
+                    if (quests == null || quests.Count <= 0)
                     {
-                        var quests = this.CurrentWorldMap?.QuestLimit;
-                        if (quests == null || quests.Count <= 0)
+                        if (this.CmbQuestList.ItemsSource != null)
                         {
                             this.CmbQuestList.ItemsSource = null;
-                            this.CmbQuestList.Visibility = Visibility.Hidden;
                         }
-                        else
-                        {
-                            var dataSource = new List<object>();
-                            dataSource.AddRange(quests);
-                            dataSource.Add("(none)");
-                            this.CmbQuestList.ItemsSource = dataSource;
-                            this.CmbQuestList.SelectedIndex = 0;
-                            this.CmbQuestList.Visibility = Visibility.Visible;
-                        }
+                        this.CmbQuestList.Visibility = Visibility.Hidden;
                     }
-                    catch //ignore exceptions on closing.
+                    else
                     {
+                        var dataSource = new List<object>();
+                        dataSource.AddRange(quests);
+                        dataSource.Add("(none)");
+                        this.CmbQuestList.ItemsSource = dataSource;
+                        this.CmbQuestList.SelectedIndex = 0;
+                        this.CmbQuestList.Visibility = Visibility.Visible;
                     }
                 }
                 if (this.CmbFogList != null)
                 {
-                    try
+                    var fogs = this.CurrentWorldMap?.Fog;
+                    if (fogs == null || fogs.Count <= 0)
                     {
-                        var fogs = this.CurrentWorldMap?.Fog;
-                        if (fogs == null || fogs.Count <= 0)
+                        if (this.CmbFogList.ItemsSource != null)
                         {
                             this.CmbFogList.ItemsSource = null;
-                            this.CmbFogList.Visibility = Visibility.Hidden;
                         }
-                        else
-                        {
-                            var dataSource = new List<object>();
-                            dataSource.AddRange(fogs);
-                            dataSource.Add("(none)");
-                            this.CmbFogList.ItemsSource = dataSource;
-                            this.CmbFogList.SelectedIndex = 0;
-                            this.CmbFogList.Visibility = Visibility.Visible;
-                        }
+                        this.CmbFogList.Visibility = Visibility.Hidden;
                     }
-                    catch //ignore exceptions on closing.
+                    else
                     {
+                        var dataSource = new List<object>();
+                        dataSource.AddRange(fogs);
+                        dataSource.Add("(none)");
+                        this.CmbFogList.ItemsSource = dataSource;
+                        this.CmbFogList.SelectedIndex = 0;
+                        this.CmbFogList.Visibility = Visibility.Visible;
                     }
                 }
             }
