@@ -7,7 +7,7 @@
 ⚠️ The WzComparerR2 project is now in deep maintenance status. This means that only critical bugs or wz file format breaking changes are being considered for inclusion by owner. Expect slow replies to issues.
 
 # WzComparerR2
-这是一个用C#7/.Net4.6.2组装的冒险岛提取器...  
+这是一个用C# latest/.Net4.62+.Net6组装的冒险岛提取器...  
 包含了一些奇怪的机能比如stringWZ搜索 客户端对比 装备模拟 地图模拟等等..  
 
 tips: WcR2将尽力维持每周更新，Releases里**不会**提供最稳定版下载，最新版会通过azure-pipeline自动发布。  
@@ -34,7 +34,7 @@ git clone --recurse-submodules -j8 git://github.com/Kagamia/WzComparerR2.git
 Clone repository with submodules.
 
 # Compile
-- vs2017 or higher
+- vs2022 or higher/.net 6 SDK
 
 # Credits and Acknowledgement
 - **Fiel** ([Southperry](http://www.southperry.net))  wz文件读取代码改造自WzExtract 以及WzPatcher
