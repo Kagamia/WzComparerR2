@@ -74,9 +74,9 @@ namespace WzComparerR2
             this.ShowAnimation(frameData);
         }
 
-        public FrameAnimationData LoadFrameAnimation(Wz_Node node)
+        public FrameAnimationData LoadFrameAnimation(Wz_Node node, FrameAnimationCreatingOptions options = default)
         {
-            return FrameAnimationData.CreateFromNode(node, this.GraphicsDevice, PluginBase.PluginManager.FindWz);
+            return FrameAnimationData.CreateFromNode(node, this.GraphicsDevice, options, PluginBase.PluginManager.FindWz);
         }
 
         public ISpineAnimationData LoadSpineAnimation(Wz_Node node)
@@ -218,8 +218,8 @@ namespace WzComparerR2
 
             if (bounds.Width <= 0 || bounds.Height <= 0
                 || targetSize.X <= 0 || targetSize.Y <= 0
-                || startTime < 0 || stopTime > length
-                || stopTime - startTime < 0)
+                || startTime < 0
+                || stopTime - startTime <= 0)
             {
                 return false;
             }
@@ -305,7 +305,7 @@ namespace WzComparerR2
             IEnumerable<int> ClipTimeline(int[] _timeline)
             {
                 int t = 0;
-                for (int i = 0; i < timeline.Length; i++)
+                for (int i = 0; ; i = (i + 1) % timeline.Length)
                 {
                     var frameDelay = timeline[i];
                     if (t < startTime)

@@ -218,9 +218,17 @@ namespace WzComparerR2.Controls
 
         private void AnimationControl_MouseWheel(object sender, MouseEventArgs e)
         {
+            const int WHEEL_DELTA = 120;
             if ((Control.ModifierKeys & Keys.Control) != 0)
             {
-                this.GlobalScale += 0.1f * e.Delta / 120;
+                float wheelTicks = e.Delta / WHEEL_DELTA;
+                float oldScale = this.GlobalScale;
+                float newScale = oldScale * (1 + 0.1f * wheelTicks);
+                if (oldScale.CompareTo(1f) * newScale.CompareTo(1f) == -1) // scaling cross 100%
+                {
+                    newScale = 1f;
+                }
+                this.GlobalScale = newScale;
             }
         }
 

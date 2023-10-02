@@ -32,27 +32,50 @@ namespace WzComparerR2.Animation
             return bound ?? Rectangle.Empty;
         }
 
-        public static FrameAnimationData CreateFromNode(Wz_Node node, GraphicsDevice graphicsDevice, GlobalFindNodeFunction findNode)
+        public static FrameAnimationData CreateFromNode(Wz_Node node, GraphicsDevice graphicsDevice, FrameAnimationCreatingOptions options, GlobalFindNodeFunction findNode)
         {
             if (node == null)
                 return null;
             var anime = new FrameAnimationData();
-            for (int i = 0; ; i++)
+            if (options.HasFlag(FrameAnimationCreatingOptions.ScanAllChildrenFrames))
             {
-                Wz_Node frameNode = node.FindNodeByPath(i.ToString());
-
-                if (frameNode == null || frameNode.Value == null)
-                    break;
-                Frame frame = Frame.CreateFromNode(frameNode, graphicsDevice, findNode);
-
-                if (frame == null)
-                    break;
-                anime.Frames.Add(frame);
+                foreach(var frameNode in node.Nodes)
+                {
+                    Frame frame = Frame.CreateFromNode(frameNode, graphicsDevice, findNode);
+                    if (frame != null)
+                    {
+                        anime.Frames.Add(frame);
+                    }
+                }
             }
+            else
+            {
+                for (int i = 0; ; i++)
+                {
+                    Wz_Node frameNode = node.FindNodeByPath(i.ToString());
+
+                    if (frameNode == null || frameNode.Value == null)
+                        break;
+                    Frame frame = Frame.CreateFromNode(frameNode, graphicsDevice, findNode);
+
+                    if (frame == null)
+                        break;
+                    anime.Frames.Add(frame);
+                }
+            }
+
             if (anime.Frames.Count > 0)
                 return anime;
             else
                 return null;
         }
+    }
+
+    [Flags]
+    public enum FrameAnimationCreatingOptions
+    {
+        None = 0,
+        FindFrameNameInOrdinalNumber = 1 << 0,
+        ScanAllChildrenFrames = 1 << 1,
     }
 }

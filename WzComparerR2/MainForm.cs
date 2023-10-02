@@ -463,7 +463,8 @@ namespace WzComparerR2
             }
             else
             {
-                var frameData = this.pictureBoxEx1.LoadFrameAnimation(node);
+                var options = (sender == this.buttonItemExtractGifEx) ? FrameAnimationCreatingOptions.ScanAllChildrenFrames: default;
+                var frameData = this.pictureBoxEx1.LoadFrameAnimation(node, options);
 
                 if (frameData != null)
                 {
@@ -544,7 +545,8 @@ namespace WzComparerR2
 
             var aniItem = this.pictureBoxEx1.Items[0];
             var frameData = (aniItem as FrameAnimator)?.Data;
-            if (frameData != null && frameData.Frames.Count == 1)
+            if (frameData != null && frameData.Frames.Count == 1 
+                && frameData.Frames[0].A0 == 255 && frameData.Frames[0].A1 == 255 && frameData.Frames[0].Delay == 0)
             {
                 // save still picture as png
                 this.OnSavePngFile(frameData.Frames[0]);
