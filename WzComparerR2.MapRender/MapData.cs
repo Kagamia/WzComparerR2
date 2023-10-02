@@ -145,10 +145,7 @@ namespace WzComparerR2.MapRender
             {
                 this.ID = int.Parse(m.Result("$1"));
             }
-            else
-            {
-                this.Name = mapImgNode.Text;
-            }
+            this.Name = mapImgNode.Text;
         }
 
         private void LoadInfo(Wz_Node infoNode)

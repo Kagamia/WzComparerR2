@@ -15,42 +15,133 @@ namespace WzComparerR2.MapRender
 {
     public partial class FrmMapRender2
     {
+        enum SceneManagerState
+        {
+            Starting = 0,
+            Loading,
+            Entering,
+            Running,
+            Exiting,
+        }
+
+        #region private fields
         MapViewData viewData;
         LinkedList<MapViewData> viewHistory;
+        SceneManagerState sceneManagerState;
+        Wz_Image mapImgLoading;
+        #endregion
+
+        public void LoadMap(Wz_Image mapImg)
+        {
+            if (this.sceneManagerState == SceneManagerState.Starting || this.sceneManagerState == SceneManagerState.Running)
+            {
+                this.mapImgLoading = mapImg;
+            }
+        }
+
+        /*
+         * State machine transition table
+         *
+         * FromState |   condition  | ToState
+         * ----------|--------------|-----------
+         * Starting  | mapImg != null | Loading
+         * Starting  | mapImg == null | Running (empty scene)
+         * Loading   | mapData != null | Entering
+         * Loading   | mapData == null | Running (empty scene)
+         * Entering  | global_light >= 1.0 | Running
+         * Running   | viewData.toMap != null | Exiting
+         * Exiting  | viewData.toMap != null | Loading
+         * 
+         */
 
         private IE OnStart()
         {
-            //初始化
-            viewHistory = new LinkedList<MapViewData>();
-
-            //开始加载地图
-            yield return new WaitTaskCompletedCoroutine(LoadMap());
-
-            //添加视图状态
+            // initialize
+            this.viewHistory = new LinkedList<MapViewData>();
+            this.sceneManagerState = SceneManagerState.Starting;
+            // add view state
             this.viewData = new MapViewData()
             {
-                MapID = mapData?.ID ?? -1,
-                Portal = "sp"
+                MapID = -1,
+                ToMapID = null,
             };
 
-            if (this.mapData != null)
+            if (this.mapImgLoading != null)
             {
-                yield return cm.Yield(OnSceneEnter());
+                this.viewData.ToPortal = "sp";
+                yield return cm.Yield(OnMapLoading());
             }
             else
             {
-                //添加提示语
-                this.ui.ChatBox.AppendTextSystem("MapRender加载失败，没有地图数据。");
                 this.opacity = 1;
                 yield return cm.Yield(OnSceneRunning());
             }
         }
 
-        private async Task LoadMap()
+        private IE OnMapLoading()
         {
-            if (this.mapImg == null)
+            this.sceneManagerState = SceneManagerState.Loading;
+
+            var loadMapTask = this.LoadMap();
+            yield return new WaitTaskCompletedCoroutine(loadMapTask);
+            if (loadMapTask.Exception != null)
             {
-                return;
+                this.ui.ChatBox.AppendTextSystem($"Failed to load map：{loadMapTask.Exception}");
+                this.mapImgLoading = null;
+                this.opacity = 1;
+                yield return cm.Yield(OnSceneRunning());
+                yield break;
+            }
+
+            // backfill toMapID 
+            if (this.viewData.ToMapID == null && this.mapData?.ID != null)
+            {
+                this.viewData.ToMapID = this.mapData.ID;
+            }
+
+            //记录历史
+            if (this.viewData.MapID > -1 && this.viewData.MapID != this.viewData.ToMapID && this.viewData.ToMapID != null)
+            {
+                if (this.viewData.IsMoveBack
+                    && this.viewData.ToMapID == this.viewHistory.Last?.Value?.MapID)
+                {
+                    var last = this.viewHistory.Last.Value;
+                    this.viewHistory.RemoveLast();
+                    var toViewData = new MapViewData()
+                    {
+                        MapID = last.MapID,
+                        Portal = last.Portal ?? "sp"
+                    };
+                    this.viewData = toViewData;
+                }
+                else
+                {
+                    viewHistory.AddLast(this.viewData);
+                    var toViewData = new MapViewData()
+                    {
+                        MapID = this.viewData.ToMapID.Value,
+                        Portal = this.viewData.ToPortal ?? "sp"
+                    };
+                    this.viewData = toViewData;
+                }
+            }
+            else
+            {
+                this.viewData.MapID = this.viewData.ToMapID ?? -1;
+                this.viewData.ToMapID = null;
+                this.viewData.Portal = this.viewData.ToPortal;
+                this.viewData.ToPortal = null;
+            }
+
+            this.viewData.IsMoveBack = false;
+            yield return cm.Yield(OnSceneEnter());
+        }
+
+        private async Task<bool> LoadMap()
+        {
+            if (this.mapImgLoading == null)
+            {
+                return false;
             }
 
             //开始加载
@@ -59,7 +150,7 @@ namespace WzComparerR2.MapRender
 
             //加载地图数据
             var mapData = new MapData(this.Services.GetService<IRandom>());
-            mapData.Load(mapImg.Node, resLoader);
+            mapData.Load(this.mapImgLoading.Node, resLoader);
 
             //处理bgm
             Music newBgm = LoadBgm(mapData);
@@ -86,12 +177,15 @@ namespace WzComparerR2.MapRender
             this.resLoader.Recycle();
 
             //准备场景和bgm
+            this.mapImg = this.mapImgLoading;
+            this.mapImgLoading = null;
             this.mapData = mapData;
             this.bgm = newBgm;
             if (willSwitchBgm && this.bgm != null)
             {
                 bgmTask = FadeIn(this.bgm, 1000);
             }
+            return true;
         }
 
         private async Task FadeOut(Music music, int ms)
@@ -327,6 +421,8 @@ namespace WzComparerR2.MapRender
 
         private IE OnSceneEnter()
         {
+            this.sceneManagerState = SceneManagerState.Entering;
+
             //初始化指向传送门
             if (!string.IsNullOrEmpty(viewData.Portal))
             {
@@ -358,6 +454,8 @@ namespace WzComparerR2.MapRender
 
         private IE OnSceneExit()
         {
+            this.sceneManagerState = SceneManagerState.Exiting;
+
             //场景渐出
             this.opacity = 1;
             double time = 500;
@@ -368,57 +466,16 @@ namespace WzComparerR2.MapRender
             }
             this.opacity = 0;
             yield return null;
-            yield return cm.Yield(OnSwitchMap());
-        }
-
-        private IE OnSwitchMap()
-        {
-            //记录历史
-            if (this.viewData.MapID != this.viewData.ToMapID && this.viewData.ToMapID != null)
-            {
-                if (this.viewData.IsMoveBack 
-                    && this.viewData.ToMapID == this.viewHistory.Last?.Value?.MapID)
-                {
-                    var last = this.viewHistory.Last.Value;
-                    this.viewHistory.RemoveLast();
-                    var toViewData = new MapViewData()
-                    {
-                        MapID = last.MapID,
-                        Portal = last.Portal ?? "sp"
-                    };
-                    this.viewData = toViewData;
-                }
-                else
-                {
-                    viewHistory.AddLast(this.viewData);
-                    var toViewData = new MapViewData()
-                    {
-                        MapID = this.viewData.ToMapID.Value,
-                        Portal = this.viewData.ToPortal ?? "sp"
-                    };
-                    this.viewData = toViewData;
-                }
-            }
-            else
-            {
-                this.viewData.ToMapID = null;
-                this.viewData.Portal = this.viewData.ToPortal;
-                this.viewData.ToPortal = null;
-            }
-
-            yield return new WaitTaskCompletedCoroutine(LoadMap());
-            if (this.mapData != null)
-            {
-                yield return cm.Yield(OnSceneEnter());
-            }
+            yield return cm.Yield(OnMapLoading());
         }
 
         private IE OnSceneRunning()
         {
+            this.sceneManagerState = SceneManagerState.Running;
             while (true)
             {
                 SceneUpdate();
-                if (this.viewData?.ToMapID != null)
+                if (this.mapImgLoading != null)
                 {
                     break;
                 }
@@ -483,7 +540,7 @@ namespace WzComparerR2.MapRender
                     Wz_Image img = node.GetNodeWzImage();
                     if (img != null)
                     {
-                        this.mapImg = img;
+                        this.mapImgLoading = img;
                         viewData.ToMapID = toMap;
                         viewData.ToPortal = pName;
                         viewData.Portal = fromPName;

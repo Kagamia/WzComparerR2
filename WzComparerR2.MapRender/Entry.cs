@@ -104,20 +104,27 @@ namespace WzComparerR2.MapRender
                         {
                             if (this.mapRenderGame2 != null)
                             {
+                                // post message to the opening game.
+                                this.mapRenderGame2.LoadMap(img);
                                 return;
                             }
-                            this.mapRenderGame2 = new FrmMapRender2(img) { StringLinker = sl };
-                            this.mapRenderGame2.Window.Title = "MapRender " + this.Version;
-                            try
+                            else
                             {
-                                using (this.mapRenderGame2)
+                                this.mapRenderGame2 = new FrmMapRender2() { StringLinker = sl };
+                                this.mapRenderGame2.Window.Title = "MapRender " + this.Version;
+                                this.mapRenderGame2.LoadMap(img);
+
+                                try
                                 {
-                                    this.mapRenderGame2.Run();
+                                    using (this.mapRenderGame2)
+                                    {
+                                        this.mapRenderGame2.Run();
+                                    }
                                 }
-                            }
-                            finally
-                            {
-                                this.mapRenderGame2 = null;
+                                finally
+                                {
+                                    this.mapRenderGame2 = null;
+                                }
                             }
                         }
 #if !DEBUG

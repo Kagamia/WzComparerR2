@@ -28,13 +28,12 @@ namespace WzComparerR2.MapRender
 {
     public partial class FrmMapRender2 : Game
     {
-        public FrmMapRender2(Wz_Image img)
+        public FrmMapRender2()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.DeviceCreated += Graphics_DeviceCreated;
             graphics.DeviceResetting += Graphics_DeviceResetting;
 
-            this.mapImg = img;
             this.MaxElapsedTime = TimeSpan.MaxValue;
             this.IsFixedTimeStep = false;
             this.TargetElapsedTime = TimeSpan.FromSeconds(1.0 / 60);
