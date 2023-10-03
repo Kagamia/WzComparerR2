@@ -920,7 +920,7 @@ namespace WzComparerR2.MapRender
 
             try
             {
-                System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(
+                using System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(
                     mapWidth,
                     mapHeight,
                     mapWidth * 4,
@@ -928,11 +928,16 @@ namespace WzComparerR2.MapRender
                     Marshal.UnsafeAddrOfPinnedArrayElement(mapData, 0));
 
                 string outputFileName = DateTime.Now.ToString("yyyyMMddHHmmssfff") + "_" + (this.mapData?.ID ?? 0).ToString("D9") + ".png";
-                bitmap.Save(outputFileName,
-                    System.Drawing.Imaging.ImageFormat.Png);
+                bitmap.Save(outputFileName, System.Drawing.Imaging.ImageFormat.Png);
 
-                bitmap.Dispose();
-                this.ui.ChatBox.AppendTextHelp($"截图保存到文件{outputFileName}");
+                this.cm.StartCoroutine(cm.Post((v) =>
+                {
+                    v.ui.ChatBox.AppendTextHelp($"截图保存到文件{v.outputFileName}");
+                }, new
+                {
+                    this.ui,
+                    outputFileName
+                }));
             }
             catch
             {

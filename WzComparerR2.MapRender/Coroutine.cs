@@ -98,18 +98,24 @@ namespace WzComparerR2.MapRender
 
         public Coroutine StartCoroutine(IE ie)
         {
-            var coroutine = new Coroutine() { Enumerator = ie };
+            return this.StartCoroutine(new Coroutine() { Enumerator = ie });
+        }
 
-            if (this.isUpdating)
+        public Coroutine StartCoroutine(Coroutine coroutine)
+        {
+            lock (this)
             {
-                preAdd.Add(coroutine);
-            }
-            else
-            {
-                this.runList.AddLast(coroutine);
-            }
+                if (this.isUpdating)
+                {
+                    preAdd.Add(coroutine);
+                }
+                else
+                {
+                    this.runList.AddLast(coroutine);
+                }
 
-            return coroutine;
+                return coroutine;
+            }
         }
 
         public Coroutine Yield(IE ie)
@@ -120,6 +126,16 @@ namespace WzComparerR2.MapRender
         public Coroutine Yield(Coroutine coroutine)
         {
             return new YieldCoroutine() { Enumerator = coroutine.Enumerator };
+        }
+
+        public Coroutine Post(Action action)
+        {
+            return new InvokeActionCoroutine(action);
+        }
+
+        public Coroutine Post<T>(Action<T> action, T arg0)
+        {
+            return new InvokeActionCoroutine<T>(action, arg0);
         }
 
         public void StopCoroutine(Coroutine coroutine)
@@ -171,6 +187,42 @@ namespace WzComparerR2.MapRender
                 }
 #endif
             }
+        }
+    }
+
+    sealed class InvokeActionCoroutine : Coroutine
+    {
+        public InvokeActionCoroutine(Action action)
+        {
+            this.Action = action;
+            this.Enumerator = this.GetEnumerator();
+        }
+
+        public Action Action { get; set; }
+
+        private IE GetEnumerator()
+        {
+            this.Action.Invoke();
+            yield break;
+        }
+    }
+
+    sealed class InvokeActionCoroutine<T> : Coroutine
+    {
+        public InvokeActionCoroutine(Action<T> action, T arg0)
+        {
+            this.Action = action;
+            this.Arg0 = arg0;
+            this.Enumerator = this.GetEnumerator();
+        }
+
+        public Action<T> Action { get; set; }
+        public T Arg0 { get; set; }
+
+        private IE GetEnumerator()
+        {
+            this.Action.Invoke(this.Arg0);
+            yield break;
         }
     }
 }
