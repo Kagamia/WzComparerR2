@@ -409,7 +409,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.crossBowThimble: return "箭神职业群可穿戴装备";
                 case GearType.shadowerSheath: return "侠盗职业群可穿戴装备";
                 case GearType.nightLordPoutch: return "隐士职业群可穿戴装备";
-                case GearType.katara: return "暗影双刀职业群可穿戴装备";
+                case GearType.katara: return "暗影双刀可穿戴装备";
                 case GearType.viperWristband: return "冲锋队长职业群可穿戴装备";
                 case GearType.captainSight: return "船长职业群可穿戴装备";
                 case GearType.connonGunPowder: 

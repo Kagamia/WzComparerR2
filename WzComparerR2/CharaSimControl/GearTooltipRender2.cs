@@ -680,7 +680,7 @@ namespace WzComparerR2.CharaSimControl
             //绘制倾向
             if (Gear.State == GearState.itemList)
             {
-                string incline = null;
+                StringBuilder incline = new StringBuilder();
                 GearPropType[] inclineTypes = new GearPropType[]{
                     GearPropType.charismaEXP,
                     GearPropType.senseEXP,
@@ -696,13 +696,17 @@ namespace WzComparerR2.CharaSimControl
                 {
                     if (Gear.Props.TryGetValue(inclineTypes[i], out value) && value > 0)
                     {
-                        incline += "，" + inclineString[i] + value;
+                        if (incline.Length > 0)
+                        {
+                            incline.Append(", ");
+                        }
+                        incline.Append(inclineString[i]).Append(value);
                     }
                 }
 
-                if (!string.IsNullOrEmpty(incline))
+                if (incline.Length > 0)
                 {
-                    desc.Add("\n #c装备时可以获得" + incline.Substring(1) + "的经验值，仅限1次。#");
+                    desc.Add($"\n #c装备时限1次获得{incline}的经验值.(每天限制,超过最大值时除外)#");
                 }
             }
 
