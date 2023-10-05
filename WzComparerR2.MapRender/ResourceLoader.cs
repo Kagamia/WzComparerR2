@@ -126,10 +126,10 @@ namespace WzComparerR2.MapRender
                     case "duration": desc.Duration = pNode.GetValue<float>(); break;
                     case "blendFuncSrc": desc.BlendFuncSrc = (ParticleBlendFunc)pNode.GetValue<int>(); break;
                     case "blendFuncDst": desc.BlendFuncDst = (ParticleBlendFunc)pNode.GetValue<int>(); break;
-                    case "startColor": desc.StartColor = System.Drawing.Color.FromArgb(pNode.GetValue<int>()).ToXnaColor(); break;
-                    case "startColorVar": desc.StartColorVar = System.Drawing.Color.FromArgb(pNode.GetValue<int>()).ToXnaColor(); break;
-                    case "endColor": desc.EndColor = System.Drawing.Color.FromArgb(pNode.GetValue<int>()).ToXnaColor(); break;
-                    case "endColorVar": desc.EndColorVar = System.Drawing.Color.FromArgb(pNode.GetValue<int>()).ToXnaColor(); break;
+                    case "startColor": desc.StartColor = pNode.GetXnaColor(); break;
+                    case "startColorVar": desc.StartColorVar = pNode.GetXnaColor(); break;
+                    case "endColor": desc.EndColor = pNode.GetXnaColor(); break;
+                    case "endColorVar": desc.EndColorVar = pNode.GetXnaColor(); break;
                     case "MiddlePoint0": desc.MiddlePoint0 = pNode.GetValue<int>(); break;
                     case "MiddlePointAlpha0": desc.MiddlePointAlpha0 = pNode.GetValue<int>(); break;
                     case "MiddlePoint1": desc.MiddlePoint1 = pNode.GetValue<int>(); break;

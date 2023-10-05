@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 using GdipColor = System.Drawing.Color;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX.Direct3D11;
 using Texture2D = Microsoft.Xna.Framework.Graphics.Texture2D;
-using System.IO;
+using WzComparerR2.WzLib;
 
 namespace WzComparerR2.Rendering
 {
@@ -19,6 +16,13 @@ namespace WzComparerR2.Rendering
         public static Color ToXnaColor(this GdipColor color)
         {
             return new Color(color.R, color.G, color.B, color.A);
+        }
+
+        public static Color GetXnaColor(this Wz_Node node)
+        {
+            var argbColor = node.GetValueEx<int>(0);
+            var bgra = BitConverter.GetBytes(argbColor);
+            return new Color(bgra[2], bgra[1], bgra[0], bgra[3]);
         }
 
         public static Texture2D CreateMosaic(GraphicsDevice device, Color c0, Color c1, int blockSize)

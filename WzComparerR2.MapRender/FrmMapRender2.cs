@@ -120,6 +120,7 @@ namespace WzComparerR2.MapRender
         MapData mapData;
         ResourceLoader resLoader;
         MeshBatcher batcher;
+        LightRenderer lightRenderer;
         PatchVisibility patchVisibility;
 
         bool prepareCapture;
@@ -154,6 +155,7 @@ namespace WzComparerR2.MapRender
             //init components
             this.renderEnv = new RenderEnv(this, this.graphics);
             this.batcher = new MeshBatcher(this.GraphicsDevice) { CullingEnabled = true };
+            this.lightRenderer = new LightRenderer(this.GraphicsDevice);
             this.resLoader = new ResourceLoader(this.Services);
             this.ui = new MapRenderUIRoot();
             this.BindingUIInput();
@@ -806,7 +808,7 @@ namespace WzComparerR2.MapRender
             int height = Math.Min(oldRect.Height, maxTextureHeight);
             this.renderEnv.Camera.UseWorldRect = true;
 
-            var target2d = new RenderTarget2D(this.GraphicsDevice, width, height, false, SurfaceFormat.Bgra32, DepthFormat.None);
+            var target2d = new RenderTarget2D(this.GraphicsDevice, width, height, false, SurfaceFormat.Bgra32, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             PngEffect pngEffect = null;
 
             Color bgColor = Color.Black;
@@ -1034,6 +1036,8 @@ namespace WzComparerR2.MapRender
             this.batcher = null;
             this.renderEnv?.Dispose();
             this.renderEnv = null;
+            this.lightRenderer?.Dispose();
+            this.lightRenderer = null;
             this.engine = null;
 
             foreach (var disposable in this.attachedEvent)

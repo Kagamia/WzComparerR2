@@ -8,6 +8,7 @@ using WzComparerR2.MapRender.Patches2;
 using WzComparerR2.Animation;
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using WzComparerR2.Controls;
 
 namespace WzComparerR2.MapRender
@@ -204,6 +205,18 @@ namespace WzComparerR2.MapRender
             {
                 return;
             }
+            RenderTarget2D lightMapTexture = null;
+
+            // draw lightmap if available
+            if (this.mapData?.Light != null)
+            {
+                var viewport = this.GraphicsDevice.Viewport;
+                lightMapTexture = new RenderTarget2D(this.GraphicsDevice, viewport.Width, viewport.Height, false, SurfaceFormat.Color, DepthFormat.None);
+                var oldRenderTarget = this.GraphicsDevice.GetRenderTargets();
+                this.GraphicsDevice.SetRenderTarget(lightMapTexture);
+                this.PrepareLightMap();
+                this.GraphicsDevice.SetRenderTargets(oldRenderTarget);
+            }
 
             allItems.Clear();
             var origin = this.renderEnv.Camera.Origin.ToPoint();
@@ -241,8 +254,14 @@ namespace WzComparerR2.MapRender
 
             //在场景之上绘制额外标记
             DrawFootholds(gameTime);
-
             this.batcher.End();
+
+            // apply light map
+            if (lightMapTexture != null)
+            {
+                this.ApplyLightMap(lightMapTexture);
+                lightMapTexture.Dispose();
+            }
         }
 
         private void DrawTooltipItems(GameTime gameTime)
@@ -438,6 +457,40 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        private void PrepareLightMap()
+        {
+            var mapLight = this.mapData.Light;
+            var origin = this.renderEnv.Camera.Origin.ToPoint();
+            this.GraphicsDevice.Clear(mapLight.BackColor);
+
+            this.lightRenderer.Begin(Matrix.CreateTranslation(new Vector3(-origin.X, -origin.Y, 0)));
+            // render spot light
+            foreach (var light2D in mapLight.Lights)
+            {
+                this.lightRenderer.DrawSpotLight(light2D);
+            }
+            // render texture light
+            foreach(var container in GetSceneContainers(this.mapData.Scene))
+            {
+                foreach (var item in container.Slots)
+                {
+                    if (item is ObjItem obj && obj.Light && obj.View.Animator is FrameAnimator frameAni)
+                    {
+                        var frame = frameAni.CurrentFrame;
+                        this.lightRenderer.DrawTextureLight(frame.Texture, new Vector2(obj.X, obj.Y), frame.AtlasRect, frame.Origin.ToVector2(), obj.Flip, new Color(Color.White, frame.A0));
+                    }
+                }
+            }
+            this.lightRenderer.End();
+        }
+
+        private void ApplyLightMap(Texture2D lightMapTexture)
+        {
+            this.renderEnv.Sprite.Begin(blendState: this.renderEnv.BlendStateMultiplyRGB);
+            this.renderEnv.Sprite.Draw(lightMapTexture, Vector2.Zero, Color.White);
+            this.renderEnv.Sprite.End();
+        }
+
         private IEnumerable<ContainerNode> GetSceneContainers(SceneNode node)
         {
             /*
@@ -540,11 +593,11 @@ namespace WzComparerR2.MapRender
                     return GetMeshBack(back);
                 }
             }
-            else if (item is ObjItem)
+            else if (item is ObjItem obj)
             {
-                if (patchVisibility.ObjVisible)
+                if (patchVisibility.ObjVisible && !obj.Light)
                 {
-                    return GetMeshObj((ObjItem)item);
+                    return GetMeshObj(obj);
                 }
             }
             else if (item is TileItem)
@@ -693,7 +746,7 @@ namespace WzComparerR2.MapRender
 
         private MeshItem GetMeshObj(ObjItem obj)
         {
-            var renderObj = GetRenderObject(obj.View.Animator, flip: obj.Flip, blend: obj.Light);
+            var renderObj = GetRenderObject(obj.View.Animator, flip: obj.Flip);
             if (renderObj == null)
             {
                 return null;
@@ -788,7 +841,7 @@ namespace WzComparerR2.MapRender
             return mesh;
         }
 
-        private object GetRenderObject(object animator, bool flip = false, int alpha = 255, bool blend = false)
+        private object GetRenderObject(object animator, bool flip = false, int alpha = 255)
         {
             if (animator is FrameAnimator frameAni)
             {
@@ -798,10 +851,6 @@ namespace WzComparerR2.MapRender
                     if (alpha < 255) //理论上应该返回一个新的实例
                     {
                         frame.A0 = frame.A0 * alpha / 255;
-                    }
-                    if (blend)
-                    {
-                        frame.Blend = blend;
                     }
                     return frame;
                 }

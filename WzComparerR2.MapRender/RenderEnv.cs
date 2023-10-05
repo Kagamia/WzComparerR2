@@ -17,6 +17,8 @@ namespace WzComparerR2.MapRender
             this.D2DRenderer = new D2DRenderer(this.GraphicsDevice);
             this.Input = new InputState(game);
             this.Fonts = new MapRenderFonts();
+
+            this.BlendStateMultiplyRGB = StateEx.MultiplyRGB();
         }
 
         public Camera Camera { get; private set; }
@@ -25,6 +27,8 @@ namespace WzComparerR2.MapRender
         public InputState Input { get; private set; }
         public GraphicsDevice GraphicsDevice { get; private set; }
         public MapRenderFonts Fonts { get; private set; }
+        
+        public BlendState BlendStateMultiplyRGB { get; private set; }
 
         public void Dispose()
         {
@@ -37,6 +41,7 @@ namespace WzComparerR2.MapRender
             {
                 this.Sprite.Dispose();
                 this.Fonts.Dispose();
+                this.BlendStateMultiplyRGB.Dispose();
             }
         }
     }

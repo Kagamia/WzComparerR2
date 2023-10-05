@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace WzComparerR2.Rendering
 {
     public static class StateEx
     {
-
         public static BlendState NonPremultipled_Hidef() => new BlendState()
         {
             AlphaSourceBlend = Blend.One,
@@ -26,6 +22,16 @@ namespace WzComparerR2.Rendering
             AlphaBlendFunction = BlendFunction.Add,
             ColorSourceBlend = Blend.Zero,
             ColorDestinationBlend = Blend.InverseSourceAlpha,
+            ColorBlendFunction = BlendFunction.Add,
+        };
+
+        public static BlendState MultiplyRGB() => new BlendState()
+        {
+            AlphaSourceBlend = Blend.Zero,
+            AlphaDestinationBlend = Blend.One,
+            AlphaBlendFunction = BlendFunction.Add,
+            ColorSourceBlend = Blend.Zero,
+            ColorDestinationBlend = Blend.SourceColor,
             ColorBlendFunction = BlendFunction.Add,
         };
 
