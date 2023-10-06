@@ -10,6 +10,7 @@
 #region Using Statements
 using System;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -80,14 +81,8 @@ namespace WzComparerR2.Controls
                 this.graphicsDeviceService = GraphicsDeviceService.AddRef(Handle,
                                                                      ClientSize.Width,
                                                                      ClientSize.Height);
-                this.swapChainRT = new SwapChainRenderTarget(graphicsDeviceService.GraphicsDevice,
-                    this.Handle,
-                    ClientSize.Width,
-                    ClientSize.Height)
-                {
-                    PresentInterval = PresentInterval.Immediate
-                };
-
+                this.swapChainRT = new SwapChainRenderTarget(graphicsDeviceService.GraphicsDevice, this.Handle, ClientSize.Width, ClientSize.Height);
+                this.swapChainRT.Disposing += SwapChainRT_Disposing;
                 // Register the service, so components like ContentManager can find it.
                 services.AddService<IGraphicsDeviceService>(graphicsDeviceService);
 
@@ -119,7 +114,19 @@ namespace WzComparerR2.Controls
             base.Dispose(disposing);
         }
 
-
+        private void SwapChainRT_Disposing(object sender, EventArgs e)
+        {
+            // fix monogame memory leak bug.
+            if (sender is SwapChainRenderTarget swapChainRT)
+            {
+                var backBufferField = sender.GetType().GetField("_backBuffer", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (backBufferField != null && backBufferField.GetValue(swapChainRT) is SharpDX.Direct3D11.Resource d3dResource)
+                {
+                    SharpDX.Utilities.Dispose(ref d3dResource);
+                    backBufferField.SetValue(swapChainRT, null);
+                }
+            }
+        }
         #endregion
 
         #region Paint
@@ -181,9 +188,6 @@ namespace WzComparerR2.Controls
                 return deviceResetError;
             }
 
-            //设置当前rt
-            GraphicsDevice.SetRenderTarget(swapChainRT);
-
             // Many GraphicsDeviceControl instances can be sharing the same
             // GraphicsDevice. The device backbuffer will be resized to fit the
             // largest of these controls. But what if we are currently drawing
@@ -201,6 +205,9 @@ namespace WzComparerR2.Controls
             viewport.MaxDepth = 1;
 
             GraphicsDevice.Viewport = viewport;
+            GraphicsDevice.PresentationParameters.BackBufferWidth = viewport.Width;
+            GraphicsDevice.PresentationParameters.BackBufferHeight = viewport.Height;
+            GraphicsDevice.SetRenderTarget(swapChainRT);
 
             return null;
         }
@@ -273,10 +280,8 @@ namespace WzComparerR2.Controls
                         this.graphicsDeviceService.GraphicsDevice,
                         this.Handle,
                         clientSize.Width,
-                        clientSize.Height)
-                    {
-                        PresentInterval = PresentInterval.Immediate
-                    };
+                        clientSize.Height);
+                    this.swapChainRT.Disposing += SwapChainRT_Disposing;
                 }
                 catch (Exception e)
                 {
