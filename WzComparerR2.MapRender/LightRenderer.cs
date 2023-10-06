@@ -197,8 +197,8 @@ namespace WzComparerR2.MapRender
             indexBuffer[1] = vertexIndexStart + 1;
             indexBuffer[2] = vertexIndexStart + 2;
             indexBuffer[3] = vertexIndexStart + 2;
-            indexBuffer[4] = vertexIndexStart + 3;
-            indexBuffer[5] = vertexIndexStart + 1;
+            indexBuffer[4] = vertexIndexStart + 1;
+            indexBuffer[5] = vertexIndexStart + 3;
         }
 
         public void End()
