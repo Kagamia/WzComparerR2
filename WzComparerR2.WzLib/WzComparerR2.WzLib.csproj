@@ -24,6 +24,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
     <Compile Include="..\Build\CommonAssemblyInfo.cs">
