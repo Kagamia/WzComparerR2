@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFrameworks>net462;net6.0-windows</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>WzComparerR2.PluginBase</AssemblyName>
     <RootNamespace>WzComparerR2.PluginBase</RootNamespace>
     <IsPublishable>false</IsPublishable>
@@ -9,17 +10,15 @@
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
   </PropertyGroup>
-  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
-    <ImplicitUsings>disable</ImplicitUsings>
-    <NoWarn>CA1416</NoWarn>
+  <Import Project="$(ProjectDir)..\Build\Common.props" />
+  <PropertyGroup Condition="$(DotnetEdition) == 'core'">
   </PropertyGroup>
-  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+  <PropertyGroup Condition="$(DotnetEdition) == 'framework'">
   </PropertyGroup>
-  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
+  <ItemGroup Condition="$(DotnetEdition) == 'core'">
     
   </ItemGroup>
-  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
+  <ItemGroup Condition="$(DotnetEdition) == 'framework'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />

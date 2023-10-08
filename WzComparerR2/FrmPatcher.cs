@@ -22,6 +22,10 @@ namespace WzComparerR2
         public FrmPatcher()
         {
             InitializeComponent();
+#if NET6_0_OR_GREATER
+            // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
+            this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
+#endif
             panelEx1.AutoScroll = true;
 
             var settings = WcR2Config.Default.PatcherSettings;

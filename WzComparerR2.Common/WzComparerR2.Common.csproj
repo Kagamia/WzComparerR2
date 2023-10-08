@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFrameworks>net462;net6.0-windows</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>WzComparerR2.Common</AssemblyName>
     <RootNamespace>WzComparerR2</RootNamespace>
     <IsPublishable>false</IsPublishable>
@@ -9,17 +10,14 @@
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
   </PropertyGroup>
-  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
-    <ImplicitUsings>disable</ImplicitUsings>
-    <NoWarn>CA1416</NoWarn>
+  <Import Project="$(ProjectDir)..\Build\Common.props" />
+  <PropertyGroup Condition="$(DotnetEdition) == 'core'">
   </PropertyGroup>
-  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+  <PropertyGroup Condition="$(DotnetEdition) == 'framework'">
   </PropertyGroup>
-  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.303" />
+  <ItemGroup Condition="$(DotnetEdition) == 'core'">
   </ItemGroup>
-  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
+  <ItemGroup Condition="$(DotnetEdition) == 'framework'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -27,10 +25,10 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Configuration" />
     <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1641" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="$(MonogameFrameworkVersion)" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ImageManipulation">
@@ -42,14 +40,25 @@
     <Reference Include="DevComponents.DotNetBar2">
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
     </Reference>
-    <PackageReference Include="SharpDX" Version="4.2.0" />
+    <!-- force upgrading SharpDX -->
+    <PackageReference Include="SharpDX" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.Direct2D1" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.Direct3D11" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.DXGI" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.Mathematics" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.MediaFoundation" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.XAudio2" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.XInput" Version="$(SharpDXVersion)" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Rendering\Effect\PngEffect.mgfxo" />
+    <EmbeddedResource Include="Rendering\Effect\PngEffect.$(MonogameFrameworkVersion).mgfxo" LogicalName="WzComparerR2.Rendering.Effect.PngEffect.mgfxo" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
     <Compile Include="..\Build\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Windows')) AND !Exists('$(ProjectDir)\Rendering\Effect\PngEffect.$(MonogameFrameworkVersion).mgfxo')">
+    <Exec Command="EffectCompiler.bat $(MonogameFrameworkVersion)" WorkingDirectory="$(ProjectDir)Rendering\Effect" />
+  </Target>
 </Project>

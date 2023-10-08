@@ -135,7 +135,7 @@ namespace WzComparerR2.PluginBase
             return fileList.ToArray();
         }
 
-        internal static IEnumerable<PluginInfo> LoadPlugin(Assembly assembly, PluginContext context)
+        internal static IReadOnlyCollection<PluginInfo> LoadPlugin(Assembly assembly, PluginContext context)
         {
             var baseType = typeof(PluginEntry);
             return assembly.GetExportedTypes().Where(type => type.IsSubclassOf(baseType) && !type.IsAbstract)
@@ -147,7 +147,7 @@ namespace WzComparerR2.PluginBase
                         var plugin = new PluginInfo()
                         {
                             Assembly = assembly,
-                            FileName = assembly.CodeBase,
+                            FileName = assembly.Location,
                             Instance = entry,
                         };
                         loadedPlugins.Add(plugin);
@@ -157,7 +157,8 @@ namespace WzComparerR2.PluginBase
                     {
                         return null;
                     }
-                }).OfType<PluginInfo>();
+                }).OfType<PluginInfo>()
+                .ToList();
         }
 
         internal static void PluginOnLoad()

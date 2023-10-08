@@ -35,6 +35,10 @@ namespace WzComparerR2
         public MainForm()
         {
             InitializeComponent();
+#if NET6_0_OR_GREATER
+            // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
+            this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
+#endif
             Form.CheckForIllegalCrossThreadCalls = false;
             this.MinimumSize = new Size(600, 450);
             advTree1.AfterNodeSelect += new AdvTreeNodeEventHandler(advTree1_AfterNodeSelect_2);
@@ -3099,7 +3103,15 @@ namespace WzComparerR2
 
         private void buttonItemUpdate_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/Kagamia/WzComparerR2/releases");
+#if NET6_0_OR_GREATER
+            Process.Start(new ProcessStartInfo
+            {
+                UseShellExecute = true,
+                FileName = "https://github.com/Kagamia/WzComparerR2/releases",
+            });
+#else
+            Process.Start("https://github.com/Kagamia/WzComparerR2/releases");
+#endif
         }
 
         private void btnItemOptions_Click(object sender, System.EventArgs e)

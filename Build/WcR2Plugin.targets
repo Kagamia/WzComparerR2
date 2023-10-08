@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <MainProgramOutputDir Condition="'$(MainProgramOutputDir)' == ''">$(SolutionDir)WzComparerR2\bin\$(Configuration)\$(TargetFramework)</MainProgramOutputDir>
+    <PluginOutputDir Condition="'$(PluginOutputDir)' == ''">$(MainProgramOutputDir)\Plugin\$(MSBuildProjectName)</PluginOutputDir>
+    <NativeLibOutputDir Condition="'$(NativeLibOutputDir)' == ''">$(MainProgramOutputDir)\Lib</NativeLibOutputDir>
+  </PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <Exec Command="xcopy &quot;$(TargetDir)*.dll&quot; &quot;$(PluginOutputDir)&quot; /I /Y /F" />
+    <Exec Condition="$(DotnetEdition) == 'core'" Command="xcopy &quot;$(TargetDir)*.deps.json&quot; &quot;$(PluginOutputDir)&quot; /I /Y /F" />
+    <Exec Condition="$(DotnetEdition) == 'core'" Command="xcopy &quot;$(TargetDir)*.runtimeconfig.json&quot; &quot;$(PluginOutputDir)&quot; /I /Y /F" />
+    <Exec Condition="Exists('$(TargetDir)x86')" Command="xcopy &quot;$(TargetDir)x86\*.dll&quot; &quot;$(NativeLibOutputDir)\x86&quot; /I /Y /F" />
+    <Exec Condition="Exists('$(TargetDir)x64')" Command="xcopy &quot;$(TargetDir)x64\*.dll&quot; &quot;$(NativeLibOutputDir)\x64&quot; /I /Y /F" />
+  </Target>
+</Project>

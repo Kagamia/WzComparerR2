@@ -1,25 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFrameworks>net462;net6.0-windows</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>WzComparerR2.Network</AssemblyName>
     <RootNamespace>WzComparerR2.Network</RootNamespace>
     <IsPublishable>false</IsPublishable>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <LangVersion>latest</LangVersion>
-    <Nullable>disable</Nullable>
+    <WcR2Plugin>true</WcR2Plugin>
   </PropertyGroup>
-  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
-    <ImplicitUsings>disable</ImplicitUsings>
-    <NoWarn>CA1416</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-  </PropertyGroup>
-  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
+  <Import Project="$(ProjectDir)..\Build\Common.props" />
+  <PropertyGroup Condition="$(DotnetEdition) == 'core'">
 
+  </PropertyGroup>
+  <PropertyGroup Condition="$(DotnetEdition) == 'framework'">
+    
+  </PropertyGroup>
+  <ItemGroup Condition="$(DotnetEdition) == 'core'">
+    
   </ItemGroup>
-  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
+  <ItemGroup Condition="$(DotnetEdition) == 'framework'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -47,7 +45,5 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
-    <Exec Command="xcopy &quot;$(TargetDir)*.dll&quot; &quot;$(SolutionDir)WzComparerR2\bin\$(ConfigurationName)\$(TargetFramework)\Plugin\$(ProjectName)&quot; /I /Y" />
-  </Target>
+  <Import Project="$(ProjectDir)..\Build\WcR2Plugin.targets" />
 </Project>

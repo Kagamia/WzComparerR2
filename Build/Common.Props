@@ -1,0 +1,41 @@
+<Project>
+  <!-- common c# language build config -->
+  <PropertyGroup>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <!-- disable code analysis -->
+  <PropertyGroup>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
+    <RunAnalyzers>false</RunAnalyzers>
+  </PropertyGroup>
+
+  <!-- net6+ -->
+  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
+    <ImplicitUsings>disable</ImplicitUsings>
+    <NoWarn>CA1416</NoWarn>
+    <DotnetEdition>core</DotnetEdition>
+    <MonogameFrameworkVersion>3.8.1.303</MonogameFrameworkVersion>
+  </PropertyGroup>
+  
+  <!-- net framework -->
+  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <DotnetEdition>framework</DotnetEdition>
+    <MonogameFrameworkVersion>3.8.0.1641</MonogameFrameworkVersion>
+  </PropertyGroup>
+
+  <!-- net framework -->
+  <PropertyGroup>
+    <SharpDXVersion>4.2.0</SharpDXVersion>
+  </PropertyGroup>
+
+  <!-- plugin specified property -->
+  <PropertyGroup Condition="$(WcR2Plugin) == 'true' and $(DotnetEdition) == 'core'">
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+</Project>

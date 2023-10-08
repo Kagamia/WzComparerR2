@@ -15,10 +15,13 @@ namespace WzComparerR2
 {
     public partial class FrmGifSetting : DevComponents.DotNetBar.Office2007Form
     {
-
         public FrmGifSetting()
         {
             InitializeComponent();
+#if NET6_0_OR_GREATER
+            // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
+            this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
+#endif
             initSelection();
         }
 

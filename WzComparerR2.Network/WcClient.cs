@@ -20,7 +20,7 @@ namespace WzComparerR2.Network
             DefaultSerializerSetting = new JsonSerializerSettings()
             {
                 TypeNameHandling = TypeNameHandling.Objects,
-                Binder = new TypeNameBinder(),
+                SerializationBinder = new TypeNameBinder(),
                 Converters = new[] { new ByteArrayConverter() },
             };
         }

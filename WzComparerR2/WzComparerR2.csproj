@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net462</TargetFrameworks>
+    <TargetFrameworks>net462;net6.0-windows</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>WzComparerR2</AssemblyName>
     <RootNamespace>WzComparerR2</RootNamespace>
@@ -13,17 +13,18 @@
     <ApplicationIcon>wcr2_256.ico</ApplicationIcon>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
   </PropertyGroup>
-  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
-    <ImplicitUsings>disable</ImplicitUsings>
-    <NoWarn>CA1416</NoWarn>
+  <Import Project="$(ProjectDir)..\Build\Common.props" />
+  <PropertyGroup Condition="$(DotnetEdition) == 'core'">
   </PropertyGroup>
-  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+  <PropertyGroup Condition="$(DotnetEdition) == 'framework'">
   </PropertyGroup>
-  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.303" />
+  <ItemGroup Condition="$(DotnetEdition) == 'core'">
+    <!-- patching dotnetbar on net6 -->
+    <PackageReference Include="Lib.Harmony" Version="2.2.2" />
+    <!-- upgrade indirect dependency of SharpDX to prevent too many runtime libraries -->
+    <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
   </ItemGroup>
-  <ItemGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net4'))">
+  <ItemGroup Condition="$(DotnetEdition) == 'framework'">
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -31,7 +32,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Configuration" />
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1641" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="wcr2_256.ico" />
@@ -41,7 +41,8 @@
     <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj" />
     <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj" />
     <ProjectReference Include="..\CharaSimResource\CharaSimResource.csproj" />
-    <PackageReference Include="SharpDX" Version="4.2.0" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="$(MonogameFrameworkVersion)" />
+    <PackageReference Include="SharpDX" Version="$(SharpDXVersion)" />
     <PackageReference Include="ManagedBass" Version="3.1.1" />
     <PackageReference Include="System.Resources.Extensions" Version="7.0.0" />
   </ItemGroup>

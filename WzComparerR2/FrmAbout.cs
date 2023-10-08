@@ -17,6 +17,10 @@ namespace WzComparerR2
         public FrmAbout()
         {
             InitializeComponent();
+#if NET6_0_OR_GREATER
+            // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
+            this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
+#endif
 
             this.lblClrVer.Text = string.Format("{0} ({1})", Environment.Version, Environment.Is64BitProcess ? "x64": "x86");
             this.lblAsmVer.Text = GetAsmVersion().ToString();
