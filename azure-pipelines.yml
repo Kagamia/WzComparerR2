@@ -16,7 +16,9 @@ variables:
   buildConfiguration: 'Release'
   outputDir_netfx_anycpu: 'WzComparerR2/bin/release/net462'
   outputDir_netfx_x86: 'WzComparerR2/bin/x86/release/net462'
-  outputFileName: 'WcR2_With_Plugins_$(Build.BuildNumber)'
+  outputDir_net6_anycpu: 'WzComparerR2/bin/release/net6.0-windows'
+  outputFileName_netfx: 'WcR2_With_Plugins_$(Build.BuildNumber)'
+  outputFileName_net6: 'WcR2_With_Plugins_net6_$(Build.BuildNumber)'
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   accountName: 'wcr2publish'
   containerName: 'ci-build'
@@ -32,7 +34,6 @@ steps:
   displayName: Generate version file
   inputs:
     script: |
-      mkdir Build
       echo [assembly: global::System.Reflection.AssemblyInformationalVersion("2.2.$(Build.BuildNumber)")] >> Build\CommonAssemblyInfo.cs
 
 - task: NuGetCommand@2
@@ -68,11 +69,21 @@ steps:
     failOnStderr: true
 
 - task: ArchiveFiles@2
+  displayName: Compress netfx release
   inputs:
     rootFolderOrFile: '$(outputDir_netfx_anycpu)'
     includeRootFolder: false
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/$(outputFileName).zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(outputFileName_netfx).zip'
+    replaceExistingArchive: true
+ 
+ - task: ArchiveFiles@2
+  displayName: Compress net6 release
+  inputs:
+    rootFolderOrFile: '$(outputDir_net6_anycpu)'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(outputFileName_net6).zip'
     replaceExistingArchive: true
 
 - task: AzureCLI@2
@@ -82,21 +93,36 @@ steps:
     scriptType: 'ps'
     scriptLocation: 'inlineScript'
     inlineScript: |
-      Write-Host "Uploading files..."
-      az storage blob upload --auth-mode login --account-name $(accountName) --container-name $(containerName) --name "$(outputFileName).zip" --file "$(Build.ArtifactStagingDirectory)/$(outputFileName).zip"
+      $files = @(
+        @{
+          "srcFile"="$(outputFileName_netfx).zip"
+          "outputVariableName"="sasurl_netfx"
+        }
+        @{
+          "srcFile"="$(outputFileName_net6).zip"
+          "outputVariableName"="sasurl_net6"
+        }
+      )
       
-      Write-Host "Generate url..."
-      $url = ConvertFrom-Json (az storage blob url --auth-mode login --account-name $(accountName) --container-name $(containerName) --name "$(outputFileName).zip")
-
-      Write-Host "Generate sas..."
       $expireDate = (Get-Date).ToUniversalTime().AddYears(1).ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")
       $keys = ConvertFrom-Json ((az storage account keys list --account-name $(accountName)) -join "")
       $accountKey = $keys[0].value
-      $sas = ConvertFrom-Json (az storage blob generate-sas --account-name $(accountName) --account-key "$accountKey" --container-name $(containerName) --name "$(outputFileName).zip" --expiry "$expireDate" --permissions "r")
+
+      foreach ($f in $files) {
+        $srcFile = "$(Build.ArtifactStagingDirectory)/{0}" -f $f.srcFile
+        $dstFile = $f.srcFile
+        $varName = $f.outputVariableName
+        
+        Write-Host "Uploading ${srcFile} ..."
+        az storage blob upload --auth-mode login --account-name $(accountName) --container-name $(containerName) --name $dstFile --file $srcFile
       
-      $sasurl = "${url}?${sas}"
-      Write-Host "${sasurl}"
-      Write-Host "##vso[task.setvariable variable=sasurl]${sasurl}"
+        Write-Host "Generate sas url..."
+        $url = ConvertFrom-Json (az storage blob url --auth-mode login --account-name $(accountName) --container-name $(containerName) --name $dstFile)
+        $sas = ConvertFrom-Json (az storage blob generate-sas --account-name $(accountName) --account-key "$accountKey" --container-name $(containerName) --name $dstFile --expiry "$expireDate" --permissions "r")
+        $sasurl = "${url}?${sas}"
+        Write-Host "${sasurl}"
+        Write-Host "##vso[task.setvariable variable=${varName}]${sasurl}"
+      }
 
 - task: GitHubRelease@1
   condition: and(succeeded(), eq(variables.isMain, true))
@@ -128,6 +154,6 @@ steps:
     releaseNotesSource: 'inline'
     releaseNotesInline: |
       Automation build from azure-pipeline.
-      Mirror: [Zip]($(sasurl))
+      Mirror: [WcR2.netfx.zip]($(sasurl_netfx)) [wcR2.net6.zip]($(sasurl_net6))
     isPreRelease: false
     addChangeLog: false
