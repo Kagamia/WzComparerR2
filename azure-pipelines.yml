@@ -77,7 +77,7 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/$(outputFileName_netfx).zip'
     replaceExistingArchive: true
  
- - task: ArchiveFiles@2
+- task: ArchiveFiles@2
   displayName: Compress net6 release
   inputs:
     rootFolderOrFile: '$(outputDir_net6_anycpu)'
