@@ -69,7 +69,7 @@ steps:
       
       move "$(outputDir_net6_anycpu)\*.dll" "$(outputDir_net6_anycpu)\Lib"
       del "$(outputDir_net6_anycpu)\*.pdb"
-      move "$(outputDir_net6_anycpu)\WzComparerR2.dll" "$(outputDir_net6_anycpu)"
+      move "$(outputDir_net6_anycpu)\Lib\WzComparerR2.dll" "$(outputDir_net6_anycpu)"
     failOnStderr: true
 
 - task: ArchiveFiles@2
