@@ -8,6 +8,10 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using WzComparerR2.PluginBase;
 
+#if NET6_0_OR_GREATER
+using System.Runtime.Loader;
+#endif
+
 namespace WzComparerR2
 {
     public class Program
@@ -29,7 +33,7 @@ namespace WzComparerR2
         public static string LibPath { get; private set; }
         private static List<Assembly> loadedPluginAssemblies = new List<Assembly>();
 
-        private 
+        private
 
         /// <summary>
         /// 这是程序入口无雾。
@@ -55,7 +59,7 @@ namespace WzComparerR2
                 try
                 {
 #if NET6_0_OR_GREATER
-                    var ctx = new PluginLoadContext(GetDllDirectory(), asmFile);
+                    var ctx = new PluginLoadContext(GetUnmanagedDllDirectory(), asmFile);
                     return ctx.LoadFromAssemblyPath(asmFile);
 #else
                     var asmName = AssemblyName.GetAssemblyName(asmFile);
@@ -95,19 +99,35 @@ namespace WzComparerR2
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            foreach(var asm in loadedPluginAssemblies)
+            foreach (var asm in loadedPluginAssemblies)
             {
                 if (asm.FullName == args.Name)
                 {
                     return asm;
                 }
             }
+
+#if NET6_0_OR_GREATER
+            try
+            {
+                var assemblyName = new AssemblyName(args.Name);
+                string assemblyPath = Path.Combine(GetManagedDllDirectory(), assemblyName.Name + ".dll");
+                if (File.Exists(assemblyPath))
+                {
+                    return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+#endif
             return null;
         }
 
         static void SetDllDirectory()
         {
-            LibPath = GetDllDirectory();
+            LibPath = GetUnmanagedDllDirectory();
             SetDllDirectory(LibPath);
 
             foreach (var dllName in Directory.GetFiles(LibPath, "*.dll"))
@@ -116,7 +136,8 @@ namespace WzComparerR2
             }
         }
 
-        static string GetDllDirectory() => Path.Combine(Application.StartupPath, "Lib", Environment.Is64BitProcess ? "x64" : "x86");
+        static string GetManagedDllDirectory() => Path.Combine(Application.StartupPath, "Lib");
+        static string GetUnmanagedDllDirectory() => Path.Combine(Application.StartupPath, "Lib", Environment.Is64BitProcess ? "x64" : "x86");
 
         [DllImport("kernel32.dll")]
         static extern bool SetDllDirectory(string path);

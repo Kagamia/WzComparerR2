@@ -66,6 +66,10 @@ steps:
       rename "$(outputDir_netfx_anycpu)\WzComparerR2.exe.config" "WzComparerR2.anycpu.exe.config"
       copy /y "$(outputDir_netfx_x86)\WzComparerR2.exe" "$(outputDir_netfx_anycpu)"
       copy /y "$(outputDir_netfx_x86)\WzComparerR2.exe.config" "$(outputDir_netfx_anycpu)"
+      
+      move "$(outputDir_net6_anycpu)\*.dll" "$(outputDir_net6_anycpu)\Lib"
+      del "$(outputDir_net6_anycpu)\*.pdb"
+      move "$(outputDir_net6_anycpu)\WzComparerR2.dll" "$(outputDir_net6_anycpu)"
     failOnStderr: true
 
 - task: ArchiveFiles@2
@@ -154,6 +158,6 @@ steps:
     releaseNotesSource: 'inline'
     releaseNotesInline: |
       Automation build from azure-pipeline.
-      Mirror: [WcR2.netfx.zip]($(sasurl_netfx)) [wcR2.net6.zip]($(sasurl_net6))
+      Mirror: [[WcR2.netfx.zip]($(sasurl_netfx))] | [[WcR2.net6.zip]($(sasurl_net6))]
     isPreRelease: false
     addChangeLog: false

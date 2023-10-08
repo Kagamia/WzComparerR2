@@ -62,7 +62,7 @@
       <HintPath>..\References\spine-monogame.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="$(MonogameFrameworkVersion)" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="$(MonogameFrameworkVersion)" ExcludeAssets="runtime" />
     <PackageReference Include="ManagedBass" Version="3.1.1" ExcludeAssets="runtime" />
     <PackageReference Include="SharpDX" Version="$(SharpDXVersion)" ExcludeAssets="runtime" />
     <PackageReference Include="SharpDX.RawInput" Version="$(SharpDXVersion)" />
