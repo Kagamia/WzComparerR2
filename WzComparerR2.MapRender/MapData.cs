@@ -126,6 +126,10 @@ namespace WzComparerR2.MapRender
             {
                 LoadSkyWhale(node);
             }
+            if ((node = mapImgNode.Nodes["illuminantCluster"]) != null)
+            {
+                LoadIlluminantCluster(node);
+            }
             if ((node = mapImgNode.Nodes["ToolTip"]) != null)
             {
                 LoadTooltip(node);
@@ -385,6 +389,19 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        private void LoadIlluminantCluster(Wz_Node illuminantClusterNode)
+        {
+            foreach (var node in illuminantClusterNode.Nodes)
+            {
+                if (node.Nodes.Count > 0)
+                {
+                    var item = IlluminantClusterItem.LoadFromNode(node);
+                    item.Name = node.Text;
+                    Scene.Fly.IlluminantCluster.Slots.Add(item);
+                }
+            }
+        }
+
         private void LoadTooltip(Wz_Node tooltipNode)
         {
             Func<Wz_Node, Rectangle> getRect = (node) =>
@@ -572,6 +589,10 @@ namespace WzComparerR2.MapRender
                         else if (item is PortalItem)
                         {
                             PreloadResource(resLoader, (PortalItem)item);
+                        }
+                        else if (item is IlluminantClusterItem)
+                        {
+                            PreloadResource(resLoader, (IlluminantClusterItem)item);
                         }
                         else if (item is ReactorItem)
                         {
@@ -764,6 +785,41 @@ namespace WzComparerR2.MapRender
             }
 
             portal.View = view;
+        }
+
+        private void PreloadResource(ResourceLoader resLoader, IlluminantClusterItem illuminantCluster)
+        {
+            string path;
+
+            var view = new IlluminantClusterItem.ItemView();
+            path = $@"Map\Obj\sellas.img\fieldGimmick\cluster\{illuminantCluster.StartPoint * 2}";
+
+            var aniNode = PluginManager.FindWz(path);
+            if (aniNode != null)
+            {
+                var aniData = resLoader.LoadAnimationData(aniNode);
+                if (aniData != null)
+                {
+                    view.Animator = CreateAnimator(aniData);
+                }
+            }
+
+            illuminantCluster.StartView = view;
+
+            view = new IlluminantClusterItem.ItemView();
+            path = $@"Map\Obj\sellas.img\fieldGimmick\cluster\{illuminantCluster.EndPoint * 2 + 1}";
+
+            aniNode = PluginManager.FindWz(path);
+            if (aniNode != null)
+            {
+                var aniData = resLoader.LoadAnimationData(aniNode);
+                if (aniData != null)
+                {
+                    view.Animator = CreateAnimator(aniData);
+                }
+            }
+
+            illuminantCluster.EndView = view;
         }
 
         private void PreloadResource(ResourceLoader resLoader, ReactorItem reactor)

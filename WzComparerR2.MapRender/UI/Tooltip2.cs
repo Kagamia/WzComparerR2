@@ -89,6 +89,10 @@ namespace WzComparerR2.MapRender.UI
             {
                 return DrawItem(gameTime, env, (PortalItem)target);
             }
+            else if (target is IlluminantClusterItem)
+            {
+                return DrawItem(gameTime, env, (IlluminantClusterItem)target);
+            }
             else if (target is ReactorItem)
             {
                 return DrawItem(gameTime, env, (ReactorItem)target);
@@ -211,6 +215,26 @@ namespace WzComparerR2.MapRender.UI
             size.Y = current.Y;
             return new TooltipContent() { blocks = blocks, size = size };
         }
+
+        private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, IlluminantClusterItem item)
+        {
+            var blocks = new List<TextBlock>();
+            Vector2 size = Vector2.Zero;
+            StringResult sr = null;
+            Vector2 current = Vector2.Zero;
+
+            var sb = new StringBuilder();
+            sb.Append("Name: ").AppendLine(item.Name);
+
+            sb.AppendLine("Type: 发光体群落");
+
+            sb.Length -= 2;
+
+            blocks.Add(PrepareTextLine(env.Fonts.TooltipContentFont, sb.ToString(), ref current, Color.White, ref size.X));
+            size.Y = current.Y;
+            return new TooltipContent() { blocks = blocks, size = size };
+        }
+
 
         private TooltipContent DrawItem(GameTime gameTime, RenderEnv env, ReactorItem item)
         {

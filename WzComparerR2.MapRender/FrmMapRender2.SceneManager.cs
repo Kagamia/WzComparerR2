@@ -340,6 +340,14 @@ namespace WzComparerR2.MapRender
                         break;
                 }
             }
+            foreach (var illuminantCluster in mapData.Scene.IlluminantClusters)
+            {
+                this.ui.Minimap.Icons.Add(new UIMinimap2.MapIcon()
+                {
+                    IconType = UIMinimap2.IconType.HiddenPortal,
+                    WorldPosition = new EmptyKeys.UserInterface.PointF(illuminantCluster.Start.X, illuminantCluster.Start.Y)
+                });
+            }
 
             foreach (var npc in mapData.Scene.Npcs)
             {
