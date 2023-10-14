@@ -65,7 +65,7 @@
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="$(MonogameFrameworkVersion)" ExcludeAssets="runtime" />
     <PackageReference Include="ManagedBass" Version="3.1.1" ExcludeAssets="runtime" />
     <PackageReference Include="SharpDX" Version="$(SharpDXVersion)" ExcludeAssets="runtime" />
-    <PackageReference Include="SharpDX.RawInput" Version="$(SharpDXVersion)" />
+    <PackageReference Include="SharpDX.RawInput" Version="$(SharpDXVersion)" NoWarn="NU1701" />
     <PackageReference Include="System.Resources.Extensions" Version="7.0.0" ExcludeAssets="runtime" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">

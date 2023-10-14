@@ -35,9 +35,7 @@
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <PackageReference Include="ICSharpCode.TextEditor" Version="3.2.1.6466">
-      <ExcludeAssets>NU1701</ExcludeAssets>
-    </PackageReference>
+    <PackageReference Include="ICSharpCode.TextEditor" Version="3.2.1.6466" NoWarn="NU1701"/>
     <PackageReference Include="KeraLua" Version="1.3.1" GeneratePathProperty="true" />
     <PackageReference Include="NLua" Version="1.6.0" />
   </ItemGroup>
