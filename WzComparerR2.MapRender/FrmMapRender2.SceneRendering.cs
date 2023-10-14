@@ -83,6 +83,14 @@ namespace WzComparerR2.MapRender
                             frameAni.Update(elapsed);
                         }
                     }
+                    else if (item is IlluminantClusterItem)
+                    {
+                        var illuminantCluster = (IlluminantClusterItem)item;
+                        (illuminantCluster.StartView.Animator as WzComparerR2.Controls.AnimationItem)?.Update(elapsed);
+                        illuminantCluster.StartView.Time += (int)elapsed.TotalMilliseconds;
+                        (illuminantCluster.EndView.Animator as WzComparerR2.Controls.AnimationItem)?.Update(elapsed);
+                        illuminantCluster.EndView.Time += (int)elapsed.TotalMilliseconds;
+                    }
                     else if (item is ReactorItem)
                     {
                         var reactor = (ReactorItem)item;
@@ -129,7 +137,7 @@ namespace WzComparerR2.MapRender
             {
                 var mouseTarget = this.allItems.Reverse<ItemRect>().FirstOrDefault(item =>
                 {
-                    return item.rect.Contains(mouse) && (item.item is LifeItem || item.item is PortalItem || item.item is ReactorItem);
+                    return item.rect.Contains(mouse) && (item.item is LifeItem || item.item is PortalItem || item.item is IlluminantClusterItem || item.item is ReactorItem);
                 });
                 target = mouseTarget.item;
             }
@@ -196,6 +204,11 @@ namespace WzComparerR2.MapRender
                 {
                     MoveToPortal(portal.ToMap, portal.ToName, portal.PName);
                 }
+            }
+            else if (item is IlluminantClusterItem)
+            {
+                var illuminantCluster = (IlluminantClusterItem)item;
+                this.cm.StartCoroutine(OnCameraMoving(new Point(illuminantCluster.End.X, illuminantCluster.End.Y), 500));
             }
         }
 
@@ -330,6 +343,35 @@ namespace WzComparerR2.MapRender
                 foreach (var item in skyWhaleList)
                 {
                     foreach (var dx in new[] { 0, -item.Width / 2, item.Width / 2 })
+                    {
+                        Point start = new Point(item.Start.X + dx, item.Start.Y);
+                        Point end = new Point(item.End.X + dx, item.End.Y);
+                        //画箭头
+                        lines.Add(start);
+                        lines.Add(end);
+                        lines.Add(end);
+                        lines.Add(new Point(end.X - 5, end.Y + 8));
+                        lines.Add(end);
+                        lines.Add(new Point(end.X + 5, end.Y + 8));
+                    }
+                }
+
+                if (lines.Count > 0)
+                {
+                    var meshItem = this.batcher.MeshPop();
+                    meshItem.RenderObject = new LineListMesh(lines.ToArray(), color, 1);
+                    this.batcher.Draw(meshItem);
+                    this.batcher.MeshPush(meshItem);
+                }
+            }
+
+            if (patchVisibility.IlluminantClusterPathVisible)
+            {
+                var lines = new List<Point>();
+                var illuminentClusterList = this.mapData.Scene.Fly.IlluminantCluster.Slots.OfType<IlluminantClusterItem>();
+                foreach (var item in illuminentClusterList)
+                {
+                    foreach (var dx in new[] { 0, -item.Size / 2, item.Size / 2 })
                     {
                         Point start = new Point(item.Start.X + dx, item.Start.Y);
                         Point end = new Point(item.End.X + dx, item.End.Y);
@@ -566,6 +608,16 @@ namespace WzComparerR2.MapRender
                     if (mesh != null)
                     {
                         kvList.Add(new KeyValuePair<SceneItem, MeshItem>(item, mesh));
+                    }
+                    if (item is IlluminantClusterItem)
+                    {
+                        if (patchVisibility.IlluminantClusterVisible)
+                        {
+                            foreach (var meshIlluminantCluster in GetMeshesIlluminantCluster((IlluminantClusterItem)item))
+                            {
+                                kvList.Add(new KeyValuePair<SceneItem, MeshItem>(item, meshIlluminantCluster));
+                            }
+                        }
                     }
                 }
                 kvList.Sort((kv1, kv2) => kv1.Value.CompareTo(kv2.Value));
@@ -804,6 +856,31 @@ namespace WzComparerR2.MapRender
             mesh.Z0 = ((renderObj as Frame)?.Z ?? 0);
             mesh.Z1 = portal.Index;
             return mesh;
+        }
+
+        private MeshItem[] GetMeshesIlluminantCluster(IlluminantClusterItem illuminantCluster)
+        {
+            var renderObj = GetRenderObject(illuminantCluster.StartView.Animator);
+            if (renderObj == null)
+            {
+                return null;
+            }
+            var startMesh = batcher.MeshPop();
+            startMesh.RenderObject = renderObj;
+            startMesh.Position = new Vector2(illuminantCluster.Start.X + illuminantCluster.Size / 2, illuminantCluster.Start.Y - illuminantCluster.Size / 2);
+            startMesh.Z0 = ((renderObj as Frame)?.Z ?? 0);
+            startMesh.Z1 = illuminantCluster.Index;
+            renderObj = GetRenderObject(illuminantCluster.EndView.Animator);
+            if (renderObj == null)
+            {
+                return null;
+            }
+            var endMesh = batcher.MeshPop();
+            endMesh.RenderObject = renderObj;
+            endMesh.Position = new Vector2(illuminantCluster.End.X + illuminantCluster.Size / 2, illuminantCluster.End.Y - illuminantCluster.Size / 2);
+            endMesh.Z0 = ((renderObj as Frame)?.Z ?? 0);
+            endMesh.Z1 = illuminantCluster.Index;
+            return new MeshItem[] { startMesh, endMesh };
         }
 
         private MeshItem GetMeshReactor(ReactorItem reactor)
