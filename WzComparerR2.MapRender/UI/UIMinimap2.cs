@@ -452,6 +452,17 @@ namespace WzComparerR2.MapRender.UI
                                 }
                             }
                             break;
+
+                        case IconType.Another:
+                            {
+                                var texture = this.FindResource("another") as TextureBase;
+                                if (texture != null)
+                                {
+                                    var rect = drawIconFunc(texture, icon.WorldPosition);
+                                    iconRectCache.Add(new IconRect() { Rect = rect, Tooltip = icon.Tooltip });
+                                }
+                            }
+                            break;
                     }
                 }
 
@@ -495,6 +506,7 @@ namespace WzComparerR2.MapRender.UI
                     addResource("shop");
                     addResource("trunk");
                     addResource("arrowup");
+                    addResource("another");
                 }
             }
 
@@ -524,6 +536,7 @@ namespace WzComparerR2.MapRender.UI
             Shop,
             Trunk,
             ArrowUp,
+            Another,
         }
 
         private sealed class UIMinimapResource : INinePatchResource<TextureBase>
