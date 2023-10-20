@@ -35,7 +35,7 @@ namespace WzComparerR2.MapRender.Patches2
                 Z = node.Nodes["z"].GetValueEx(0),
 
                 Flip = node.Nodes["f"].GetValueEx(false),
-                Light = node.Nodes["light"].GetValueEx(false),
+                Light = node.Nodes["light"].GetValueEx<int>(0) != 0,
                 SpineAni = node.Nodes["spineAni"].GetValueEx<string>(null),
             };
 
