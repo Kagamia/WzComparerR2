@@ -38,6 +38,12 @@ namespace WzComparerR2.MapRender
             .Where(lifeNode => lifeNode.Type == LifeItem.LifeType.Npc && !lifeNode.Hide)
             .Concat(this.Fly.Sky.Slots.OfType<LifeItem>()
             .Where(lifeNode => lifeNode.Type == LifeItem.LifeType.Npc && !lifeNode.Hide));
+        public IEnumerable<LifeItem> Mobs => this.Layers.Nodes.OfType<LayerNode>()
+                    .SelectMany(layerNode => layerNode.Foothold.Nodes).OfType<ContainerNode<FootholdItem>>()
+                    .SelectMany(fhNode => fhNode.Slots).OfType<LifeItem>()
+                    .Where(lifeNode => lifeNode.Type == LifeItem.LifeType.Mob && !lifeNode.Hide)
+                    .Concat(this.Fly.Sky.Slots.OfType<LifeItem>()
+                    .Where(lifeNode => lifeNode.Type == LifeItem.LifeType.Mob && !lifeNode.Hide));
 
         public PortalItem FindPortal(string pName)
         {

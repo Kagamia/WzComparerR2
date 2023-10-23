@@ -414,6 +414,18 @@ namespace WzComparerR2.MapRender
                     });
                 }
             }
+            foreach (var mob in mapData.Scene.Mobs)
+            {
+                var mobNode = PluginManager.FindWz(string.Format("Mob/{0:D7}.img/info", mob.ID));
+                if ((mobNode?.Nodes["minimap"].GetValueEx(0) ?? 0) != 0)
+                {
+                    this.ui.Minimap.Icons.Add(new UIMinimap2.MapIcon()
+                    {
+                        IconType = UIMinimap2.IconType.Another,
+                        WorldPosition = new EmptyKeys.UserInterface.PointF(mob.X, mob.Y)
+                    });
+                }
+            }
 
             if (mapData.MiniMap.Width > 0 && mapData.MiniMap.Height > 0)
             {
