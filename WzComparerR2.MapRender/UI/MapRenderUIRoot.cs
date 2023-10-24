@@ -30,6 +30,7 @@ namespace WzComparerR2.MapRender.UI
 
         public event EventHandler InputUpdated;
         public ContentPresenter ContentControl { get; private set; }
+        public UIMirrorFrame MirrorFrame { get; private set; }
         public UIMinimap2 Minimap { get; private set; }
         public UIWorldMap WorldMap { get; private set; }
         public UITopBar TopBar { get; private set; }
@@ -41,6 +42,15 @@ namespace WzComparerR2.MapRender.UI
             style.TargetType = this.GetType();
             this.Style = style;
             this.Background = null;
+
+            var mirrorFrame = new UIMirrorFrame();
+            mirrorFrame.Parent = this;
+            mirrorFrame.IsOnTop = false;
+            mirrorFrame.Visibility = Visibility.Collapsed;
+            mirrorFrame.SetBinding(UIMirrorFrame.WidthProperty, new Binding(UIRoot.WidthProperty) { Source = this });
+            mirrorFrame.SetBinding(UIMirrorFrame.HeightProperty, new Binding(UIRoot.HeightProperty) { Source = this });
+            this.MirrorFrame = mirrorFrame;
+            this.Windows.Add(mirrorFrame);
 
             var minimap = new UIMinimap2();
             minimap.Parent = this;

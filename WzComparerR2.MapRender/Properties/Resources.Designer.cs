@@ -439,5 +439,35 @@ namespace WzComparerR2.MapRender.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap UIWindow3_img_mirrorFrame_1024 {
+            get {
+                object obj = ResourceManager.GetObject("UIWindow3_img_mirrorFrame_1024", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap UIWindow3_img_mirrorFrame_1366 {
+            get {
+                object obj = ResourceManager.GetObject("UIWindow3_img_mirrorFrame_1366", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap UIWindow3_img_mirrorFrame_800 {
+            get {
+                object obj = ResourceManager.GetObject("UIWindow3_img_mirrorFrame_800", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }
