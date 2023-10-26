@@ -254,6 +254,10 @@ namespace WzComparerR2.MapRender
             //同步UI
             this.renderEnv.Camera.WorldRect = mapData.VRect;
 
+            this.ui.MirrorFrame.Visibility = mapData.ID / 10000000 == 32 ? EmptyKeys.UserInterface.Visibility.Visible : EmptyKeys.UserInterface.Visibility.Collapsed;
+
+            this.ui.Minimap.Mirror = mapData.ID / 10000000 == 32;
+
             StringResult sr;
             if (mapData.ID != null && this.StringLinker != null
                 && StringLinker.StringMap.TryGetValue(mapData.ID.Value, out sr))
