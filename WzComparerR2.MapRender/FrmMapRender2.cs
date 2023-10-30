@@ -885,11 +885,11 @@ namespace WzComparerR2.MapRender
             prepareCapture = false;
 
             captureTask = Task.Factory.StartNew(() =>
-                SaveTexture(picBlocks, oldRect.Width, oldRect.Height, width, height)
+                SaveTexture(picBlocks, oldRect.Width, oldRect.Height, width, height, bgColor.A == 255)
             );
         }
 
-        private void SaveTexture(byte[,][] picBlocks, int mapWidth, int mapHeight, int blockWidth, int blockHeight)
+        private void SaveTexture(byte[,][] picBlocks, int mapWidth, int mapHeight, int blockWidth, int blockHeight, bool resetAlphaChannel)
         {
             //组装
             byte[] mapData = new byte[mapWidth * mapHeight * 4];
@@ -921,6 +921,14 @@ namespace WzComparerR2.MapRender
                             offset += blockWidth * 4;
                         }
                     }
+                }
+            }
+
+            if (resetAlphaChannel)
+            {
+                for (int i = 0; i < mapData.Length; i += 4)
+                {
+                    mapData[i + 3] = 255;
                 }
             }
 
