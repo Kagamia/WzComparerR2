@@ -68,6 +68,20 @@ namespace WzComparerR2.Patcher.Builder
             return base.Seek(offset, origin);
         }
 
+#if NET6_0_OR_GREATER
+        // In .Net6, DeflateStream overrides ReadByte() method and does not call Read(byte[], int, int).
+        // we should override it once more to calculate position.
+        public override int ReadByte()
+        {
+            byte[] buffer = new byte[1];
+            if (this.Read(buffer, 0, 1) != 0)
+            {
+                return buffer[0];
+            }
+            return -1;
+        }
+#endif
+
         public override int Read(byte[] array, int offset, int count)
         {
             int length = base.Read(array, offset, count);
