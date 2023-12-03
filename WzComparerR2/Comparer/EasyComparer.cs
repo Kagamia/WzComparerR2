@@ -367,26 +367,30 @@ namespace WzComparerR2.Comparer
             foreach (var diff in diffList)
             {
                 int idx = -1;
-                string col0 = null;
+                string fullPath = null;
+                string fullPathToFile = null;
                 switch (diff.DifferenceType)
                 {
                     case DifferenceType.Changed:
                         idx = 0;
-                        col0 = diff.NodeNew.FullPath;
+                        fullPath = diff.NodeNew.FullPath;
+                        fullPathToFile = diff.NodeNew.FullPathToFile;
                         break;
                     case DifferenceType.Append:
                         idx = 1;
-                        col0 = diff.NodeNew.FullPath;
+                        fullPath = diff.NodeNew.FullPath;
+                        fullPathToFile = diff.NodeNew.FullPathToFile;
                         break;
                     case DifferenceType.Remove:
                         idx = 2;
-                        col0 = diff.NodeOld.FullPath;
+                        fullPath = diff.NodeOld.FullPath;
+                        fullPathToFile = diff.NodeOld.FullPathToFile;
                         break;
                 }
                 sb.AppendFormat("<tr class=\"r{0}\">", idx);
-                sb.AppendFormat("<td>{0}</td>", col0 ?? " ");
-                sb.AppendFormat("<td>{0}</td>", OutputNodeValue(col0, diff.ValueNew, 0, outputDir) ?? " ");
-                sb.AppendFormat("<td>{0}</td>", OutputNodeValue(col0, diff.ValueOld, 1, outputDir) ?? " ");
+                sb.AppendFormat("<td>{0}</td>", fullPath ?? " ");
+                sb.AppendFormat("<td>{0}</td>", OutputNodeValue(fullPathToFile, diff.ValueNew, 0, outputDir) ?? " ");
+                sb.AppendFormat("<td>{0}</td>", OutputNodeValue(fullPathToFile, diff.ValueOld, 1, outputDir) ?? " ");
                 sb.AppendLine("</tr>");
                 count[idx]++;
             }

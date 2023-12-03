@@ -313,7 +313,7 @@ namespace WzComparerR2.Comparer
                 }
                 else if ((linkNode = node1.Nodes["_outlink"]) != null)
                 {
-                    linkInfo.LinkType = PngLinkType.Inlink;
+                    linkInfo.LinkType = PngLinkType.Outlink;
                     linkInfo.LinkUrl = linkNode.GetValue<string>();
                     return true;
                 }
