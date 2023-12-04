@@ -15,6 +15,8 @@ namespace WzComparerR2.MapRender.Patches2
         public int Y { get; set; }
         public int? ToMap { get; set; }
         public string ToName { get; set; }
+        //Graph.img에 따른 이동경로 출력
+        public List<int> GraphTargetMap { get; set; }
         public string Script { get; set; }
         public int Image { get; set; }
         public bool EnchantPortal { get; set; }
