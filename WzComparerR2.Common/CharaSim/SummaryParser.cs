@@ -170,7 +170,14 @@ namespace WzComparerR2.CharaSim
                         {
                             case 'c': break; // \c忽略掉 原因不明
                             case 'r': sb.Append(param.R); break;
-                            case 'n': sb.Append(param.N); break;
+                            case 'n':
+                                if (beginC && options.EndColorOnNewLine)
+                                {
+                                    beginC = false;
+                                    sb.Append(param.CEnd);
+                                }
+                                sb.Append(param.N);
+                                break;
                             case '\\': sb.Append('\\'); break;
                             default: sb.Append(H[idx + 1]); break;
                         }
@@ -248,5 +255,6 @@ namespace WzComparerR2.CharaSim
         public bool ConvertCooltimeMS { get; set; }
         public bool ConvertPerM { get; set; }
         public bool IgnoreEvalError { get; set; }
+        public bool EndColorOnNewLine { get; set; }
     }
 }
