@@ -207,7 +207,7 @@ namespace WzComparerR2.MapRender.UI
                 //Graph.img에 따른 이동경로 출력
                 if (item.GraphTargetMap.Count > 0)
                 {
-                    sb.Append("脚本链接地图: ");
+                    sb.Append("scriptMap: ");
                     foreach (var targetMapID in item.GraphTargetMap)
                     {
                         sb.Append(targetMapID);
