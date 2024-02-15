@@ -144,6 +144,7 @@ namespace WzComparerR2.MapRender
 
         protected override void Initialize()
         {
+
             //init services
             this.Services.AddService<Random>(new Random());
             this.Services.AddService<IRandom>(new ParticleRandom(this.Services.GetService<Random>()));
@@ -168,6 +169,9 @@ namespace WzComparerR2.MapRender
             this.ApplySetting();
             SwitchResolution(Resolution.Window_800_600);
             base.Initialize();
+
+            //init UI teleport
+            this.ui.Teleport.Sl = this.StringLinker;
         }
 
         protected override void OnActivated(object sender, EventArgs args)

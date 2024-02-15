@@ -58,7 +58,7 @@ namespace WzComparerR2.MapRender.UI
 
             Border title = new Border();
             title.Height = 24;
-            title.SetBinding(Canvas.WidthProperty, new Binding(Canvas.WidthProperty) { Source = canvas });
+            title.SetBinding(Border.WidthProperty, new Binding(Border.WidthProperty) { Source = canvas });
             canvas.Children.Add(title);
             this.SetDragTarget(title);
 
@@ -117,6 +117,7 @@ namespace WzComparerR2.MapRender.UI
             btnBack.Name = "Cancel";
             btnBack.Click += BtnBack_Click;
             btnBack.SetResourceReference(UIElement.StyleProperty, MapRenderResourceKey.MapRenderButtonStyle);
+            btnBack.Focusable = false;
             Canvas.SetLeft(btnBack, 106);
             Canvas.SetTop(btnBack, 149);
             canvas.Children.Add(btnBack);
@@ -125,6 +126,7 @@ namespace WzComparerR2.MapRender.UI
             btnGo.Name = "OK";
             btnGo.Click += BtnGo_Click;
             btnGo.SetResourceReference(UIElement.StyleProperty, MapRenderResourceKey.MapRenderButtonStyle);
+            btnGo.Focusable = false;
             Canvas.SetLeft(btnGo, 58);
             Canvas.SetTop(btnGo, 149);
             canvas.Children.Add(btnGo);
@@ -133,6 +135,7 @@ namespace WzComparerR2.MapRender.UI
             btnClose.Name = "Close";
             btnClose.Click += BtnClose_Click;
             btnClose.SetResourceReference(UIElement.StyleProperty, MapRenderResourceKey.MapRenderButtonStyle);
+            btnClose.Focusable = false;
             Canvas.SetRight(btnClose, 7);
             Canvas.SetTop(btnClose, 5);
             canvas.Children.Add(btnClose);

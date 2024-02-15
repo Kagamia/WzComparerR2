@@ -202,8 +202,7 @@ namespace WzComparerR2.MapRender
                 else if (portal.GraphTargetMap.Count > 1)
                 {
                     this.ui.Teleport.Sl = this.StringLinker;
-                    this.ui.Teleport.CmbMaps.ItemsSource = null;
-                    this.ui.Teleport.CmbMaps.ItemsSource = portal.GraphTargetMap;
+                    this.ui.Teleport.CmbMaps.ItemsSource = portal.GraphTargetMap.ToList();
                     this.ui.Teleport.CmbMaps.SelectedIndex = 0;
                     this.ui.Teleport.Toggle();
                 }
