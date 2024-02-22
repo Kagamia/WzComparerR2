@@ -204,6 +204,17 @@ namespace WzComparerR2.MapRender
                 {
                     MoveToPortal(portal.ToMap, portal.ToName, portal.PName);
                 }
+                else if (portal.GraphTargetMap.Count == 1)
+                {
+                    MoveToPortal(portal.GraphTargetMap[0], "sp", portal.PName);
+                }
+                else if (portal.GraphTargetMap.Count > 1)
+                {
+                    this.ui.Teleport.Sl = this.StringLinker;
+                    this.ui.Teleport.CmbMaps.ItemsSource = portal.GraphTargetMap.ToList();
+                    this.ui.Teleport.CmbMaps.SelectedIndex = 0;
+                    this.ui.Teleport.Toggle();
+                }
             }
             else if (item is IlluminantClusterItem)
             {

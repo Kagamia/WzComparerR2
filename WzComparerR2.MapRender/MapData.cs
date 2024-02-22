@@ -317,7 +317,20 @@ namespace WzComparerR2.MapRender
 
         private void LoadPortal(Wz_Node portalNode)
         {
+            string mapID = this.ID.ToString().PadLeft(9, '0');
             var portalTooltipNode = PluginManager.FindWz("String/ToolTipHelp.img/PortalTooltip/" + this.ID);
+            var graphMapNode = PluginManager.FindWz(string.Format("Map/Map/Graph.img/{0:D2}/{1}/portal", this.ID / 10000000, mapID));
+            if (graphMapNode == null)
+            {
+                foreach (var graphImgSubNode in PluginManager.FindWz("Map/Map/Graph.img")?.Nodes ?? Enumerable.Empty<Wz_Node>())
+                {
+                    if (graphImgSubNode.Nodes[mapID] != null)
+                    {
+                        graphMapNode = graphImgSubNode.Nodes[mapID].Nodes["portal"];
+                        break;
+                    }
+                }
+            }
 
             foreach (var node in portalNode.Nodes)
             {
@@ -345,7 +358,22 @@ namespace WzComparerR2.MapRender
                         item.Tooltip = tooltip;
                     }
                 }
-
+                //Graph.img에 따른 이동경로 출력
+                item.GraphTargetMap = new List<int>();
+                if (graphMapNode != null)
+                {
+                    foreach (var graphPortalNode in graphMapNode.Nodes)
+                    {
+                        if (item.Index == graphPortalNode.Nodes["portalNum"].GetValueEx<int>())
+                        {
+                            var targetMapID = graphPortalNode.Nodes["targetMap"].GetValueEx<int>();
+                            if (targetMapID != null)
+                            {
+                                item.GraphTargetMap.Add(targetMapID.Value);
+                            }
+                        }
+                    }
+                }
                 Scene.Fly.Portal.Slots.Add(item);
             }
         }

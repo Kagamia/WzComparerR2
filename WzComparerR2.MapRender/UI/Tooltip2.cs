@@ -207,6 +207,19 @@ namespace WzComparerR2.MapRender.UI
             if (!string.IsNullOrEmpty(item.Script))
             {
                 sb.Append("script: ").AppendLine(item.Script);
+
+                //Graph.img에 따른 이동경로 출력
+                if (item.GraphTargetMap.Count > 0)
+                {
+                    sb.Append("scriptMap: ");
+                    foreach (var targetMapID in item.GraphTargetMap)
+                    {
+                        sb.Append(targetMapID);
+                        this.StringLinker?.StringMap.TryGetValue(targetMapID, out sr);
+                        string toMapName = sr?.Name;
+                        sb.Append("(").Append(sr?.Name ?? "null").AppendLine(")");
+                    }
+                }
             }
 
             sb.Length -= 2;
