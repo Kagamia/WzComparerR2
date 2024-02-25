@@ -493,6 +493,13 @@ namespace WzComparerR2.CharaSimControl
                 hasPart2 = true;
             }
 
+            if (Gear.Props.TryGetValue(GearPropType.CuttableCount, out value) && value > 0)
+            {
+                GearGraphics.DrawString(g, "#c可使用剪刀：" + value + "次#", GearGraphics.ItemDetailFont, 13, 256, ref picH, 16);
+                hasPart2 = true;
+            }
+
+
             //星星锤子
             if (hasTuc && Gear.Hammer > -1)
             {
