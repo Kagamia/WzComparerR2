@@ -792,6 +792,13 @@ namespace WzComparerR2.CharaSim
                 }
             }
 
+            //检查道具默认的剪刀次数
+            var cuttableCountOverride = findNode?.Invoke(@$"Etc\KarmaScissor_WZ2.img\ItemList\{gear.ItemID}")?.GetValueEx<int>();
+            if (cuttableCountOverride != null && cuttableCountOverride > 0)
+            {
+                gear.Props[GearPropType.CuttableCount] = cuttableCountOverride.Value;
+            }
+
             //备份标准属性
             gear.StandardProps = new Dictionary<GearPropType, int>(gear.Props);
 

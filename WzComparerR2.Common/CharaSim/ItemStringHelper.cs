@@ -143,6 +143,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incAUT: return "原初之力 : " + sign + value;
 
                 case GearPropType.Etuc: return "可进行卓越强化。（最多：" + value + "次）";
+                case GearPropType.CuttableCount: return "可使用剪刀：" + value + "次";
                 default: return null;
             }
         }

@@ -86,10 +86,11 @@ namespace WzComparerR2.CharaSimControl
         /// 表示物品附加属性中橙色字体画刷。
         /// </summary>
         public static readonly Brush OrangeBrush2 = new SolidBrush(Color.FromArgb(255, 170, 0));
+        public static readonly Color OrangeBrush3Color = Color.FromArgb(255, 204, 0);
         /// <summary>
         /// 表示装备职业额外说明中使用的橙黄色画刷。
         /// </summary>
-        public static readonly Brush OrangeBrush3 = new SolidBrush(Color.FromArgb(255, 204, 0));
+        public static readonly Brush OrangeBrush3 = new SolidBrush(OrangeBrush3Color);
         /// <summary>
         /// 表示装备属性额外说明中使用的绿色画刷。
         /// </summary>

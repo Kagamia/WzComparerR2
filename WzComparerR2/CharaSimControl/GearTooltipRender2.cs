@@ -489,16 +489,13 @@ namespace WzComparerR2.CharaSimControl
             }
             else if (hasTuc)
             {
-                GearGraphics.DrawString(g, "可升级次数 : " + value + "回 #c（可修复次数：0）#", GearGraphics.ItemDetailFont, 13, 256, ref picH, 16);
+                var colorTable = new Dictionary<string, Color>
+                {
+                    { "c", GearGraphics.OrangeBrush3Color }
+                };
+                GearGraphics.DrawString(g, "可升级次数 : " + value + "回 #c（可修复次数：0）#", GearGraphics.ItemDetailFont, colorTable, 13, 256, ref picH, 16);
                 hasPart2 = true;
             }
-
-            if (Gear.Props.TryGetValue(GearPropType.CuttableCount, out value) && value > 0)
-            {
-                GearGraphics.DrawString(g, "#c可使用剪刀：" + value + "次#", GearGraphics.ItemDetailFont, 13, 256, ref picH, 16);
-                hasPart2 = true;
-            }
-
 
             //星星锤子
             if (hasTuc && Gear.Hammer > -1)
@@ -513,6 +510,13 @@ namespace WzComparerR2.CharaSimControl
                     g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.superiorEqp, value), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 11, picH);
                     picH += 16;
                 }
+            }
+
+            if (Gear.Props.TryGetValue(GearPropType.CuttableCount, out value) && value > 0) //可使用剪刀
+            {
+                g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.CuttableCount, value), GearGraphics.ItemDetailFont, GearGraphics.OrangeBrush3, 11, picH);
+                picH += 16;
+                hasPart2 = true;
             }
 
             if (Gear.Props.TryGetValue(GearPropType.limitBreak, out value) && value > 0) //突破上限
