@@ -101,7 +101,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.bdR: return "攻击首领怪时，伤害+" + value + "%";
                 case GearPropType.incIMDR:
                 case GearPropType.imdR: return "无视怪物防御率：+" + value + "%";
-                case GearPropType.limitBreak: return "伤害上限突破至" + value + "。";
+                case GearPropType.limitBreak:return "伤害上限突破至" + ToChineseNumberExpr(value) + "。";
                 case GearPropType.reduceReq: return "装备等级降低：- " + value;
                 case GearPropType.nbdR: return "攻击普通怪物时，伤害+" + value + "%";
 
@@ -749,6 +749,39 @@ namespace WzComparerR2.CharaSim
                 case 14212: return "超能力者(4次)";
             }
             return null;
+        }
+
+        private static string ToChineseNumberExpr(int value)
+        {
+            var sb = new StringBuilder(16);
+            bool firstPart = true;
+            if (value < 0)
+            {
+                sb.Append("-");
+                value = -value; // just ignore the exception -2147483648
+            }
+            if (value >= 1_0000_0000)
+            {
+                int part = value / 1_0000_0000;
+                sb.AppendFormat("{0}亿", part);
+                value -= part * 1_0000_0000;
+                firstPart = false;
+            }
+            if (value >= 1_0000)
+            {
+                int part = value / 1_0000;
+                sb.Append(firstPart ? null : " ");
+                sb.AppendFormat("{0}万", part);
+                value -= part * 1_0000;
+                firstPart = false;
+            }
+            if (value > 0)
+            {
+                sb.Append(firstPart ? null : " ");
+                sb.AppendFormat("{0}", value);
+            }
+
+            return sb.Length > 0 ? sb.ToString() : "0";
         }
     }
 }
