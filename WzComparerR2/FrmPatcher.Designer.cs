@@ -30,7 +30,6 @@
         {
             this.comboBoxEx1 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.integerInput1 = new DevComponents.Editors.IntegerInput();
-            this.integerInput2 = new DevComponents.Editors.IntegerInput();
             this.txtUrl = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.buttonXPatch = new DevComponents.DotNetBar.ButtonX();
             this.chkDeadPatch = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -42,6 +41,7 @@
             this.txtPatchFile = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.labelX1 = new DevComponents.DotNetBar.LabelX();
             this.expandablePanel1 = new DevComponents.DotNetBar.ExpandablePanel();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.buttonXCheck = new DevComponents.DotNetBar.ButtonX();
             this.expandablePanel2 = new DevComponents.DotNetBar.ExpandablePanel();
             this.chkEnableDarkMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -83,8 +83,8 @@
             this.superTooltip1 = new DevComponents.DotNetBar.SuperTooltip();
             this.chkResolvePngLink = new DevComponents.DotNetBar.Controls.CheckBoxX();
             ((System.ComponentModel.ISupportInitialize)(this.integerInput1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.integerInput2)).BeginInit();
             this.expandablePanel1.SuspendLayout();
+            this.flowLayoutPanel1.SuspendLayout();
             this.expandablePanel2.SuspendLayout();
             this.panelEx2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
@@ -121,33 +121,14 @@
             this.integerInput1.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.integerInput1.ButtonFreeText.Shortcut = DevComponents.DotNetBar.eShortcut.F2;
             this.integerInput1.DisplayFormat = "00000";
-            this.integerInput1.Location = new System.Drawing.Point(104, 35);
+            this.integerInput1.Location = new System.Drawing.Point(3, 3);
             this.integerInput1.MaxValue = 99999;
             this.integerInput1.MinValue = 0;
             this.integerInput1.Name = "integerInput1";
             this.integerInput1.ShowUpDown = true;
-            this.integerInput1.Size = new System.Drawing.Size(80, 21);
+            this.integerInput1.Size = new System.Drawing.Size(60, 21);
             this.integerInput1.TabIndex = 1;
-            this.integerInput1.ValueChanged += new System.EventHandler(this.integerInput1_ValueChanged);
-            // 
-            // integerInput2
-            // 
-            // 
-            // 
-            // 
-            this.integerInput2.BackgroundStyle.Class = "DateTimeInputBackground";
-            this.integerInput2.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.integerInput2.ButtonFreeText.Shortcut = DevComponents.DotNetBar.eShortcut.F2;
-            this.integerInput2.DisplayFormat = "00000";
-            this.integerInput2.Location = new System.Drawing.Point(190, 35);
-            this.integerInput2.MaxValue = 99999;
-            this.integerInput2.MinValue = 0;
-            this.integerInput2.Name = "integerInput2";
-            this.integerInput2.ShowUpDown = true;
-            this.integerInput2.Size = new System.Drawing.Size(80, 21);
-            this.integerInput2.TabIndex = 2;
-            this.integerInput2.Value = 1;
-            this.integerInput2.ValueChanged += new System.EventHandler(this.integerInput2_ValueChanged);
+            this.integerInput1.ValueChanged += new System.EventHandler(this.integerInput_ValueChanged);
             // 
             // txtUrl
             // 
@@ -295,11 +276,10 @@
             // 
             this.expandablePanel1.CanvasColor = System.Drawing.SystemColors.Control;
             this.expandablePanel1.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.expandablePanel1.Controls.Add(this.flowLayoutPanel1);
             this.expandablePanel1.Controls.Add(this.buttonXCheck);
             this.expandablePanel1.Controls.Add(this.comboBoxEx1);
             this.expandablePanel1.Controls.Add(this.txtUrl);
-            this.expandablePanel1.Controls.Add(this.integerInput1);
-            this.expandablePanel1.Controls.Add(this.integerInput2);
             this.expandablePanel1.DisabledBackColor = System.Drawing.Color.Empty;
             this.expandablePanel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.expandablePanel1.ExpandOnTitleClick = true;
@@ -322,6 +302,18 @@
             this.expandablePanel1.TitleStyle.ForeColor.ColorSchemePart = DevComponents.DotNetBar.eColorSchemePart.PanelText;
             this.expandablePanel1.TitleStyle.GradientAngle = 90;
             this.expandablePanel1.TitleText = "Patch Download Url";
+            // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.flowLayoutPanel1.BackColor = System.Drawing.Color.Transparent;
+            this.flowLayoutPanel1.Controls.Add(this.integerInput1);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(104, 33);
+            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(270, 26);
+            this.flowLayoutPanel1.TabIndex = 5;
             // 
             // buttonXCheck
             // 
@@ -913,8 +905,8 @@
             this.Text = "更新装置";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FrmPatcher_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.integerInput1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.integerInput2)).EndInit();
             this.expandablePanel1.ResumeLayout(false);
+            this.flowLayoutPanel1.ResumeLayout(false);
             this.expandablePanel2.ResumeLayout(false);
             this.expandablePanel2.PerformLayout();
             this.panelEx2.ResumeLayout(false);
@@ -935,7 +927,6 @@
 
         private DevComponents.DotNetBar.Controls.ComboBoxEx comboBoxEx1;
         private DevComponents.Editors.IntegerInput integerInput1;
-        private DevComponents.Editors.IntegerInput integerInput2;
         private DevComponents.DotNetBar.Controls.TextBoxX txtUrl;
         private DevComponents.DotNetBar.ButtonX buttonXOpen2;
         private DevComponents.DotNetBar.Controls.TextBoxX txtMSFolder;
@@ -987,5 +978,6 @@
         private DevComponents.DotNetBar.ButtonX buttonXCreate;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkResolvePngLink;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnableDarkMode;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
     }
 }

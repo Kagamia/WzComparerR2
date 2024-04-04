@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using DevComponents.DotNetBar;
-using DevComponents.AdvTree;
 using System.IO;
-
+using System.Linq;
+using System.Text;
 using System.Threading;
-using WzComparerR2.WzLib;
-using WzComparerR2.Patcher;
+using System.Windows.Forms;
+using DevComponents.AdvTree;
+using DevComponents.DotNetBar;
+using DevComponents.Editors;
 using WzComparerR2.Comparer;
 using WzComparerR2.Config;
+using WzComparerR2.Patcher;
+using WzComparerR2.WzLib;
 
 namespace WzComparerR2
 {
@@ -31,17 +30,19 @@ namespace WzComparerR2
             var settings = WcR2Config.Default.PatcherSettings;
             if (settings.Count <= 0)
             {
-                settings.Add(new PatcherSetting("KMST", "http://maplestory.dn.nexoncdn.co.kr/PatchT/{1:d5}/{0:d5}to{1:d5}.patch"));
-                settings.Add(new PatcherSetting("KMS", "http://maplestory.dn.nexoncdn.co.kr/Patch/{1:d5}/{0:d5}to{1:d5}.patch"));
-                settings.Add(new PatcherSetting("JMS", "http://webdown2.nexon.co.jp/maple/patch/patchdir/{1:d5}/{0:d5}to{1:d5}.patch"));
-                settings.Add(new PatcherSetting("GMS", "http://download2.nexon.net/Game/MapleStory/patch/patchdir/{1:d5}/CustomPatch{0}to{1}.exe"));
-                settings.Add(new PatcherSetting("TMS", "http://tw.cdnpatch.maplestory.beanfun.com/maplestory/patch/patchdir/{1:d5}/{0:d5}to{1:d5}.patch"));
-                settings.Add(new PatcherSetting("MSEA", "http://patch.maplesea.com/sea/patch/patchdir/{1:d5}/{0:d5}to{1:d5}.patch"));
-                settings.Add(new PatcherSetting("CMS", "http://mxd.clientdown.sdo.com/maplestory/patch/patchdir/{1:d5}/{0:d5}to{1:d5}.patch"));
+                settings.Add(new PatcherSetting("KMST", "http://maplestory.dn.nexoncdn.co.kr/PatchT/{1:d5}/{0:d5}to{1:d5}.patch", 2));
+                settings.Add(new PatcherSetting("KMST-Minor", "http://maplestory.dn.nexoncdn.co.kr/PatchT/{0:d5}/Minor/{1:d2}to{2:d2}.patch", 3));
+                settings.Add(new PatcherSetting("KMS", "http://maplestory.dn.nexoncdn.co.kr/Patch/{1:d5}/{0:d5}to{1:d5}.patch", 2));
+                settings.Add(new PatcherSetting("JMS", "http://webdown2.nexon.co.jp/maple/patch/patchdir/{1:d5}/{0:d5}to{1:d5}.patch", 2));
+                settings.Add(new PatcherSetting("GMS", "http://download2.nexon.net/Game/MapleStory/patch/patchdir/{1:d5}/CustomPatch{0}to{1}.exe", 2));
+                settings.Add(new PatcherSetting("TMS", "http://tw.cdnpatch.maplestory.beanfun.com/maplestory/patch/patchdir/{1:d5}/{0:d5}to{1:d5}.patch", 2));
+                settings.Add(new PatcherSetting("MSEA", "http://patch.maplesea.com/sea/patch/patchdir/{1:d5}/{0:d5}to{1:d5}.patch", 2));
+                settings.Add(new PatcherSetting("CMS", "http://mxd.clientdown.sdo.com/maplestory/patch/patchdir/{1:d5}/{0:d5}to{1:d5}.patch", 2));
             }
 
             foreach (PatcherSetting p in settings)
             {
+                this.MigrateSetting(p);
                 comboBoxEx1.Items.Add(p);
             }
             if (comboBoxEx1.Items.Count > 0)
@@ -58,42 +59,110 @@ namespace WzComparerR2
         EventWaitHandle waitHandle;
         bool waiting;
         string loggingFileName;
+        bool isUpdating;
+
+        private PatcherSetting SelectedPatcherSetting => comboBoxEx1.SelectedItem as PatcherSetting;
+
+        private void MigrateSetting(PatcherSetting patcherSetting)
+        {
+            if (patcherSetting.MaxVersion == 0 && patcherSetting.Versions == null)
+            {
+                patcherSetting.MaxVersion = 2;
+                patcherSetting.Versions = new[] { patcherSetting.Version0 ?? 0, patcherSetting.Version1 ?? 0 };
+                patcherSetting.Version0 = null;
+                patcherSetting.Version1 = null;
+            }
+            if (patcherSetting.Versions != null && patcherSetting.Versions.Length < patcherSetting.MaxVersion)
+            {
+                var newVersions = new int[patcherSetting.MaxVersion];
+                Array.Copy(patcherSetting.Versions, newVersions, patcherSetting.Versions.Length);
+                patcherSetting.Versions = newVersions;
+            }
+        }
+
+        private void ApplySetting(PatcherSetting p)
+        {
+            if (isUpdating)
+            {
+                return;
+            }
+            isUpdating = true;
+            try
+            {
+                if (this.flowLayoutPanel1.Controls.Count < p.MaxVersion)
+                {
+                    var inputTemplate = this.integerInput1;
+                    var preAddedControls = Enumerable.Range(0, p.MaxVersion - this.flowLayoutPanel1.Controls.Count)
+                        .Select(_ =>
+                        {
+                            var input = new IntegerInput()
+                            {
+                                AllowEmptyState = inputTemplate.AllowEmptyState,
+                                Size = inputTemplate.Size,
+                                Value = 0,
+                                MinValue = inputTemplate.MinValue,
+                                MaxValue = inputTemplate.MaxValue,
+                                DisplayFormat = inputTemplate.DisplayFormat,
+                                ShowUpDown = inputTemplate.ShowUpDown,
+                            };
+                            input.BackgroundStyle.ApplyStyle(inputTemplate.BackgroundStyle);
+                            input.ValueChanged += this.integerInput_ValueChanged;
+                            return input;
+                        }).ToArray();
+                    this.flowLayoutPanel1.Controls.AddRange(preAddedControls);
+                }
+                for (int i = 0; i < this.flowLayoutPanel1.Controls.Count; i++)
+                {
+                    var input = (IntegerInput)this.flowLayoutPanel1.Controls[i];
+                    if (i < p.MaxVersion)
+                    {
+                        input.Show();
+                        input.Value = (p.Versions != null && i < p.Versions.Length) ? p.Versions[i] : 0;
+                    }
+                    else
+                    {
+                        input.Hide();
+                        input.Value = 0;
+                    }
+                }
+                this.txtUrl.Text = p.Url;
+            }
+            finally
+            {
+                isUpdating = false;
+            }
+        }
 
         private void combineUrl()
         {
-            PatcherSetting p = comboBoxEx1.SelectedItem as PatcherSetting;
-            if (p != null)
+            if (this.SelectedPatcherSetting is var p)
+            {
                 txtUrl.Text = p.Url;
+            }
         }
 
         private void comboBoxEx1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            PatcherSetting p = comboBoxEx1.SelectedItem as PatcherSetting;
-            if (p != null)
+            if (this.SelectedPatcherSetting is var p)
             {
-                integerInput1.Value = p.Version0;
-                integerInput2.Value = p.Version1;
-                combineUrl();
+                this.ApplySetting(p);
             }
         }
 
-        private void integerInput1_ValueChanged(object sender, EventArgs e)
+        private void integerInput_ValueChanged(object sender, EventArgs e)
         {
-            PatcherSetting p = comboBoxEx1.SelectedItem as PatcherSetting;
-            if (p != null)
+            if (this.SelectedPatcherSetting is var p && sender is IntegerInput input)
             {
-                p.Version0 = integerInput1.Value;
-                combineUrl();
-            }
-        }
-
-        private void integerInput2_ValueChanged(object sender, EventArgs e)
-        {
-            PatcherSetting p = comboBoxEx1.SelectedItem as PatcherSetting;
-            if (p != null)
-            {
-                p.Version1 = integerInput2.Value;
-                combineUrl();
+                var i = this.flowLayoutPanel1.Controls.IndexOf(input);
+                if (i > -1 && i < p.MaxVersion)
+                {
+                    if (p.Versions == null)
+                    {
+                        p.Versions = new int[p.MaxVersion];
+                    }
+                    p.Versions[i] = input.Value;
+                }
+                this.ApplySetting(p);
             }
         }
 
