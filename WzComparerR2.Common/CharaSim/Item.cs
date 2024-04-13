@@ -50,47 +50,26 @@ namespace WzComparerR2.CharaSim
             Wz_Node infoNode = node.FindNodeByPath("info");
             if (infoNode != null)
             {
-                Wz_Node pngNode;
                 foreach (Wz_Node subNode in infoNode.Nodes)
                 {
                     switch (subNode.Text)
                     {
                         case "icon":
-                            pngNode = subNode;
-                            while (pngNode.Value is Wz_Uol)
+                            if (subNode.Value is Wz_Uol || subNode.Value is Wz_Png)
                             {
-                                Wz_Uol uol = pngNode.Value as Wz_Uol;
-                                Wz_Node uolNode = uol.HandleUol(subNode);
-                                if (uolNode != null)
-                                {
-                                    pngNode = uolNode;
-                                }
-                            }
-                            if (pngNode.Value is Wz_Png)
-                            {
-                                item.Icon = BitmapOrigin.CreateFromNode(pngNode, findNode);
+                                item.Icon = BitmapOrigin.CreateFromNode(subNode, findNode);
                             }
                             break;
 
                         case "iconRaw":
-                            pngNode = subNode;
-                            while (pngNode.Value is Wz_Uol)
+                            if (subNode.Value is Wz_Uol || subNode.Value is Wz_Png)
                             {
-                                Wz_Uol uol = pngNode.Value as Wz_Uol;
-                                Wz_Node uolNode = uol.HandleUol(subNode);
-                                if (uolNode != null)
-                                {
-                                    pngNode = uolNode;
-                                }
-                            }
-                            if (pngNode.Value is Wz_Png)
-                            {
-                                item.IconRaw = BitmapOrigin.CreateFromNode(pngNode, findNode);
+                                item.IconRaw = BitmapOrigin.CreateFromNode(subNode, findNode);
                             }
                             break;
 
                         case "sample":
-                            if (subNode.Value is Wz_Png)
+                            if (subNode.Value is Wz_Uol || subNode.Value is Wz_Png)
                             {
                                 item.Sample = BitmapOrigin.CreateFromNode(subNode, findNode);
                             }
