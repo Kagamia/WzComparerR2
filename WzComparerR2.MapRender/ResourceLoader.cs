@@ -10,7 +10,6 @@ using Microsoft.Xna.Framework.Content;
 using WzComparerR2.Animation;
 using WzComparerR2.Rendering;
 using WzComparerR2.Common;
-using Spine;
 
 namespace WzComparerR2.MapRender
 {
@@ -309,12 +308,18 @@ namespace WzComparerR2.MapRender
         {
             if (node != null && (node = node.ResolveUol()) != null)
             {
+                SpineDetectionResult detectionResult;
+
                 if (node.Value is Wz_Png) //单帧动画
                 {
                     var aniData = new FrameAnimationData();
                     var frame = LoadFrame(node);
                     aniData.Frames.Add(frame);
                     return aniData;
+                }
+                else if ((detectionResult = SpineLoader.Detect(node)).Success)
+                {
+                    return this.LoadSpineAnimationData(detectionResult);
                 }
                 else if (node.Value == null && node.Nodes.Count > 0) //分析目录
                 {
@@ -324,17 +329,10 @@ namespace WzComparerR2.MapRender
                         var textureLoader = new SpineTextureLoader(this, node);
                         var atlasNode = node.Nodes[spine + ".atlas"];
 
-                        var detectionResult = SpineLoader.Detect(atlasNode);
+                        detectionResult = SpineLoader.Detect(atlasNode);
                         if (detectionResult.Success)
                         {
-                            if (detectionResult.Version == SpineVersion.V2)
-                            {
-                                return SpineAnimationDataV2.CreateFromNode(atlasNode, textureLoader);
-                            }
-                            else if (detectionResult.Version == SpineVersion.V4)
-                            {
-                                return SpineAnimationDataV4.CreateFromNode(atlasNode, textureLoader);
-                            }
+                            return this.LoadSpineAnimationData(detectionResult);
                         }
                     }
                     else //读取序列帧动画
@@ -384,6 +382,24 @@ namespace WzComparerR2.MapRender
             return frame;
         }
 
+        private ISpineAnimationData LoadSpineAnimationData(SpineDetectionResult detectionResult)
+        {
+            if (detectionResult.Success)
+            {
+                var textureLoader = new SpineTextureLoader(this, detectionResult.SourceNode.ParentNode);
+                if (detectionResult.Version == SpineVersion.V2)
+                {
+                    return SpineAnimationDataV2.Create(detectionResult, textureLoader);
+                }
+                else if (detectionResult.Version == SpineVersion.V4)
+                {
+                    return SpineAnimationDataV4.Create(detectionResult, textureLoader);
+                }
+            }
+            
+            return null;
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -414,7 +430,7 @@ namespace WzComparerR2.MapRender
             public ResourceLoader BaseLoader { get; set; }
             public Wz_Node TopNode { get; set; }
 
-            public void Load(AtlasPage page, string path)
+            public void Load(Spine.AtlasPage page, string path)
             {
                 if (this.TryLoadTexture(path, out var texture))
                 {
@@ -456,7 +472,9 @@ namespace WzComparerR2.MapRender
                 if (frameNode.Value is Wz_Png)
                 {
                     var linkNode = frameNode.GetLinkedSourceNode(PluginManager.FindWz);
-                    texture = BaseLoader.Load<Texture2D>(linkNode);
+                    // workaround for KMST 1172, skeleton atlas and other obj may link to the same png node.
+                    // TODO: add options to always load into a standalone texture, disable dynamic atlas on this resource, 
+                    texture = BaseLoader.Load<TextureAtlas>(linkNode).Texture;
                     return true;
                 }
 

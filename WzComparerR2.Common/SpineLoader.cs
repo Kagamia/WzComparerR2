@@ -10,36 +10,79 @@ namespace WzComparerR2.Common
         private const string AtlasExtension = ".atlas";
         private const string JsonExtension = ".json";
         private const string SkelExtension = ".skel";
+        private const string SharedAtlasNodeName = "atlas";
 
-        public static SpineDetectionResult Detect(Wz_Node atlasNode)
+        public static SpineDetectionResult Detect(Wz_Node wzNode)
         {
-            if (atlasNode == null || atlasNode.ParentNode == null)
+            if (wzNode == null || wzNode.ParentNode == null)
             {
-                return SpineDetectionResult.Failed("AtlasNode or its parent cannot be null.");
+                return SpineDetectionResult.Failed("WzNode or its parent cannot be null.");
             }
-            if (!atlasNode.Text.EndsWith(AtlasExtension))
-            {
-                return SpineDetectionResult.Failed($"AtlasNode name has no suffix {AtlasExtension}.");
-            }
-
-            string spineName = atlasNode.Text.Substring(0, atlasNode.Text.Length - AtlasExtension.Length);
-            Wz_Node parentNode = atlasNode.ParentNode;
+           
+            Wz_Node parentNode = wzNode.ParentNode;
+            Wz_Node atlasNode = null;
+            Wz_Node skelNode = null;
             SkeletonLoadType loadType;
             SpineVersion spineVersion;
-            Wz_Node skelNode;
 
-            // find skel node in sibling nodes
-            if ((skelNode = parentNode.Nodes[spineName + JsonExtension]) != null)
+            if (wzNode.Text.EndsWith(AtlasExtension)) // detect from atlasNode
             {
-                loadType = SkeletonLoadType.Json;
+                atlasNode = wzNode;
+                string spineName = atlasNode.Text.Substring(0, atlasNode.Text.Length - AtlasExtension.Length);
+
+                // find skel node in sibling nodes
+                if ((skelNode = parentNode.Nodes[spineName + JsonExtension]) != null)
+                {
+                    loadType = SkeletonLoadType.Json;
+                }
+                else if ((skelNode = parentNode.Nodes[spineName] ?? parentNode.Nodes[spineName + SkelExtension]) != null)
+                {
+                    loadType = SkeletonLoadType.Binary;
+                }
+                else
+                {
+                    return SpineDetectionResult.Failed("Failed to find skel node.");
+                }
             }
-            else if ((skelNode = parentNode.Nodes[spineName] ?? parentNode.Nodes[spineName + SkelExtension]) != null)
+            else // detect from skel node
             {
-                loadType = SkeletonLoadType.Binary;
-            }
-            else
-            {
-                return SpineDetectionResult.Failed("Failed to find skel node.");
+                skelNode = wzNode;
+                string spineName = null;
+                if (skelNode.Text.EndsWith(JsonExtension))
+                {
+                    spineName = skelNode.Text.Substring(0, skelNode.Text.Length - JsonExtension.Length);
+                    loadType = SkeletonLoadType.Json;
+                }
+                else if (skelNode.Text.EndsWith(SkelExtension))
+                {
+                    spineName = skelNode.Text.Substring(0, skelNode.Text.Length - SkelExtension.Length);
+                    loadType = SkeletonLoadType.Binary;
+                }
+                else
+                {
+                    switch (skelNode.ResolveUol()?.Value)
+                    {
+                        case Wz_Sound sound when sound.SoundType == Wz_SoundType.Binary:
+                        case Wz_RawData rawData:
+                            spineName = skelNode.Text;
+                            loadType = SkeletonLoadType.Binary;
+                            break;
+
+                        default:
+                            return SpineDetectionResult.Failed("Failed to infer the wzNode as atlasNode or skelNode.");
+                    }
+                }
+
+                if (spineName != null)
+                {
+                    // find atlas node in sibling nodes
+                    // KMST 1172: the atlas node name could be constant
+                    atlasNode = parentNode.Nodes[spineName + AtlasExtension] ?? parentNode.Nodes[SharedAtlasNodeName];
+                    if (atlasNode == null)
+                    {
+                        return SpineDetectionResult.Failed("Failed to find atlas node.");
+                    }
+                }
             }
 
             // resolve uols
@@ -90,15 +133,8 @@ namespace WzComparerR2.Common
                 case 4: spineVersion = SpineVersion.V4; break;
                 default: return SpineDetectionResult.Failed($"Spine version '{versionStr}' is not supported."); ;
             }
-            
-            return new SpineDetectionResult
-            {
-                Success = true,
-                ResolvedAtlasNode = atlasNode,
-                ResolvedSkelNode = skelNode,
-                LoadType = loadType,
-                Version = spineVersion,
-            };
+
+            return SpineDetectionResult.Create(wzNode, atlasNode, skelNode, loadType, spineVersion);
         }
 
         private static string ReadSpineVersionFromJson(string jsonText)
@@ -151,9 +187,9 @@ namespace WzComparerR2.Common
             }
         }
 
-        public static Spine.V2.SkeletonData LoadSkeletonV2(Wz_Node atlasNode, Spine.V2.TextureLoader textureLoader)
+        public static Spine.V2.SkeletonData LoadSkeletonV2(Wz_Node wzNode, Spine.V2.TextureLoader textureLoader)
         {
-            var detectionResult = Detect(atlasNode);
+            var detectionResult = Detect(wzNode);
             if (detectionResult.Success && detectionResult.Version == SpineVersion.V2)
             {
                 return LoadSkeletonV2(detectionResult, textureLoader);
@@ -200,9 +236,9 @@ namespace WzComparerR2.Common
             }
         }
 
-        public static Spine.SkeletonData LoadSkeletonV4(Wz_Node atlasNode, Spine.TextureLoader textureLoader)
+        public static Spine.SkeletonData LoadSkeletonV4(Wz_Node atlasOrSkelNode, Spine.TextureLoader textureLoader)
         {
-            var detectionResult = Detect(atlasNode);
+            var detectionResult = Detect(atlasOrSkelNode);
             if (detectionResult.Success && detectionResult.Version == SpineVersion.V4)
             {
                 return LoadSkeletonV4(detectionResult, textureLoader);
@@ -272,6 +308,7 @@ namespace WzComparerR2.Common
 
         public bool Success { get; internal set; }
         public string ErrorDetail { get; internal set; }
+        public Wz_Node SourceNode { get; internal set; }
         public Wz_Node ResolvedAtlasNode { get; internal set; }
         public Wz_Node ResolvedSkelNode { get; internal set; }
         public SkeletonLoadType LoadType { get; internal set; }
@@ -281,6 +318,17 @@ namespace WzComparerR2.Common
         {
             Success = false,
             ErrorDetail = error,
+        };
+
+        public static SpineDetectionResult Create(Wz_Node sourceNode, Wz_Node atlasNode, Wz_Node skelNode, SkeletonLoadType loadType, SpineVersion version) => new SpineDetectionResult
+        {
+            Success = true,
+            ErrorDetail = null,
+            SourceNode = sourceNode,
+            ResolvedAtlasNode = atlasNode,
+            ResolvedSkelNode = skelNode,
+            LoadType = loadType,
+            Version = version
         };
     }
 }
