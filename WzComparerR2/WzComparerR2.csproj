@@ -50,6 +50,9 @@
     <Reference Include="DevComponents.DotNetBar2">
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
     </Reference>
+    <Reference Include="spine-monogame">
+      <HintPath>..\References\spine-monogame.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
     <Compile Include="..\Build\CommonAssemblyInfo.cs">

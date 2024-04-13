@@ -81,13 +81,18 @@ namespace WzComparerR2
 
         public ISpineAnimationData LoadSpineAnimation(Wz_Node node)
         {
-            var detectionResult = SpineLoader.Detect(node);
+            return this.LoadSpineAnimation(SpineLoader.Detect(node));
+        }
+
+        public ISpineAnimationData LoadSpineAnimation(SpineDetectionResult detectionResult)
+        {
             if (!detectionResult.Success)
                 return null;
+            var textureLoader = new WzSpineTextureLoader(detectionResult.SourceNode.ParentNode, this.GraphicsDevice, PluginBase.PluginManager.FindWz);
             if (detectionResult.Version == SpineVersion.V2)
-                return SpineAnimationDataV2.CreateFromNode(node, this.GraphicsDevice, PluginBase.PluginManager.FindWz);
+                return SpineAnimationDataV2.Create(detectionResult, textureLoader);
             else if (detectionResult.Version == SpineVersion.V4)
-                return SpineAnimationDataV4.CreateFromNode(node, this.GraphicsDevice, PluginBase.PluginManager.FindWz);
+                return SpineAnimationDataV4.Create(detectionResult, textureLoader);
             else
                 return null;
         }
