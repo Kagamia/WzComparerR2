@@ -420,7 +420,7 @@ namespace WzComparerR2.CharaSimControl
                 bool isValidSpeed = (2 <= value && value <= 9);
                 string speedStr = string.Format("攻击速度 : {0}{1}{2}",
                     ItemStringHelper.GetAttackSpeedString(value),
-                    isValidSpeed ? $"（{10 - value}阶段）" : null,
+                    isValidSpeed ? $"（第{10 - value}阶段）" : null,
                     ShowSpeed ? $"({value})" : null
                 );
 

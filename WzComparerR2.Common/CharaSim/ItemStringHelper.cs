@@ -319,8 +319,8 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.energySword: return "能量剑";
                 case GearType.desperado: return "亡命剑";
-                case GearType.magicStick: return "驯兽魔法棒";
-                case GearType.whistle: return "哨子";
+                case GearType.magicStick: return "记忆长杖";
+                case GearType.whistle: return "飞越";
                 case GearType.boxingClaw: return "拳爪";
                 case GearType.katana2: return "小太刀";
                 case GearType.espLimiter: return "ESP限制器";
@@ -516,7 +516,7 @@ namespace WzComparerR2.CharaSim
                 case 64: return "魔链影士可穿戴装备";
                 case 65: return "爆莉萌天使可穿戴装备";
                 case 101: return "神之子可穿戴装备";
-                case 112: return "林之灵可穿戴装备";
+                case 112: return "琳可穿戴装备";
                 case 142: return "超能力者可穿戴装备";
                 case 151: return "御剑骑士可穿戴装备";
                 case 152: return "圣晶使徒可穿戴装备";
