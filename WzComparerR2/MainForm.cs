@@ -87,7 +87,7 @@ namespace WzComparerR2
             charaSimCtrl.Character = new Character();
             charaSimCtrl.Character.Name = "Test";
 
-            string[] images = new string[] { "dir", "mp3", "num", "png", "str", "uol", "vector", "img", "rawdata" };
+            string[] images = new string[] { "dir", "mp3", "num", "png", "str", "uol", "vector", "img", "rawdata", "convex" };
             foreach (string img in images)
             {
                 imageList1.Images.Add(img, (Image)Properties.Resources.ResourceManager.GetObject(img));
@@ -1041,58 +1041,54 @@ namespace WzComparerR2
 
         private string getValueString(object value)
         {
-            Wz_Png png;
-            Wz_Sound sound;
-            Wz_Vector vector;
-            Wz_Uol uol;
-            Wz_Image img;
-            Wz_RawData rawData;
+            switch (value)
+            {
+                case Wz_Png png:
+                    return $"png {png.Width}*{png.Height} ({png.Form})";
 
-            if ((png = value as Wz_Png) != null)
-            {
-                return "png " + png.Width + "*" + png.Height + " (" + png.Form + ")";
-            }
-            else if ((vector = value as Wz_Vector) != null)
-            {
-                return "(" + vector.X + ", " + vector.Y + ")";
-            }
-            else if ((uol = value as Wz_Uol) != null)
-            {
-                return uol.Uol;
-            }
-            else if ((sound = value as Wz_Sound) != null)
-            {
-                return "sound " + sound.Ms + "ms";
-            }
-            else if ((img = value as Wz_Image) != null)
-            {
-                return "<" + img.Node.Nodes.Count + ">";
-            }
-            else if ((rawData = value as Wz_RawData) != null)
-            {
-                return "rawdata " + rawData.Length;
-            }
-            else
-            {
-                String cellVal = Convert.ToString(value);
-                if (cellVal != null && cellVal.Length > 50)
-                {
-                    cellVal = cellVal.Substring(0, 50);
-                }
-                return cellVal;
+                case Wz_Vector vector:
+                    return $"({vector.X}, {vector.Y})";
+
+                case Wz_Uol uol:
+                    return uol.Uol;
+
+                case Wz_Sound sound:
+                    return $"sound {sound.Ms}ms";
+
+                case Wz_Image img:
+                    return $"<{img.Node.Nodes.Count}>";
+
+                case Wz_RawData rawData:
+                    return $"rawdata {rawData.Length}";
+
+                case Wz_Convex convex:
+                    return $"convex [{convex.Points.Length}]";
+
+                default:
+                    string cellVal = Convert.ToString(value);
+                    if (cellVal != null && cellVal.Length > 50)
+                    {
+                        cellVal = cellVal.Substring(0, 50);
+                    }
+                    return cellVal;
             }
         }
 
         private string getValueImageKey(object value)
         {
-            if (value is Wz_Png) return "png";
-            else if (value is String) return "str";
-            else if (value is Wz_Vector) return "vector";
-            else if (value is Wz_Uol) return "uol";
-            else if (value is Wz_Sound sound) return sound.SoundType == Wz_SoundType.Binary ? "rawdata" : "mp3";
-            else if (value is Wz_Image) return "img";
-            else if (value is Wz_RawData) return "rawdata";
-            else return null;
+            return value switch
+            {
+                string => "str",
+                short or int or long or float or double=> "num",
+                Wz_Png => "png",
+                Wz_Vector => "vector",
+                Wz_Uol => "uol",
+                Wz_Sound sound => sound.SoundType == Wz_SoundType.Binary ? "rawdata" : "mp3",
+                Wz_Image => "img",
+                Wz_RawData => "rawdata",
+                Wz_Convex => "convex",
+                _ => null
+            };
         }
 
         private void advTree3_AfterNodeSelect(object sender, AdvTreeNodeEventArgs e)
@@ -1113,87 +1109,93 @@ namespace WzComparerR2
             if (selectedNode == null)
                 return;
 
-            Wz_Png png;
-            Wz_Sound sound;
-            Wz_Vector vector;
-            Wz_Uol uol;
-            Wz_RawData rawData;
+            switch (selectedNode.Value)
+            {
+                case Wz_Png png:
+                    pictureBoxEx1.PictureName = GetSelectedNodeImageName();
+                    pictureBoxEx1.ShowImage(png);
+                    this.cmbItemAniNames.Items.Clear();
+                    advTree3.PathSeparator = ".";
+                    textBoxX1.Text = "dataLength: " + png.DataLength + " bytes\r\n" +
+                        "offset: " + png.Offset + "\r\n" +
+                        "size: " + png.Width + "*" + png.Height + "\r\n" +
+                        "png format: " + png.Form;
+                    break;
 
-            if ((png = selectedNode.Value as Wz_Png) != null)
-            {
-                pictureBoxEx1.PictureName = GetSelectedNodeImageName();
-                pictureBoxEx1.ShowImage(png);
-                this.cmbItemAniNames.Items.Clear();
-                advTree3.PathSeparator = ".";
-                textBoxX1.Text = "dataLength: " + png.DataLength + " bytes\r\n" +
-                    "offset: " + png.Offset + "\r\n" +
-                    "size: " + png.Width + "*" + png.Height + "\r\n" +
-                    "png format: " + png.Form;
-            }
-            else if ((vector = selectedNode.Value as Wz_Vector) != null)
-            {
-                textBoxX1.Text = "x: " + vector.X + " px\r\n" +
-                    "y: " + vector.Y + " px";
-            }
-            else if ((uol = selectedNode.Value as Wz_Uol) != null)
-            {
-                textBoxX1.Text = "uolPath: " + uol.Uol;
-            }
-            else if ((sound = selectedNode.Value as Wz_Sound) != null)
-            {
-                preLoadSound(sound, selectedNode.Text);
-                textBoxX1.Text = "dataLength: " + sound.DataLength + " bytes\r\n" +
-                    "offset: " + sound.Offset + "\r\n" +
-                    "time: " + sound.Ms + " ms\r\n" +
-                    "headerLength: " + (sound.Header == null ? 0 : sound.Header.Length) + " bytes\r\n" +
-                    "freq: " + sound.Frequency + " Hz\r\n" +
-                    "type: " + sound.SoundType.ToString();
-            }
-            else if (selectedNode.Value is Wz_Image)
-            {
-                //do nothing;
-            }
-            else if ((rawData = selectedNode.Value as Wz_RawData) != null)
-            {
-                textBoxX1.Text = "dataLength: " + rawData.Length + " bytes\r\n" +
-                    "offset: " + rawData.Offset;
-            }
-            else
-            {
-                string valueStr = Convert.ToString(selectedNode.Value);
-                if (valueStr != null && valueStr.Contains("\n") && !valueStr.Contains("\r\n"))
-                {
-                    valueStr = valueStr.Replace("\n", "\r\n");
-                }
-                textBoxX1.Text = Convert.ToString(valueStr);
+                case Wz_Vector vector:
+                    textBoxX1.Text = "x: " + vector.X + " px\r\n" +
+                        "y: " + vector.Y + " px";
+                    break;
 
-                switch (selectedNode.Text)
-                {
-                    case "source":
-                    case "_inlink":
-                    case "_outlink":
-                        {
-                            var parentNode = selectedNode.ParentNode;
-                            if (parentNode != null && parentNode.Value is Wz_Png)
+                case Wz_Convex convex:
+                    var sb = new StringBuilder();
+                    for (int i = 0; i < convex.Points.Length; i++)
+                    {
+                        if (i > 0) sb.AppendLine();
+                        sb.AppendFormat("({0}, {1})", convex.Points[i].X, convex.Points[i].Y);
+                    }
+                    textBoxX1.Text = sb.ToString();
+                    break;
+
+                case Wz_Uol uol:
+                    textBoxX1.Text = "uolPath: " + uol.Uol;
+                    break;
+
+                case Wz_Sound sound:
+                    preLoadSound(sound, selectedNode.Text);
+                    textBoxX1.Text = "dataLength: " + sound.DataLength + " bytes\r\n" +
+                        "offset: " + sound.Offset + "\r\n" +
+                        "time: " + sound.Ms + " ms\r\n" +
+                        "headerLength: " + (sound.Header == null ? 0 : sound.Header.Length) + " bytes\r\n" +
+                        "freq: " + sound.Frequency + " Hz\r\n" +
+                        "type: " + sound.SoundType.ToString();
+                    break;
+
+                case Wz_Image:
+                    //do nothing;
+                    break;
+
+                case Wz_RawData rawData:
+                    textBoxX1.Text = "dataLength: " + rawData.Length + " bytes\r\n" +
+                        "offset: " + rawData.Offset;
+                    break;
+
+                default:
+                    string valueStr = Convert.ToString(selectedNode.Value);
+                    if (valueStr != null && valueStr.Contains("\n") && !valueStr.Contains("\r\n"))
+                    {
+                        valueStr = valueStr.Replace("\n", "\r\n");
+                    }
+                    textBoxX1.Text = Convert.ToString(valueStr);
+
+                    switch (selectedNode.Text)
+                    {
+                        case "source":
+                        case "_inlink":
+                        case "_outlink":
                             {
-                                var linkNode = parentNode.GetLinkedSourceNode(PluginManager.FindWz);
-                                png = linkNode.GetValueEx<Wz_Png>(null);
-
-                                if (png != null)
+                                var parentNode = selectedNode.ParentNode;
+                                if (parentNode != null && parentNode.Value is Wz_Png)
                                 {
-                                    pictureBoxEx1.PictureName = GetSelectedNodeImageName();
-                                    pictureBoxEx1.ShowImage(png);
-                                    this.cmbItemAniNames.Items.Clear();
-                                    advTree3.PathSeparator = ".";
-                                    textBoxX1.AppendText("\r\n\r\ndataLength: " + png.DataLength + " bytes\r\n" +
+                                    var linkNode = parentNode.GetLinkedSourceNode(PluginManager.FindWz);
+                                    var png = linkNode.GetValueEx<Wz_Png>(null);
+
+                                    if (png != null)
+                                    {
+                                        pictureBoxEx1.PictureName = GetSelectedNodeImageName();
+                                        pictureBoxEx1.ShowImage(png);
+                                        this.cmbItemAniNames.Items.Clear();
+                                        advTree3.PathSeparator = ".";
+                                        textBoxX1.AppendText("\r\n\r\ndataLength: " + png.DataLength + " bytes\r\n" +
                                         "offset: " + png.Offset + "\r\n" +
                                         "size: " + png.Width + "*" + png.Height + "\r\n" +
-                                        "png format: " + png.Form);
+                                            "png format: " + png.Form);
+                                    }
                                 }
                             }
-                        }
-                        break;
-                }
+                            break;
+                    }
+                    break;
             }
         }
 

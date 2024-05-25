@@ -212,10 +212,21 @@ namespace WzComparerR2.WzLib
 
                 case "Shape2D#Convex2D":
                     entries = this.WzFile.ReadInt32();
+                    Wz_Vector[] points = new Wz_Vector[entries];
+                    Wz_Node virtualNode = new Wz_Node();
                     for (int i = 0; i < entries; i++)
                     {
-                        ExtractImg(offset, parent, 0);
+                        ExtractImg(offset, virtualNode, 0);
+                        if (virtualNode.Value is Wz_Vector point)
+                        {
+                            points[i] = point;
+                        }
+                        else
+                        {
+                            throw new Exception("Convex2D contains non vector2D items.");
+                        }
                     }
+                    parent.Value = new Wz_Convex(points);
                     break;
 
                 case "Sound_DX8":
