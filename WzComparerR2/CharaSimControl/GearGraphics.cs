@@ -513,13 +513,14 @@ namespace WzComparerR2.CharaSimControl
                 {
                     g.DrawImage(wce[1].Bitmap, left - wce[1].Origin.X, picH - wce[1].Origin.Y);
                 }
-                // draw ani0
-                g.DrawImage(ani0.Bitmap, left - ani0.Origin.X, picH - ani0.Origin.Y);
+                // draw ani0 based on bg center position
+                g.DrawImage(ani0.Bitmap, left - wce[1].Origin.X - ani0.Origin.X, picH - wce[1].Origin.Y - ani0.Origin.Y);
                 // draw name
                 if (!string.IsNullOrEmpty(tagName))
                 {
                     using var brush = new SolidBrush(color);
-                    g.DrawString(tagName, font, brush, nameLeft, picH, fmt);
+                    // offsetX with bg for better alignment
+                    g.DrawString(tagName, font, brush, nameLeft - wce[1].Origin.X, picH, fmt);
                 }
             }
 
