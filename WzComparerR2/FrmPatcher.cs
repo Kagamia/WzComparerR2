@@ -176,7 +176,7 @@ namespace WzComparerR2
                 item.GetFileLength();
                 if (item.FileLength > 0)
                 {
-                    switch (MessageBoxEx.Show(string.Format("文件大小：{0:N0} bytes, 更新时间：{1:yyyy-MM-dd HH:mm:ss}\n\r是否立即开始下载文件？", item.FileLength, item.LastModified), "Patcher", MessageBoxButtons.YesNo))
+                    switch (MessageBoxEx.Show(string.Format("文件大小：{0:N0} bytes, 更新时间：{1:yyyy-MM-dd HH:mm:ss}\r\n是否立即开始下载文件？", item.FileLength, item.LastModified), "Patcher", MessageBoxButtons.YesNo))
                     {
                         case DialogResult.Yes:
                         #if NET6_0_OR_GREATER
