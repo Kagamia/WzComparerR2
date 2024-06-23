@@ -98,7 +98,7 @@ namespace WzComparerR2.WzLib
                 DeflateStream zlib;
                 byte[] plainData = null;
 
-                this.WzFile.FileStream.Position = this.Offset;
+                this.WzFile.FileStream.Position = this.Offset + 1; // skip the first byte
 
                 if (this.WzFile.BReader.ReadUInt16() == 0x9C78)
                 {

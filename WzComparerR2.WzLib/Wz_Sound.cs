@@ -1,26 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace WzComparerR2.WzLib
 {
     public class Wz_Sound
     {
-        public Wz_Sound(uint offset, int length, byte[] header, int ms, Wz_Image wz_i)
+        public Wz_Sound(uint offset, int length, int ms, Interop.AM_MEDIA_TYPE mediaType, Wz_Image wz_i)
         {
             this.offset = offset;
             this.dataLength = length;
-            this.header = header;
             this.ms = ms;
+            this.mediaType = mediaType;
             this.wz_i = wz_i;
-            TryDecryptHeader();
         }
 
         private uint offset;
-        private byte[] header;
         private int dataLength;
         private int ms;
-
+        private Interop.AM_MEDIA_TYPE mediaType;
         private Wz_Image wz_i;
 
         /// <summary>
@@ -32,26 +31,19 @@ namespace WzComparerR2.WzLib
             set { offset = value; }
         }
 
-        /// <summary>
-        /// 获取或设置头部字节段。
-        /// </summary>
-        public byte[] Header
+        public int Channels => this.mediaType?.PbFormat switch
         {
-            get { return header; }
-            set { header = value; }
-        }
+            Interop.WAVEFORMATEX waveFmtEx => (int)waveFmtEx.Channels,
+            Interop.MPEGLAYER3WAVEFORMAT mp3WaveFmt => (int)mp3WaveFmt.Wfx.Channels,
+            _ => 0,
+        };
 
-        public int Frequency
+        public int Frequency => this.mediaType?.PbFormat switch
         {
-            get
-            {
-                if (header == null || header.Length < 0x3c)
-                {
-                    return 0;
-                }
-                return BitConverter.ToInt32(header, 0x38);
-            }
-        }
+            Interop.WAVEFORMATEX waveFmtEx => (int)waveFmtEx.SamplesPerSec,
+            Interop.MPEGLAYER3WAVEFORMAT mp3WaveFmt => (int)mp3WaveFmt.Wfx.SamplesPerSec,
+            _ => 0,
+        };
 
         /// <summary>
         /// 获取或设置数据块的长度。
@@ -71,13 +63,18 @@ namespace WzComparerR2.WzLib
             set { ms = value; }
         }
 
+        public Interop.AM_MEDIA_TYPE MediaType
+        {
+            get { return mediaType; }
+            set { mediaType = value; }
+        }
+
         /// <summary>
         /// 获取或设置图片所属的WzFile。
         /// </summary>
         public Wz_File WzFile
         {
-            get { return wz_i.WzFile; }
-            set { wz_i.WzFile = value; }
+            get { return wz_i?.WzFile; }
         }
 
         /// <summary>
@@ -93,36 +90,33 @@ namespace WzComparerR2.WzLib
         {
             get
             {
-                Wz_SoundType soundType;
-                if (this.header == null)
+                if (this.mediaType?.MajorType == Interop.MEDIATYPE_Stream)
                 {
-                    soundType = Wz_SoundType.Mp3;
-                }
-                else
-                {
-                    switch (this.header.Length)
+                    if (this.mediaType.SubType == Interop.MEDIASUBTYPE_MPEG1Audio)
                     {
-                        default:
-                        case 0x52:
-                            soundType = Wz_SoundType.Mp3;
-                            break;
-
-                        case 0x46:
+                        return Wz_SoundType.Mp3;
+                    }
+                    else if (this.mediaType.SubType == Interop.MEDIASUBTYPE_WAVE)
+                    {
+                        if (this.mediaType.PbFormat is Interop.MPEGLAYER3WAVEFORMAT)
+                        {
+                            return Wz_SoundType.Mp3;
+                        }
+                        else if (this.mediaType.PbFormat is Interop.WAVEFORMATEX waveFmtEx && waveFmtEx.FormatTag == Interop.WAVE_FORMAT_PCM)
+                        {
+                            if (this.Ms == 1000 && this.Frequency == this.dataLength)
                             {
-                                if (this.Frequency == this.dataLength && this.Ms == 1000)
-                                {
-                                    soundType = Wz_SoundType.Binary;
-                                }
-                                else
-                                {
-                                    soundType = Wz_SoundType.WavRaw;
-                                }
+                                return Wz_SoundType.Binary;
                             }
-                            break;
+                            else
+                            {
+                                return Wz_SoundType.Pcm;
+                            }
+                        }
                     }
                 }
 
-                return soundType;
+                return Wz_SoundType.Unknown;
             }
         }
 
@@ -137,60 +131,31 @@ namespace WzComparerR2.WzLib
                         this.WzFile.FileStream.Read(data, 0, this.dataLength);
                         return data;
                     }
-                case Wz_SoundType.WavRaw:
+                case Wz_SoundType.Pcm:
                     {
+                        var waveFmtEx = (Interop.WAVEFORMATEX)this.mediaType.PbFormat;
                         byte[] data = new byte[this.dataLength + 44];
+                        using var ms = new MemoryStream(data, true);
+                        using var br = new BinaryWriter(ms);
+                        br.Write(new byte[] { 0x52, 0x49, 0x46, 0x46 }); //"RIFF"
+                        br.Write(this.dataLength + 36); //chunkSize
+                        br.Write(new byte[] { 0x57, 0x41, 0x56, 0x45 }); //"WAVE"
+                        br.Write(new byte[] { 0x66, 0x6d, 0x74, 0x20 }); //"fmt "
+                        br.Write(16); //chunk1Size
+                        br.Write(waveFmtEx.FormatTag);
+                        br.Write(waveFmtEx.Channels);
+                        br.Write(waveFmtEx.SamplesPerSec);
+                        br.Write(waveFmtEx.AvgBytesPerSec);
+                        br.Write(waveFmtEx.BlockAlign);
+                        br.Write(waveFmtEx.BitsPerSample);
+                        br.Write(new byte[] { 0x64, 0x61, 0x74, 0x61 }); //"data"
+                        br.Write(this.dataLength); //chunk2Size
                         this.WzFile.FileStream.Seek(this.offset, System.IO.SeekOrigin.Begin);
                         this.WzFile.FileStream.Read(data, 44, this.dataLength);
-                        byte[] wavHeader = new byte[44]{
-                          0x52,0x49,0x46,0x46, //"RIFF"
-                          0,0,0,0, //ChunkSize
-                          0x57,0x41,0x56,0x45, //"WAVE"
-
-                          0x66,0x6d,0x74,0x20, //"fmt "
-                          0x10,0,0,0, //chunk1Size
-                          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // copy16字节
-
-                          0x64,0x61,0x74,0x61, //"data"
-                          0,0,0,0 //chunk2Size
-                        };
-                        Array.Copy(BitConverter.GetBytes(this.dataLength + 36), 0, wavHeader, 4, 4);
-                        Array.Copy(this.header, 0x34, wavHeader, 20, 16);
-                        Array.Copy(BitConverter.GetBytes(this.dataLength), 0, wavHeader, 40, 4);
-                        Array.Copy(wavHeader, data, wavHeader.Length);
                         return data;
                     }
             }
             return null;
-        }
-
-        private void TryDecryptHeader()
-        {
-            if (this.header == null)
-            {
-                return;
-            }
-            if (this.header.Length > 51)
-            {
-                byte waveFormatLen = this.header[51];
-                if (this.header.Length != 52 + waveFormatLen) //长度错误
-                {
-                    return;
-                }
-                int cbSize = BitConverter.ToUInt16(this.header, 52 + 16);
-                if (cbSize + 18 != waveFormatLen)
-                {
-                    byte[] tempHeader = new byte[waveFormatLen];
-                    Buffer.BlockCopy(this.header, 52, tempHeader, 0, tempHeader.Length);
-                    var encKeys = this.WzImage.EncKeys;
-                    encKeys.Decrypt(tempHeader, 0, tempHeader.Length); //解密
-                    cbSize = BitConverter.ToUInt16(tempHeader, 16); //重新验证
-                    if (cbSize + 18 == waveFormatLen)
-                    {
-                        Buffer.BlockCopy(tempHeader, 0, this.header, 52, tempHeader.Length);
-                    }
-                }
-            }
         }
     }
 }
