@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace WzComparerR2.WzLib
 {
@@ -112,7 +112,7 @@ namespace WzComparerR2.WzLib
                         this.WzFile.FileStream.Position = this.Offset;
                         if (!this.IsLuaImage)
                         {
-                            ExtractImg(this.Offset, this.Node, 0);
+                            ExtractImg(this.Offset, this.Node);
                             this.WzFile.stringTable.Clear();
                         }
                         else
@@ -171,7 +171,7 @@ namespace WzComparerR2.WzLib
             }
         }
 
-        private void ExtractImg(long offset, Wz_Node parent, long eob)
+        private void ExtractImg(long offset, Wz_Node parent)
         {
             int entries = 0;
             string tag = this.WzFile.ReadString(offset, this.EncKeys);
@@ -203,11 +203,11 @@ namespace WzComparerR2.WzLib
                     }
                     int w = this.WzFile.ReadInt32();
                     int h = this.WzFile.ReadInt32();
-                    int form = this.WzFile.ReadInt32() + this.WzFile.BReader.ReadByte();
-                    this.WzFile.FileStream.Position += 4;
-                    int bufsize = this.WzFile.BReader.ReadInt32();
-                    parent.Value = new Wz_Png(w, h, bufsize - 1, form, (uint)this.WzFile.FileStream.Position + 1, this);
-                    this.WzFile.FileStream.Position += bufsize;
+                    int form = this.WzFile.ReadInt32();
+                    this.WzFile.FileStream.Position += 5;
+                    int dataLen = this.WzFile.BReader.ReadInt32();
+                    parent.Value = new Wz_Png(w, h, dataLen, form, (uint)this.WzFile.FileStream.Position, this);
+                    this.WzFile.FileStream.Position += dataLen;
                     break;
 
                 case "Shape2D#Convex2D":
@@ -216,7 +216,7 @@ namespace WzComparerR2.WzLib
                     Wz_Node virtualNode = new Wz_Node();
                     for (int i = 0; i < entries; i++)
                     {
-                        ExtractImg(offset, virtualNode, 0);
+                        ExtractImg(offset, virtualNode);
                         if (virtualNode.Value is Wz_Vector point)
                         {
                             points[i] = point;
@@ -231,12 +231,50 @@ namespace WzComparerR2.WzLib
 
                 case "Sound_DX8":
                     this.WzFile.FileStream.Position++;
-                    int len = this.WzFile.ReadInt32();
-                    int ms = this.WzFile.ReadInt32();
-                    int headerLen = (int)(eob - len - this.WzFile.FileStream.Position);
-                    byte[] header = this.WzFile.BReader.ReadBytes(headerLen);
-                    parent.Value = new Wz_Sound((uint)(eob - len), len, header, ms, this);
-                    this.WzFile.FileStream.Position = eob;
+                    dataLen = this.WzFile.ReadInt32();
+                    int duration = this.WzFile.ReadInt32();
+                    int soundDecl = this.WzFile.BReader.ReadByte();
+                    var mediaType = new Interop.AM_MEDIA_TYPE();
+                    mediaType.MajorType = new Guid(this.WzFile.BReader.ReadBytes(16));
+                    mediaType.SubType = new Guid(this.WzFile.BReader.ReadBytes(16));
+                    mediaType.FixedSizeSamples = this.WzFile.BReader.ReadByte() != 0;
+                    mediaType.TemporalCompression = this.WzFile.BReader.ReadByte() != 0;
+                    mediaType.FormatType = new Guid(this.WzFile.BReader.ReadBytes(16));
+                    switch(soundDecl)
+                    {
+                        case 2:
+                            int fmtExLen = this.WzFile.ReadInt32();
+                            var fmtExData = this.WzFile.BReader.ReadBytes(fmtExLen);
+                            this.EncKeys.Decrypt(fmtExData, 0, fmtExData.Length);
+                            GCHandle gcHandle = GCHandle.Alloc(fmtExData, GCHandleType.Pinned);
+                            mediaType.CbFormat = (uint)fmtExLen;
+                            try
+                            {
+                                var waveFormatEx = Marshal.PtrToStructure<Interop.WAVEFORMATEX>(gcHandle.AddrOfPinnedObject());
+                                if (fmtExLen != waveFormatEx.CbSize + Marshal.SizeOf<Interop.WAVEFORMATEX>())
+                                {
+                                    throw new Exception($"Failed to parse WAVEFORMATEX struct at offset {this.WzFile.FileStream.Position}.");
+                                }
+                                switch (waveFormatEx.FormatTag)
+                                {
+                                    case Interop.WAVE_FORMAT_PCM:
+                                        mediaType.PbFormat = waveFormatEx;
+                                        break;
+                                    case Interop.WAVE_FORMAT_MPEGLAYER3:
+                                        mediaType.PbFormat = Marshal.PtrToStructure<Interop.MPEGLAYER3WAVEFORMAT>(gcHandle.AddrOfPinnedObject());
+                                        break;
+                                    default:
+                                        throw new Exception($"Unknown WAVEFORMATEX.FormatTag {waveFormatEx.FormatTag} at offset {this.WzFile.FileStream.Position}.");
+                                }
+                            }
+                            finally
+                            {
+                                gcHandle.Free();
+                            }
+                            break;
+                    }
+                    parent.Value = new Wz_Sound((uint)this.WzFile.FileStream.Position, dataLen, duration, mediaType, this);
+                    this.WzFile.FileStream.Position += dataLen;
                     break;
 
                 case "UOL":
@@ -344,11 +382,17 @@ namespace WzComparerR2.WzLib
                     break;
 
                 case 0x09:
-                    ExtractImg(offset, parent, this.WzFile.BReader.ReadInt32() + this.WzFile.FileStream.Position);
+                    int objDataLen = this.WzFile.BReader.ReadInt32();
+                    long eob = this.WzFile.FileStream.Position + objDataLen;
+                    ExtractImg(offset, parent);
+                    if (this.WzFile.FileStream.Position != eob)
+                    {
+                        throw new Exception($"Object is not fully loaded at offset {this.WzFile.FileStream.Position}.");
+                    }
                     break;
 
                 default:
-                    throw new Exception("读取值错误." + flag + " at Offset: " + this.WzFile.FileStream.Position);
+                    throw new Exception($"Unknown value type {flag} at offset {this.WzFile.FileStream.Position}.");
             }
         }
 
