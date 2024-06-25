@@ -111,6 +111,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.accountSharable: return value == 0 ? null : "服务器内只有我的角色之间可以移动";
                 case GearPropType.onlyEquip: return value == 0 ? null : "固有装备物品";
                 case GearPropType.notExtend: return value == 0 ? null : "无法延长有效时间。";
+                case GearPropType.accountSharableAfterExchange: return value == 0 ? null : "可交换1次\n（交易后只能在世界内我的角色之间移动）";
                 case GearPropType.tradeAvailable:
                     switch (value)
                     {
@@ -541,6 +542,8 @@ namespace WzComparerR2.CharaSim
                     return GetGearPropString(GearPropType.only, value);
                 case ItemPropType.accountSharable:
                     return GetGearPropString(GearPropType.accountSharable, value);
+                case ItemPropType.accountSharableAfterExchange:
+                    return GetGearPropString(GearPropType.accountSharableAfterExchange, value);
                 case ItemPropType.quest:
                     return value == 0 ? null : "任务道具";
                 case ItemPropType.pquest:
