@@ -98,12 +98,13 @@ namespace WzComparerR2.WzLib
                 DeflateStream zlib;
                 byte[] plainData = null;
 
+                long endPosition = this.Offset + this.DataLength;
                 this.WzFile.FileStream.Position = this.Offset + 1; // skip the first byte
 
                 if (this.WzFile.BReader.ReadUInt16() == 0x9C78)
                 {
-                    byte[] buffer = this.WzFile.BReader.ReadBytes(this.data_length - 2);
-                    MemoryStream dataStream = new MemoryStream(buffer);
+                    byte[] buffer = this.WzFile.BReader.ReadBytes((int)(endPosition - this.WzFile.FileStream.Position));
+                    MemoryStream dataStream = new MemoryStream(buffer, false);
 
                     zlib = new DeflateStream(dataStream, CompressionMode.Decompress);
                 }
@@ -111,9 +112,8 @@ namespace WzComparerR2.WzLib
                 {
                     this.WzFile.FileStream.Position -= 2;
                     byte[] buffer = new byte[this.DataLength];
-                    int startIndex = 0;
-                    long endPosition = this.DataLength + this.WzFile.FileStream.Position;
-
+                    int dataEndOffset = 0;
+                    
                     var encKeys = this.WzImage.EncKeys;
 
                     while (this.WzFile.FileStream.Position < endPosition)
@@ -121,14 +121,14 @@ namespace WzComparerR2.WzLib
                         int blockSize = this.WzFile.BReader.ReadInt32();
                         if (this.WzFile.FileStream.Position + blockSize > endPosition)
                         {
-                            throw new Exception($"Wz_Png exceeds the declared data size. (data length: {this.DataLength}, readed bytes: {startIndex}, next block: {blockSize})");
+                            throw new Exception($"Wz_Png exceeds the declared data size. (data length: {this.DataLength}, readed bytes: {dataEndOffset}, next block: {blockSize})");
                         }
-                        this.WzFile.BReader.Read(buffer, startIndex, blockSize);
-                        encKeys.Decrypt(buffer, startIndex, blockSize);
+                        this.WzFile.BReader.Read(buffer, dataEndOffset, blockSize);
+                        encKeys.Decrypt(buffer, dataEndOffset, blockSize);
 
-                        startIndex += blockSize;
+                        dataEndOffset += blockSize;
                     }
-                    var dataStream = new MemoryStream(buffer);
+                    var dataStream = new MemoryStream(buffer, 0, dataEndOffset, false);
                     dataStream.Position = 2;
                     zlib = new DeflateStream(dataStream, CompressionMode.Decompress);
                 }
