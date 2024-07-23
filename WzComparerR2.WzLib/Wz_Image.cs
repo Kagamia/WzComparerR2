@@ -245,24 +245,32 @@ namespace WzComparerR2.WzLib
                         case 2:
                             int fmtExLen = this.WzFile.ReadInt32();
                             var fmtExData = this.WzFile.BReader.ReadBytes(fmtExLen);
-                            this.EncKeys.Decrypt(fmtExData, 0, fmtExData.Length);
-                            GCHandle gcHandle = GCHandle.Alloc(fmtExData, GCHandleType.Pinned);
                             mediaType.CbFormat = (uint)fmtExLen;
+
+                            GCHandle gcHandle = GCHandle.Alloc(fmtExData, GCHandleType.Pinned);
                             try
                             {
                                 var waveFormatEx = Marshal.PtrToStructure<Interop.WAVEFORMATEX>(gcHandle.AddrOfPinnedObject());
                                 if (fmtExLen != waveFormatEx.CbSize + Marshal.SizeOf<Interop.WAVEFORMATEX>())
                                 {
-                                    throw new Exception($"Failed to parse WAVEFORMATEX struct at offset {this.WzFile.FileStream.Position}.");
+                                    //  parse waveFormatEx after decryption
+                                    this.EncKeys.Decrypt(fmtExData, 0, fmtExLen);
+                                    waveFormatEx = Marshal.PtrToStructure<Interop.WAVEFORMATEX>(gcHandle.AddrOfPinnedObject());
+                                    if (fmtExLen != waveFormatEx.CbSize + Marshal.SizeOf<Interop.WAVEFORMATEX>())
+                                    {
+                                        throw new Exception($"Failed to parse WAVEFORMATEX struct at offset {this.WzFile.FileStream.Position}.");
+                                    }
                                 }
                                 switch (waveFormatEx.FormatTag)
                                 {
                                     case Interop.WAVE_FORMAT_PCM:
                                         mediaType.PbFormat = waveFormatEx;
                                         break;
+
                                     case Interop.WAVE_FORMAT_MPEGLAYER3:
                                         mediaType.PbFormat = Marshal.PtrToStructure<Interop.MPEGLAYER3WAVEFORMAT>(gcHandle.AddrOfPinnedObject());
                                         break;
+
                                     default:
                                         throw new Exception($"Unknown WAVEFORMATEX.FormatTag {waveFormatEx.FormatTag} at offset {this.WzFile.FileStream.Position}.");
                                 }
