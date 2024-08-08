@@ -294,7 +294,15 @@ namespace WzComparerR2.WzLib
                     int rawDataVer = this.WzFile.BReader.ReadByte();
                     if (rawDataVer == 1) // introduced in KMST 1177
                     {
-                        this.WzFile.FileStream.Position++;
+                        if (this.WzFile.BReader.ReadByte() == 0x01) // read sub property
+                        {
+                            this.WzFile.FileStream.Position += 2;
+                            entries = this.WzFile.ReadInt32();
+                            for (int i = 0; i < entries; i++)
+                            {
+                                ExtractValue(offset, parent);
+                            }
+                        }
                     }
                     int rawDataLen = this.WzFile.ReadInt32();
                     uint rawDataOffset = (uint)this.WzFile.FileStream.Position;
