@@ -291,7 +291,11 @@ namespace WzComparerR2.WzLib
                     break;
 
                 case "RawData": // introduced in GMS v243
-                    this.WzFile.FileStream.Position++;
+                    int rawDataVer = this.WzFile.BReader.ReadByte();
+                    if (rawDataVer == 1) // introduced in KMST 1177
+                    {
+                        this.WzFile.FileStream.Position++;
+                    }
                     int rawDataLen = this.WzFile.ReadInt32();
                     uint rawDataOffset = (uint)this.WzFile.FileStream.Position;
                     parent.Value = new Wz_RawData(rawDataOffset, rawDataLen, this);
