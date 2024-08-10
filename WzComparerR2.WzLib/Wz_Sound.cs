@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using WzComparerR2.WzLib.Utilities;
 
 namespace WzComparerR2.WzLib
 {
-    public class Wz_Sound
+    public class Wz_Sound : IMapleStoryBlob
     {
         public Wz_Sound(uint offset, int length, int ms, Interop.AM_MEDIA_TYPE mediaType, Wz_Image wz_i)
         {
@@ -72,7 +73,7 @@ namespace WzComparerR2.WzLib
         /// <summary>
         /// 获取或设置图片所属的WzFile。
         /// </summary>
-        public Wz_File WzFile
+        public IMapleStoryFile WzFile
         {
             get { return wz_i?.WzFile; }
         }
@@ -120,6 +121,8 @@ namespace WzComparerR2.WzLib
             }
         }
 
+        int IMapleStoryBlob.Length => this.DataLength;
+
         public byte[] ExtractSound()
         {
             switch (this.SoundType)
@@ -127,8 +130,7 @@ namespace WzComparerR2.WzLib
                 case Wz_SoundType.Mp3:
                     {
                         byte[] data = new byte[this.dataLength];
-                        this.WzFile.FileStream.Seek(this.offset, System.IO.SeekOrigin.Begin);
-                        this.WzFile.FileStream.Read(data, 0, this.dataLength);
+                        this.CopyTo(data, 0);
                         return data;
                     }
                 case Wz_SoundType.Pcm:
@@ -150,12 +152,39 @@ namespace WzComparerR2.WzLib
                         br.Write(waveFmtEx.BitsPerSample);
                         br.Write(new byte[] { 0x64, 0x61, 0x74, 0x61 }); //"data"
                         br.Write(this.dataLength); //chunk2Size
-                        this.WzFile.FileStream.Seek(this.offset, System.IO.SeekOrigin.Begin);
-                        this.WzFile.FileStream.Read(data, 44, this.dataLength);
+                        this.CopyTo(data, 44);
                         return data;
                     }
             }
             return null;
+        }
+
+        public void CopyTo(byte[] buffer, int offset)
+        {
+            if (buffer.Length - offset < this.DataLength)
+            {
+                throw new ArgumentException("Insufficient buffer size");
+            }
+            lock (this.WzFile.ReadLock)
+            {
+                var s = this.WzImage.OpenRead();
+                s.Position = this.Offset;
+                s.ReadExactly(buffer, offset, this.DataLength);
+            }
+        }
+
+        public void CopyTo(Span<byte> span)
+        {
+            if (span.Length < this.DataLength)
+            {
+                throw new ArgumentException("Insufficient buffer size");
+            }
+            lock (this.WzFile.ReadLock)
+            {
+                var s = this.WzImage.OpenRead();
+                s.Position = this.Offset;
+                s.ReadExactly(span.Slice(0, this.DataLength));
+            }
         }
     }
 }

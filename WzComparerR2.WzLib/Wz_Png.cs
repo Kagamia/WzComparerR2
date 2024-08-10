@@ -76,10 +76,9 @@ namespace WzComparerR2.WzLib
         /// <summary>
         /// 获取或设置图片所属的WzFile
         /// </summary>
-        public Wz_File WzFile
+        public IMapleStoryFile WzFile
         {
-            get { return wz_i.WzFile; }
-            set { wz_i.WzFile = value; }
+            get { return wz_i?.WzFile; }
         }
 
         /// <summary>
@@ -98,32 +97,34 @@ namespace WzComparerR2.WzLib
                 DeflateStream zlib;
                 byte[] plainData = null;
 
+                var stream = this.WzImage.OpenRead();
                 long endPosition = this.Offset + this.DataLength;
-                this.WzFile.FileStream.Position = this.Offset + 1; // skip the first byte
+                stream.Position = this.Offset + 1; // skip the first byte
+                var bReader = new BinaryReader(stream);
 
-                if (this.WzFile.BReader.ReadUInt16() == 0x9C78)
+                if (bReader.ReadUInt16() == 0x9C78)
                 {
-                    byte[] buffer = this.WzFile.BReader.ReadBytes((int)(endPosition - this.WzFile.FileStream.Position));
+                    byte[] buffer = bReader.ReadBytes((int)(endPosition - stream.Position));
                     MemoryStream dataStream = new MemoryStream(buffer, false);
 
                     zlib = new DeflateStream(dataStream, CompressionMode.Decompress);
                 }
                 else
                 {
-                    this.WzFile.FileStream.Position -= 2;
+                    stream.Position -= 2;
                     byte[] buffer = new byte[this.DataLength];
                     int dataEndOffset = 0;
                     
                     var encKeys = this.WzImage.EncKeys;
 
-                    while (this.WzFile.FileStream.Position < endPosition)
+                    while (stream.Position < endPosition)
                     {
-                        int blockSize = this.WzFile.BReader.ReadInt32();
-                        if (this.WzFile.FileStream.Position + blockSize > endPosition)
+                        int blockSize = bReader.ReadInt32();
+                        if (stream.Position + blockSize > endPosition)
                         {
                             throw new Exception($"Wz_Png exceeds the declared data size. (data length: {this.DataLength}, readed bytes: {dataEndOffset}, next block: {blockSize})");
                         }
-                        this.WzFile.BReader.Read(buffer, dataEndOffset, blockSize);
+                        bReader.Read(buffer, dataEndOffset, blockSize);
                         encKeys.Decrypt(buffer, dataEndOffset, blockSize);
 
                         dataEndOffset += blockSize;

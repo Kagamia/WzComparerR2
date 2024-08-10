@@ -5,6 +5,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
+using WzComparerR2.WzLib.Utilities;
 
 namespace WzComparerR2.WzLib
 {
@@ -205,7 +206,7 @@ namespace WzComparerR2.WzLib
             }
         }
 
-        public class Wz_CryptoKey
+        public class Wz_CryptoKey : IWzDecrypter
         {
             public Wz_CryptoKey(byte[] iv)
             {

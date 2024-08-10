@@ -110,11 +110,12 @@ namespace WzComparerR2.Common
                     break;
 
                 case SkeletonLoadType.Binary when skelNode.Value is Wz_Sound wzSound && wzSound.SoundType == Wz_SoundType.Binary:
-                    versionStr = ReadSpineVersionFromBinary(wzSound.WzFile.FileStream, wzSound.Offset, wzSound.DataLength);
-                    break;
-
                 case SkeletonLoadType.Binary when skelNode.Value is Wz_RawData wzRawData:
-                    versionStr = ReadSpineVersionFromBinary(wzRawData.WzFile.FileStream, wzRawData.Offset, wzRawData.Length);
+                    var blob = skelNode.Value as IMapleStoryBlob;
+                    var data = new byte[blob.Length];
+                    blob.CopyTo(data, 0);
+                    var ms = new MemoryStream(data);
+                    versionStr = ReadSpineVersionFromBinary(ms, 0, blob.Length);
                     break;
             }
 
@@ -198,7 +199,7 @@ namespace WzComparerR2.Common
         }
 
         public static Spine.V2.SkeletonData LoadSkeletonV2(SpineDetectionResult detectionResult, Spine.V2.TextureLoader textureLoader)
-        { 
+        {
             using var atlasReader = new StringReader((string)detectionResult.ResolvedAtlasNode.Value);
             var atlas = new Spine.V2.Atlas(atlasReader, "", textureLoader);
 
@@ -211,25 +212,12 @@ namespace WzComparerR2.Common
                         return skeletonJson.ReadSkeletonData(skeletonReader);
                     }
 
-                case SkeletonLoadType.Binary:
-                    FileStream fs;
-                    switch (detectionResult.ResolvedSkelNode.Value)
-                    {
-                        case Wz_Sound wzSound:
-                            fs = wzSound.WzFile.FileStream;
-                            fs.Position = wzSound.Offset;
-                            break;
-
-                        case Wz_RawData rawData:
-                            fs = rawData.WzFile.FileStream;
-                            fs.Position = rawData.Offset;
-                            break;
-
-                        default:
-                            return null;
-                    }
+                case SkeletonLoadType.Binary when detectionResult.ResolvedSkelNode.Value is IMapleStoryBlob blob:
+                    byte[] data = new byte[blob.Length];
+                    blob.CopyTo(data, 0);
+                    var ms = new MemoryStream(data);
                     var skeletonBinary = new Spine.V2.SkeletonBinary(atlas);
-                    return skeletonBinary.ReadSkeletonData(fs);
+                    return skeletonBinary.ReadSkeletonData(ms);
 
                 default:
                     return null;
@@ -260,25 +248,12 @@ namespace WzComparerR2.Common
                         return skeletonJson.ReadSkeletonData(skeletonReader);
                     }
 
-                case SkeletonLoadType.Binary:
-                    FileStream fs;
-                    switch (detectionResult.ResolvedSkelNode.Value)
-                    {
-                        case Wz_Sound wzSound:
-                            fs = wzSound.WzFile.FileStream;
-                            fs.Position = wzSound.Offset;
-                            break;
-
-                        case Wz_RawData rawData:
-                            fs = rawData.WzFile.FileStream;
-                            fs.Position = rawData.Offset;
-                            break;
-
-                        default:
-                            return null;
-                    }
+                case SkeletonLoadType.Binary when detectionResult.ResolvedSkelNode.Value is IMapleStoryBlob blob:
+                    byte[] data = new byte[blob.Length];
+                    blob.CopyTo(data, 0);
+                    var ms = new MemoryStream(data);
                     var skeletonBinary = new Spine.SkeletonBinary(atlas);
-                    return skeletonBinary.ReadSkeletonData(fs);
+                    return skeletonBinary.ReadSkeletonData(ms);
 
                 default:
                     return null;

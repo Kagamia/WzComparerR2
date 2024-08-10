@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace WzComparerR2.WzLib
 {
-    public class Wz_File : IDisposable
+    public class Wz_File : IMapleStoryFile, IDisposable
     {
         public Wz_File(string fileName, Wz_Structure wz)
         {
@@ -35,7 +35,7 @@ namespace WzComparerR2.WzLib
 
         public Encoding TextEncoding { get; set; }
 
-        public readonly object ReadLock = new object();
+        public object ReadLock => this.fileStream;
 
         internal Dictionary<long, string> stringTable;
         internal byte[] tempBuffer;
@@ -98,6 +98,12 @@ namespace WzComparerR2.WzLib
         {
             get { return this.ownerWzFile; }
         }
+
+        Wz_Structure IMapleStoryFile.WzStructure => this.wzStructure;
+
+        Stream IMapleStoryFile.FileStream => this.fileStream;
+
+        object IMapleStoryFile.ReadLock => this.ReadLock;
 
         public void Close()
         {

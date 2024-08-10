@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.IO;
+using WzComparerR2.WzLib.Utilities;
+using System.Buffers;
 
 namespace WzComparerR2.WzLib
 {
     public class Wz_Image
     {
-        public Wz_Image(string name, int size, int cs32, uint hashOff, uint hashPos, Wz_File wz_f)
+        public Wz_Image(string name, int size, int cs32, uint hashOff, uint hashPos, IMapleStoryFile wz_f)
         {
             this.Name = name;
             this.WzFile = wz_f;
@@ -26,10 +29,11 @@ namespace WzComparerR2.WzLib
         private bool extr;
         private bool chec;
         private bool checEnc;
+        private Stream stream;
         private Wz_CryptoKeyType encType;
 
         public string Name { get; set; }
-        public Wz_File WzFile { get; set; }
+        public IMapleStoryFile WzFile { get; set; }
         public int Size { get; set; }
         public int Checksum { get; set; }
         public uint HashedOffset { get; set; }
@@ -45,6 +49,7 @@ namespace WzComparerR2.WzLib
             get { return this.chec; }
             internal set { this.chec = value; }
         }
+
         public bool IsLuaImage
         {
             get { return this.Name.EndsWith(".lua"); }
@@ -73,16 +78,24 @@ namespace WzComparerR2.WzLib
         {
             if (!this.extr)
             {
+                if (this.stream == null)
+                {
+                    this.stream = this.OpenRead();
+                }
+                var reader = new WzBinaryReader(this.stream, true);
+                reader.BaseStream.Position = 0;
+
                 bool disabledChec = this.WzFile?.WzStructure?.ImgCheckDisabled ?? false;
                 if (!disabledChec && !this.chec)
                 {
-                    if (this.Checksum != CalcCheckSum())
+                    if (this.Checksum != this.CalcCheckSum(this.stream))
                     {
                         e = new ArgumentException("checksum error");
                         return false;
                     }
                     this.chec = true;
                 }
+
                 if (!this.checEnc)
                 {
                     if (!this.IsLuaImage)
@@ -109,15 +122,14 @@ namespace WzComparerR2.WzLib
                 {
                     lock (this.WzFile.ReadLock)
                     {
-                        this.WzFile.FileStream.Position = this.Offset;
+                        reader.BaseStream.Position = 0;
                         if (!this.IsLuaImage)
                         {
-                            ExtractImg(this.Offset, this.Node);
-                            this.WzFile.stringTable.Clear();
+                            ExtractImg(reader, this.Node);
                         }
                         else
                         {
-                            ExtractLua();
+                            ExtractLua(reader);
                         }
                         this.extr = true;
                     }
@@ -136,87 +148,115 @@ namespace WzComparerR2.WzLib
         public void Unextract()
         {
             this.extr = false;
+            if (this.stream != null)
+            {
+                this.stream.Dispose();
+                this.stream = null;
+            }
             this.Node.Nodes.Clear();
         }
 
-        public unsafe int CalcCheckSum()
+        public virtual unsafe int CalcCheckSum(Stream stream)
         {
             lock (this.WzFile.ReadLock)
             {
-                this.WzFile.FileStream.Position = this.Offset;
+                stream.Position = 0;
                 int cs = 0;
-                byte[] buffer = new byte[4096];
-                int count;
                 int size = this.Size;
-                while ((count = this.WzFile.FileStream.Read(buffer, 0, Math.Min(size, buffer.Length))) > 0)
-                {
-                    fixed (byte* pBuffer = buffer)
-                    {
-                        int* p = (int*)pBuffer;
-                        int i, j = count / 4;
-                        for (i = 0; i < j; i++)
-                        {
-                            int data = *(p + i);
-                            cs += (data & 0xff) + (data >> 8 & 0xff) + (data >> 16 & 0xff) + (data >> 24 & 0xff);
-                        }
-                        for (i = i * 4; i < count; i++)
-                        {
-                            cs += buffer[i];
-                        }
-                    }
+                var buffer = ArrayPool<byte>.Shared.Rent(4096);
 
-                    size -= count;
+                try
+                {
+                    int count;
+                    while ((count = stream.Read(buffer, 0, Math.Min(size, buffer.Length))) > 0)
+                    {
+                        fixed (byte* pBuffer = buffer)
+                        {
+                            int* p = (int*)pBuffer;
+                            int i, j = count / 4;
+                            for (i = 0; i < j; i++)
+                            {
+                                int data = *(p + i);
+                                cs += (data & 0xff) + (data >> 8 & 0xff) + (data >> 16 & 0xff) + (data >> 24 & 0xff);
+                            }
+                            for (i = i * 4; i < count; i++)
+                            {
+                                cs += buffer[i];
+                            }
+                        }
+
+                        size -= count;
+                    }
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(buffer);
+                }
+
+                if (size > 0)
+                {
+                    throw new EndOfStreamException();
                 }
                 return cs;
             }
         }
 
-        private void ExtractImg(long offset, Wz_Node parent)
+        public virtual Stream OpenRead()
         {
-            int entries = 0;
-            string tag = this.WzFile.ReadString(offset, this.EncKeys);
+            if (this.stream == null)
+            {
+                this.stream = new PartialStream(this.WzFile.FileStream, this.Offset, this.Size, true);
+            }
+            return this.stream;
+        }
+
+        private void ExtractImg(WzBinaryReader reader, Wz_Node parent)
+        {
+            int entries;
+            string tag = reader.ReadImageObjectTypeName(this.EncKeys);
             switch (tag)
             {
                 case "Property":
-                    this.WzFile.FileStream.Position += 2;
-                    entries = this.WzFile.ReadInt32();
+                    reader.SkipBytes(2);
+                    entries = reader.ReadCompressedInt32();
                     for (int i = 0; i < entries; i++)
                     {
-                        ExtractValue(offset, parent);
+                        ExtractValue(reader, parent);
                     }
                     break;
 
                 case "Shape2D#Vector2D":
-                    parent.Value = new Wz_Vector(this.WzFile.ReadInt32(), this.WzFile.ReadInt32());
+                    parent.Value = new Wz_Vector(reader.ReadCompressedInt32(), reader.ReadCompressedInt32());
                     break;
 
                 case "Canvas":
-                    this.WzFile.FileStream.Position++;
-                    if (this.WzFile.BReader.ReadByte() == 0x01)
+                    reader.SkipBytes(1);
+                    if (reader.ReadByte() == 0x01)
                     {
-                        this.WzFile.FileStream.Position += 2;
-                        entries = this.WzFile.ReadInt32();
+                        // read a mini Property
+                        reader.SkipBytes(2);
+                        entries = reader.ReadCompressedInt32();
                         for (int i = 0; i < entries; i++)
                         {
-                            ExtractValue(offset, parent);
+                            ExtractValue(reader, parent);
                         }
                     }
-                    int w = this.WzFile.ReadInt32();
-                    int h = this.WzFile.ReadInt32();
-                    int form = this.WzFile.ReadInt32();
-                    this.WzFile.FileStream.Position += 5;
-                    int dataLen = this.WzFile.BReader.ReadInt32();
-                    parent.Value = new Wz_Png(w, h, dataLen, form, (uint)this.WzFile.FileStream.Position, this);
-                    this.WzFile.FileStream.Position += dataLen;
+                    int w = reader.ReadCompressedInt32();
+                    int h = reader.ReadCompressedInt32();
+                    int form = reader.ReadCompressedInt32();
+                    reader.SkipBytes(5);
+                    int dataLen = reader.ReadInt32();
+                    parent.Value = new Wz_Png(w, h, dataLen, form, (uint)reader.BaseStream.Position, this);
+                    reader.SkipBytes(dataLen);
                     break;
 
                 case "Shape2D#Convex2D":
-                    entries = this.WzFile.ReadInt32();
+                    entries = reader.ReadCompressedInt32();
                     Wz_Vector[] points = new Wz_Vector[entries];
                     Wz_Node virtualNode = new Wz_Node();
                     for (int i = 0; i < entries; i++)
                     {
-                        ExtractImg(offset, virtualNode);
+                        ExtractImg(reader, virtualNode);
                         if (virtualNode.Value is Wz_Vector point)
                         {
                             points[i] = point;
@@ -230,21 +270,21 @@ namespace WzComparerR2.WzLib
                     break;
 
                 case "Sound_DX8":
-                    this.WzFile.FileStream.Position++;
-                    dataLen = this.WzFile.ReadInt32();
-                    int duration = this.WzFile.ReadInt32();
-                    int soundDecl = this.WzFile.BReader.ReadByte();
+                    reader.SkipBytes(1);
+                    dataLen = reader.ReadCompressedInt32();
+                    int duration = reader.ReadCompressedInt32();
+                    int soundDecl = reader.ReadByte();
                     var mediaType = new Interop.AM_MEDIA_TYPE();
-                    mediaType.MajorType = new Guid(this.WzFile.BReader.ReadBytes(16));
-                    mediaType.SubType = new Guid(this.WzFile.BReader.ReadBytes(16));
-                    mediaType.FixedSizeSamples = this.WzFile.BReader.ReadByte() != 0;
-                    mediaType.TemporalCompression = this.WzFile.BReader.ReadByte() != 0;
-                    mediaType.FormatType = new Guid(this.WzFile.BReader.ReadBytes(16));
+                    mediaType.MajorType = new Guid(reader.ReadBytes(16));
+                    mediaType.SubType = new Guid(reader.ReadBytes(16));
+                    mediaType.FixedSizeSamples = reader.ReadByte() != 0;
+                    mediaType.TemporalCompression = reader.ReadByte() != 0;
+                    mediaType.FormatType = new Guid(reader.ReadBytes(16));
                     switch(soundDecl)
                     {
                         case 2:
-                            int fmtExLen = this.WzFile.ReadInt32();
-                            var fmtExData = this.WzFile.BReader.ReadBytes(fmtExLen);
+                            int fmtExLen = reader.ReadCompressedInt32();
+                            var fmtExData = reader.ReadBytes(fmtExLen);
                             mediaType.CbFormat = (uint)fmtExLen;
 
                             GCHandle gcHandle = GCHandle.Alloc(fmtExData, GCHandleType.Pinned);
@@ -258,7 +298,7 @@ namespace WzComparerR2.WzLib
                                     waveFormatEx = Marshal.PtrToStructure<Interop.WAVEFORMATEX>(gcHandle.AddrOfPinnedObject());
                                     if (fmtExLen != waveFormatEx.CbSize + Marshal.SizeOf<Interop.WAVEFORMATEX>())
                                     {
-                                        throw new Exception($"Failed to parse WAVEFORMATEX struct at offset {this.WzFile.FileStream.Position}.");
+                                        throw new Exception($"Failed to parse WAVEFORMATEX struct at offset {this.Offset}+{reader.BaseStream.Position}.");
                                     }
                                 }
                                 switch (waveFormatEx.FormatTag)
@@ -272,7 +312,7 @@ namespace WzComparerR2.WzLib
                                         break;
 
                                     default:
-                                        throw new Exception($"Unknown WAVEFORMATEX.FormatTag {waveFormatEx.FormatTag} at offset {this.WzFile.FileStream.Position}.");
+                                        throw new Exception($"Unknown WAVEFORMATEX.FormatTag {waveFormatEx.FormatTag} at offset {this.Offset}+{reader.BaseStream.Position}.");
                                 }
                             }
                             finally
@@ -281,33 +321,32 @@ namespace WzComparerR2.WzLib
                             }
                             break;
                     }
-                    parent.Value = new Wz_Sound((uint)this.WzFile.FileStream.Position, dataLen, duration, mediaType, this);
-                    this.WzFile.FileStream.Position += dataLen;
+                    parent.Value = new Wz_Sound((uint)reader.BaseStream.Position, dataLen, duration, mediaType, this);
+                    reader.SkipBytes(dataLen);
                     break;
 
                 case "UOL":
-                    this.WzFile.FileStream.Position++;
-                    parent.Value = new Wz_Uol(this.WzFile.ReadString(offset, this.EncKeys));
+                    reader.SkipBytes(1);
+                    parent.Value = new Wz_Uol(reader.ReadImageString(this.EncKeys));
                     break;
 
                 case "RawData": // introduced in GMS v243
-                    int rawDataVer = this.WzFile.BReader.ReadByte();
+                    int rawDataVer = reader.ReadByte();
                     if (rawDataVer == 1) // introduced in KMST 1177
                     {
-                        if (this.WzFile.BReader.ReadByte() == 0x01) // read sub property
+                        if (reader.ReadByte() == 0x01) // read sub property
                         {
-                            this.WzFile.FileStream.Position += 2;
-                            entries = this.WzFile.ReadInt32();
+                            reader.SkipBytes(2);
+                            entries = reader.ReadCompressedInt32();
                             for (int i = 0; i < entries; i++)
                             {
-                                ExtractValue(offset, parent);
+                                ExtractValue(reader, parent);
                             }
                         }
                     }
-                    int rawDataLen = this.WzFile.ReadInt32();
-                    uint rawDataOffset = (uint)this.WzFile.FileStream.Position;
-                    parent.Value = new Wz_RawData(rawDataOffset, rawDataLen, this);
-                    this.WzFile.FileStream.Position += rawDataLen;
+                    int rawDataLen = reader.ReadCompressedInt32();
+                    parent.Value = new Wz_RawData((uint)reader.BaseStream.Position, rawDataLen, this);
+                    reader.SkipBytes(rawDataLen);
                     break;
 
                 default:
@@ -348,9 +387,10 @@ namespace WzComparerR2.WzLib
 
         private bool IsIllegalTag(Wz_CryptoKeyType keyType)
         {
-            this.WzFile.FileStream.Position = this.Offset;
-            this.WzFile.stringTable.Remove(Offset);
-            switch (this.WzFile.ReadString(Offset, keyType))
+            this.stream.Position = 0;
+            var reader = new WzBinaryReader(this.stream, false);
+            var encKey = this.WzFile.WzStructure.encryption.GetKeys(keyType);
+            switch (reader.ReadImageObjectTypeName(encKey))
             {
                 case "Property":
                 case "Shape2D#Vector2D":
@@ -358,16 +398,17 @@ namespace WzComparerR2.WzLib
                 case "Shape2D#Convex2D":
                 case "Sound_DX8":
                 case "UOL":
+                case "RawData":
                     return true;
                 default:
                     return false;
             }
         }
 
-        private void ExtractValue(long offset, Wz_Node parent)
+        private void ExtractValue(WzBinaryReader reader, Wz_Node parent)
         {
-            parent = parent.Nodes.Add(this.WzFile.ReadString(offset, this.EncKeys));
-            byte flag = this.WzFile.BReader.ReadByte();
+            parent = parent.Nodes.Add(reader.ReadImageString(this.EncKeys));
+            byte flag = reader.ReadByte();
             switch (flag)
             {
                 case 0x00:
@@ -376,68 +417,68 @@ namespace WzComparerR2.WzLib
 
                 case 0x02:
                 case 0x0B:
-                    parent.Value = this.WzFile.BReader.ReadInt16();
+                    parent.Value = reader.ReadInt16();
                     break;
 
                 case 0x03:
                 case 0x13:
-               // case 0x14:
-                    parent.Value = this.WzFile.ReadInt32();
+                    // case 0x14:
+                    parent.Value = reader.ReadCompressedInt32();
                     break;
 
                 case 0x14:
-                    parent.Value = this.WzFile.ReadInt64();
+                    parent.Value = reader.ReadCompressedInt64();
                     break;
 
                 case 0x04:
-                    parent.Value = this.WzFile.ReadSingle();
+                    parent.Value = reader.ReadCompressedSingle();
                     break;
 
                 case 0x05:
-                    parent.Value = this.WzFile.BReader.ReadDouble();
+                    parent.Value = reader.ReadDouble();
                     break;
 
                 case 0x08:
-                    parent.Value = this.WzFile.ReadString(offset, this.EncKeys);
+                    parent.Value = reader.ReadImageString(this.EncKeys);
                     break;
 
                 case 0x09:
-                    int objDataLen = this.WzFile.BReader.ReadInt32();
-                    long eob = this.WzFile.FileStream.Position + objDataLen;
-                    ExtractImg(offset, parent);
-                    if (this.WzFile.FileStream.Position != eob)
+                    int objDataLen = reader.ReadInt32();
+                    long eob = reader.BaseStream.Position + objDataLen;
+                    this.ExtractImg(reader, parent);
+                    if (reader.BaseStream.Position != eob)
                     {
-                        throw new Exception($"Object is not fully loaded at offset {this.WzFile.FileStream.Position}.");
+                        throw new Exception($"Object is not fully loaded at offset {this.Offset}+{reader.BaseStream.Position}.");
                     }
                     break;
 
                 default:
-                    throw new Exception($"Unknown value type {flag} at offset {this.WzFile.FileStream.Position}.");
+                    throw new Exception($"Unknown value type {flag} at offset {this.Offset}+{reader.BaseStream.Position}.");
             }
         }
 
-        private void ExtractLua()
+        private void ExtractLua(WzBinaryReader reader)
         {
-            while(this.WzFile.FileStream.Position < this.Offset + this.Size)
+            while (reader.BaseStream.Position < reader.BaseStream.Length)
             {
-                var flag = this.WzFile.BReader.ReadByte();
+                var flag = reader.ReadByte();
 
                 switch (flag)
                 {
                     case 0x01:
-                        ExtractLuaValue(this.Node);
+                        ExtractLuaValue(reader, this.Node);
                         break;
 
                     default:
-                        throw new Exception("读取Lua错误." + flag + " at Offset: " + this.WzFile.FileStream.Position);
+                        throw new Exception($"Unknown Lua flag {flag} at Offset {this.Offset}+{reader.BaseStream.Position}.");
                 }
             }
         }
 
-        private void ExtractLuaValue(Wz_Node parent)
+        private void ExtractLuaValue(WzBinaryReader reader, Wz_Node parent)
         {
-            int len = this.WzFile.ReadInt32();
-            byte[] data = this.WzFile.BReader.ReadBytes(len);
+            int len = reader.ReadCompressedInt32();
+            byte[] data = reader.ReadBytes(len);
             if (!this.checEnc)
             {
                 TryDetectLuaEnc(data);
