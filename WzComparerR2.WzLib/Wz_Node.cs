@@ -503,8 +503,12 @@ namespace WzComparerR2.WzLib
                     while (wzfile.OwnerWzFile != null)
                     {
                         wzfile = wzfile.OwnerWzFile;
+                        node = wzfile.Node;
                     }
-                    return wzfile;
+                    if (!wzfile.IsSubDir)
+                    {
+                        return wzfile;
+                    }
                 }
                 else if (node.Value is Wz_Image wzImg || (wzImg = (node as Wz_Image.Wz_ImageNode)?.Image) != null)
                 {

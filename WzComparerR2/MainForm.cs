@@ -1270,7 +1270,7 @@ namespace WzComparerR2
                 {
                     foreach (var wzf in wzs.wz_files)
                     {
-                        if (wzf.Type == wzType)
+                        if (wzf.Type == wzType && wzf.OwnerWzFile == null)
                         {
                             allWzFile.Add(wzf.Node);
                         }
