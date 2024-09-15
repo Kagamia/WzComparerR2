@@ -15,11 +15,12 @@ namespace WzComparerR2.WzLib.Utilities
         public WzBinaryReader(Stream stream, IWzStringPool stringPool)
         {
             this.BaseStream = stream;
-            this.bReader = new BinaryReader(this.BaseStream);
+            this.bReader = new BinaryReader(this.BaseStream, System.Text.Encoding.ASCII, true);
             this.stringPool = stringPool;
         }
 
         public Stream BaseStream { get; private set; }
+        public int StringReferenceOffsetBytes { get; set; }
         private BinaryReader bReader;
         private IWzStringPool stringPool;
 
@@ -28,9 +29,19 @@ namespace WzComparerR2.WzLib.Utilities
             return this.bReader.ReadByte();
         }
 
+        public sbyte ReadSByte()
+        {
+            return this.bReader.ReadSByte();
+        }
+
         public short ReadInt16()
         {
             return this.bReader.ReadInt16();
+        }
+
+        public ushort ReadUInt16()
+        {
+            return this.bReader.ReadUInt16();
         }
 
         public int ReadCompressedInt32()
@@ -44,10 +55,20 @@ namespace WzComparerR2.WzLib.Utilities
             return this.bReader.ReadInt32();
         }
 
+        public uint ReadUInt32()
+        {
+            return this.bReader.ReadUInt32();
+        }
+
         public long ReadCompressedInt64()
         {
             int s = this.bReader.ReadSByte();
             return (s == -128) ? this.bReader.ReadInt64() : s;
+        }
+
+        public long ReadInt64()
+        {
+            return this.bReader.ReadInt64();
         }
 
         public float ReadCompressedSingle()
@@ -61,29 +82,30 @@ namespace WzComparerR2.WzLib.Utilities
             return this.bReader.ReadDouble();
         }
 
+        public char[] ReadChars(int count)
+        {
+            return this.bReader.ReadChars(count);
+        }
+
         public string ReadString(IWzDecrypter decrypter)
         {
             long currentPos = this.BaseStream.Position;
 
-            int size = this.bReader.ReadSByte();
-            string result = null;
-            if (size < 0) // read ASCII string
+            int size = this.ReadSByte();
+            if (size < 0) // read ASCII/cp1252 string
             {
-                size = (size == -128) ? this.bReader.ReadInt32() : -size;
+                size = (size == -128) ? this.ReadInt32() : -size;
 
                 // for net6+ we can use Stream.Read(Span<byte>) instead, the array buffer is not needed.
                 var buffer = ArrayPool<byte>.Shared.Rent(size);
                 try
                 {
-                    int actualSize = this.BaseStream.Read(buffer, 0, size);
-                    if (actualSize < size)
-                    {
-                        throw new EndOfStreamException();
-                    }
+                    this.BaseStream.ReadExactly(buffer, 0, size);
                     decrypter.Decrypt(buffer, 0, size);
 
                     using var charBuffer = MemoryPool<byte>.Shared.Rent(size * 2);
                     Span<char> chars = MemoryMarshal.Cast<byte, char>(charBuffer.Memory.Span).Slice(0, size);
+                    // TODO: SIMD optimization for net6
                     byte mask = 0xAA;
                     for (int i = 0; i < size; i++)
                     {
@@ -107,14 +129,11 @@ namespace WzComparerR2.WzLib.Utilities
                 var buffer = ArrayPool<byte>.Shared.Rent(size * 2);
                 try
                 {
-                    int actualSize = this.BaseStream.Read(buffer, 0, size * 2);
-                    if (actualSize < size * 2)
-                    {
-                        throw new EndOfStreamException();
-                    }
-                    decrypter.Decrypt(buffer, 0, size);
+                    this.BaseStream.ReadExactly(buffer, 0, size * 2);
+                    decrypter.Decrypt(buffer, 0, size * 2);
 
                     Span<char> chars = MemoryMarshal.Cast<byte, char>(buffer).Slice(0, size);
+                    // TODO: SIMD optimization for net6
                     ushort mask = 0xAAAA;
                     for (int i = 0; i < size; i++)
                     {
@@ -142,7 +161,7 @@ namespace WzComparerR2.WzLib.Utilities
                 case 0x73:
                     return this.ReadString(decrypter);
                 case 0x1B:
-                    return this.ReadStringAt(this.ReadInt32(), decrypter);
+                    return this.ReadStringAt(this.ReadInt32() + this.StringReferenceOffsetBytes, decrypter);
                 default:
                     throw new Exception($"Unexpected flag '{flag}' when reading string at {this.BaseStream.Position}.");
             }
@@ -156,7 +175,7 @@ namespace WzComparerR2.WzLib.Utilities
                 case 0x00:
                     return this.ReadString(decrypter);
                 case 0x01:
-                    return this.ReadStringAt(this.ReadInt32(), decrypter);
+                    return this.ReadStringAt(this.ReadInt32() + this.StringReferenceOffsetBytes, decrypter);
                 case 0x04: 
                     this.SkipBytes(8);
                     return null;
@@ -165,7 +184,7 @@ namespace WzComparerR2.WzLib.Utilities
             }
         }
 
-        private string ReadStringAt(long offset, IWzDecrypter decrypter)
+        public string ReadStringAt(long offset, IWzDecrypter decrypter)
         {
             if (this.stringPool != null && this.stringPool.TryGet(offset, out string s))
             {

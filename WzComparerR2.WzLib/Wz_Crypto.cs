@@ -104,13 +104,14 @@ namespace WzComparerR2.WzLib
         {
             int old_off = (int)f.FileStream.Position;
             f.FileStream.Position = f.Header.DataStartPosition;
-            if (f.ReadInt32() <= 0) //只有文件头 无法预判
+            var br = new WzBinaryReader(f.FileStream, false);
+            if (br.ReadCompressedInt32() <= 0) //只有文件头 无法预判
             {
                 return;
             }
             f.FileStream.Position++;
-            int len = (int)(-f.BReader.ReadSByte());
-            byte[] bytes = f.BReader.ReadBytes(len);
+            int len = (int)(-br.ReadSByte());
+            byte[] bytes = br.ReadBytes(len);
 
             for (int i = 0; i < len; i++)
             {
