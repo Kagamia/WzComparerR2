@@ -57,6 +57,8 @@ namespace WzComparerR2
             cmbComparePng.SelectedItem = WzPngComparison.SizeAndDataLength;
         }
 
+        public Encoding PatcherNoticeEncoding { get; set; }
+
         Thread patchThread;
         EventWaitHandle waitHandle;
         bool waiting;
@@ -307,6 +309,7 @@ namespace WzComparerR2
             try
             {
                 patcher = new WzPatcher(patchFile);
+                patcher.NoticeEncoding = this.PatcherNoticeEncoding ?? Encoding.Default;
                 patcher.PatchingStateChanged += new EventHandler<PatchingEventArgs>(patcher_PatchingStateChanged);
                 AppendStateText($"补丁文件：{patchFile}\r\n");
                 AppendStateText("正在检查补丁...");
