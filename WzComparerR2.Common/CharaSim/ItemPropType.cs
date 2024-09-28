@@ -17,6 +17,7 @@ namespace WzComparerR2.CharaSim
         only,
         tradeAvailable,
         accountSharable,
+        accountSharableAfterExchange,
         timeLimited,
         setItemID,
         nickTag,
