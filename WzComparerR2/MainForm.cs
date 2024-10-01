@@ -649,7 +649,7 @@ namespace WzComparerR2
             using (OpenFileDialog dlg = new OpenFileDialog())
             {
                 dlg.Title = "请选择冒险岛wz文件...";
-                dlg.Filter = "base.wz|*.wz";
+                dlg.Filter = "MapleStory Data File(Base.wz, *.wz, *.ms)|*.wz;*.ms";
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     openWz(dlg.FileName);
@@ -676,15 +676,22 @@ namespace WzComparerR2
             advTree1.BeginUpdate();
             try
             {
-                if (wz.IsKMST1125WzFormat(wzFilePath))
+                if (string.Equals(Path.GetExtension(wzFilePath), ".ms", StringComparison.OrdinalIgnoreCase))
+                {
+                    wz.LoadMsFile(wzFilePath);
+                }
+                else if (wz.IsKMST1125WzFormat(wzFilePath))
                 {
                     wz.LoadKMST1125DataWz(wzFilePath);
-                    string packsDir = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(wzFilePath)), "Packs");
-                    if (Directory.Exists(packsDir))
+                    if (string.Equals(Path.GetFileName(wzFilePath), "Base.wz", StringComparison.OrdinalIgnoreCase))
                     {
-                        foreach (var msFile in Directory.GetFiles(packsDir, "*.ms"))
+                        string packsDir = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(wzFilePath)), "Packs");
+                        if (Directory.Exists(packsDir))
                         {
-                            wz.LoadMsFile(msFile);
+                            foreach (var msFile in Directory.GetFiles(packsDir, "*.ms"))
+                            {
+                                wz.LoadMsFile(msFile);
+                            }
                         }
                     }
                 }

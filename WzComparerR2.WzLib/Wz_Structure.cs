@@ -267,8 +267,16 @@ namespace WzComparerR2.WzLib
 
         public void LoadMsFile(string fileName)
         {
+            this.LoadMsFile(fileName, ref this.WzNode);
+        }
+
+        private void LoadMsFile(string fileName, ref Wz_Node node)
+        {
             Ms_File file = null;
-            Wz_Node node = this.WzNode;
+            if (node == null)
+            {
+                node = new Wz_Node(Path.GetFileName(fileName));
+            }
             try
             {
                 file = new Ms_File(fileName, this);
