@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.IO.Compression;
 using WzComparerR2.Patcher.Builder;
+using PartialStream = WzComparerR2.WzLib.Utilities.PartialStream;
 
 namespace WzComparerR2.Patcher
 {

@@ -5,6 +5,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
+using WzComparerR2.WzLib.Utilities;
 
 namespace WzComparerR2.WzLib
 {
@@ -103,13 +104,14 @@ namespace WzComparerR2.WzLib
         {
             int old_off = (int)f.FileStream.Position;
             f.FileStream.Position = f.Header.DataStartPosition;
-            if (f.ReadInt32() <= 0) //只有文件头 无法预判
+            var br = new WzBinaryReader(f.FileStream, false);
+            if (br.ReadCompressedInt32() <= 0) //只有文件头 无法预判
             {
                 return;
             }
             f.FileStream.Position++;
-            int len = (int)(-f.BReader.ReadSByte());
-            byte[] bytes = f.BReader.ReadBytes(len);
+            int len = (int)(-br.ReadSByte());
+            byte[] bytes = br.ReadBytes(len);
 
             for (int i = 0; i < len; i++)
             {
@@ -205,7 +207,7 @@ namespace WzComparerR2.WzLib
             }
         }
 
-        public class Wz_CryptoKey
+        public class Wz_CryptoKey : IWzDecrypter
         {
             public Wz_CryptoKey(byte[] iv)
             {

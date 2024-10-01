@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using WzComparerR2.WzLib.Utilities;
 
 namespace WzComparerR2.WzLib
 {
-    public class Wz_RawData
+    public class Wz_RawData : IMapleStoryBlob
     {
         public Wz_RawData(uint offset, int length, Wz_Image wz_Image)
         {
@@ -18,6 +15,34 @@ namespace WzComparerR2.WzLib
         public uint Offset { get; set; }
         public int Length { get; set; }
         public Wz_Image WzImage { get; set; }
-        public Wz_File WzFile => this.WzImage?.WzFile;
+        public IMapleStoryFile WzFile => this.WzImage?.WzFile;
+
+        public void CopyTo(byte[] buffer, int offset)
+        {
+            if (buffer.Length - offset < this.Length)
+            {
+                throw new ArgumentException("Insufficient buffer size");
+            }
+            lock (this.WzFile.ReadLock)
+            {
+                var s = this.WzImage.OpenRead();
+                s.Position = this.Offset;
+                s.ReadExactly(buffer, offset, this.Length);
+            }
+        }
+
+        public void CopyTo(Span<byte> span)
+        {
+            if (span.Length < this.Length)
+            {
+                throw new ArgumentException("Insufficient buffer size");
+            }
+            lock (this.WzFile.ReadLock)
+            {
+                var s = this.WzImage.OpenRead();
+                s.Position = this.Offset;
+                s.ReadExactly(span.Slice(0, this.Length));
+            }
+        }
     }
 }

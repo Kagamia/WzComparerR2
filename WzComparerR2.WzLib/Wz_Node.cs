@@ -493,42 +493,43 @@ namespace WzComparerR2.WzLib
         /// </summary>
         /// <param Name="node">要搜索的wznode。</param>
         /// <returns></returns>
-        public static Wz_File GetNodeWzFile(this Wz_Node node, bool returnClosestWzFile = false)
+        public static Wz_File GetNodeWzFile(this Wz_Node node)
         {
             Wz_File wzfile = null;
             while (node != null)
             {
                 if ((wzfile = node.Value as Wz_File) != null)
                 {
-                    if (wzfile.OwnerWzFile != null)
+                    while (wzfile.OwnerWzFile != null)
                     {
                         wzfile = wzfile.OwnerWzFile;
                         node = wzfile.Node;
                     }
-                    if (!wzfile.IsSubDir || returnClosestWzFile)
+                    if (!wzfile.IsSubDir)
                     {
-                        break;
+                        return wzfile;
                     }
                 }
-                else if (node.Value is Wz_Image wzImg
-                    || (wzImg = (node as Wz_Image.Wz_ImageNode)?.Image) != null)
+                else if (node.Value is Wz_Image wzImg || (wzImg = (node as Wz_Image.Wz_ImageNode)?.Image) != null)
                 {
-                    wzfile = GetImageWzFile(wzImg, returnClosestWzFile);
-                    break;
+                    switch (wzImg.WzFile)
+                    {
+                        case Wz_File wzfile2:
+                            node = wzfile2.Node;
+                            continue;
+
+                        default:
+                            if (node.ParentNode == null)
+                            {
+                                node = wzImg.OwnerNode;
+                                continue;
+                            }
+                            break;
+                    }
                 }
                 node = node.ParentNode;
             }
             return wzfile;
-        }
-
-        public static Wz_File GetImageWzFile(this Wz_Image wzImg, bool returnClosestWzFile = false)
-        {
-            if (!returnClosestWzFile && wzImg.WzFile != null)
-            {
-                return GetNodeWzFile(wzImg.WzFile.Node, returnClosestWzFile);
-            }
-
-            return wzImg.WzFile;
         }
 
         public static int GetMergedVersion(this Wz_File wzFile)
@@ -609,8 +610,7 @@ namespace WzComparerR2.WzLib
                 if (data == null)
                 {
                     data = new byte[sound.DataLength];
-                    sound.WzFile.FileStream.Seek(sound.Offset, SeekOrigin.Begin);
-                    sound.WzFile.FileStream.Read(data, 0, sound.DataLength);
+                    sound.CopyTo(data, 0);
                 }
                 writer.WriteAttributeString("value", Convert.ToBase64String(data));
             }
