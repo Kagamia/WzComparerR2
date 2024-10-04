@@ -54,7 +54,7 @@ namespace WzComparerR2.CharaSimControl
             Bitmap tooltip = new Bitmap(290, DefaultPicHeight);
             Graphics g = Graphics.FromImage(tooltip);
             StringFormat format = new StringFormat();
-            int value;
+            long value;
             format.Alignment = StringAlignment.Center;
             picHeight = 10;
             iconY = 32;
@@ -119,7 +119,7 @@ namespace WzComparerR2.CharaSimControl
 
         private string GetItemAttributeString()
         {
-            int value;
+            long value;
             List<string> tags = new List<string>();
 
             if (item.Props.TryGetValue(ItemPropType.quest, out value) && value != 0)

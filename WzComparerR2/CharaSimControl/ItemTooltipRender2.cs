@@ -63,10 +63,9 @@ namespace WzComparerR2.CharaSimControl
             Bitmap setItemBmp = null;
 
             //图纸相关
-            int recipeID;
-            if (this.item.Specs.TryGetValue(ItemSpecType.recipe, out recipeID))
+            if (this.item.Specs.TryGetValue(ItemSpecType.recipe, out long recipeID))
             {
-                int recipeSkillID = recipeID/10000;
+                long recipeSkillID = recipeID / 10000;
                 Recipe recipe = null;
                 //寻找配方
                 Wz_Node recipeNode = PluginBase.PluginManager.FindWz(string.Format(@"Skill\Recipe_{0}.img\{1}", recipeSkillID, recipeID));
@@ -134,11 +133,10 @@ namespace WzComparerR2.CharaSimControl
                 }
             }
 
-            int setID;
-            if (this.item.Props.TryGetValue(ItemPropType.setItemID, out setID))
+            if (this.item.Props.TryGetValue(ItemPropType.setItemID, out long setID))
             {
                 SetItem setItem;
-                if (CharaSimLoader.LoadedSetItems.TryGetValue(setID, out setItem))
+                if (CharaSimLoader.LoadedSetItems.TryGetValue((int)setID, out setItem))
                 {
                     setItemBmp = RenderSetItem(setItem);
                 }
@@ -236,7 +234,7 @@ namespace WzComparerR2.CharaSimControl
         private Bitmap RenderItem(out int picH)
         {
             StringFormat format = (StringFormat)StringFormat.GenericDefault.Clone();
-            int value;
+            long value;
 
             //物品标题
             StringResult sr;
@@ -440,7 +438,7 @@ namespace WzComparerR2.CharaSimControl
             //绘制配方需求
             if (item.Specs.TryGetValue(ItemSpecType.recipe, out value))
             {
-                int reqSkill, reqSkillLevel;
+                long reqSkill, reqSkillLevel;
                 if (!item.Specs.TryGetValue(ItemSpecType.reqSkill, out reqSkill))
                 {
                     reqSkill = value / 10000 * 10000;
@@ -458,7 +456,7 @@ namespace WzComparerR2.CharaSimControl
                 picH += 17;
 
                 //技能标题
-                if (StringLinker == null || !StringLinker.StringSkill.TryGetValue(reqSkill, out sr))
+                if (StringLinker == null || !StringLinker.StringSkill.TryGetValue((int)reqSkill, out sr))
                 {
                     sr = new StringResult();
                     sr.Name = "(null)";
@@ -474,7 +472,7 @@ namespace WzComparerR2.CharaSimControl
 
         private string GetItemAttributeString()
         {
-            int value;
+            long value;
             List<string> tags = new List<string>();
 
             if (item.Props.TryGetValue(ItemPropType.quest, out value) && value != 0)
@@ -561,7 +559,7 @@ namespace WzComparerR2.CharaSimControl
             return renderer.Render();
         }
 
-        private bool TryGetNickResource(int nickTag, out Wz_Node resNode)
+        private bool TryGetNickResource(long nickTag, out Wz_Node resNode)
         {
             resNode = PluginBase.PluginManager.FindWz("UI/NameTag.img/nick/" + nickTag);
             return resNode != null;
