@@ -633,7 +633,7 @@ namespace WzComparerR2.MapRender
         public void Dispose()
         {
             this.sprite?.Dispose();
-            this.spineRender?.Effect.Dispose();
+            this.spineRender?.Dispose();
             this.alphaBlendState.Dispose();
             this.maskState.Dispose();
             this.meshPool.Clear();
