@@ -243,8 +243,8 @@ namespace WzComparerR2.WzLib
                     }
                     int w = reader.ReadCompressedInt32();
                     int h = reader.ReadCompressedInt32();
-                    int form = reader.ReadCompressedInt32();
-                    reader.SkipBytes(5);
+                    int form = reader.ReadCompressedInt32() + reader.ReadByte();
+                    reader.SkipBytes(4);
                     int dataLen = reader.ReadInt32();
                     parent.Value = new Wz_Png(w, h, dataLen, form, (uint)reader.BaseStream.Position, this);
                     reader.SkipBytes(dataLen);
