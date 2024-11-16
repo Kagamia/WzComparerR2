@@ -651,6 +651,10 @@ namespace WzComparerR2.MapRender
             if (item is BackItem)
             {
                 var back = (BackItem)item;
+                if (back.Quest.Exists(quest => !patchVisibility.IsVisible(quest.Item1, quest.Item2)))
+                {
+                    return null;
+                }
                 if (back.IsFront ? patchVisibility.FrontVisible : patchVisibility.BackVisible)
                 {
                     return GetMeshBack(back);
@@ -660,6 +664,14 @@ namespace WzComparerR2.MapRender
             {
                 if (patchVisibility.ObjVisible && !obj.Light)
                 {
+                    if (((ObjItem)item).Quest.Exists(quest => !patchVisibility.IsVisible(quest.Item1, quest.Item2)))
+                    {
+                        return null;
+                    }
+                    if (((ObjItem)item).Questex.Exists(questex => !patchVisibility.IsVisible(questex.Item1, questex.Item2, questex.Item3)))
+                    {
+                        return null;
+                    }
                     return GetMeshObj(obj);
                 }
             }
@@ -695,7 +707,14 @@ namespace WzComparerR2.MapRender
             }
             else if (item is ParticleItem)
             {
-                return GetMeshParticle((ParticleItem)item);
+                if (((ParticleItem)item).Quest.Exists(quest => !patchVisibility.IsVisible(quest.Item1, quest.Item2)))
+                {
+                    return null;
+                }
+                if (patchVisibility.EffectVisible)
+                {
+                    return GetMeshParticle((ParticleItem)item);
+                }
             }
             return null;
         }

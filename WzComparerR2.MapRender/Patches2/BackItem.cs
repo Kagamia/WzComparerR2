@@ -23,8 +23,8 @@ namespace WzComparerR2.MapRender.Patches2
         public int ScreenMode { get; set; }
         public bool Flip { get; set; }
         public bool IsFront { get; set; }
+        public List<Tuple<int, int>> Quest { get; set; }
 
-        
         public ItemView View { get; set; }
 
         public static BackItem LoadFromNode(Wz_Node node)
@@ -35,7 +35,7 @@ namespace WzComparerR2.MapRender.Patches2
                 Ani = node.Nodes["ani"].GetValueEx<int>(0),
                 No = node.Nodes["no"].GetValueEx<string>(null),
                 SpineAni = node.Nodes["spineAni"].GetValueEx<string>(null),
-               
+
                 X = node.Nodes["x"].GetValueEx(0),
                 Y = node.Nodes["y"].GetValueEx(0),
                 Cx = node.Nodes["cx"].GetValueEx(0),
@@ -53,6 +53,15 @@ namespace WzComparerR2.MapRender.Patches2
             if (!string.IsNullOrWhiteSpace(backTags))
             {
                 item.Tags = backTags.Split(',').Select(tag => tag.Trim()).ToArray();
+            }
+            item.Quest = new List<Tuple<int, int>>();
+            if (node.Nodes["backTags"] != null)
+            {
+                int questID;
+                if (int.TryParse(node.Nodes["backTags"].GetValueEx<string>(null), out questID))
+                {
+                    item.Quest.Add(Tuple.Create(questID, 1));
+                }
             }
             return item;
         }
