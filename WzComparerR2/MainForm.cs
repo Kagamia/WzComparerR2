@@ -649,7 +649,7 @@ namespace WzComparerR2
             using (OpenFileDialog dlg = new OpenFileDialog())
             {
                 dlg.Title = "请选择冒险岛wz文件...";
-                dlg.Filter = "base.wz|*.wz";
+                dlg.Filter = "MapleStory Data File(Base.wz, *.wz, *.ms)|*.wz;*.ms";
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     openWz(dlg.FileName);
@@ -676,9 +676,24 @@ namespace WzComparerR2
             advTree1.BeginUpdate();
             try
             {
-                if (wz.IsKMST1125WzFormat(wzFilePath))
+                if (string.Equals(Path.GetExtension(wzFilePath), ".ms", StringComparison.OrdinalIgnoreCase))
+                {
+                    wz.LoadMsFile(wzFilePath);
+                }
+                else if (wz.IsKMST1125WzFormat(wzFilePath))
                 {
                     wz.LoadKMST1125DataWz(wzFilePath);
+                    if (string.Equals(Path.GetFileName(wzFilePath), "Base.wz", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string packsDir = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(wzFilePath)), "Packs");
+                        if (Directory.Exists(packsDir))
+                        {
+                            foreach (var msFile in Directory.GetFiles(packsDir, "*.ms"))
+                            {
+                                wz.LoadMsFile(msFile);
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -1262,7 +1277,7 @@ namespace WzComparerR2
                 {
                     foreach (var wzf in wzs.wz_files)
                     {
-                        if (wzf.Type == wzType)
+                        if (wzf.Type == wzType && wzf.OwnerWzFile == null)
                         {
                             allWzFile.Add(wzf.Node);
                         }
@@ -1661,28 +1676,16 @@ namespace WzComparerR2
                 try
                 {
                     fs = new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write);
-                    FileStream fsWz = img.WzFile.FileStream;
-                    fsWz.Seek(img.Offset, SeekOrigin.Begin);
-                    byte[] buffer = new byte[2048];
-                    int count, size = img.Size;
-                    while (size > 0 &&
-                        (count = fsWz.Read(buffer, 0, Math.Min(size, buffer.Length))) > 0)
-                    {
-                        fs.Write(buffer, 0, count);
-                        size -= count;
-                    }
+                    var s = img.OpenRead();
+                    s.Position = 0;
+                    s.CopyTo(fs);
+                    fs.Close();
                     labelItemStatus.Text = img.Name + "导出完毕。";
                 }
                 catch (Exception ex)
                 {
+                    fs?.Close();
                     MessageBoxEx.Show(ex.ToString(), "错了");
-                }
-                finally
-                {
-                    if (fs != null)
-                    {
-                        fs.Close();
-                    }
                 }
             }
         }
@@ -2068,6 +2071,12 @@ namespace WzComparerR2
                 }
             }
             FrmPatcher patcher = new FrmPatcher();
+            var config = WcR2Config.Default;
+            var defaultEnc = config?.WzEncoding?.Value ?? 0;
+            if (defaultEnc != 0)
+            {
+                patcher.PatcherNoticeEncoding = Encoding.GetEncoding(defaultEnc);
+            }
             patcher.Owner = this;
             patcher.Show();
         }
@@ -2274,11 +2283,11 @@ namespace WzComparerR2
                     }
                 }
             }
-            else if (item is Wz_Sound wzSound)
+            else if (item is IMapleStoryBlob blob)
             {
                 SaveFileDialog dlg = new SaveFileDialog();
                 dlg.FileName = advTree3.SelectedNode.Text;
-                if (!dlg.FileName.Contains("."))
+                if (!dlg.FileName.Contains(".") && blob is Wz_Sound wzSound)
                 {
                     switch (wzSound.SoundType)
                     {
@@ -2291,60 +2300,12 @@ namespace WzComparerR2
                 {
                     try
                     {
+                        byte[] data = new byte[blob.Length];
+                        blob.CopyTo(data, 0);
                         using (var f = File.Create(dlg.FileName))
                         {
-                            wzSound.WzFile.FileStream.Seek(wzSound.Offset, SeekOrigin.Begin);
-                            byte[] buffer = new byte[4096];
-                            int bytes = wzSound.DataLength;
-                            while (bytes > 0)
-                            {
-                                int count = wzSound.WzFile.FileStream.Read(buffer, 0, Math.Min(buffer.Length, bytes));
-                                if (count > 0)
-                                {
-                                    f.Write(buffer, 0, count);
-                                    bytes -= count;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                        this.labelItemStatus.Text = "保存成功。";
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBoxEx.Show("文件保存失败。\r\n" + ex.ToString(), "提示");
-                    }
-                }
-            }
-            else if (item is Wz_RawData rawData)
-            {
-                SaveFileDialog dlg = new SaveFileDialog();
-                dlg.FileName = advTree3.SelectedNode.Text;
-                dlg.Filter = "*.*|*.*";
-                if (dlg.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        using (var f = File.Create(dlg.FileName))
-                        {
-                            rawData.WzFile.FileStream.Seek(rawData.Offset, SeekOrigin.Begin);
-                            byte[] buffer = new byte[4096];
-                            int bytes = rawData.Length;
-                            while (bytes > 0)
-                            {
-                                int count = rawData.WzFile.FileStream.Read(buffer, 0, Math.Min(buffer.Length, bytes));
-                                if (count > 0)
-                                {
-                                    f.Write(buffer, 0, count);
-                                    bytes -= count;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
+                            f.Write(data, 0, data.Length);
+                            f.Flush();
                         }
                         this.labelItemStatus.Text = "保存成功。";
                     }

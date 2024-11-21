@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
-namespace WzComparerR2.Patcher.Builder
+namespace WzComparerR2.WzLib.Utilities
 {
     public class PartialStream : Stream
     {
-        public PartialStream(Stream baseStream, long offset, long length)
+        public PartialStream(Stream baseStream, long offset, long length, bool leaveOpen = false)
         {
             if (baseStream == null)
             {
@@ -24,11 +22,13 @@ namespace WzComparerR2.Patcher.Builder
             this.baseStream = baseStream;
             this.offset = offset;
             this.length = length;
+            this.leaveOpen = leaveOpen;
         }
 
         private Stream baseStream;
         private long offset;
         private long length;
+        private bool leaveOpen;
 
         public Stream BaseStream
         {
@@ -69,11 +69,11 @@ namespace WzComparerR2.Patcher.Builder
         {
             get
             {
-                return baseStream.Position - offset;
+                return baseStream.Position - this.offset;
             }
             set
             {
-                baseStream.Position = value + offset; 
+                baseStream.Position = value + this.offset;
             }
         }
 
@@ -123,14 +123,17 @@ namespace WzComparerR2.Patcher.Builder
 
         public override void Close()
         {
-            baseStream.Close();
+            this.Dispose(true);
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                baseStream.Dispose();
+                if (!this.leaveOpen)
+                {
+                    baseStream.Dispose();
+                }
             }
         }
 

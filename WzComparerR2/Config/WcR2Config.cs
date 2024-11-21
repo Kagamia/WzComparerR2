@@ -17,6 +17,7 @@ namespace WzComparerR2.Config
             this.MainStyleColor = Color.DimGray;
             this.SortWzOnOpened = true;
             this.AutoDetectExtFiles = true;
+            this.WzVersionVerifyMode = WzLib.WzVersionVerifyMode.Fast;
         }
 
         /// <summary>

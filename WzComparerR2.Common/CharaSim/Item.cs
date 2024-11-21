@@ -10,14 +10,14 @@ namespace WzComparerR2.CharaSim
     {
         public Item()
         {
-            this.Props = new Dictionary<ItemPropType, int>();
-            this.Specs = new Dictionary<ItemSpecType, int>();
+            this.Props = new Dictionary<ItemPropType, long>();
+            this.Specs = new Dictionary<ItemSpecType, long>();
         }
 
         public int Level { get; set; }
 
-        public Dictionary<ItemPropType, int> Props { get; private set; }
-        public Dictionary<ItemSpecType, int> Specs { get; private set; }
+        public Dictionary<ItemPropType, long> Props { get; private set; }
+        public Dictionary<ItemSpecType, long> Specs { get; private set; }
 
         public bool Cash
         {
@@ -31,8 +31,7 @@ namespace WzComparerR2.CharaSim
 
         public bool GetBooleanValue(ItemPropType type)
         {
-            int value;
-            return this.Props.TryGetValue(type, out value) && value != 0;
+            return this.Props.TryGetValue(type, out long value) && value != 0;
         }
 
         public static Item CreateFromNode(Wz_Node node, GlobalFindNodeFunction findNode)
@@ -85,7 +84,7 @@ namespace WzComparerR2.CharaSim
                             {
                                 try
                                 {
-                                    item.Props.Add(type, Convert.ToInt32(subNode.Value));
+                                    item.Props.Add(type, Convert.ToInt64(subNode.Value));
                                 }
                                 finally
                                 {
@@ -106,7 +105,7 @@ namespace WzComparerR2.CharaSim
                     {
                         try
                         {
-                            item.Specs.Add(type, Convert.ToInt32(subNode.Value));
+                            item.Specs.Add(type, Convert.ToInt64(subNode.Value));
                         }
                         finally
                         {

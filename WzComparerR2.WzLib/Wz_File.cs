@@ -4,24 +4,22 @@ using System.Text;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using WzComparerR2.WzLib.Utilities;
 
 namespace WzComparerR2.WzLib
 {
-    public class Wz_File : IDisposable
+    public class Wz_File : IMapleStoryFile, IDisposable
     {
         public Wz_File(string fileName, Wz_Structure wz)
         {
             this.imageCount = 0;
             this.wzStructure = wz;
             this.fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            this.bReader = new BinaryReader(this.FileStream);
             this.loaded = this.GetHeader(fileName);
-            this.stringTable = new Dictionary<long, string>();
             this.directories = new List<Wz_Directory>();
         }
 
         private FileStream fileStream;
-        private BinaryReader bReader;
         private Wz_Structure wzStructure;
         private Wz_Header header;
         private Wz_Node node;
@@ -35,19 +33,11 @@ namespace WzComparerR2.WzLib
 
         public Encoding TextEncoding { get; set; }
 
-        public readonly object ReadLock = new object();
-
-        internal Dictionary<long, string> stringTable;
-        internal byte[] tempBuffer;
+        public object ReadLock => this.fileStream;
 
         public FileStream FileStream
         {
             get { return fileStream; }
-        }
-
-        public BinaryReader BReader
-        {
-            get { return bReader; }
         }
 
         public Wz_Structure WzStructure
@@ -99,10 +89,14 @@ namespace WzComparerR2.WzLib
             get { return this.ownerWzFile; }
         }
 
+        Wz_Structure IMapleStoryFile.WzStructure => this.wzStructure;
+
+        Stream IMapleStoryFile.FileStream => this.fileStream;
+
+        object IMapleStoryFile.ReadLock => this.ReadLock;
+
         public void Close()
         {
-            if (this.bReader != null)
-                this.bReader.Close();
             if (this.fileStream != null)
                 this.fileStream.Close();
         }
@@ -115,15 +109,17 @@ namespace WzComparerR2.WzLib
         private bool GetHeader(string fileName)
         {
             this.fileStream.Position = 0;
+            var br = new WzBinaryReader(this.fileStream, false);
+
             long filesize = this.FileStream.Length;
             if (filesize < 4) { goto __failed; }
-
-            string signature = new string(this.BReader.ReadChars(4));
+            
+            string signature = new string(br.ReadChars(4));
             if (signature != "PKG1") { goto __failed; }
 
-            long dataSize = this.BReader.ReadInt64();
-            int headerSize = this.BReader.ReadInt32();
-            string copyright = new string(this.BReader.ReadChars(headerSize - (int)this.FileStream.Position));
+            long dataSize = br.ReadInt64();
+            int headerSize = br.ReadInt32();
+            string copyright = new string(br.ReadChars(headerSize - (int)this.FileStream.Position));
 
             // encver detecting:
             // Since KMST1132, wz removed the 2 bytes encver, and use a fixed wzver '777'.
@@ -133,7 +129,7 @@ namespace WzComparerR2.WzLib
             if (dataSize >= 2)
             {
                 this.fileStream.Position = headerSize;
-                encver = this.BReader.ReadUInt16();
+                encver = br.ReadUInt16();
                 // encver always less than 256
                 if (encver > 0xff)
                 {
@@ -148,7 +144,7 @@ namespace WzComparerR2.WzLib
                     if (dataSize >= 5)
                     {
                         this.fileStream.Position = headerSize;
-                        int propCount = this.ReadInt32();
+                        int propCount = br.ReadCompressedInt32();
                         if (propCount > 0 && (propCount & 0xff) == 0 && propCount <= 0xffff)
                         {
                             encverMissing = true;
@@ -184,164 +180,6 @@ namespace WzComparerR2.WzLib
             return false;
         }
 
-        public int ReadInt32()
-        {
-            int s = this.BReader.ReadSByte();
-            return (s == -128) ? this.BReader.ReadInt32() : s;
-        }
-
-        public long ReadInt64()
-        {
-            int s = this.BReader.ReadSByte();
-            return (s == -128) ? this.BReader.ReadInt64() : s;
-        }
-
-        public float ReadSingle()
-        {
-            float fl = this.BReader.ReadSByte();
-            return (fl == -128) ? this.BReader.ReadSingle() : fl;
-        }
-
-        public string ReadString(long offset)
-        {
-            return this.ReadString(offset, this.WzStructure.encryption.keys);
-        }
-
-        public string ReadString(long offset, Wz_CryptoKeyType keyType)
-        {
-            return this.ReadString(offset, this.WzStructure.encryption.GetKeys(keyType));
-        }
-
-        public string ReadString(long offset, Wz_Crypto.Wz_CryptoKey cryptoKey)
-        {
-            byte b = this.BReader.ReadByte();
-            switch (b)
-            {
-                case 0x00:
-                case 0x73:
-                    return ReadString(cryptoKey);
-
-                case 0x01:
-                case 0x1B:
-                    return ReadStringAt(offset + this.BReader.ReadInt32(), cryptoKey);
-
-                case 0x04:
-                    this.FileStream.Position += 8;
-                    break;
-
-                default:
-                    throw new Exception("读取字符串错误 在:" + this.FileStream.Name + " " + this.FileStream.Position);
-            }
-            return string.Empty;
-        }
-
-        private string ReadStringAt(long offset, Wz_Crypto.Wz_CryptoKey cryptoKey)
-        {
-            long oldoffset = this.FileStream.Position;
-            string str;
-            if (!stringTable.TryGetValue(offset, out str))
-            {
-                this.FileStream.Position = offset;
-                str = ReadString(cryptoKey);
-                stringTable[offset] = str;
-                this.FileStream.Position = oldoffset;
-            }
-            return str;
-        }
-
-        private unsafe string ReadString(Wz_Crypto.Wz_CryptoKey cryptoKey)
-        {
-            int size = this.BReader.ReadSByte();
-            string result = null;
-            if (size < 0)
-            {
-                byte mask = 0xAA;
-                size = (size == -128) ? this.BReader.ReadInt32() : -size;
-
-                var buffer = GetStringBuffer(size);
-                this.fileStream.Read(buffer, 0, size);
-                cryptoKey.Decrypt(buffer, 0, size);
-
-                fixed (byte* pData = buffer)
-                {
-                    for (int i = 0; i < size; i++)
-                    {
-                        pData[i] ^= mask;
-                        unchecked { mask++; }
-                    }
-
-                    var enc = this.TextEncoding ?? Encoding.Default;
-                    result = enc.GetString(buffer, 0, size);
-                }
-            }
-            else if (size > 0)
-            {
-                ushort mask = 0xAAAA;
-                if (size == 127)
-                {
-                    size = this.BReader.ReadInt32();
-                }
-
-                var buffer = GetStringBuffer(size * 2);
-                this.fileStream.Read(buffer, 0, size * 2);
-                cryptoKey.Decrypt(buffer, 0, size * 2);
-
-                fixed (byte* pData = buffer)
-                {
-                    ushort* pChar = (ushort*)pData;
-                    for (int i = 0; i < size; i++)
-                    {
-                        pChar[i] ^= mask;
-                        unchecked { mask++; }
-                    }
-
-                    result = new string((char*)pChar, 0, size);
-                }
-            }
-            else
-            {
-                return string.Empty;
-            }
-
-            //memory optimize
-            if (result.Length <= 4)
-            {
-                for (int i = 0; i < result.Length; i++)
-                {
-                    if (result[i] >= 0x80)
-                    {
-                        return result;
-                    }
-                }
-                return string.Intern(result);
-            }
-            else
-            {
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// 为字符串解密提供缓冲区。
-        /// </summary>
-        /// <param name="size"></param>
-        /// <returns></returns>
-        private byte[] GetStringBuffer(int size)
-        {
-            if (size <= 4096)
-            {
-                if (tempBuffer == null || tempBuffer.Length < size)
-                {
-                    Array.Resize(ref tempBuffer, size);
-                }
-                return tempBuffer;
-            }
-            else
-            {
-                return new byte[size];
-            }
-        }
-
         public uint CalcOffset(uint filePos, uint hashedOffset)
         {
             uint offset = (uint)(filePos - 0x3C) ^ 0xFFFFFFFF;
@@ -359,48 +197,53 @@ namespace WzComparerR2.WzLib
 
         public void GetDirTree(Wz_Node parent, bool useBaseWz = false, bool loadWzAsFolder = false)
         {
-            List<string> dirs = new List<string>();
-            string name = null;
-            int size = 0;
-            int cs32 = 0;
-            uint pos = 0, hashOffset = 0;
-            //int offs = 0;
+            var ps = new PartialStream(this.FileStream, this.header.DataStartPosition, this.fileStream.Length - this.header.DataStartPosition, true);
+            ps.Position = 0;
+            var reader = new WzBinaryReader(ps, false);
+            this.GetDirTree(reader, parent, useBaseWz, loadWzAsFolder);
+        }
 
-            int count = ReadInt32();
+        private void GetDirTree(WzBinaryReader reader, Wz_Node parent, bool useBaseWz = false, bool loadWzAsFolder = false)
+        {
+            List<string> dirs = new List<string>();
+            int count = reader.ReadCompressedInt32();
             var cryptoKey = this.WzStructure.encryption.keys;
 
             for (int i = 0; i < count; i++)
             {
-                switch ((int)this.BReader.ReadByte())
+                byte nodeType = reader.ReadByte();
+                string name;
+                switch (nodeType)
                 {
                     case 0x02:
-                        int stringOffAdd = this.Header.HasCapabilities(Wz_Capabilities.EncverMissing) ? 2 : 1;
-                        name = this.ReadStringAt(this.Header.HeaderSize + stringOffAdd + this.BReader.ReadInt32(), cryptoKey);
-                        goto case 0xffff;
+                        int stringOffAdd = this.Header.HasCapabilities(Wz_Capabilities.EncverMissing) ? 2 : -1;
+                        name = reader.ReadStringAt(reader.ReadInt32() + stringOffAdd, cryptoKey);
+                        break;
                     case 0x04:
-                        name = this.ReadString(cryptoKey);
-                        goto case 0xffff;
+                    case 0x03:
+                        name = reader.ReadString(cryptoKey);
+                        break;
+                    default:
+                        throw new Exception($"Unknown type {nodeType} in WzDirTree.");
+                }
 
-                    case 0xffff:
-                        size = this.ReadInt32();
-                        cs32 = this.ReadInt32();
-                        pos = (uint)this.bReader.BaseStream.Position;
-                        hashOffset = this.bReader.ReadUInt32();
+                int size = reader.ReadCompressedInt32();
+                int cs32 = reader.ReadCompressedInt32();
+                uint pos = (uint)this.fileStream.Position;
+                uint hashOffset = reader.ReadUInt32();
 
+                switch (nodeType)
+                {
+                    case 0x02:
+                    case 0x04:
                         Wz_Image img = new Wz_Image(name, size, cs32, hashOffset, pos, this);
                         Wz_Node childNode = parent.Nodes.Add(name);
                         childNode.Value = img;
                         img.OwnerNode = childNode;
-
                         this.imageCount++;
                         break;
 
                     case 0x03:
-                        name = this.ReadString(cryptoKey);
-                        size = this.ReadInt32();
-                        cs32 = this.ReadInt32();
-                        pos = (uint)this.bReader.BaseStream.Position;
-                        hashOffset = this.bReader.ReadUInt32();
                         this.directories.Add(new Wz_Directory(name, size, cs32, hashOffset, pos, this));
                         dirs.Add(name);
                         break;
@@ -466,7 +309,7 @@ namespace WzComparerR2.WzLib
                 Wz_Node t = parent.Nodes.Add(dir);
                 if (i < dirCount)
                 {
-                    GetDirTree(t, false);
+                    this.GetDirTree(reader, t, false);
                 }
 
                 if (t.Nodes.Count == 0)

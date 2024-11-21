@@ -320,8 +320,7 @@ namespace WzComparerR2.CharaSimControl
             }
             if (item.Cash)
             {
-                int value;
-                if (item.Props.TryGetValue(ItemPropType.wonderGrade, out value) && value > 0)
+                if (item.Props.TryGetValue(ItemPropType.wonderGrade, out long value) && value > 0)
                 {
                     Image label = Resource.ResourceManager.GetObject("CashItem_label_" + (value + 3)) as Image;
                     if (label != null)

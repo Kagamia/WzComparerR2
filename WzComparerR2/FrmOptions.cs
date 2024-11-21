@@ -35,8 +35,8 @@ namespace WzComparerR2
 
             cmbWzVersionVerifyMode.Items.AddRange(new[]
             {
-                new ComboItem("默认"){ Value = WzLib.WzVersionVerifyMode.Default },
                 new ComboItem("快速"){ Value = WzLib.WzVersionVerifyMode.Fast },
+                new ComboItem("传统"){ Value = WzLib.WzVersionVerifyMode.Default },
             });
         }
 
@@ -100,7 +100,6 @@ namespace WzComparerR2
             this.AutoDetectExtFiles = config.AutoDetectExtFiles;
             this.ImgCheckDisabled = config.ImgCheckDisabled;
             this.WzVersionVerifyMode = config.WzVersionVerifyMode;
-
         }
 
         public void Save(WcR2Config config)

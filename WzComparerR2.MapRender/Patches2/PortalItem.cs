@@ -43,7 +43,7 @@ namespace WzComparerR2.MapRender.Patches2
             return item;
         }
 
-        public static readonly IReadOnlyList<string> PortalTypes = new[] { "sp", "pi", "pv", "pc", "pg", "tp", "ps", "pgi", "psi", "pcs", "ph", "psh", "pcj", "pci", "pci2", "pcig", "pshg", "pcc" };
+        public static readonly IReadOnlyList<string> PortalTypes = new[] { "sp", "pi", "pv", "pc", "pg", "tp", "ps", "pgi", "psi", "pcs", "ph", "psh", "pcj", "pci", "pci2", "pcig", "pshg", "pcc", "pcir" };
 
         public class ItemView
         {

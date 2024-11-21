@@ -95,7 +95,7 @@ namespace WzComparerR2.CharaSimControl
 
                 ItemBase itemBase = null;
                 bool cash = false;
-                int wonderGrade = 0;
+                long wonderGrade = 0;
 
                 if (setItemPart.Value.ItemIDs.Count > 0)
                 {

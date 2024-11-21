@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.IO.Compression;
 using WzComparerR2.Patcher.Builder;
+using PartialStream = WzComparerR2.WzLib.Utilities.PartialStream;
 
 namespace WzComparerR2.Patcher
 {
@@ -13,6 +14,7 @@ namespace WzComparerR2.Patcher
         {
             this.patchFile = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read,
                 0x4000, FileOptions.Asynchronous | FileOptions.RandomAccess);
+            this.NoticeEncoding = Encoding.Default;
         }
 
         private const int MAX_PATH = 260;
@@ -24,6 +26,8 @@ namespace WzComparerR2.Patcher
         private string noticeText;
         private List<PatchPartContext> patchParts;
         private Dictionary<string, uint> oldFileHash;
+
+        public Encoding NoticeEncoding { get; set; }
 
         public List<PatchPartContext> PatchParts
         {
@@ -77,61 +81,78 @@ namespace WzComparerR2.Patcher
         {
             metaStream.Seek(0, SeekOrigin.Begin);
             BinaryReader r = new BinaryReader(metaStream);
-            PartialStream patchBlock;
 
-            if (r.ReadUInt16() == 0x5a4d)//"MZ"
+            bool TryCheckFileEnding(out PartialStream patchBlock, out string noticeText)
             {
                 metaStream.Seek(-4, SeekOrigin.End);
-                ulong check = r.ReadUInt32();
-                if (check == 0xf2f7fbf3)
+                uint check = r.ReadUInt32();
+                if (check != 0xf2f7fbf3) // f3 fb f7 f2
                 {
-                    metaStream.Seek(-12, SeekOrigin.End);
-                    long patchBlockLength = r.ReadUInt32();
-                    long noticeLength = r.ReadUInt32();
-                    metaStream.Seek(-12 - noticeLength - patchBlockLength, SeekOrigin.End);
-                    patchBlock = new PartialStream(metaStream, metaStream.Position, patchBlockLength);
-                    metaStream.Seek(patchBlockLength, SeekOrigin.Current);
-                    noticeText = Encoding.Default.GetString(r.ReadBytes((int)noticeLength));
+                    patchBlock = null;
+                    noticeText = null;
+                    return false;
                 }
-                else //兼容TMS的patch.exe
-                {
-                    metaStream.Seek(-8, SeekOrigin.End);
-                    check = r.ReadUInt64();
-                    if (check == 0xf2f7fbf3)
-                    {
-                        metaStream.Seek(-24, SeekOrigin.End);
-                        long patchBlockLength = r.ReadInt64();
-                        long noticeLength = r.ReadInt64();
-                        metaStream.Seek(-24 - noticeLength - patchBlockLength, SeekOrigin.End);
-                        patchBlock = new PartialStream(metaStream, metaStream.Position, patchBlockLength);
-                        metaStream.Seek(patchBlockLength, SeekOrigin.Current);
-                        noticeText = Encoding.Default.GetString(r.ReadBytes((int)noticeLength));
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-            }
-            else
-            {
-                patchBlock = new PartialStream(metaStream, 0, metaStream.Length);
+
+                metaStream.Seek(-12, SeekOrigin.End);
+                long patchBlockLength = r.ReadUInt32();
+                long noticeLength = r.ReadUInt32();
+                metaStream.Seek(-12 - noticeLength - patchBlockLength, SeekOrigin.End);
+                patchBlock = new PartialStream(metaStream, metaStream.Position, patchBlockLength);
+                metaStream.Seek(patchBlockLength, SeekOrigin.Current);
+                noticeText = this.NoticeEncoding.GetString(r.ReadBytes((int)noticeLength));
+                return true;
             }
 
-            if (patchBlock != null)
+            bool TryCheckFileEnding64(out PartialStream patchBlock, out string noticeText)
             {
-                patchBlock.Seek(0, SeekOrigin.Begin);
-                r = new BinaryReader(patchBlock);
-                if (Encoding.ASCII.GetString(r.ReadBytes(8)) == "WzPatch\x1A")
+                metaStream.Seek(-8, SeekOrigin.End);
+                ulong check = r.ReadUInt64();
+                if (check != 0xf2f7fbf3) // f3 fb f7 f2 00 00 00 00
                 {
-                    patchBlock.Seek(0, SeekOrigin.Begin);
+                    patchBlock = null;
+                    noticeText = null;
+                    return false;
                 }
-                else
+
+                metaStream.Seek(-24, SeekOrigin.End);
+                long patchBlockLength = r.ReadInt64();
+                long noticeLength = r.ReadInt64();
+                metaStream.Seek(-24 - noticeLength - patchBlockLength, SeekOrigin.End);
+                patchBlock = new PartialStream(metaStream, metaStream.Position, patchBlockLength);
+                metaStream.Seek(patchBlockLength, SeekOrigin.Current);
+                noticeText = this.NoticeEncoding.GetString(r.ReadBytes((int)noticeLength));
+                return true;
+            }
+
+            PartialStream patchBlock;
+            string noticeText;
+            if (r.ReadUInt16() == 0x5a4d)//"MZ"
+            {
+                if (!(TryCheckFileEnding(out patchBlock, out noticeText) || TryCheckFileEnding64(out patchBlock, out noticeText)))
                 {
                     return null;
                 }
             }
+            else
+            {
+                // for TMS264 patcher, also check file ending
+                if (!TryCheckFileEnding64(out patchBlock, out noticeText))
+                {
+                    patchBlock = new PartialStream(metaStream, 0, metaStream.Length);
+                    noticeText = null;
+                }
+            }
 
+            // check file header
+            patchBlock.Seek(0, SeekOrigin.Begin);
+            r = new BinaryReader(patchBlock);
+            if (!r.ReadBytes(8).AsSpan().SequenceEqual("WzPatch\x1A"u8))
+            {
+                return null;
+            }
+
+            this.noticeText = noticeText;
+            patchBlock.Seek(0, SeekOrigin.Begin);
             return patchBlock;
         }
 

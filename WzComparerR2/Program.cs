@@ -10,6 +10,7 @@ using WzComparerR2.PluginBase;
 
 #if NET6_0_OR_GREATER
 using System.Runtime.Loader;
+using System.Text;
 #endif
 
 namespace WzComparerR2
@@ -25,6 +26,7 @@ namespace WzComparerR2
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             Program.SetDllDirectory();
 #if NET6_0_OR_GREATER
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Dotnet6Patch.Patch();
 #endif
             Program.StartMainForm();
