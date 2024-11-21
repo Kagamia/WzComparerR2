@@ -112,6 +112,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.onlyEquip: return value == 0 ? null : "固有装备物品";
                 case GearPropType.notExtend: return value == 0 ? null : "无法延长有效时间。";
                 case GearPropType.accountSharableAfterExchange: return value == 0 ? null : "可交换1次\n（交易后只能在世界内我的角色之间移动）";
+                case GearPropType.mintable: return value == 0 ? null : "可铸造";
                 case GearPropType.tradeAvailable:
                     switch (value)
                     {
@@ -550,6 +551,8 @@ namespace WzComparerR2.CharaSim
                     return value == 0 ? null : "组队任务道具";
                 case ItemPropType.permanent:
                     return value == 0 ? null : "可以一直使用魔法的神奇宠物。";
+                case ItemPropType.mintable:
+                    return GetGearPropString(GearPropType.mintable, value);
                 default:
                     return null;
             }

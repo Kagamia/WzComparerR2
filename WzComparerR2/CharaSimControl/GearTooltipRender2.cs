@@ -9,6 +9,7 @@ using Resource = CharaSimResource.Resource;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
 using WzComparerR2.WzLib;
+using System.Windows.Forms;
 
 namespace WzComparerR2.CharaSimControl
 {
@@ -162,7 +163,10 @@ namespace WzComparerR2.CharaSimControl
             int value;
 
             picH = 13;
-            DrawStar2(g, ref picH); //绘制星星
+            if (!Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
+            {
+                DrawStar2(g, ref picH); //绘制星星
+            }
 
             //绘制装备名称
             StringResult sr;
@@ -323,7 +327,7 @@ namespace WzComparerR2.CharaSimControl
 
             //绘制攻击力变化
             format.Alignment = StringAlignment.Far;
-            g.DrawString("攻击力提升", GearGraphics.ItemDetailFont, GearGraphics.GrayBrush2, 251, picH + 10, format);
+            g.DrawString("攻击力增加量", GearGraphics.ItemDetailFont, GearGraphics.GrayBrush2, 251, picH + 10, format);
             g.DrawImage(Resource.UIToolTip_img_Item_Equip_Summary_incline_0, 249 - 19, picH + 27); //暂时画个0
 
             //绘制属性需求
@@ -476,7 +480,7 @@ namespace WzComparerR2.CharaSimControl
             bool hasReduce = Gear.Props.TryGetValue(GearPropType.reduceReq, out value);
             if (hasReduce && value > 0)
             {
-                g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.reduceReq, value), GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
+                g.DrawString(ItemStringHelper.GetGearPropString(GearPropType.reduceReq, value), GearGraphics.ItemDetailFont, GearGraphics.GreenBrush2, 11, picH);
                 picH += 16;
                 hasPart2 = true;
             }
@@ -487,7 +491,12 @@ namespace WzComparerR2.CharaSimControl
                 g.DrawString("无法强化", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
                 picH += 16;
             }
-            else if (hasTuc)
+            else if (Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
+            {
+                g.DrawString("无法进行星之力强化", GearGraphics.ItemDetailFont, GearGraphics.BlockRedBrush, 11, picH);
+                picH += 16;
+            }
+            else if (hasTuc && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 var colorTable = new Dictionary<string, Color>
                 {
@@ -498,11 +507,11 @@ namespace WzComparerR2.CharaSimControl
             }
 
             //星星锤子
-            if (hasTuc && Gear.Hammer > -1)
+            if (hasTuc && Gear.Hammer > -1 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 if (Gear.Hammer == 2)
                 {
-                    g.DrawString("黄金锤提炼完成", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
+                    g.DrawString("应用黄金锤精炼", GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
                     picH += 16;
                 }
                 if (Gear.Props.TryGetValue(GearPropType.superiorEqp, out value) && value > 0) //极真
@@ -526,7 +535,7 @@ namespace WzComparerR2.CharaSimControl
                 hasPart2 = true;
             }
 
-            if (hasTuc && Gear.Hammer > -1)
+            if (hasTuc && Gear.Hammer > -1 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 g.DrawString("金锤子已提高的强化次数", GearGraphics.ItemDetailFont, GearGraphics.GoldHammerBrush, 11, picH + 2);
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
@@ -535,8 +544,13 @@ namespace WzComparerR2.CharaSimControl
                 picH += 16;
                 hasPart2 = true;
             }
+            else if (Gear.GetBooleanValue(GearPropType.blockUpgradeExtraOption))
+            {
+                g.DrawString("无法设置/重设额外属性", GearGraphics.ItemDetailFont, GearGraphics.BlockRedBrush, 11, picH);
+                picH += 16;
+            }
 
-            if (hasTuc && Gear.PlatinumHammer > -1)
+            if (hasTuc && Gear.PlatinumHammer > -1 && !Gear.GetBooleanValue(GearPropType.blockUpgradeStarforce))
             {
                 g.DrawString("白金锤强化次数：" + Gear.PlatinumHammer, GearGraphics.ItemDetailFont, Brushes.White, 11, picH);
                 picH += 16;
@@ -1036,6 +1050,10 @@ namespace WzComparerR2.CharaSimControl
             if (Gear.Props.TryGetValue(GearPropType.tradeBlock, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetGearPropString(GearPropType.tradeBlock, value));
+            }
+            if (Gear.Props.TryGetValue(GearPropType.mintable, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetGearPropString(GearPropType.mintable, value));
             }
             if (Gear.Props.TryGetValue(GearPropType.abilityTimeLimited, out value) && value != 0)
             {

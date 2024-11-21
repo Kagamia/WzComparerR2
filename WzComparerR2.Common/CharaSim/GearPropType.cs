@@ -182,6 +182,10 @@ namespace WzComparerR2.CharaSim
         tucIgnoreForPotential,
         Etuc,
         CuttableCount,
+        //MSN专属属性
+        blockUpgradeExtraOption,
+        blockUpgradeStarforce,
+        mintable,
 
         gatherTool_incSkillLevel = 2000,
         gatherTool_incSpeed,

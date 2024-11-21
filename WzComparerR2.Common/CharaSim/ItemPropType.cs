@@ -24,5 +24,7 @@ namespace WzComparerR2.CharaSim
         wonderGrade,
         life,
         permanent,
+        //MSN专属属性
+        mintable,
     }
 }
