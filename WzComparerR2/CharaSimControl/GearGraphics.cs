@@ -506,30 +506,38 @@ namespace WzComparerR2.CharaSimControl
                     g.DrawString(tagName, font, brush, left, picH, fmt);
                 }
             }
-            else //  ani mode
+            else // ani mode
             {
+                bool mixedAniMode = wce[1].Bitmap != null && (wce[1].Bitmap.Width > 1 || wce[1].Bitmap.Height > 1);
+
                 offsetY = Math.Min(offsetY, ani0.OpOrigin.Y);
                 height = Math.Max(height, ani0.Rectangle.Bottom);
 
-                int bgWidth = wce[1].Bitmap?.Width ?? 0;
+                int bgWidth = mixedAniMode ? wce[1].Bitmap.Width : nameWidth;
                 int left = center - bgWidth / 2;
                 int right = left + bgWidth;
                 int nameLeft = center - nameWidth / 2;
 
                 picH -= offsetY;
 
-                if (wce[1].Bitmap != null) // draw center only
+                if (mixedAniMode)
                 {
-                    g.DrawImage(wce[1].Bitmap, left - wce[1].Origin.X, picH - wce[1].Origin.Y);
+                    // draw legay center
+                    // Note: item 1143360 (MILESTONE) does not render well, ignore it.
+                    g.DrawImage(wce[1].Bitmap, left - wce[1].Origin.X, picH - wce[1].Origin.Y);                   
+                    // draw ani0 based on bg center position
+                    g.DrawImage(ani0.Bitmap, left - wce[1].Origin.X - ani0.Origin.X, picH - wce[1].Origin.Y - ani0.Origin.Y);
+                    if (!string.IsNullOrEmpty(tagName)) // draw name
+                    {
+                        using var brush = new SolidBrush(color);
+                        // offsetX with bg for better alignment
+                        g.DrawString(tagName, font, brush, nameLeft - wce[1].Origin.X, picH, fmt);
+                    }
                 }
-                // draw ani0 based on bg center position
-                g.DrawImage(ani0.Bitmap, left - wce[1].Origin.X - ani0.Origin.X, picH - wce[1].Origin.Y - ani0.Origin.Y);
-                // draw name
-                if (!string.IsNullOrEmpty(tagName))
+                else
                 {
-                    using var brush = new SolidBrush(color);
-                    // offsetX with bg for better alignment
-                    g.DrawString(tagName, font, brush, nameLeft - wce[1].Origin.X, picH, fmt);
+                    // draw ani0 only
+                    g.DrawImage(ani0.Bitmap, left - ani0.Origin.X, picH - ani0.Origin.Y);
                 }
             }
 
