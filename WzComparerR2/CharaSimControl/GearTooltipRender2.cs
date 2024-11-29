@@ -723,7 +723,7 @@ namespace WzComparerR2.CharaSimControl
 
             //判断是否绘制徽章
             Wz_Node medalResNode = null;
-            bool willDrawMedalTag = this.ShowMedalTag
+            bool willDrawMedalTag = this.ShowMedalTag && this.Gear.Sample.Bitmap == null
                 && this.Gear.Props.TryGetValue(GearPropType.medalTag, out value)
                 && this.TryGetMedalResource(value, out medalResNode);
 
