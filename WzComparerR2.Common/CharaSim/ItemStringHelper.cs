@@ -167,16 +167,20 @@ namespace WzComparerR2.CharaSim
                     case GearPropType.incMMP:
                     case GearPropType.incMDF:
                     case GearPropType.incARC:
+                    case GearPropType.incAUT:
                     case GearPropType.incPAD:
                     case GearPropType.incMAD:
                     case GearPropType.incPDD:
                     case GearPropType.incMDD:
-                        subfix = $"({standardValue} #$+{value - standardValue}#)"; break;
-
+                    case GearPropType.incSpeed:
+                    case GearPropType.incJump:
+                        subfix = $"({standardValue} #e+{value - standardValue}#)"; break;
                     case GearPropType.bdR:
                     case GearPropType.incBDR:
                     case GearPropType.imdR:
                     case GearPropType.incIMDR:
+                    case GearPropType.damR:
+                    case GearPropType.incDAMr:
                         subfix = $"({standardValue}% #$+{value - standardValue}%#)"; break;
                 }
                 propStr = "#$" + propStr + "# " + subfix;

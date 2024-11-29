@@ -10,6 +10,8 @@ namespace WzComparerR2.CharaSim
         private string n;
         private string cStart;
         private string cEnd;
+        private string eStart;
+        private string eEnd;
         private string gStart;
         private string gEnd;
 
@@ -50,6 +52,24 @@ namespace WzComparerR2.CharaSim
         }
 
         /// <summary>
+        /// 获取或设置自定义高亮起始符(#e)的替换字符串。
+        /// </summary>
+        public string EStart
+        {
+            get { return eStart; }
+            set { eStart = value; }
+        }
+
+        /// <summary>
+        /// 获取或设置自定义高亮结束符(#)的替换字符串
+        /// </summary>
+        public string EEnd
+        {
+            get { return eEnd; }
+            set { eEnd = value; }
+        }
+
+        /// <summary>
         /// 获取或设置自定义高亮起始符(#g)的替换字符串。
         /// </summary>
         public string GStart
@@ -80,6 +100,8 @@ namespace WzComparerR2.CharaSim
                     N = @"\n",
                     cStart = @"#c",
                     cEnd = @"#",
+                    eStart = @"#e",
+                    eEnd = @"#",
                     gStart = @"#g",
                     gEnd = @"#"
                 };
@@ -96,6 +118,8 @@ namespace WzComparerR2.CharaSim
                     N = "\n",
                     cStart = @"#c",
                     cEnd = @"#",
+                    eStart = @"#e",
+                    eEnd = @"#",
                     gStart = @"#g",
                     gEnd = @"#"
                 };
@@ -112,6 +136,8 @@ namespace WzComparerR2.CharaSim
                     N = "<br />",
                     cStart = @"<span style=""font-weight:bold; color:orange;"">",
                     cEnd = @"</span>",
+                    eStart = @"<span style=""font-weight:bold; color:#aaffff;"">",
+                    eEnd = @"</span>",
                     gStart = @"<span style=""font-weight:bold; color:#3f0;"">",
                     gEnd = @"</span>"
                 };

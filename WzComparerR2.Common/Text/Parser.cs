@@ -65,6 +65,12 @@ namespace WzComparerR2.Text
                             colorStack.Push("c");
                             strPos++;
                         }
+                        else if (strPos < format.Length && format[strPos] == 'e')//遇到#e(自定义) 换紫蓝刷子并flush
+                        {
+                            flushRun();
+                            colorStack.Push("e");
+                            strPos++;
+                        }
                         else if (strPos < format.Length && format[strPos] == 'g')//遇到#g(自定义) 换绿刷子并flush
                         {
                             flushRun();
