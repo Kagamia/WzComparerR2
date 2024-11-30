@@ -156,7 +156,7 @@ namespace WzComparerR2.CharaSim
             var propStr = GetGearPropString(propType, value);
             if (value > standardValue)
             {
-                string subfix = null;
+                string suffix = null;
                 switch (propType)
                 {
                     case GearPropType.incSTR:
@@ -174,15 +174,16 @@ namespace WzComparerR2.CharaSim
                     case GearPropType.incMDD:
                     case GearPropType.incSpeed:
                     case GearPropType.incJump:
+                        suffix = $"({standardValue} #$+{value - standardValue}#)"; break;
                     case GearPropType.bdR:
                     case GearPropType.incBDR:
                     case GearPropType.imdR:
                     case GearPropType.incIMDR:
                     case GearPropType.damR:
                     case GearPropType.incDAMr:
-                        subfix = $"({standardValue}% #$+{value - standardValue}%#)"; break;
+                        suffix = $"({standardValue}% #$+{value - standardValue}%#)"; break;
                 }
-                propStr = "#$" + propStr + "# " + subfix;
+                propStr = "#$" + propStr + "# " + suffix;
             }
             return propStr;
         }
