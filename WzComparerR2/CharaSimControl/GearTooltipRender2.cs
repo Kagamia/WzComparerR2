@@ -9,7 +9,6 @@ using Resource = CharaSimResource.Resource;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
 using WzComparerR2.WzLib;
-using System.Windows.Forms;
 
 namespace WzComparerR2.CharaSimControl
 {
