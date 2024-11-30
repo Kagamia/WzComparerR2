@@ -111,6 +111,8 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.accountSharable: return value == 0 ? null : "服务器内只有我的角色之间可以移动";
                 case GearPropType.onlyEquip: return value == 0 ? null : "固有装备物品";
                 case GearPropType.notExtend: return value == 0 ? null : "无法延长有效时间。";
+                case GearPropType.accountSharableAfterExchange: return value == 0 ? null : "可交换1次\n（交易后只能在世界内我的角色之间移动）";
+                case GearPropType.mintable: return value == 0 ? null : "可铸造";
                 case GearPropType.tradeAvailable:
                     switch (value)
                     {
@@ -165,16 +167,19 @@ namespace WzComparerR2.CharaSim
                     case GearPropType.incMMP:
                     case GearPropType.incMDF:
                     case GearPropType.incARC:
+                    case GearPropType.incAUT:
                     case GearPropType.incPAD:
                     case GearPropType.incMAD:
                     case GearPropType.incPDD:
                     case GearPropType.incMDD:
-                        subfix = $"({standardValue} #$+{value - standardValue}#)"; break;
-
+                    case GearPropType.incSpeed:
+                    case GearPropType.incJump:
                     case GearPropType.bdR:
                     case GearPropType.incBDR:
                     case GearPropType.imdR:
                     case GearPropType.incIMDR:
+                    case GearPropType.damR:
+                    case GearPropType.incDAMr:
                         subfix = $"({standardValue}% #$+{value - standardValue}%#)"; break;
                 }
                 propStr = "#$" + propStr + "# " + subfix;
@@ -541,12 +546,16 @@ namespace WzComparerR2.CharaSim
                     return GetGearPropString(GearPropType.only, value);
                 case ItemPropType.accountSharable:
                     return GetGearPropString(GearPropType.accountSharable, value);
+                case ItemPropType.accountSharableAfterExchange:
+                    return GetGearPropString(GearPropType.accountSharableAfterExchange, value);
                 case ItemPropType.quest:
                     return value == 0 ? null : "任务道具";
                 case ItemPropType.pquest:
                     return value == 0 ? null : "组队任务道具";
                 case ItemPropType.permanent:
                     return value == 0 ? null : "可以一直使用魔法的神奇宠物。";
+                case ItemPropType.mintable:
+                    return GetGearPropString(GearPropType.mintable, value);
                 default:
                     return null;
             }

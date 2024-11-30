@@ -281,7 +281,13 @@ namespace WzComparerR2.CharaSimControl
             if (!string.IsNullOrEmpty(attr))
             {
                 g.DrawString(attr, GearGraphics.ItemDetailFont, GearGraphics.GearNameBrushC, tooltip.Width / 2, picH, format);
-                picH += 19;
+                if (attr.Contains("\n")) {
+                    picH += 31;
+                }
+                else
+                {
+                    picH += 19;
+                }
                 hasPart2 = true;
             }
 
@@ -494,6 +500,14 @@ namespace WzComparerR2.CharaSimControl
             if (item.Props.TryGetValue(ItemPropType.accountSharable, out value) && value != 0)
             {
                 tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.accountSharable, value));
+            }
+            if (item.Props.TryGetValue(ItemPropType.accountSharableAfterExchange, out value) && value != 0)
+            {
+                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.accountSharableAfterExchange, value));
+            }
+            if (item.Props.TryGetValue(ItemPropType.mintable, out value))
+            {
+                tags.Add(ItemStringHelper.GetItemPropString(ItemPropType.mintable, value));
             }
 
             return tags.Count > 0 ? string.Join(", ", tags.ToArray()) : null;

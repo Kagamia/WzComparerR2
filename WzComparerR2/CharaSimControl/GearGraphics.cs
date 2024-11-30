@@ -97,6 +97,11 @@ namespace WzComparerR2.CharaSimControl
         public static readonly Brush GreenBrush2 = new SolidBrush(Color.FromArgb(204, 255, 0));
         public static readonly Color GrayColor2 = Color.FromArgb(153, 153, 153);
         /// <summary>
+        /// 表示装备属性额外说明中使用的卷轴强化数值画刷。
+        /// </summary>
+        public static readonly Color ScrollEnhancementColor = Color.FromArgb(170, 170, 255);
+        public static readonly Brush ScrollEnhancementBrush = new SolidBrush(ScrollEnhancementColor);
+        /// <summary>
         /// 表示用于绘制“攻击力提升”文字的灰色画刷。
         /// </summary>
         public static readonly Brush GrayBrush2 = new SolidBrush(GrayColor2);
@@ -108,6 +113,10 @@ namespace WzComparerR2.CharaSimControl
         /// 表示套装属性不可用的灰色画刷。
         /// </summary>
         public static readonly Brush SetItemGrayBrush = new SolidBrush(Color.FromArgb(119, 136, 153));
+        /// <summary>
+        /// 表示效果不可用的红色画刷。
+        /// </summary>
+        public static readonly Brush BlockRedBrush = new SolidBrush(Color.FromArgb(255, 0, 102));
         /// <summary>
         /// 表示装备tooltip中金锤子描述文字的颜色画刷。
         /// </summary>

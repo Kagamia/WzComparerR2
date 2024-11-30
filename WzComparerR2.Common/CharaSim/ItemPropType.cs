@@ -17,11 +17,14 @@ namespace WzComparerR2.CharaSim
         only,
         tradeAvailable,
         accountSharable,
+        accountSharableAfterExchange,
         timeLimited,
         setItemID,
         nickTag,
         wonderGrade,
         life,
         permanent,
+        //MSN专属属性
+        mintable,
     }
 }
