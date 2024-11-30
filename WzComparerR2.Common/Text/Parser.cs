@@ -65,17 +65,12 @@ namespace WzComparerR2.Text
                             colorStack.Push("c");
                             strPos++;
                         }
-                        else if (strPos < format.Length && format[strPos] == 'g')//遇到#g(自定义) 换绿刷子并flush
+                        else if (strPos < format.Length && format[strPos] == '$'
+                            && strPos + 1 < format.Length )//遇到#$(自定义) 更换为自定义颜色表
                         {
                             flushRun();
-                            colorStack.Push("g");
-                            strPos++;
-                        }
-                        else if (strPos < format.Length && format[strPos] == '$')//遇到#$(自定义) 换青色刷子并flush
-                        {
-                            flushRun();
-                            colorStack.Push("$");
-                            strPos++;
+                            colorStack.Push(format.Substring(strPos, 2));
+                            strPos += 2;
                         }
                         else if (colorStack.Count == 1) //同#c
                         {

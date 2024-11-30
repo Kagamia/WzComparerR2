@@ -80,7 +80,7 @@ namespace WzComparerR2.CharaSim
                     N = @"\n",
                     cStart = @"#c",
                     cEnd = @"#",
-                    gStart = @"#g",
+                    gStart = @"#$g",
                     gEnd = @"#"
                 };
             }
@@ -96,7 +96,7 @@ namespace WzComparerR2.CharaSim
                     N = "\n",
                     cStart = @"#c",
                     cEnd = @"#",
-                    gStart = @"#g",
+                    gStart = @"#$g",
                     gEnd = @"#"
                 };
             }

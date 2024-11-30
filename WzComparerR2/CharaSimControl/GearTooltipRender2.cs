@@ -159,6 +159,11 @@ namespace WzComparerR2.CharaSimControl
             Graphics g = Graphics.FromImage(bitmap);
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
             StringFormat format = (StringFormat)StringFormat.GenericTypographic.Clone();
+            var itemPropColorTable = new Dictionary<string, Color>()
+            {
+                { "$y", GearGraphics.gearCyanColor },
+                { "$e", GearGraphics.ScrollEnhancementColor },
+            };
             int value;
 
             picH = 13;
@@ -458,7 +463,7 @@ namespace WzComparerR2.CharaSimControl
                 //绘制属性变化
                 Gear.StandardProps.TryGetValue(type, out value); //standard value
                 var propStr = ItemStringHelper.GetGearPropDiffString(type, Gear.Props[type], value);
-                GearGraphics.DrawString(g, propStr, GearGraphics.ItemDetailFont, 13, 256, ref picH, 16);
+                GearGraphics.DrawString(g, propStr, GearGraphics.ItemDetailFont, itemPropColorTable, 13, 256, ref picH, 16);
                 hasPart2 = true;
             }
 

@@ -174,16 +174,16 @@ namespace WzComparerR2.CharaSim
                     case GearPropType.incMDD:
                     case GearPropType.incSpeed:
                     case GearPropType.incJump:
-                        suffix = $"({standardValue} #$+{value - standardValue}#)"; break;
+                        suffix = $"({standardValue} #$e+{value - standardValue}#)"; break;
                     case GearPropType.bdR:
                     case GearPropType.incBDR:
                     case GearPropType.imdR:
                     case GearPropType.incIMDR:
                     case GearPropType.damR:
                     case GearPropType.incDAMr:
-                        suffix = $"({standardValue}% #$+{value - standardValue}%#)"; break;
+                        suffix = $"({standardValue}% #$y+{value - standardValue}%#)"; break;
                 }
-                propStr = "#$" + propStr + "# " + suffix;
+                propStr = "#$y" + propStr + "# " + suffix;
             }
             return propStr;
         }
