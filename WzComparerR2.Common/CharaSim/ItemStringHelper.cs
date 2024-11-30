@@ -174,7 +174,6 @@ namespace WzComparerR2.CharaSim
                     case GearPropType.incMDD:
                     case GearPropType.incSpeed:
                     case GearPropType.incJump:
-                        subfix = $"({standardValue} #e+{value - standardValue}#)"; break;
                     case GearPropType.bdR:
                     case GearPropType.incBDR:
                     case GearPropType.imdR:
