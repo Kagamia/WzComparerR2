@@ -235,6 +235,12 @@ namespace WzComparerR2.CharaSim
                 {
                     h = sr.SkillH[level - 1];
                 }
+                else if (sr.SkillH.Count == 1)
+                {
+                    h = sr.SkillH[0];
+                }
+                var levelCommon = level <= skill.levelCommon.Count ? skill.levelCommon[level - 1] : skill.common;
+                return GetSkillSummary(h, level, levelCommon, param, options);
             }
             else
             {
@@ -242,9 +248,8 @@ namespace WzComparerR2.CharaSim
                 {
                     h = sr.SkillH[0];
                 }
+                return GetSkillSummary(h, level, skill.Common, param, options);
             }
-
-            return GetSkillSummary(h, level, skill.Common, param, options);
         }
 
         public static Dictionary<string,string> GlobalVariableMapping { get; private set; }
