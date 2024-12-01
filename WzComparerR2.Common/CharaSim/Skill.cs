@@ -196,8 +196,7 @@ namespace WzComparerR2.CharaSim
             skill.PreBBSkill = false;
             if (skill.levelCommon.Count > 0)
             {
-                if (skill.common.Count <= 0
-                    || (skill.common.Count == 1 && skill.common.ContainsKey("maxLevel")))
+                if (skill.common.Count <= 0 || skill.common.ContainsKey("maxLevel"))
                 {
                     skill.PreBBSkill = true;
                 }
