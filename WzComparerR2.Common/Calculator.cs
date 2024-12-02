@@ -20,7 +20,7 @@ namespace WzComparerR2
                 {
                     switch (i)
                     {
-                        case 0: paramList["x"] = args[0]; break;
+                        case 0: paramList["x"] = args[0]; paramList["X"] = args[0]; break;
                         case 1: paramList["y"] = args[1]; break;
                         case 2: paramList["z"] = args[2]; break;
                         case 3: paramList["w"] = args[3]; break;
@@ -120,21 +120,26 @@ namespace WzComparerR2
 
                     case TokenType.BracketEnd: //括号结束 弹出到上一个括号
                         {
-                            Token t;
-                            int count = 0;
-                            while ((t = stack.Pop()) != null)
+                            bool foundBracketEnd = false;
+                            while (stack.Count > 0)
                             {
+                                Token t = stack.Pop();
                                 if (t.Type != TokenType.BracketStart)
                                 {
                                     value.Add(t);
-                                    count++;
                                 }
                                 else
                                 {
                                     if (t.Tag == Tag.Call)
                                         value.Add(new Token(TokenType.CallEnd, ""));
+                                    foundBracketEnd = true;
                                     break;
                                 }
+                            }
+                            // ignore redundant bracketEnd at the end of expression, workaround for skill 80003671,80003672,80003677
+                            if (!foundBracketEnd && i != tokens.Count - 1)
+                            {
+                                throw new ArgumentException("Brackets are not paired.");
                             }
                         }
                         break;
@@ -347,7 +352,12 @@ namespace WzComparerR2
                     value = (Func<decimal, decimal>)Math.Floor;
                     return true;
                 }
-                else if ((m = Regex.Match(key, @"log(\d+)")).Success)
+                else if (key == "min")
+                {
+                    value = (Func<decimal, decimal, decimal>)Math.Min;
+                    return true;
+                }
+                else if ((m = Regex.Match(key, @"^log(\d+)$")).Success)
                 {
                     var logBase = int.Parse(m.Result("$1"));
                     value = (Func<decimal, decimal>)(x => x <= 0 ? 0 : (decimal)Math.Floor(Math.Log(decimal.ToDouble(x), logBase)));
