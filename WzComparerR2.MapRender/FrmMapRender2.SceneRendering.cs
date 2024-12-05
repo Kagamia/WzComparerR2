@@ -460,6 +460,8 @@ namespace WzComparerR2.MapRender
                     case LifeItem.LifeType.Npc:
                         if (this.patchVisibility.NpcNameVisible)
                         {
+                            if (life.HideName) break;
+
                             string name, desc;
                             if (this.StringLinker?.StringNpc.TryGetValue(life.ID, out sr) ?? false)
                             {
@@ -492,10 +494,11 @@ namespace WzComparerR2.MapRender
                             {
                                 mesh = batcher.MeshPop();
                                 mesh.Position = new Vector2(life.X, life.Cy + 20);
+                                // temporarily ignore font name and size here.
                                 mesh.RenderObject = new TextMesh()
                                 {
                                     Align = Alignment.Center,
-                                    ForeColor = Color.Yellow,
+                                    ForeColor = life.CustomFont?.FontColor ?? Color.Yellow,
                                     BackColor = new Color(Color.Black, 0.7f),
                                     Font = renderEnv.Fonts.NpcNameFont,
                                     Padding = new Margins(2, 2, 2, 2),

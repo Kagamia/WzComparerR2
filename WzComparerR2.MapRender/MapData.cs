@@ -724,6 +724,14 @@ namespace WzComparerR2.MapRender
                     var npcNode = PluginManager.FindWz(path);
 
                     //TODO: 加载npc数据
+
+                    life.HideName = (npcNode?.FindNodeByPath(@"info\hideName")?.GetValueEx<int>(0) ?? 0) != 0;
+                    var customFontNode = npcNode?.FindNodeByPath(@"info\customFont:func");
+                    if (customFontNode != null)
+                    {
+                        life.CustomFont = LifeItem.LoadCustomFontFunc(customFontNode);
+                    }
+
                     int? npcLink = npcNode?.FindNodeByPath(@"info\link").GetValueEx<int>();
                     if (npcLink != null)
                     {
