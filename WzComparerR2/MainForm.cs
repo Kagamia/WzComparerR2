@@ -1898,7 +1898,7 @@ namespace WzComparerR2
             QueryPerformance.Start();
             if (!this.stringLinker.HasValues)
             {
-                if (!this.stringLinker.Load(findStringWz()))
+                if (!this.TryLoadStringWz())
                 {
                     MessageBoxEx.Show("没有初始化string链接，请手动指定一个String.wz。", "喵~~");
                     return;
@@ -1962,19 +1962,19 @@ namespace WzComparerR2
             }            
         }
 
-        private Wz_File findStringWz()
+        private bool TryLoadStringWz()
         {
             foreach (Wz_Structure wz in openedWz)
             {
                 foreach (Wz_File file in wz.wz_files)
                 {
-                    if (file.Type == Wz_Type.String)
+                    if (file.Type == Wz_Type.String && this.stringLinker.Load(file))
                     {
-                        return file;
+                        return true;
                     }
                 }
             }
-            return null;
+            return false;
         }
 
         private IEnumerable<KeyValuePair<int, StringResult>> searchStringLinker(IEnumerable<Dictionary<int, StringResult>> dicts, string key, bool exact, bool isRegex)
@@ -2507,7 +2507,7 @@ namespace WzComparerR2
 
             if (!this.stringLinker.HasValues)
             {
-                this.stringLinker.Load(findStringWz());
+                this.TryLoadStringWz();
             }
 
             object obj = null;
@@ -2995,7 +2995,7 @@ namespace WzComparerR2
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 if (!this.stringLinker.HasValues)
-                    this.stringLinker.Load(findStringWz());
+                    this.TryLoadStringWz();
 
                 DBConnection conn = new DBConnection(this.stringLinker);
                 DataSet ds = conn.GenerateSkillTable();
@@ -3018,7 +3018,7 @@ namespace WzComparerR2
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 if (!this.stringLinker.HasValues)
-                    this.stringLinker.Load(findStringWz());
+                    this.TryLoadStringWz();
 
                 DBConnection conn = new DBConnection(this.stringLinker);
                 conn.ExportSkillOption(dlg.SelectedPath);
