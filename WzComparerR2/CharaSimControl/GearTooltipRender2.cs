@@ -835,7 +835,7 @@ namespace WzComparerR2.CharaSimControl
         {
             Bitmap addBitmap = null;
             picHeight = 0;
-            if (Gear.Additions.Count > 0)
+            if (Gear.Additions.Count > 0 && !Gear.AdditionHideDesc)
             {
                 addBitmap = new Bitmap(261, DefaultPicHeight);
                 Graphics g = Graphics.FromImage(addBitmap);
