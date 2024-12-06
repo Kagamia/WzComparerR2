@@ -46,6 +46,15 @@ namespace WzComparerR2.CharaSim
             }
             item.ItemID = value;
 
+            // in msn the node could be UOL.
+            if (node.Value is Wz_Uol)
+            {
+                if ((node = node.ResolveUol()) == null)
+                {
+                    return item;
+                }
+            }
+
             Wz_Node infoNode = node.FindNodeByPath("info");
             if (infoNode != null)
             {
