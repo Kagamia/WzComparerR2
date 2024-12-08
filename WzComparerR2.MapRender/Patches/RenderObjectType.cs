@@ -18,5 +18,6 @@ namespace WzComparerR2.MapRender.Patches
         Front,
         NpcName,
         MobName,
+        Effect,
     }
 }
