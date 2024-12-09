@@ -14,7 +14,7 @@ namespace WzComparerR2.MapRender.Patches2
         public int Ry { get; set; }
         public int Z { get; set; }
         public SubParticleItem[] SubItems { get; set; }
-        public List<Tuple<int, int>> Quest { get; set; }
+        public List<QuestInfo> Quest { get; private set; } = new List<QuestInfo>();
         public ItemView View { get; set; }
 
         public static ParticleItem LoadFromNode(Wz_Node node)
@@ -27,12 +27,14 @@ namespace WzComparerR2.MapRender.Patches2
                 Z = node.Nodes["z"].GetValueEx(0)
             };
 
-            item.Quest = new List<Tuple<int, int>>();
             if (node.Nodes["quest"] != null)
             {
                 foreach (Wz_Node questNode in node.Nodes["quest"].Nodes)
                 {
-                    item.Quest.Add(Tuple.Create(int.Parse(questNode.Text), Convert.ToInt32(questNode.Value)));
+                    if (int.TryParse(questNode.Text, out int questID))
+                    {
+                        item.Quest.Add(new QuestInfo(questID, Convert.ToInt32(questNode.Value)));
+                    }
                 }
             }
 
@@ -49,12 +51,15 @@ namespace WzComparerR2.MapRender.Patches2
                     X = subNode.Nodes["x"].GetValueEx(0),
                     Y = subNode.Nodes["y"].GetValueEx(0),
                 };
-                subitem.Quest = new List<Tuple<int, int>>();
+
                 if (subNode.Nodes["quest"] != null)
                 {
                     foreach (Wz_Node questNode in subNode.Nodes["quest"].Nodes)
                     {
-                        subitem.Quest.Add(Tuple.Create(int.Parse(questNode.Text), Convert.ToInt32(questNode.Value)));
+                        if (int.TryParse(questNode.Text, out int questID))
+                        {
+                            subitem.Quest.Add(new QuestInfo(questID, Convert.ToInt32(questNode.Value)));
+                        }
                     }
                 }
                 subItems.Add(subitem);
@@ -76,7 +81,7 @@ namespace WzComparerR2.MapRender.Patches2
         {
             public int X { get; set; }
             public int Y { get; set; }
-            public List<Tuple<int, int>> Quest { get; set; }
+            public List<QuestInfo> Quest { get; private set; } = new List<QuestInfo>();
         }
 
         public class ItemView

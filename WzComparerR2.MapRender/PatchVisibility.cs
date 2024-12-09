@@ -155,52 +155,52 @@ namespace WzComparerR2.MapRender
             this.dictVisible[type] = visible;
         }
 
-        public bool IsVisible(int questID, int questState)
+        public bool IsQuestVisible(int questID, int questState)
         {
             int visible;
-            if (!questVisible.TryGetValue(questID, out visible))
+            if (!this.questVisible.TryGetValue(questID, out visible))
             {
                 return true;
             }
             return visible == -1 || visible == questState;
         }
 
-        public bool IsVisibleExact(int questID, int questState)
+        public bool IsQuestVisibleExact(int questID, int questState)
         {
             int visible;
-            if (!questVisible.TryGetValue(questID, out visible))
+            if (!this.questVisible.TryGetValue(questID, out visible))
             {
                 return false;
             }
             return visible == questState;
         }
 
-        public void SetVisible(int questID, int questState)
+        public void SetQuestVisible(int questID, int questState)
         {
             this.questVisible[questID] = questState;
         }
 
-        public bool IsVisible(int questID, string qkey, int questState)
+        public bool IsQuestVisible(int questID, string qkey, int questState)
         {
             int visible;
-            if (!questexVisible.TryGetValue(new Tuple<int, string>(questID, qkey), out visible))
+            if (!this.questexVisible.TryGetValue(new Tuple<int, string>(questID, qkey), out visible))
             {
                 return true;
             }
             return visible == -1 || visible == questState;
         }
 
-        public bool IsVisibleExact(int questID, string qkey, int questState)
+        public bool IsQuestVisibleExact(int questID, string qkey, int questState)
         {
             int visible;
-            if (!questexVisible.TryGetValue(new Tuple<int, string>(questID, qkey), out visible))
+            if (!this.questexVisible.TryGetValue(new Tuple<int, string>(questID, qkey), out visible))
             {
                 return false;
             }
             return visible == questState;
         }
 
-        public void SetVisible(int questID, string qkey, int questState)
+        public void SetQuestVisible(int questID, string qkey, int questState)
         {
             this.questexVisible[new Tuple<int, string>(questID, qkey)] = questState;
         }

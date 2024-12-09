@@ -23,7 +23,7 @@ namespace WzComparerR2.MapRender.Patches2
         public int ScreenMode { get; set; }
         public bool Flip { get; set; }
         public bool IsFront { get; set; }
-        public List<Tuple<int, int>> Quest { get; set; }
+        public List<QuestInfo> Quest { get; private set; } = new List<QuestInfo>();
 
         public ItemView View { get; set; }
 
@@ -53,14 +53,10 @@ namespace WzComparerR2.MapRender.Patches2
             if (!string.IsNullOrWhiteSpace(backTags))
             {
                 item.Tags = backTags.Split(',').Select(tag => tag.Trim()).ToArray();
-            }
-            item.Quest = new List<Tuple<int, int>>();
-            if (node.Nodes["backTags"] != null)
-            {
-                int questID;
-                if (int.TryParse(node.Nodes["backTags"].GetValueEx<string>(null), out questID))
+
+                if (int.TryParse(backTags, out int questID))
                 {
-                    item.Quest.Add(Tuple.Create(questID, 1));
+                    item.Quest.Add(new QuestInfo(questID, 1));
                 }
             }
             return item;

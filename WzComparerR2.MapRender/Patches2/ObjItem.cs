@@ -18,8 +18,8 @@ namespace WzComparerR2.MapRender.Patches2
         public bool Flip { get; set; }
         public bool Light { get; set; }
         public string SpineAni { get; set; }
-        public List<Tuple<int, int>> Quest { get; set; }
-        public List<Tuple<int, string, int>> Questex { get; set; }
+        public List<QuestInfo> Quest { get; private set; } = new List<QuestInfo>();
+        public List<QuestExInfo> Questex { get; private set; } = new List<QuestExInfo>();
 
         public ItemView View { get; set; }
 
@@ -46,7 +46,7 @@ namespace WzComparerR2.MapRender.Patches2
             {
                 item.Tags = objTags.Split(',').Select(tag => tag.Trim()).ToArray();
             }
-            item.Quest = new List<Tuple<int, int>>();
+
             if (item.Tags != null)
             {
                 int questID;
@@ -54,30 +54,33 @@ namespace WzComparerR2.MapRender.Patches2
                 {
                     if (int.TryParse(tag, out questID) || (tag.StartsWith("q") && int.TryParse(tag.Substring(1), out questID)))
                     {
-                        item.Quest.Add(Tuple.Create(questID, 1));
+                        item.Quest.Add(new QuestInfo(questID, 1));
                     }
                 }
             }
+
             if (node.Nodes["quest"] != null)
             {
                 foreach (Wz_Node questNode in node.Nodes["quest"].Nodes)
                 {
-                    item.Quest.Add(Tuple.Create(int.Parse(questNode.Text), Convert.ToInt32(questNode.Value)));
+                    if (int.TryParse(questNode.Text, out int questID))
+                    {
+                        item.Quest.Add(new QuestInfo(questID, Convert.ToInt32(questNode.Value)));
+                    }  
                 }
             }
 
-            item.Questex = new List<Tuple<int, string, int>>();
             if (node.Nodes["questex"] != null)
             {
-                foreach (Wz_Node qnodes in node.Nodes["questex"].Nodes)
+                foreach (Wz_Node questNode in node.Nodes["questex"].Nodes)
                 {
-                    if (int.TryParse(qnodes.Text, out int questID))
+                    if (int.TryParse(questNode.Text, out int questID))
                     {
-                        Wz_Node knodes = qnodes.Nodes["key"];
-                        Wz_Node vnodes = qnodes.Nodes["value"];
-                        if (knodes != null && vnodes != null)
+                        Wz_Node keyNode = questNode.Nodes["key"];
+                        Wz_Node valueNode = questNode.Nodes["value"];
+                        if (keyNode != null && valueNode != null)
                         {
-                            item.Questex.Add(Tuple.Create(questID, knodes.GetValueEx<string>(null), vnodes.GetValueEx<int>(-1)));
+                            item.Questex.Add(new QuestExInfo(questID, keyNode.GetValueEx<string>(null), valueNode.GetValueEx<int>(-1)));
                         }
                     }
                 }

@@ -651,73 +651,73 @@ namespace WzComparerR2.MapRender
                 return null;
             }
 
-            if (item is BackItem)
+            switch (item)
             {
-                var back = (BackItem)item;
-                if (back.Quest.Exists(quest => !patchVisibility.IsVisible(quest.Item1, quest.Item2)))
-                {
-                    return null;
-                }
-                if (back.IsFront ? patchVisibility.FrontVisible : patchVisibility.BackVisible)
-                {
-                    return GetMeshBack(back);
-                }
-            }
-            else if (item is ObjItem obj)
-            {
-                if (patchVisibility.ObjVisible && !obj.Light)
-                {
-                    if (((ObjItem)item).Quest.Exists(quest => !patchVisibility.IsVisible(quest.Item1, quest.Item2)))
+                case BackItem back:
+                    if (back.Quest.Exists(quest => !patchVisibility.IsQuestVisible(quest.ID, quest.State)))
                     {
                         return null;
                     }
-                    if (((ObjItem)item).Questex.Exists(questex => !patchVisibility.IsVisible(questex.Item1, questex.Item2, questex.Item3)))
+                    if (back.IsFront ? patchVisibility.FrontVisible : patchVisibility.BackVisible)
+                    {
+                        return GetMeshBack(back);
+                    }
+                    break;
+
+                case ObjItem obj:
+                    if (patchVisibility.ObjVisible && !obj.Light)
+                    {
+                        if (obj.Quest.Exists(quest => !patchVisibility.IsQuestVisible(quest.ID, quest.State)))
+                        {
+                            return null;
+                        }
+                        if (obj.Questex.Exists(questex => !patchVisibility.IsQuestVisible(questex.ID, questex.Key, questex.State)))
+                        {
+                            return null;
+                        }
+                        return GetMeshObj(obj);
+                    }
+                    break;
+
+                case TileItem tile:
+                    if (patchVisibility.TileVisible)
+                    {
+                        return GetMeshTile(tile);
+                    }
+                    break;
+
+                case LifeItem life:
+                    if ((life.Type == LifeItem.LifeType.Mob && patchVisibility.MobVisible)
+                        || (life.Type == LifeItem.LifeType.Npc && patchVisibility.NpcVisible))
+                    {
+                        return GetMeshLife(life);
+                    }
+                    break;
+
+                case PortalItem portal:
+                    if (patchVisibility.PortalVisible)
+                    {
+                        return GetMeshPortal(portal);
+                    }
+                    break;
+
+                case ReactorItem reactor:
+                    if (patchVisibility.ReactorVisible)
+                    {
+                        return GetMeshReactor(reactor);
+                    }
+                    break;
+
+                case ParticleItem particle:
+                    if (particle.Quest.Exists(quest => !patchVisibility.IsQuestVisible(quest.ID, quest.State)))
                     {
                         return null;
                     }
-                    return GetMeshObj(obj);
-                }
-            }
-            else if (item is TileItem)
-            {
-                if (patchVisibility.TileVisible)
-                {
-                    return GetMeshTile((TileItem)item);
-                }
-            }
-            else if (item is LifeItem)
-            {
-                var life = (LifeItem)item;
-                if ((life.Type == LifeItem.LifeType.Mob && patchVisibility.MobVisible)
-                    || (life.Type == LifeItem.LifeType.Npc && patchVisibility.NpcVisible))
-                {
-                    return GetMeshLife(life);
-                }
-            }
-            else if (item is PortalItem)
-            {
-                if (patchVisibility.PortalVisible)
-                {
-                    return GetMeshPortal((PortalItem)item);
-                }
-            }
-            else if (item is ReactorItem)
-            {
-                if (patchVisibility.ReactorVisible)
-                {
-                    return GetMeshReactor((ReactorItem)item);
-                }
-            }
-            else if (item is ParticleItem)
-            {
-                if (((ParticleItem)item).Quest.Exists(quest => !patchVisibility.IsVisible(quest.Item1, quest.Item2)))
-                {
-                    return null;
-                }
-                if (patchVisibility.EffectVisible)
-                {
-                    return GetMeshParticle((ParticleItem)item);
-                }
+                    if (patchVisibility.EffectVisible)
+                    {
+                        return GetMeshParticle((ParticleItem)item);
+                    }
+                    break;
             }
             return null;
         }

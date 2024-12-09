@@ -750,7 +750,7 @@ namespace WzComparerR2.MapRender
                     switch (arguments.ElementAtOrDefault(1))
                     {
                         case "list":
-                            List<Tuple<int, int>> questList = this?.mapData.Scene.Back.Slots.SelectMany(item => ((BackItem)item).Quest)
+                            List<QuestInfo> questList = this?.mapData.Scene.Back.Slots.SelectMany(item => ((BackItem)item).Quest)
                                 .Concat(this?.mapData.Scene.Layers.Nodes.SelectMany(l => ((LayerNode)l).Obj.Slots.SelectMany(item => ((ObjItem)item).Quest)))
                                 .Concat(this?.mapData.Scene.Npcs.SelectMany(item => item.Quest))
                                 .Concat(this?.mapData.Scene.Front.Slots.SelectMany(item => ((BackItem)item).Quest))
@@ -758,19 +758,19 @@ namespace WzComparerR2.MapRender
                                 .Concat(this?.mapData.Scene.Effect.Slots.Where(item => item is ParticleItem).SelectMany(item => ((ParticleItem)item).SubItems).SelectMany(item => item.Quest))
                                 .Distinct().ToList();
                             this.ui.ChatBox.AppendTextHelp($"相关任务数量：({questList.Count()})");
-                            foreach (Tuple<int, int> item in questList)
+                            foreach (QuestInfo item in questList)
                             {
-                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{item.Item1}.img\QuestInfo")
-                                    ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{item.Item1}");
+                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{item.ID}.img\QuestInfo")
+                                    ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{item.ID}");
                                 string questName = questInfoNode?.Nodes["name"].GetValueEx<string>(null) ?? "null";
-                                this.ui.ChatBox.AppendTextHelp($"  {questName}({item.Item1}) / {item.Item2}");
+                                this.ui.ChatBox.AppendTextHelp($"  {questName}({item.ID}) / {item.State}");
                             }
                             break;
 
                         case "set":
                             if (Int32.TryParse(arguments.ElementAtOrDefault(2), out int questID) && questID > -1 && Int32.TryParse(arguments.ElementAtOrDefault(3), out int questState) && questState >= -1 && questState <= 2)
                             {
-                                this.patchVisibility.SetVisible(questID, questState);
+                                this.patchVisibility.SetQuestVisible(questID, questState);
                                 this.mapData.PreloadResource(resLoader);
                                 Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{questID}.img\QuestInfo")
                                     ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{questID}");
@@ -794,15 +794,15 @@ namespace WzComparerR2.MapRender
                     switch (arguments.ElementAtOrDefault(1))
                     {
                         case "list":
-                            List<Tuple<int, string, int>> questList = this?.mapData.Scene.Layers.Nodes.SelectMany(l => ((LayerNode)l).Obj.Slots.SelectMany(item => ((ObjItem)item).Questex))
+                            List<QuestExInfo> questList = this?.mapData.Scene.Layers.Nodes.SelectMany(l => ((LayerNode)l).Obj.Slots.SelectMany(item => ((ObjItem)item).Questex))
                                 .Distinct().ToList();
                             this.ui.ChatBox.AppendTextHelp($"相关任务Key的数量：({questList.Count()})");
-                            foreach (Tuple<int, string, int> item in questList)
+                            foreach (QuestExInfo item in questList)
                             {
-                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{item.Item1}.img\QuestInfo")
-                                    ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{item.Item1}");
+                                Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{item.ID}.img\QuestInfo")
+                                    ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{item.ID}");
                                 string questName = questInfoNode?.Nodes["name"].GetValueEx<string>(null) ?? "null";
-                                this.ui.ChatBox.AppendTextHelp($"  {questName}({item.Item1}) / Key:{item.Item2}, Value:{item.Item3}");
+                                this.ui.ChatBox.AppendTextHelp($"  {questName}({item.ID}) / Key:{item.Key}, Value:{item.State}");
                             }
                             break;
 
@@ -810,7 +810,7 @@ namespace WzComparerR2.MapRender
                             string qkey = arguments.ElementAtOrDefault(3);
                             if (Int32.TryParse(arguments.ElementAtOrDefault(2), out int questID) && questID > -1 && Int32.TryParse(arguments.ElementAtOrDefault(4), out int questState) && questState >= -1 && qkey != null)
                             {
-                                this.patchVisibility.SetVisible(questID, qkey, questState);
+                                this.patchVisibility.SetQuestVisible(questID, qkey, questState);
                                 this.mapData.PreloadResource(resLoader);
                                 Wz_Node questInfoNode = PluginBase.PluginManager.FindWz($@"Quest\QuestData\{questID}.img\QuestInfo")
                                     ?? PluginBase.PluginManager.FindWz($@"Quest\QuestInfo.img\{questID}");
