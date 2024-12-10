@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using NLua;
 using System.IO;
-using System.Diagnostics;
-using System.Threading;
-using DevComponents.DotNetBar;
 using System.Reflection;
-using ICSharpCode.TextEditor.Document;
-using WzComparerR2.PluginBase;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows.Forms;
+using WzComparerR2.PluginBase;
+using WzComparerR2.WzLib;
+using DevComponents.DotNetBar;
+using ICSharpCode.TextEditor.Document;
+using NLua;
 
 namespace WzComparerR2.LuaConsole
 {
@@ -74,6 +72,7 @@ end
                 "Lua\\?\\init.lua" };
             string packageDir = string.Join(";", Array.ConvertAll(packageFile, s => Path.Combine(baseDir, s)));
             lua.DoString(string.Format("package.path = [[{0}]]..';'..package.path", packageDir));
+            lua.RegisterLuaDelegateType(typeof(WzComparerR2.GlobalFindNodeFunction), typeof(LuaGlobalFindNodeFunctionHandler)); 
         }
 
         public class LuaEnvironment
@@ -300,6 +299,20 @@ env:WriteLine(string format, object[] args)");
 
             editor.SaveFile(editor.FileName);
             textBoxX2.AppendText($"====已经保存{editor.FileName}====");
+        }
+
+        class LuaGlobalFindNodeFunctionHandler : NLua.Method.LuaDelegate
+        {
+            Wz_Node CallFunction(string wzPath)
+            {
+                object[] args = { wzPath };
+                object[] inArgs = { wzPath };
+                int[] outArgs = { };
+
+                object ret = CallFunction(args, inArgs, outArgs);
+
+                return (Wz_Node)ret;
+            }
         }
     }
 }

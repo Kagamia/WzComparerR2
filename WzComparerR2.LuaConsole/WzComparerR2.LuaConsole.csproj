@@ -27,7 +27,15 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
     <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj">
       <Private>false</Private>
       <ExcludeAssets>all</ExcludeAssets>
     </ProjectReference>
@@ -36,8 +44,8 @@
       <Private>false</Private>
     </Reference>
     <PackageReference Include="ICSharpCode.TextEditor" Version="3.2.1.6466" NoWarn="NU1701"/>
-    <PackageReference Include="KeraLua" Version="1.3.1" GeneratePathProperty="true" />
-    <PackageReference Include="NLua" Version="1.6.0" />
+    <PackageReference Include="KeraLua" Version="1.4.1" GeneratePathProperty="true" />
+    <PackageReference Include="NLua" Version="1.7.3" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\SharpLua.xshd" />
