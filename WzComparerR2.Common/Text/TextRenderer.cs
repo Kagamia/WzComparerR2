@@ -14,13 +14,10 @@ namespace WzComparerR2.Text
         }
 
         public bool WordWrapEnabled { get; set; }
-
-        const int MAX_RANGES = 32;
-
         protected StringBuilder sb;
         protected TFont font;
 
-        public void DrawFormatString(string s, TFont font, int width, ref int y, int height)
+        public void DrawFormatString(string s, TFont font, int width, ref int y, int height, TextAlignment alignment = TextAlignment.Left)
         {
             //初始化环境
             this.font = font;
@@ -29,28 +26,23 @@ namespace WzComparerR2.Text
 
             //读取格式
             var doc = Parser.Parse(s);
-            var runs = PrepareRuns(doc);
-
-            //拆分成词
-            runs = runs.SelectMany(run => SplitWords(run)).ToList();
-
-            //对词进行measure
-            MeasureRuns(runs);
-
-            //直接绘制
-            DrawRuns(runs, width, ref y, height);
+            this.DrawRunsInner(this.PrepareRuns(doc), width, ref y, height, alignment);
         }
 
-        public void DrawPlainText(string s, TFont font, int width, ref int y, int height)
+        public void DrawPlainText(string s, TFont font, int width, ref int y, int height, TextAlignment alignment = TextAlignment.Left)
         {
             this.font = font;
             this.sb.Clear();
             this.sb.EnsureCapacity(s.Length);
+            this.DrawRunsInner(this.PrepareRuns(s), width, ref y, height, alignment);
+        }
 
-            var runs = PrepareRuns(s);
+        private void DrawRunsInner(List<Run> runs, int width, ref int y, int height, TextAlignment alignment)
+        {
             runs = runs.SelectMany(run => SplitWords(run)).ToList();
-            MeasureRuns(runs);
-            DrawRuns(runs, width, ref y, height);
+            this.MeasureRuns(runs);
+            var layout = LayoutRuns(runs, width, ref y, height, alignment);
+            this.FlushAll(layout);
         }
 
         private List<Run> PrepareRuns(IList<DocElement> doc)
@@ -175,7 +167,7 @@ namespace WzComparerR2.Text
 
         protected abstract void Flush(StringBuilder sb, int startIndex, int length, int x, int y, string ColorID);
 
-        private void DrawRuns(List<Run> runs, int width, ref int y, int lineHeight)
+        private List<PositionedText> LayoutRuns(List<Run> runs, int width, ref int y, int lineHeight, TextAlignment alignment)
         {
             int drawX = 0;
             int drawY = y;
@@ -183,20 +175,44 @@ namespace WzComparerR2.Text
             int xOffset = 0;
 
             int curX = drawX;
-
-            Func<bool> hasContent = () => start > -1 && end > start;
             string colorID = null;
+            List<PositionedText> result = new();
+            int lastLineStartIndex = 0;
 
-            Action<bool> flush = (isNewLine) =>
+            bool hasContent() => start > -1 && end > start;
+            void flush(bool isNewLine)
             {
                 if (hasContent())
                 {
-                    Flush(sb, start, end - start, drawX, drawY, colorID);
+                    result.Add(new PositionedText()
+                    {
+                        StartIndex = start,
+                        Length = end - start,
+                        X = drawX,
+                        Y = drawY,
+                        ColorID = colorID
+                    });
                 }
                 if (isNewLine)
                 {
+                    if (lastLineStartIndex < result.Count && alignment != TextAlignment.Left)
+                    {
+                        // recalculate offsetX by alignment
+                        int contentWidth = curX;
+                        int adjustOffsetX = alignment switch
+                        {
+                            TextAlignment.Center => (width - contentWidth) / 2,
+                            TextAlignment.Right => (width - contentWidth),
+                            _ => 0,
+                        };
+                        for (int i = lastLineStartIndex; i < result.Count; i++)
+                        {
+                            result[i].X += adjustOffsetX;
+                        }
+                    }
                     drawX = curX = 0;
                     drawY += lineHeight;
+                    lastLineStartIndex = result.Count;
                 }
                 else
                 {
@@ -271,6 +287,7 @@ namespace WzComparerR2.Text
                                         if (ir - start <= 0)
                                         { //限定至少输出一个字符
                                             end = start + 1;
+                                            curX = rects[i].Right - xOffset;
                                             flush(true);
                                             xOffset = rects[i].Right;
                                             continue;
@@ -278,6 +295,7 @@ namespace WzComparerR2.Text
                                         else
                                         {
                                             end = ir;
+                                            curX = rects[i].X - xOffset;
                                             flush(true);
                                             start = ir;
                                             xOffset = rects[i].X;
@@ -295,13 +313,31 @@ namespace WzComparerR2.Text
 
                     //正常绘制
                     end = run.StartIndex + run.Length;
-
+                    curX = run.X + run.Width - xOffset;
                 }
             }
 
             //输出结尾
             flush(true);
             y = drawY;
+            return result;
+        }
+
+        private void FlushAll(List<PositionedText> texts)
+        {
+            foreach (PositionedText text in texts)
+            {
+                this.Flush(sb, text.StartIndex, text.Length, text.X, text.Y, text.ColorID);
+            }
+        }
+
+        private class PositionedText
+        {
+            public int StartIndex;
+            public int Length;
+            public int X;
+            public int Y;
+            public string ColorID;
         }
     }
 

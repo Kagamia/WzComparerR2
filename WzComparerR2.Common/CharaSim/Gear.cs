@@ -15,6 +15,7 @@ namespace WzComparerR2.CharaSim
             Props = new Dictionary<GearPropType, int>();
             VariableStat = new Dictionary<GearPropType, float>();
             AbilityTimeLimited = new Dictionary<GearPropType, int>();
+            ReqSpecJobs = new List<int>();
             Options = new Potential[3];
             AdditionalOptions = new Potential[3];
             Additions = new List<Addition>();
@@ -47,6 +48,7 @@ namespace WzComparerR2.CharaSim
         public Dictionary<GearPropType, int> Props { get; private set; }
         public Dictionary<GearPropType, float> VariableStat { get; private set; }
         public Dictionary<GearPropType, int> AbilityTimeLimited { get; private set; }
+        public List<int> ReqSpecJobs { get; private set; }
 
         /// <summary>
         /// 获取或设置装备的标准属性。
@@ -737,6 +739,13 @@ namespace WzComparerR2.CharaSim
                                     {
                                     }
                                 }
+                            }
+                            break;
+
+                        case "reqSpecJobs":
+                            foreach (Wz_Node jobNode in subNode.Nodes)
+                            {
+                                gear.ReqSpecJobs.Add(jobNode.GetValue<int>());
                             }
                             break;
 

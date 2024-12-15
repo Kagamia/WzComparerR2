@@ -232,12 +232,12 @@ namespace WzComparerR2.CharaSimControl
         /// <param Name="x">起始的x坐标。</param>
         /// <param Name="X1">每行终止的x坐标。</param>
         /// <param Name="y">起始行的y坐标。</param>
-        public static void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height)
+        public static void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height, TextAlignment alignment = TextAlignment.Left)
         {
-            DrawString(g, s, font, null, x, x1, ref y, height);
+            DrawString(g, s, font, null, x, x1, ref y, height, alignment);
         }
 
-        public static void DrawString(Graphics g, string s, Font font, IDictionary<string, Color> fontColorTable, int x, int x1, ref int y, int height)
+        public static void DrawString(Graphics g, string s, Font font, IDictionary<string, Color> fontColorTable, int x, int x1, ref int y, int height, TextAlignment alignment = TextAlignment.Left)
         {
             if (s == null)
                 return;
@@ -247,11 +247,11 @@ namespace WzComparerR2.CharaSimControl
                 r.WordWrapEnabled = false;
                 r.UseGDIRenderer = false;
                 r.FontColorTable = fontColorTable;
-                r.DrawString(g, s, font, x, x1, ref y, height);
+                r.DrawString(g, s, font, x, x1, ref y, height, alignment);
             }
         }
 
-        public static void DrawPlainText(Graphics g, string s, Font font, Color color, int x, int x1, ref int y, int height)
+        public static void DrawPlainText(Graphics g, string s, Font font, Color color, int x, int x1, ref int y, int height, TextAlignment alignment = TextAlignment.Left)
         {
             if (s == null)
                 return;
@@ -260,7 +260,7 @@ namespace WzComparerR2.CharaSimControl
             {
                 r.WordWrapEnabled = false;
                 r.UseGDIRenderer = false;
-                r.DrawPlainText(g, s, font, color, x, x1, ref y, height);
+                r.DrawPlainText(g, s, font, color, x, x1, ref y, height, alignment);
             }
         }
 
@@ -574,7 +574,7 @@ namespace WzComparerR2.CharaSimControl
             int drawX;
             Color defaultColor;
 
-            public void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height)
+            public void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height, TextAlignment alignment = TextAlignment.Left)
             {
                 //初始化环境
                 this.g = g;
@@ -583,10 +583,10 @@ namespace WzComparerR2.CharaSimControl
                 float fontLineHeight = GetFontLineHeight(font);
                 this.infinityRect = new RectangleF(0, 0, ushort.MaxValue, fontLineHeight);
 
-                base.DrawFormatString(s, font, x1 - x, ref y, height);
+                base.DrawFormatString(s, font, x1 - x, ref y, height, alignment);
             }
 
-            public void DrawPlainText(Graphics g, string s, Font font, Color color, int x, int x1, ref int y, int height)
+            public void DrawPlainText(Graphics g, string s, Font font, Color color, int x, int x1, ref int y, int height, TextAlignment alignment = TextAlignment.Left)
             {
                 //初始化环境
                 this.g = g;
@@ -595,7 +595,7 @@ namespace WzComparerR2.CharaSimControl
                 float fontLineHeight = GetFontLineHeight(font);
                 this.infinityRect = new RectangleF(0, 0, ushort.MaxValue, fontLineHeight);
 
-                base.DrawPlainText(s, font, x1 - x, ref y, height);
+                base.DrawPlainText(s, font, x1 - x, ref y, height, alignment);
             }
 
             private float GetFontLineHeight(Font font)

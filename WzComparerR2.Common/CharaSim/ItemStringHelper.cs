@@ -535,6 +535,31 @@ namespace WzComparerR2.CharaSim
             }
         }
 
+        public static string GetExtraJobReqString(IEnumerable<int> specJobs)
+        {
+            List<string> extraJobNames = new List<string>();
+            foreach (int specJob in specJobs)
+            {
+                switch (specJob)
+                {
+                    case 1: extraJobNames.AddRange(new[] { "英雄", "圣骑士" }); break;
+                    case 2: extraJobNames.AddRange(new[] { "冰雷魔导师", "火毒魔导师", "主教" }); break;
+                    case 4: extraJobNames.Add("侠盗"); break;
+                    case 11: extraJobNames.Add("魂骑士"); break;
+                    case 12: extraJobNames.Add("炎术士"); break;
+                    case 22: extraJobNames.Add("龙神"); break;
+                    case 32: extraJobNames.Add("唤灵斗师"); break;
+                    case 172: extraJobNames.Add("森林小主"); break;
+                    default: extraJobNames.Add(specJob.ToString()); break;
+                }
+            }
+            if (extraJobNames.Count == 0)
+            {
+                return null;
+            }
+            return string.Join("、", extraJobNames) + "可穿戴装备";
+        }
+
         public static string GetItemPropString(ItemPropType propType, long value)
         {
             switch (propType)
