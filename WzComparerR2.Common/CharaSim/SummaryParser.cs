@@ -148,7 +148,7 @@ namespace WzComparerR2.CharaSim
                         sb.Append(param.CStart);
                         idx++;
                     }
-                    else //无法匹配 取最长的common段
+                    else if (len > 0)//无法匹配 取最长的common段
                     {
                         string key = H.Substring(idx + 1, len);
                         if (Regex.IsMatch(key, @"^\d+$"))
@@ -160,6 +160,10 @@ namespace WzComparerR2.CharaSim
                             sb.Append(0);//默认值
                         }
                         idx += len + 1;
+                    }
+                    else // skip last #
+                    {
+                        idx++;
                     }
                 }
                 else if (H[idx] == '\\')
