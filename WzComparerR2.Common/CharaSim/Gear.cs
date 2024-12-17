@@ -177,6 +177,21 @@ namespace WzComparerR2.CharaSim
             }
         }
 
+        public bool IsGenesisWeapon
+        {
+            get
+            {
+                // There's no better way to determine if a weapon is a Genesis weapon, the game itself also uses a hard-coded list to check it.
+                if (IsWeapon(this.type)
+                    && this.Props.TryGetValue(GearPropType.setItemID, out var setItemID)
+                    && 886 <= setItemID && setItemID <= 890)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
         public static bool IsWeapon(GearType type)
         {
             return IsLeftWeapon(type)
