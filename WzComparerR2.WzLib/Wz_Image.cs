@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Buffers;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.IO;
+using System.Text;
 using WzComparerR2.WzLib.Utilities;
-using System.Buffers;
 
 namespace WzComparerR2.WzLib
 {
@@ -82,8 +81,6 @@ namespace WzComparerR2.WzLib
                 {
                     this.stream = this.OpenRead();
                 }
-                var reader = new WzBinaryReader(this.stream, true);
-                reader.BaseStream.Position = 0;
 
                 bool disabledChec = this.WzFile?.WzStructure?.ImgCheckDisabled ?? false;
                 if (!disabledChec && !this.chec)
@@ -96,49 +93,74 @@ namespace WzComparerR2.WzLib
                     this.chec = true;
                 }
 
-                if (!this.checEnc)
+                if (this.IsTextFormat())
                 {
-                    if (!this.IsLuaImage)
+                    var reader = new WzStreamReader(this.stream);
+
+                    try
                     {
-                        try
+                        lock (this.WzFile.ReadLock)
                         {
-                            this.TryDetectEnc();
-                            if (!this.checEnc)
+                            reader.BaseStream.Position = 0;
+                            this.ExtractImgInTextFormat(reader, this.Node);
+                            this.extr = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        e = ex;
+                        this.Unextract();
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (!this.checEnc)
+                    {
+                        if (!this.IsLuaImage)
+                        {
+                            try
                             {
-                                e = null;
+                                this.TryDetectEnc();
+                                if (!this.checEnc)
+                                {
+                                    e = null;
+                                    return false;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                e = ex;
+                                this.Unextract();
                                 return false;
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            e = ex;
-                            this.Unextract();
-                            return false;
-                        }
                     }
-                }
 
-                try
-                {
-                    lock (this.WzFile.ReadLock)
+                    try
                     {
-                        reader.BaseStream.Position = 0;
-                        if (!this.IsLuaImage)
+                        lock (this.WzFile.ReadLock)
                         {
-                            ExtractImg(reader, this.Node);
+                            var reader = new WzBinaryReader(this.stream, true);
+                            reader.BaseStream.Position = 0;
+
+                            if (!this.IsLuaImage)
+                            {
+                                ExtractImg(reader, this.Node);
+                            }
+                            else
+                            {
+                                ExtractLua(reader);
+                            }
+                            this.extr = true;
                         }
-                        else
-                        {
-                            ExtractLua(reader);
-                        }
-                        this.extr = true;
                     }
-                }
-                catch (Exception ex)
-                {
-                    e = ex;
-                    this.Unextract();
-                    return false;
+                    catch (Exception ex)
+                    {
+                        e = ex;
+                        this.Unextract();
+                        return false;
+                    }
                 }
             }
             e = null;
@@ -525,7 +547,85 @@ namespace WzComparerR2.WzLib
             this.encType = maxCharEnc;
             this.checEnc = true;
         }
-        
+
+        private bool IsTextFormat()
+        {
+            ReadOnlySpan<byte> signatureBytes = "#Property"u8;
+            if (this.stream.Length < signatureBytes.Length)
+            {
+                return false;
+            }
+
+            this.stream.Position = 0;
+            Span<byte> buffer = stackalloc byte[signatureBytes.Length];
+            this.stream.ReadExactly(buffer);
+            
+            return buffer.SequenceEqual(signatureBytes);
+        }
+
+        private void ExtractImgInTextFormat(WzStreamReader reader, Wz_Node parent)
+        {
+            reader.SkipLine();
+            this.ReadProperty(reader, parent, true);
+        }
+
+        private void ReadProperty(WzStreamReader reader, Wz_Node parent, bool isTopLevel = false)
+        {
+            while (!reader.EndOfStream)
+            {
+                reader.SkipWhitespaceExceptLineEnding();
+                string key = reader.ReadUntilWhitespace();
+
+                if (string.IsNullOrEmpty(key)) // skip empty line
+                {
+                    reader.SkipLine();
+                    continue;
+                }
+                else if (key == "}" && !isTopLevel) // end property
+                {
+                    if (!reader.SkipLineAndCheckEmpty())
+                    {
+                        throw new Exception("Incorrect property end line.");
+                    }
+                    return;
+                }
+
+                reader.SkipWhitespaceExceptLineEnding();
+                int equalSign = reader.Read();
+                if (equalSign != '=')
+                    throw new Exception($"Expect '=' sign but got '{(char)equalSign}'.");
+                reader.SkipWhitespaceExceptLineEnding();
+
+                string stringVal = reader.ReadLine();
+
+                if (string.IsNullOrEmpty(stringVal))
+                {
+                    parent.Nodes.Add(key);
+                }
+                else if (stringVal == "{") // start property
+                {
+                    Wz_Node child = parent.Nodes.Add(key);
+                    this.ReadProperty(reader, child, false);
+                }
+                else if (int.TryParse(stringVal, out var intVal))
+                {
+                    parent.Nodes.Add(key).Value = intVal;
+                }
+                else if (long.TryParse(stringVal, out var longVal))
+                {
+                    parent.Nodes.Add(key).Value = longVal;
+                }
+                else if (double.TryParse(stringVal, out var doubleVal))
+                {
+                    parent.Nodes.Add(key).Value = doubleVal;
+                }
+                else
+                {
+                    parent.Nodes.Add(key).Value = stringVal;
+                }
+            }
+        }
+
         internal class Wz_ImageNode : Wz_Node
         {
             public Wz_ImageNode(string nodeText, Wz_Image image) : base(nodeText)
