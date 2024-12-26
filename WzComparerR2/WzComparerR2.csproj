@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net462;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net462;net6.0-windows;net8.0-windows</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>WzComparerR2</AssemblyName>
     <RootNamespace>WzComparerR2</RootNamespace>
@@ -20,7 +20,8 @@
   </PropertyGroup>
   <ItemGroup Condition="$(DotnetEdition) == 'core'">
     <!-- patching dotnetbar on net6 -->
-    <PackageReference Include="Lib.Harmony" Version="2.2.2" />
+    <PackageReference Include="Lib.Harmony" Version="2.3.3" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
     <!-- upgrade indirect dependency of SharpDX to prevent too many runtime libraries -->
     <PackageReference Include="Microsoft.NETCore.App" Version="2.1.30" />
   </ItemGroup>
@@ -44,7 +45,7 @@
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="$(MonogameFrameworkVersion)" />
     <PackageReference Include="SharpDX" Version="$(SharpDXVersion)" />
     <PackageReference Include="ManagedBass" Version="3.1.1" />
-    <PackageReference Include="System.Resources.Extensions" Version="7.0.0" />
+    <PackageReference Include="System.Resources.Extensions" Version="$(SystemResourcesExtensionsVersion)" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="DevComponents.DotNetBar2">

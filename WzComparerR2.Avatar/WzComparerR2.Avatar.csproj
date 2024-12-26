@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net462;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net462;net6.0-windows;net8.0-windows</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>WzComparerR2.Avatar</AssemblyName>
     <RootNamespace>WzComparerR2.Avatar</RootNamespace>
@@ -47,7 +47,7 @@
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <PackageReference Include="System.Resources.Extensions" Version="7.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="System.Resources.Extensions" Version="$(SystemResourcesExtensionsVersion)" ExcludeAssets="runtime" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
     <Compile Include="..\Build\CommonAssemblyInfo.cs">
