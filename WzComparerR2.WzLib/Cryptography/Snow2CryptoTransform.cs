@@ -13,11 +13,9 @@ namespace WzComparerR2.WzLib.Cryptography
     {
         public Snow2CryptoTransform(ReadOnlySpan<byte> key, ReadOnlySpan<byte> iv, bool encrypting)
         {
-            if (key == null) 
-                throw new ArgumentNullException(nameof(key));
-            if (key.Length != 16 && iv.Length != 32)
+            if (key.Length != 16 && key.Length != 32)
                 throw new ArgumentOutOfRangeException(nameof(key), "Key size must be 16 or 32 bytes.");
-            if (iv != null && iv.Length != 4)
+            if (!iv.IsEmpty && iv.Length != 4)
                 throw new ArgumentOutOfRangeException(nameof(iv), "Iv size must be 4 bytes.");
 
             this.encrypting = encrypting;
@@ -212,7 +210,7 @@ namespace WzComparerR2.WzLib.Cryptography
             }
 
             /* XOR IV values */
-            if (iv != null && iv.Length != 0)
+            if (!iv.IsEmpty)
             {
                 this.s15 ^= iv[0];
                 this.s12 ^= iv[1];
