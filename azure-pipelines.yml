@@ -181,6 +181,6 @@ steps:
     releaseNotesSource: 'inline'
     releaseNotesInline: |
       Automation build from azure-pipeline.
-      Mirror: [[WcR2.netfx.zip]($(sasurl_netfx))] | [[WcR2.net6.zip]($(sasurl_net6))]
+      Mirror: [[WcR2.netfx.zip]($(sasurl_netfx))] | [[WcR2.net6.zip]($(sasurl_net6))] | [[WcR2.net8.zip]($(sasurl_net8))]
     isPreRelease: false
     addChangeLog: false
