@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net462;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net462;net6.0-windows;net8.0-windows</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>WzComparerR2.MapRender</AssemblyName>
     <RootNamespace>WzComparerR2.MapRender</RootNamespace>
@@ -66,7 +66,7 @@
     <PackageReference Include="ManagedBass" Version="3.1.1" ExcludeAssets="runtime" />
     <PackageReference Include="SharpDX" Version="$(SharpDXVersion)" ExcludeAssets="runtime" />
     <PackageReference Include="SharpDX.RawInput" Version="$(SharpDXVersion)" NoWarn="NU1701" />
-    <PackageReference Include="System.Resources.Extensions" Version="7.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="System.Resources.Extensions" Version="$(SystemResourcesExtensionsVersion)" ExcludeAssets="runtime" />
   </ItemGroup>
   <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
     <Compile Include="..\Build\CommonAssemblyInfo.cs">

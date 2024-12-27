@@ -13,13 +13,23 @@
     <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
     <RunAnalyzers>false</RunAnalyzers>
   </PropertyGroup>
-
-  <!-- net6+ -->
-  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net[6-8]'))">
+  
+  <!-- net6 -->
+  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net8'))">
+    <ImplicitUsings>disable</ImplicitUsings>
+    <NoWarn>CA1416</NoWarn>
+    <DotnetEdition>core</DotnetEdition>
+    <MonogameFrameworkVersion>3.8.2.1105</MonogameFrameworkVersion>
+    <SystemDrawingCommonVersion>8.0.11</SystemDrawingCommonVersion>
+  </PropertyGroup>
+  
+  <!-- net6 -->
+  <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch($(TargetFramework), '^net6'))">
     <ImplicitUsings>disable</ImplicitUsings>
     <NoWarn>CA1416</NoWarn>
     <DotnetEdition>core</DotnetEdition>
     <MonogameFrameworkVersion>3.8.1.303</MonogameFrameworkVersion>
+    <SystemDrawingCommonVersion>6.0.0</SystemDrawingCommonVersion>
   </PropertyGroup>
   
   <!-- net framework -->
@@ -29,9 +39,10 @@
     <MonogameFrameworkVersion>3.8.0.1641</MonogameFrameworkVersion>
   </PropertyGroup>
 
-  <!-- net framework -->
+  <!-- common -->
   <PropertyGroup>
     <SharpDXVersion>4.2.0</SharpDXVersion>
+    <SystemResourcesExtensionsVersion>8.0.0</SystemResourcesExtensionsVersion>
   </PropertyGroup>
 
   <!-- plugin specified property -->

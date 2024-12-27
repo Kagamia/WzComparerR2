@@ -39,6 +39,7 @@ namespace WzComparerR2.MapRender
             this.TargetElapsedTime = TimeSpan.FromSeconds(1.0 / 60);
             this.InactiveSleepTime = TimeSpan.FromSeconds(1.0 / 30);
             this.IsMouseVisible = true;
+            this.Exiting += (o, e) => this.OnExiting();
 
             this.Content = new WcR2ContentManager(this.Services);
             this.patchVisibility = new PatchVisibility();
@@ -55,6 +56,8 @@ namespace WzComparerR2.MapRender
             form.FormClosed += Form_FormClosed;
 
             this.imeHelper = new IMEHandler(this, true);
+            this.Exiting += (o, e) => this.imeHelper.Dispose();
+            this.Disposed += (o, e) => this.imeHelper.Dispose();
             GameExt.FixKeyboard(this);
         }
 
@@ -1127,12 +1130,6 @@ namespace WzComparerR2.MapRender
                 this.mapData = null;
                 this.isUnloaded = true;
             }
-        }
-
-        protected override void OnExiting(object sender, EventArgs args)
-        {
-            base.OnExiting(sender, args);
-            this.OnExiting();
         }
 
         private void OnExiting()
