@@ -374,7 +374,7 @@ namespace WzComparerR2.MapRender
                 Texture = atlas.Texture,
                 AtlasRect = atlas.SrcRect,
                 Z = node.Nodes["z"].GetValueEx(0),
-                Delay = node.Nodes["delay"].GetValueEx(100),
+                Delay = node.Nodes["delay"].GetValueEx(120),
                 Blend = node.Nodes["blend"].GetValueEx(0) != 0,
                 Origin = (node.Nodes["origin"]?.Value as Wz_Vector)?.ToPoint() ?? Point.Zero
             };

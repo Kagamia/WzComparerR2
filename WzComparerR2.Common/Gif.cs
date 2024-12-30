@@ -234,7 +234,7 @@ namespace WzComparerR2.Common
                 }
                 if (gifFrame.Delay == 0)
                 {
-                    gifFrame.Delay = 100;//给予默认delay
+                    gifFrame.Delay = 120;//给予默认delay
                 }
                 return gifFrame;
             }
