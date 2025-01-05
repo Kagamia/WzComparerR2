@@ -12,12 +12,14 @@ namespace WzComparerR2.CharaSim
         {
             this.Props = new Dictionary<ItemPropType, long>();
             this.Specs = new Dictionary<ItemSpecType, long>();
+            this.Recipes = new List<int>();
         }
 
         public int Level { get; set; }
 
         public Dictionary<ItemPropType, long> Props { get; private set; }
         public Dictionary<ItemSpecType, long> Specs { get; private set; }
+        public List<int> Recipes { get; private set; }
 
         public bool Cash
         {
@@ -109,8 +111,21 @@ namespace WzComparerR2.CharaSim
             {
                 foreach (Wz_Node subNode in specNode.Nodes)
                 {
-                    ItemSpecType type;
-                    if (Enum.TryParse(subNode.Text, out type))
+                    if (subNode.Text == "recipe")
+                    {
+                        if (subNode.Value == null && subNode.Nodes.Count > 0)
+                        {
+                            foreach (var recipeNode in subNode.Nodes)
+                            {
+                                item.Recipes.Add(recipeNode.GetValue<int>());
+                            }
+                        }
+                        else
+                        {
+                            item.Recipes.Add(subNode.GetValue<int>());
+                        }
+                    }
+                    else if(Enum.TryParse(subNode.Text, out ItemSpecType type))
                     {
                         try
                         {
