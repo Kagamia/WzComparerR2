@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using DevComponents.DotNetBar;
 
 namespace WzComparerR2.Controls
 {
@@ -37,6 +38,17 @@ namespace WzComparerR2.Controls
         {
             get { return this.progressBarX1.Maximum; }
             set { this.progressBarX1.Maximum = value; }
+        }
+
+        public string FullMessage { get; set; }
+
+        private void labelX1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                Clipboard.SetText(this.FullMessage ?? this.Message);
+                ToastNotification.Show(this, "已复制到剪切板。", 1000, eToastPosition.TopCenter);
+            }
         }
     }
 }

@@ -463,7 +463,15 @@ namespace WzComparerR2
                 }
                 catch (Exception ex)
                 {
-                    context.Message = $"Error: {ex.Message}";
+                    if (ex is AggregateException aggrEx && aggrEx.InnerExceptions.Count == 1)
+                    {
+                        context.Message = $"Error: {aggrEx.InnerExceptions[0].Message}";
+                    }
+                    else
+                    {
+                        context.Message = $"Error: {ex.Message}";
+                    }
+                    context.FullMessage = ex.ToString();
                     throw;
                 }
                 finally

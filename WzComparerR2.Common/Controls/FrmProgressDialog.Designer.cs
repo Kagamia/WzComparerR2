@@ -65,6 +65,7 @@ namespace WzComparerR2.Controls
             this.labelX1.Size = new System.Drawing.Size(278, 19);
             this.labelX1.TabIndex = 0;
             this.labelX1.Text = "Message";
+            this.labelX1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.labelX1_MouseClick);
             // 
             // progressBarX1
             // 
