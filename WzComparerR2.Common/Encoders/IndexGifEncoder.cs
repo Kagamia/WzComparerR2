@@ -3,35 +3,48 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace WzComparerR2.Common
+namespace WzComparerR2.Encoders
 {
     public class IndexGifEncoder : GifEncoder
     {
-        public IndexGifEncoder(string location, int width, int height)
-             : this(location, width, height, 255, Color.FromArgb(0))
+        public IndexGifEncoder()
         {
-
-        }
-        public IndexGifEncoder(string location, int width, int height, int max_color, Color back_color)
-            :base(location, width, height)
-        {
-            encoder_pointer = construct(location, width, height, max_color, back_color.ToArgb());
         }
 
         private IntPtr encoder_pointer;
 
+        public override GifEncoderCompatibility Compatibility => new GifEncoderCompatibility()
+        {
+            IsFixedFrameRate = false,
+            MinFrameDelay = 10,
+            MaxFrameDelay = 655350,
+            FrameDelayStep = 10,
+            AlphaSupportMode = AlphaSupportMode.OneBitAlpha,
+            DefaultExtension = ".gif",
+            SupportedExtensions = new[] { ".gif" },
+        };
+
+        public override void Init(string fileName, int width, int height)
+        {
+            base.Init(fileName, width, height);
+
+            encoder_pointer = construct(fileName, width, height, 255, 0);
+        }
 
         public override void AppendFrame(IntPtr pBuffer, int delay)
         {
             encoder.append_frame(pBuffer, delay, encoder_pointer);
         }
 
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                encoder.destruct(encoder_pointer);
+                if (encoder_pointer != IntPtr.Zero)
+                {
+                    encoder.destruct(encoder_pointer);
+                    encoder_pointer = IntPtr.Zero;
+                }
             }
         }
 

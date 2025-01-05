@@ -7,19 +7,26 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using ImageManipulation;
 
-namespace WzComparerR2.Common
+namespace WzComparerR2.Encoders
 {
     public class BuildInGifEncoder : GifEncoder
     {
-        public BuildInGifEncoder(string fileName, int width, int height)
-            : base(fileName, width, height)
+        public BuildInGifEncoder()
         {
-            bWriter = new BinaryWriter(File.Create(fileName));
             mStream = new MemoryStream();
             quantizer = new OctreeQuantizer(255, 8);
-
-            WriteHeader();
         }
+
+        public override GifEncoderCompatibility Compatibility => new GifEncoderCompatibility()
+        {
+            IsFixedFrameRate = false,
+            MinFrameDelay = 10,
+            MaxFrameDelay = 655350,
+            FrameDelayStep = 10,
+            AlphaSupportMode = AlphaSupportMode.OneBitAlpha,
+            DefaultExtension = ".gif",
+            SupportedExtensions = new[] { ".gif" },
+        };
 
         private BinaryWriter bWriter;
         private MemoryStream mStream;
@@ -32,6 +39,14 @@ namespace WzComparerR2.Common
                 0x03,0x01,0x00,0x00,0x00};//循环信息 其他信息
         private static readonly byte[] gifEnd = new byte[] { 0x3b };//结束信息
 
+        public override void Init(string fileName, int width, int height)
+        {
+            base.Init(fileName, width, height);
+
+            bWriter = new BinaryWriter(File.Create(fileName));
+            WriteHeader();
+        }
+
         public override void AppendFrame(Bitmap image, int delay)
         {
             mStream.SetLength(0);
@@ -43,12 +58,12 @@ namespace WzComparerR2.Common
 
             byte[] tempArray = mStream.GetBuffer();
             // 781开始为Graphic Control Extension块 标志为21 F9 04 
-            tempArray[784] = (byte)0x09; //图像刷新时屏幕返回初始帧 貌似不打会bug 意味不明 测试用
+            tempArray[784] = 0x09; //图像刷新时屏幕返回初始帧 貌似不打会bug 意味不明 测试用
             delay = delay / 10;
             tempArray[785] = (byte)(delay & 0xff);
             tempArray[786] = (byte)(delay >> 8 & 0xff); //写入2字节的帧delay 
                                                         // 787为透明色索引  788为块结尾0x00
-            tempArray[787] = (byte)0xff;
+            tempArray[787] = 0xff;
             // 789开始为Image Descriptor块 标志位2C
             // 790~793为帧偏移大小 默认为0
             // 794~797为帧图像大小 默认他
@@ -62,9 +77,9 @@ namespace WzComparerR2.Common
 
         public override void AppendFrame(IntPtr pBuffer, int delay)
         {
-            using(var bmp = new Bitmap(Width, Height, Width *4, PixelFormat.Format32bppArgb, pBuffer))
+            using (var bmp = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppArgb, pBuffer))
             {
-                this.AppendFrame(bmp, delay);
+                AppendFrame(bmp, delay);
             }
         }
 
@@ -83,8 +98,12 @@ namespace WzComparerR2.Common
         {
             if (disposing)
             {
-                bWriter.Write(gifEnd);
-                bWriter.Close();
+                if (bWriter != null)
+                {
+                    bWriter.Write(gifEnd);
+                    bWriter.Close();
+                    bWriter = null;
+                }
             }
 
             if (mStream != null)

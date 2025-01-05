@@ -5,34 +5,46 @@ using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace WzComparerR2.Common
+namespace WzComparerR2.Encoders
 {
     public abstract class GifEncoder : IDisposable
     {
-        protected GifEncoder(string fileName, int width, int height)
+        protected GifEncoder()
         {
-            this.FileName = fileName;
-            this.Width = width;
-            this.Height = height;
         }
 
         public string FileName { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
 
+        public virtual string Name
+        {
+            get
+            {
+                return GetType().Name;
+            }
+        }
+        public abstract GifEncoderCompatibility Compatibility { get; }
+
+        public virtual void Init(string fileName, int width, int height)
+        {
+            FileName = fileName;
+            Width = width;
+            Height = height;
+        }
+
         public virtual void AppendFrame(Bitmap image, int delay)
         {
             BitmapData data = image.LockBits(new Rectangle(Point.Empty, image.Size), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-            this.AppendFrame(data.Scan0, delay);
+            AppendFrame(data.Scan0, delay);
             image.UnlockBits(data);
         }
 
         public abstract void AppendFrame(IntPtr pBuffer, int delay);
 
-
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -43,7 +55,7 @@ namespace WzComparerR2.Common
 
         ~GifEncoder()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
     }
 }

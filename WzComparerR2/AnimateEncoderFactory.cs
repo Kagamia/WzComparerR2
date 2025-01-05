@@ -1,90 +1,108 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using WzComparerR2.Common;
 using WzComparerR2.Config;
+using WzComparerR2.Encoders;
 
 namespace WzComparerR2
 {
-    public class AnimateEncoderFactory
+    public static class AnimateEncoderFactory
     {
-        private AnimateEncoderFactory()
+        static AnimateEncoderFactory()
         {
-
+            registeredEncoders = new Dictionary<int, IAnimateEncoderProvider>();
+            RegisterEncoders();
         }
 
-        public static AnimateEncoderParams GetEncoderParams(int encoderID)
+        private static Dictionary<int, IAnimateEncoderProvider> registeredEncoders;
+
+        private static void RegisterEncoders()
         {
-            switch (encoderID)
+            registeredEncoders.Add(0, new AnimateEncoderProvider<BuildInGifEncoder>
             {
-                default:
-                case 0:
-                    return new AnimateEncoderParams()
-                    {
-                        ID = 0,
-                        EncoderType = typeof(BuildInGifEncoder),
-                        FileExtension = ".gif",
-                        FileDescription = "Gif图片",
-                        SupportAlphaChannel = false,
-                    };
+                ID = 0,
+                Name = nameof(BuildInGifEncoder),
+                CreateEncoderCallback = () => new BuildInGifEncoder(),
+            });
 
-                case 1:
-                    return new AnimateEncoderParams()
-                    {
-                        ID = 1,
-                        EncoderType = typeof(BuildInGifEncoder),
-                        FileExtension = ".gif",
-                        FileDescription = "Gif图片",
-                        SupportAlphaChannel = false,
-                    };
+            registeredEncoders.Add(1, new AnimateEncoderProvider<IndexGifEncoder>
+            {
+                ID = 1,
+                Name = nameof(IndexGifEncoder),
+                CreateEncoderCallback = () => new IndexGifEncoder(),
+            });
 
-                case 2:
-                    return new AnimateEncoderParams()
-                    {
-                        ID = 2,
-                        EncoderType = typeof(BuildInGifEncoder),
-                        FileExtension = ".png",
-                        FileDescription = "APng图片",
-                        SupportAlphaChannel = true,
-                    };
+            registeredEncoders.Add(2, new AnimateEncoderProvider<BuildInApngEncoder>
+            {
+                ID = 2,
+                Name = nameof(BuildInApngEncoder),
+                CreateEncoderCallback = () => new BuildInApngEncoder(),
+                ConfigureEncoderCallback = (encoder, config) =>
+                {
+                    encoder.OptimizeEnabled = config.PaletteOptimized;
+                }
+            });
+
+            registeredEncoders.Add(3, new AnimateEncoderProvider<FFmpegEncoder>
+            {
+                ID = 3,
+                Name = nameof(FFmpegEncoder),
+                CreateEncoderCallback = () => new FFmpegEncoder(),
+                ConfigureEncoderCallback = (encoder, config) =>
+                {
+                    encoder.FFmpegBinPath = config.FFmpegBinPath;
+                    encoder.FFmpegArgumentFormat = config.FFmpegArgument;
+                    encoder.OutputFileExtension = config.FFmpegOutputFileExtension;
+                }
+            });
+        }
+
+        public static GifEncoder CreateEncoder(ImageHandlerConfig config)
+        {
+            return CreateEncoder(config.GifEncoder, config);
+        }
+
+        public static GifEncoder CreateEncoder(int id, ImageHandlerConfig config)
+        {
+            if (!registeredEncoders.TryGetValue(id, out var provider))
+            {
+                throw new Exception($"Encoder ID {id} has not registered");
+            }
+
+            var encoder = provider.CreateEncoder();
+            provider.ConfigureEncoder(encoder, config);
+            return encoder;
+        }
+
+        public interface IAnimateEncoderProvider
+        {
+            GifEncoder CreateEncoder();
+            void ConfigureEncoder(GifEncoder encoder, ImageHandlerConfig config);
+        }
+
+        public class AnimateEncoderProvider<T> : IAnimateEncoderProvider where T : GifEncoder
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public Func<T> CreateEncoderCallback { get; set; }
+            public Action<T, ImageHandlerConfig> ConfigureEncoderCallback { get; set; }
+
+            public GifEncoder CreateEncoder()
+            {
+                if (this.CreateEncoderCallback == null)
+                {
+                    throw new ArgumentNullException(nameof(CreateEncoderCallback));
+                }
+
+                return this.CreateEncoderCallback();
+            }
+
+            public void ConfigureEncoder(GifEncoder encoder, ImageHandlerConfig config)
+            {
+                if (this.ConfigureEncoderCallback != null)
+                {
+                    this.ConfigureEncoderCallback((T)encoder, config);
+                }
             }
         }
-
-        public static GifEncoder CreateEncoder(string fileName, int width, int height, ImageHandlerConfig config)
-        {
-            switch (config.GifEncoder.Value)
-            {
-                default:
-                case 0:
-                    {
-                        var enc = new BuildInGifEncoder(fileName, width, height);
-                        return enc;
-                    }
-
-                case 1:
-                    {
-                        var enc = new IndexGifEncoder(fileName, width, height);
-                        return enc;
-                    }
-
-                case 2:
-                    {
-                        var enc = new BuildInApngEncoder(fileName, width, height);
-                        enc.OptimizeEnabled = config.PaletteOptimized;
-                        return enc;
-                    }
-            }
-        }
-    }
-
-    public class AnimateEncoderParams
-    {
-        public int ID { get; set; }
-        public Type EncoderType { get; set; }
-        public string FileExtension { get; set; }
-        public string FileDescription { get; set; }
-        
-        public bool SupportAlphaChannel { get; set; }
     }
 }

@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 
-using WzComparerR2.WzLib;
-using WzComparerR2.Controls;
 using WzComparerR2.Animation;
-using WzComparerR2.Rendering;
-using WzComparerR2.Config;
 using WzComparerR2.Common;
+using WzComparerR2.Config;
+using WzComparerR2.Controls;
+using WzComparerR2.Encoders;
+using WzComparerR2.Rendering;
+using WzComparerR2.WzLib;
 
 namespace WzComparerR2
 {
@@ -144,14 +145,19 @@ namespace WzComparerR2
             }
         }
 
-        public bool SaveAsGif(AnimationItem aniItem, string fileName, ImageHandlerConfig config, bool options)
+        public bool SaveAsGif(AnimationItem aniItem, string fileName, ImageHandlerConfig config, GifEncoder encoder, bool showOptions)
         {
             var rec = new AnimationRecoder(this.GraphicsDevice);
+            var cap = encoder.Compatibility;
 
             rec.Items.Add(aniItem);
             int length = rec.GetMaxLength();
-            int delay = Math.Max(10, config.MinDelay);
-            var timeline = rec.GetGifTimeLine(delay, 655350);
+            int delay = Math.Max(cap.MinFrameDelay, config.MinDelay);
+            int[] timeline = null;
+            if (!cap.IsFixedFrameRate)
+            {
+                timeline = rec.GetGifTimeLine(delay, cap.MaxFrameDelay);
+            }
 
             // calc available canvas area
             rec.ResetAll();
@@ -183,7 +189,7 @@ namespace WzComparerR2
                 OutputHeight = bounds.Height,
             };
 
-            if (options)
+            if (showOptions)
             {
                 var frmOptions = new FrmGifClipOptions()
                 {
@@ -259,8 +265,7 @@ namespace WzComparerR2
             }
 
             // select encoder
-            GifEncoder enc = AnimateEncoderFactory.CreateEncoder(fileName, targetSize.X, targetSize.Y, config);
-            var encParams = AnimateEncoderFactory.GetEncoderParams(config.GifEncoder.Value);
+            encoder.Init(fileName, targetSize.X, targetSize.Y);
 
             // pipeline functions
             IEnumerable<Tuple<byte[], int>> MergeFrames(IEnumerable<Tuple<byte[], int>> frames)
@@ -278,7 +283,7 @@ namespace WzComparerR2
                         prevFrame = currentFrame;
                         prevDelay = currentDelay;
                     }
-                    else if (memcmp(prevFrame, currentFrame, (IntPtr)prevFrame.Length) == 0)
+                    else if (prevFrame.AsSpan().SequenceEqual(currentFrame.AsSpan()))
                     {
                         prevDelay += currentDelay;
                     }
@@ -345,7 +350,7 @@ namespace WzComparerR2
             async Task<int> ApplyFrame(byte[] frameData, int frameDelay)
             {
                 byte[] gifData = null;
-                if (!encParams.SupportAlphaChannel && config.BackgroundType.Value == ImageBackgroundType.Transparent)
+                if (cap.AlphaSupportMode != AlphaSupportMode.FullAlpha && config.BackgroundType.Value == ImageBackgroundType.Transparent)
                 {
                     using (var rt2 = rec.GetGifTexture(config.BackgroundColor.Value.ToXnaColor(), config.MinMixedAlpha))
                     {
@@ -369,15 +374,17 @@ namespace WzComparerR2
                     tasks.Add(Task.Run(() =>
                     {
                         string pngFileName = Path.Combine(framesDirName, $"{prevTime}_{prevTime + frameDelay}.png");
-                        unsafe
+                        GCHandle gcHandle = GCHandle.Alloc(frameData, GCHandleType.Pinned);
+                        try
                         {
-                            fixed (byte* pFrameBuffer = frameData)
+                            using (var bmp = new System.Drawing.Bitmap(targetSize.X, targetSize.Y, targetSize.X * 4, System.Drawing.Imaging.PixelFormat.Format32bppArgb, gcHandle.AddrOfPinnedObject()))
                             {
-                                using (var bmp = new System.Drawing.Bitmap(targetSize.X, targetSize.Y, targetSize.X * 4, System.Drawing.Imaging.PixelFormat.Format32bppArgb, new IntPtr(pFrameBuffer)))
-                                {
-                                    bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
-                                }
+                                bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
                             }
+                        }
+                        finally
+                        {
+                            gcHandle.Free();
                         }
                     }));
                 }
@@ -387,12 +394,15 @@ namespace WzComparerR2
                 {
                     // TODO: only for gif here?
                     frameDelay = Math.Max(10, (int)(Math.Round(frameDelay / 10.0) * 10));
-                    unsafe
+
+                    GCHandle gcHandle = GCHandle.Alloc(frameData, GCHandleType.Pinned);
+                    try
                     {
-                        fixed (byte* pGifBuffer = gifData)
-                        {
-                            enc.AppendFrame(new IntPtr(pGifBuffer), frameDelay);
-                        }
+                        encoder.AppendFrame(gcHandle.AddrOfPinnedObject(), frameDelay);
+                    }
+                    finally
+                    {
+                        gcHandle.Free();
                     }
                 }));
 
@@ -403,7 +413,7 @@ namespace WzComparerR2
 
             async Task RenderJob(IProgressDialogContext context, CancellationToken cancellationToken)
             {
-                bool isCompareAndMergeFrames = timeline == null;
+                bool isCompareAndMergeFrames = timeline == null && !cap.IsFixedFrameRate;
 
                 // build pipeline
                 IEnumerable<int> delayEnumerator = timeline == null ? RenderDelay() : ClipTimeline(timeline);
@@ -459,7 +469,6 @@ namespace WzComparerR2
                 finally
                 {
                     rec.End();
-                    enc.Dispose();
                     this.IsPlaying = isPlaying;
                 }
             }
@@ -543,10 +552,5 @@ namespace WzComparerR2
                     aniItem.Length);
             }
         }
-
-
-        [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int memcmp(byte[] b1, byte[] b2, IntPtr count);
-
     }
 }

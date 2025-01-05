@@ -5,27 +5,43 @@ using System.Text;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace WzComparerR2.Common
+namespace WzComparerR2.Encoders
 {
     public class BuildInApngEncoder : GifEncoder
     {
-        public BuildInApngEncoder(string fileName, int width, int height)
-            : base(fileName, width, height)
+        public BuildInApngEncoder()
         {
-            var err = apng_init(fileName, width, height, out this.handle);
+        }
+
+        public bool OptimizeEnabled { get; set; }
+
+        private IntPtr handle;
+
+        public override GifEncoderCompatibility Compatibility => new GifEncoderCompatibility()
+        {
+            IsFixedFrameRate = false,
+            MinFrameDelay = 1,
+            MaxFrameDelay = 655350,
+            FrameDelayStep = 1,
+            AlphaSupportMode = AlphaSupportMode.FullAlpha,
+            DefaultExtension = ".png",
+            SupportedExtensions = new[] { ".png" },
+        };
+
+        public override void Init(string fileName, int width, int height)
+        {
+            base.Init(fileName, width, height);
+
+            var err = apng_init(fileName, width, height, out handle);
             if (err != ApngError.Success)
             {
                 throw new Exception($"Apng error: {err}.");
             }
         }
 
-        private IntPtr handle;
-
-        public bool OptimizeEnabled { get; set; }
-
         public override void AppendFrame(IntPtr pBuffer, int delay)
         {
-            var err = apng_append_frame(this.handle, pBuffer, 0, 0, this.Width, this.Height, this.Width * 4, delay, this.OptimizeEnabled);
+            var err = apng_append_frame(handle, pBuffer, 0, 0, Width, Height, Width * 4, delay, OptimizeEnabled);
             if (err != ApngError.Success)
             {
                 throw new Exception($"Apng error: {err}.");
@@ -36,8 +52,12 @@ namespace WzComparerR2.Common
         {
             if (disposing)
             {
-                apng_write_end(this.handle);
-                apng_destroy(ref this.handle);
+                if (handle != IntPtr.Zero)
+                {
+                    apng_write_end(handle);
+                    apng_destroy(ref handle);
+                    handle = IntPtr.Zero;
+                }
             }
             base.Dispose(disposing);
         }
@@ -52,7 +72,7 @@ namespace WzComparerR2.Common
         };
 
         [DllImport("libapng.dll")]
-        static extern ApngError apng_init([MarshalAs(UnmanagedType.LPWStr)]string fileName, int width, int height, out IntPtr ppEnc);
+        static extern ApngError apng_init([MarshalAs(UnmanagedType.LPWStr)] string fileName, int width, int height, out IntPtr ppEnc);
         [DllImport("libapng.dll")]
         static extern ApngError apng_append_frame(IntPtr pEnc, IntPtr pData, int x, int y, int width, int height, int stride, int delay_ms, bool optimize);
         [DllImport("libapng.dll")]
