@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
 
 namespace WzComparerR2.MapRender.Patches2
@@ -15,6 +16,10 @@ namespace WzComparerR2.MapRender.Patches2
         public int X { get; set; }
         public int Y { get; set; }
         public int Z { get; set; }
+        public int MoveType { get; set; }
+        public int MoveW { get; set; }
+        public int MoveH { get; set; }
+        public int MoveP { get; set; }
         public bool Flip { get; set; }
         public bool Light { get; set; }
         public string SpineAni { get; set; }
@@ -35,6 +40,11 @@ namespace WzComparerR2.MapRender.Patches2
                 X = node.Nodes["x"].GetValueEx(0),
                 Y = node.Nodes["y"].GetValueEx(0),
                 Z = node.Nodes["z"].GetValueEx(0),
+
+                MoveType = 0,
+                MoveW = 0,
+                MoveH = 0,
+                MoveP = 5000,
 
                 Flip = node.Nodes["f"].GetValueEx(false),
                 Light = node.Nodes["light"].GetValueEx<int>(0) != 0,
@@ -84,6 +94,16 @@ namespace WzComparerR2.MapRender.Patches2
                         }
                     }
                 }
+            }
+
+            string path = $@"Map\Obj\{item.OS}.img\{item.L0}\{item.L1}\{item.L2}\0";
+            var obj_node = PluginManager.FindWz(path);
+            if (obj_node != null)
+            {
+                item.MoveType = obj_node.Nodes["moveType"].GetValueEx(0);
+                item.MoveW = obj_node.Nodes["moveW"].GetValueEx(0);
+                item.MoveH = obj_node.Nodes["moveH"].GetValueEx(0);
+                item.MoveP = obj_node.Nodes["moveP"].GetValueEx(5000);
             }
 
             return item;
