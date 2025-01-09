@@ -842,6 +842,31 @@ namespace WzComparerR2.MapRender
             mesh.FlipX = obj.Flip;
             mesh.Z0 = obj.Z;
             mesh.Z1 = obj.Index;
+
+            if (obj.MoveW != 0 || obj.MoveH != 0)
+            {
+                double movingX = 0;
+                double movingY = 0;
+                double time = obj.View.Time / Math.PI / 1000 * 4 / obj.MoveP * 5000;
+                switch (obj.MoveType)
+                {
+                    case 0: // none
+                        break;
+                    case 1:
+                    case 2: // line
+                        movingX = obj.MoveW * Math.Cos(time);
+                        movingY = obj.MoveH * Math.Cos(time);
+                        break;
+                    case 3: // circle
+                        movingX = obj.MoveW * Math.Cos(time);
+                        movingY = obj.MoveH * Math.Sin(time);
+                        break;
+                    default:
+                        break;
+                }
+                mesh.Position += new Vector2((float)movingX, (float)movingY);
+            }
+
             return mesh;
         }
 
