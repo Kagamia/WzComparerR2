@@ -470,7 +470,7 @@ namespace WzComparerR2.Avatar
         /// </summary>
         private void LoadActionFrameDesc(Wz_Node frameNode, ActionFrame actionFrame)
         {
-            actionFrame.Delay = frameNode.Nodes["delay"].GetValueEx<int>(100);
+            actionFrame.Delay = frameNode.Nodes["delay"].GetValueEx<int>(120);
             actionFrame.Flip = frameNode.Nodes["flip"].GetValueEx<int>(0) != 0;
             var faceNode = frameNode.Nodes["face"];
             if (faceNode != null)
