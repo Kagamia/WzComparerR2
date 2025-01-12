@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -23,7 +24,7 @@ namespace WzComparerR2.Patcher
 
         private FileStream patchFile;
         private PartialStream patchBlock;
-        private InflateStream inflateStream;
+        private Stream inflateStream;
 
         private string noticeText;
         private List<PatchPartContext> patchParts;
@@ -76,7 +77,13 @@ namespace WzComparerR2.Patcher
             {
                 patchBlock.Seek(-2, SeekOrigin.Current);
             }
+
+#if NET6_0_OR_GREATER
+            // wrap InflateStream with BufferedStream for better performance in net6+
+            this.inflateStream = new BufferedStream(new InflateStream(patchBlock));
+#else
             this.inflateStream = new InflateStream(patchBlock);
+#endif
         }
 
         private PartialStream TrySplit(Stream metaStream)
@@ -208,7 +215,7 @@ namespace WzComparerR2.Patcher
                     case 0:
                         if (part.NewFileLength > 0)
                         {
-                            this.inflateStream.Seek(part.NewFileLength, SeekOrigin.Current);
+                            StreamSkip(this.inflateStream, part.NewFileLength);
                         }
                         break;
 
@@ -848,7 +855,7 @@ namespace WzComparerR2.Patcher
                 {
                     case 0x08:
                         blockLength = cmd & 0x0fffffff;
-                        reader.BaseStream.Seek(blockLength, SeekOrigin.Current); // skip len
+                        this.StreamSkip(reader.BaseStream, blockLength); // skip len
                         patchPart.Action0++;
                         break;
 
@@ -859,7 +866,7 @@ namespace WzComparerR2.Patcher
 
                     default:
                         blockLength = cmd;
-                        reader.BaseStream.Seek(4, SeekOrigin.Current); // skip content
+                        this.StreamSkip(reader.BaseStream, 4); // skip content
                         if (this.IsKMST1125Format == true)
                         {
                             // skip old file name
@@ -914,8 +921,31 @@ namespace WzComparerR2.Patcher
             }
             catch
             {
+#if NET6_0_OR_GREATER
+                this.inflateStream = new BufferedStream(new InflateStream(this.inflateStream));
+#else
                 this.inflateStream = new InflateStream(this.inflateStream);
+#endif
                 this.inflateStream.Seek(offset, SeekOrigin.Begin);
+            }
+        }
+
+        private void StreamSkip(Stream stream, int count)
+        {
+            if (stream is BufferedStream bufferedStream)
+            {
+                var pool = ArrayPool<byte>.Shared;
+                byte[] buffer = pool.Rent(4096);
+                while (count > 0)
+                {
+                    int actual = stream.Read(buffer, 0, Math.Min(count, buffer.Length));
+                    count -= actual;
+                }
+                pool.Return(buffer);
+            }
+            else
+            {
+                stream.Seek(count, SeekOrigin.Current);
             }
         }
 

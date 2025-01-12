@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.IO.Compression;
 
@@ -97,7 +97,8 @@ namespace WzComparerR2.Patcher.Builder
 
         private void Skip(long length)
         {
-            byte[] buffer = new byte[4096];
+            var pool = ArrayPool<byte>.Shared;
+            byte[] buffer = pool.Rent(4096);
             while (length > 0)
             {
                 int len = this.Read(buffer, 0, (int)Math.Min(length, buffer.Length));
@@ -107,6 +108,7 @@ namespace WzComparerR2.Patcher.Builder
                 }
                 length -= len;
             }
+            pool.Return(buffer);
         }
 
         public override bool CanSeek
