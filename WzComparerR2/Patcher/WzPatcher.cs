@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.IO.Compression;
+using System.Threading;
+using System.Threading.Tasks;
 using WzComparerR2.Patcher.Builder;
 using PartialStream = WzComparerR2.WzLib.Utilities.PartialStream;
 
@@ -52,7 +54,7 @@ namespace WzComparerR2.Patcher
         /// <summary>
         /// 验证并初始化补丁解压流。
         /// </summary>
-        public void OpenDecompress()
+        public void OpenDecompress(CancellationToken cancellationToken)
         {
             this.patchBlock = TrySplit(this.patchFile);
 
@@ -65,7 +67,7 @@ namespace WzComparerR2.Patcher
             patchBlock.Seek(8, SeekOrigin.Begin);
             int ver = r.ReadInt32();
             uint checkSum0 = r.ReadUInt32();
-            uint checkSum1 = CheckSum.ComputeHash(patchBlock, patchBlock.Length - 0x10);
+            uint checkSum1 = CheckSum.ComputeHash(patchBlock, patchBlock.Length - 0x10, cancellationToken);
             VerifyCheckSum(checkSum0, checkSum1, "PatchFile", "0");
 
             patchBlock.Seek(16, SeekOrigin.Begin);
@@ -156,11 +158,11 @@ namespace WzComparerR2.Patcher
             return patchBlock;
         }
 
-        public long PrePatch()
+        public long PrePatch(CancellationToken cancellationToken)
         {
             if (this.inflateStream == null)
             {
-                this.OpenDecompress();
+                this.OpenDecompress(cancellationToken);
             }
             else if (this.inflateStream.Position > 0) //重置到初始化
             {
@@ -185,6 +187,7 @@ namespace WzComparerR2.Patcher
 
             while (true)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 PatchPartContext part = ReadPatchPart(r);
 
                 if (part == null)
@@ -280,9 +283,9 @@ namespace WzComparerR2.Patcher
         /// 对于已经解压的patch文件，向客户端执行更新过程。
         /// </summary>
         /// <param Name="mapleStoryFolder">冒险岛客户端所在文件夹。</param>
-        public void Patch(string mapleStoryFolder)
+        public void Patch(string mapleStoryFolder, CancellationToken cancellationToken = default)
         {
-            this.Patch(mapleStoryFolder, mapleStoryFolder);
+            this.Patch(mapleStoryFolder, mapleStoryFolder, cancellationToken);
         }
 
         /// <summary>
@@ -290,7 +293,7 @@ namespace WzComparerR2.Patcher
         /// </summary>
         /// <param Name="mapleStoryFolder">冒险岛客户端所在文件夹。</param>
         /// <param Name="tempFileFolder">生成临时文件的文件夹。</param>
-        public void Patch(string mapleStoryFolder, string tempFileFolder)
+        public void Patch(string mapleStoryFolder, string tempFileFolder, CancellationToken cancellationToken = default)
         {
             string tempDir = CreateRandomDir(tempFileFolder);
 
@@ -306,7 +309,7 @@ namespace WzComparerR2.Patcher
                 {
                     this.oldFileHash = fileHash;
                     this.IsKMST1125Format = true;
-                    this.ValidateFileHash(mapleStoryFolder);
+                    this.ValidateFileHash(mapleStoryFolder, cancellationToken);
                 }
                 else
                 {
@@ -319,6 +322,7 @@ namespace WzComparerR2.Patcher
                 this.patchParts = new List<PatchPartContext>();
                 while (true)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     PatchPartContext part = ReadPatchPart(r);
 
                     if (part == null)
@@ -344,7 +348,7 @@ namespace WzComparerR2.Patcher
             }
             else  //按照调整后顺序执行
             {
-                this.ValidateFileHash(mapleStoryFolder);
+                this.ValidateFileHash(mapleStoryFolder, cancellationToken);
 
                 foreach (PatchPartContext part in this.patchParts)
                 {
@@ -403,12 +407,13 @@ namespace WzComparerR2.Patcher
             }
         }
 
-        private void ValidateFileHash(string msDir)
+        private void ValidateFileHash(string msDir, CancellationToken cancellationToken = default)
         {
             if (this.OldFileHash != null && this.OldFileHash.Count > 0)
             {
                 foreach(var kv in this.OldFileHash)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     var part = new PatchPartContext(kv.Key, -1, -1)
                     {
                         OldFilePath = Path.Combine(msDir, kv.Key)
@@ -417,7 +422,7 @@ namespace WzComparerR2.Patcher
                     this.OnPrepareVerifyOldChecksumBegin(part);
                     using (var fs = new FileStream(part.OldFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
-                        oldCheckSum1 = CheckSum.ComputeHash(fs, fs.Length);
+                        oldCheckSum1 = CheckSum.ComputeHash(fs, fs.Length, cancellationToken);
                     }
                     this.OnPrepareVerifyOldChecksumEnd(part);
                     VerifyCheckSum(kv.Value, oldCheckSum1, part.FileName, "origin");
@@ -540,7 +545,7 @@ namespace WzComparerR2.Patcher
             this.OnTempFileClosed(part);
         }
 
-        public void RebuildFile(PatchPartContext part, string tempDir, string msDir)
+        public void RebuildFile(PatchPartContext part, string tempDir, string msDir, CancellationToken cancellationToken = default)
         {
             this.OnPatchStart(part);
             string tempFileName = Path.Combine(tempDir, part.FileName);
@@ -628,6 +633,7 @@ namespace WzComparerR2.Patcher
                 int preLoadByteCount = 0;
                 while (true)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     cmd = r.ReadInt32();
                     RebuildFileOperation op = null;
                     if (cmd != 0)

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using DevComponents.AdvTree;
 using DevComponents.DotNetBar;
@@ -59,11 +60,8 @@ namespace WzComparerR2
 
         public Encoding PatcherNoticeEncoding { get; set; }
 
-        Thread patchThread;
-        EventWaitHandle waitHandle;
-        bool waiting;
-        string loggingFileName;
-        bool isUpdating;
+        private bool isUpdating;
+        private PatcherSession patcherSession;
 
         private PatcherSetting SelectedPatcherSetting => comboBoxEx1.SelectedItem as PatcherSetting;
 
@@ -209,9 +207,9 @@ namespace WzComparerR2
 
         private void FrmPatcher_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (patchThread != null && patchThread.IsAlive)
+            if (this.patcherSession != null && !this.patcherSession.IsCompleted)
             {
-                patchThread.Abort();
+                this.patcherSession.Cancel();
             }
             ConfigManager.Reload();
             WcR2Config.Default.PatcherSettings.Clear();
@@ -235,7 +233,7 @@ namespace WzComparerR2
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Title = "请选择补丁文件路径";
             dlg.Filter = "*.patch;*.exe|*.patch;*.exe";
-            if (dlg.ShowDialog() == DialogResult.OK)
+            if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 txtPatchFile.Text = dlg.FileName;
             }
@@ -245,7 +243,7 @@ namespace WzComparerR2
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
             dlg.Description = "请选择冒险岛文件夹路径";
-            if (dlg.ShowDialog() == DialogResult.OK)
+            if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 txtMSFolder.Text = dlg.SelectedPath;
             }
@@ -253,72 +251,79 @@ namespace WzComparerR2
 
         private void buttonXPatch_Click(object sender, EventArgs e)
         {
-            if (patchThread != null)
+            if (this.patcherSession != null)
             {
-                if (waiting)
+                if (this.patcherSession.State == PatcherTaskState.WaitForContinue)
                 {
-                    waitHandle.Set();
-                    waiting = false;
+                    this.patcherSession.Continue();
                     return;
                 }
-                else
+                else if (!this.patcherSession.PatchExecTask.IsCompleted)
                 {
                     MessageBoxEx.Show("已经开始了一个补丁进程...");
                     return;
                 }
             }
-            compareFolder = null;
+            string compareFolder = null;
             if (chkCompare.Checked)
             {
                 FolderBrowserDialog dlg = new FolderBrowserDialog();
                 dlg.Description = "请选择对比报告输出文件夹";
-                if (dlg.ShowDialog() != DialogResult.OK)
+                if (dlg.ShowDialog(this) != DialogResult.OK)
                 {
                     return;
                 }
                 compareFolder = dlg.SelectedPath;
             }
 
-            patchFile = txtPatchFile.Text;
-            msFolder = txtMSFolder.Text;
-            prePatch = chkPrePatch.Checked;
-            deadPatch = chkDeadPatch.Checked;
-
-            patchThread = new Thread(() => ExecutePatch(patchFile, msFolder, prePatch));
-            patchThread.Priority = ThreadPriority.Highest;
-            waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
-            waiting = false;
-            patchThread.Start();
-            panelEx2.Visible = true;
-            expandablePanel2.Height = 340;
+            var session = new PatcherSession()
+            {
+                PatchFile = txtPatchFile.Text,
+                MSFolder = txtMSFolder.Text,
+                PrePatch = chkPrePatch.Checked,
+                DeadPatch = chkDeadPatch.Checked,
+            };
+            session.LoggingFileName = Path.Combine(session.MSFolder, $"wcpatcher_{DateTime.Now:yyyyMMdd_HHmmssfff}.log");
+            session.PatchExecTask = Task.Run(() => this.ExecutePatchAsync(session, session.CancellationToken));
+            this.patcherSession = session;
         }
 
-        string patchFile;
-        string msFolder;
-        string compareFolder;
-        bool prePatch ;
-        bool deadPatch;
-
-        private void ExecutePatch(string patchFile, string msFolder, bool prePatch)
+        private async Task ExecutePatchAsync(PatcherSession session, CancellationToken cancellationToken)
         {
+            void AppendStateText(string text)
+            {
+                this.Invoke(new Action<string>(t => this.txtPatchState.AppendText(t)), text);
+                if (session.LoggingFileName != null)
+                {
+                    File.AppendAllText(session.LoggingFileName, text, Encoding.UTF8);
+                }
+            }
+
+            this.Invoke(() =>
+            {
+                this.advTreePatchFiles.Nodes.Clear();
+                this.txtNotice.Clear();
+                this.txtPatchState.Clear();
+                this.panelEx2.Visible = true;
+                this.expandablePanel2.Height = 340;
+            });
+
             WzPatcher patcher = null;
-            advTreePatchFiles.Nodes.Clear();
-            txtNotice.Clear();
-            txtPatchState.Clear();
-            this.loggingFileName = Path.Combine(msFolder, $"wcpatcher_{DateTime.Now:yyyyMMdd_HHmmssfff}.log");
+            session.State = PatcherTaskState.Prepatch;
+
             try
             {
-                patcher = new WzPatcher(patchFile);
+                patcher = new WzPatcher(session.PatchFile);
                 patcher.NoticeEncoding = this.PatcherNoticeEncoding ?? Encoding.Default;
-                patcher.PatchingStateChanged += new EventHandler<PatchingEventArgs>(patcher_PatchingStateChanged);
-                AppendStateText($"补丁文件：{patchFile}\r\n");
+                patcher.PatchingStateChanged += (o, e) => this.patcher_PatchingStateChanged(o, e, session, AppendStateText);
+                AppendStateText($"补丁文件：{session.PatchFile}\r\n");
                 AppendStateText("正在检查补丁...");
-                patcher.OpenDecompress();
+                patcher.OpenDecompress(cancellationToken);
                 AppendStateText("成功\r\n");
-                if (prePatch)
+                if (session.PrePatch)
                 {
                     AppendStateText("正在预读补丁...\r\n");
-                    long decompressedSize = patcher.PrePatch();
+                    long decompressedSize = patcher.PrePatch(cancellationToken);
                     if (patcher.IsKMST1125Format.Value)
                     {
                         AppendStateText("补丁类型：KMST1125\r\n");
@@ -328,37 +333,48 @@ namespace WzComparerR2
                         }
                     }
                     AppendStateText(string.Format("补丁大小: {0:N0} bytes...\r\n", decompressedSize));
-                    AppendStateText(string.Format("文件变动: {0} 个...\r\n",
-                        patcher.PatchParts == null ? -1 : patcher.PatchParts.Count));
-                    txtNotice.Text = patcher.NoticeText;
-                    foreach (PatchPartContext part in patcher.PatchParts)
+                    AppendStateText(string.Format("文件变动: {0} 个...\r\n", patcher.PatchParts.Count));
+
+                    this.Invoke(() =>
                     {
-                        advTreePatchFiles.Nodes.Add(CreateFileNode(part));
-                    }
-                    advTreePatchFiles.Enabled = true;
-                    AppendStateText("等待调整更新顺序...\r\n");
-                    waiting = true;
-                    waitHandle.WaitOne();
-                    advTreePatchFiles.Enabled = false;
-                    patcher.PatchParts.Clear();
-                    for (int i = 0, j = advTreePatchFiles.Nodes.Count; i < j; i++)
-                    {
-                        if (advTreePatchFiles.Nodes[i].Checked)
+                        this.advTreePatchFiles.BeginUpdate();
+                        this.txtNotice.Text = patcher.NoticeText;
+                        foreach (PatchPartContext part in patcher.PatchParts)
                         {
-                            patcher.PatchParts.Add(advTreePatchFiles.Nodes[i].Tag as PatchPartContext);
+                            this.advTreePatchFiles.Nodes.Add(CreateFileNode(part));
+                        }
+                        this.advTreePatchFiles.Enabled = true;
+                        this.advTreePatchFiles.EndUpdate();
+                    });
+
+                    AppendStateText("等待调整更新顺序...\r\n");
+                    session.State = PatcherTaskState.WaitForContinue;
+                    await session.WaitForContinueAsync();
+                    this.Invoke(() =>
+                    {
+                        this.advTreePatchFiles.Enabled = false;
+                    });
+                    session.State = PatcherTaskState.Patching;
+                    patcher.PatchParts.Clear();
+                    foreach (Node node in this.advTreePatchFiles.Nodes)
+                    {
+                        if (node.Checked && node.Tag is PatchPartContext part)
+                        {
+                            patcher.PatchParts.Add(part);
                         }
                     }
                 }
                 AppendStateText("开始更新\r\n");
-                DateTime time = DateTime.Now;
-                patcher.Patch(msFolder);
+                var sw = Stopwatch.StartNew();
+                patcher.Patch(session.MSFolder, cancellationToken);
+                sw.Stop();
                 AppendStateText("完成\r\n");
-                TimeSpan interval = DateTime.Now - time;
-                MessageBoxEx.Show(this, "补丁结束，用时" + interval.ToString(), "Patcher");
+                session.State = PatcherTaskState.Complete;
+                MessageBoxEx.Show(this, "补丁结束，用时" + sw.Elapsed, "Patcher");
             }
-            catch (ThreadAbortException)
+            catch (OperationCanceledException)
             {
-                MessageBoxEx.Show("补丁中止。", "Patcher");
+                MessageBoxEx.Show(this.Owner, "补丁中止。", "Patcher");
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -372,41 +388,39 @@ namespace WzComparerR2
             }
             finally
             {
+                session.State = PatcherTaskState.Complete;
                 if (patcher != null)
                 {
                     patcher.Close();
                     patcher = null;
                 }
-                patchThread = null;
-                waitHandle = null;
                 GC.Collect();
-
                 panelEx2.Visible = false;
                 expandablePanel2.Height = 157;
             }
         }
 
-        private void patcher_PatchingStateChanged(object sender, PatchingEventArgs e)
+        private void patcher_PatchingStateChanged(object sender, PatchingEventArgs e, PatcherSession session, Action<string> logFunc)
         {
             switch (e.State)
             {
                 case PatchingState.PatchStart:
-                    AppendStateText("开始更新" + e.Part.FileName + "\r\n");
+                    logFunc("开始更新" + e.Part.FileName + "\r\n");
                     break;
                 case PatchingState.VerifyOldChecksumBegin:
-                    AppendStateText("  检查旧文件checksum...");
+                    logFunc("  检查旧文件checksum...");
                     break;
                 case PatchingState.VerifyOldChecksumEnd:
-                    AppendStateText("  结束\r\n");
+                    logFunc("  结束\r\n");
                     break;
                 case PatchingState.VerifyNewChecksumBegin:
-                    AppendStateText("  检查新文件checksum...");
+                    logFunc("  检查新文件checksum...");
                     break;
                 case PatchingState.VerifyNewChecksumEnd:
-                    AppendStateText("  结束\r\n");
+                    logFunc("  结束\r\n");
                     break;
                 case PatchingState.TempFileCreated:
-                    AppendStateText("  创建临时文件...\r\n");
+                    logFunc("  创建临时文件...\r\n");
                     progressBarX1.Maximum = e.Part.NewFileLength;
                     break;
                 case PatchingState.TempFileBuildProcessChanged:
@@ -414,12 +428,12 @@ namespace WzComparerR2
                     progressBarX1.Text = string.Format("{0:N0}/{1:N0}", e.CurrentFileLength, e.Part.NewFileLength);
                     break;
                 case PatchingState.TempFileClosed:
-                    AppendStateText("  关闭临时文件...\r\n");
+                    logFunc("  关闭临时文件...\r\n");
                     progressBarX1.Value = 0;
                     progressBarX1.Maximum = 0;
                     progressBarX1.Text = string.Empty;
 
-                    if (!string.IsNullOrEmpty(this.compareFolder)
+                    if (!string.IsNullOrEmpty(session.CompareFolder)
                         && e.Part.Type == 1
                         && Path.GetExtension(e.Part.FileName).Equals(".wz", StringComparison.OrdinalIgnoreCase)
                         && !Path.GetFileName(e.Part.FileName).Equals("list.wz", StringComparison.OrdinalIgnoreCase))
@@ -428,7 +442,7 @@ namespace WzComparerR2
                         Wz_Structure wzold = new Wz_Structure();
                         try
                         {
-                            AppendStateText("  (comparer)正在对比文件...\r\n");
+                            logFunc("  (comparer)正在对比文件...\r\n");
                             EasyComparer comparer = new EasyComparer();
                             comparer.OutputPng = chkOutputPng.Checked;
                             comparer.OutputAddedImg = chkOutputAddedImg.Checked;
@@ -438,7 +452,7 @@ namespace WzComparerR2
                             comparer.Comparer.ResolvePngLink = chkResolvePngLink.Checked;
                             wznew.Load(e.Part.TempFilePath, false);
                             wzold.Load(e.Part.OldFilePath, false);
-                            comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], this.compareFolder);
+                            comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], session.CompareFolder);
                         }
                         catch (Exception ex)
                         {
@@ -452,38 +466,29 @@ namespace WzComparerR2
                         }
                     }
 
-                    if (this.deadPatch && e.Part.Type == 1 && sender is WzPatcher patcher)
+                    if (session.DeadPatch && e.Part.Type == 1 && sender is WzPatcher patcher)
                     {
                         if (patcher.IsKMST1125Format.Value)
                         {
                             // TODO: we should build the file dependency tree to make sure all old files could be overridden safely.
-                            AppendStateText("  (deadpatch)延迟应用文件...\r\n");
+                            logFunc("  (deadpatch)延迟应用文件...\r\n");
                         }
                         else
                         {
                             patcher.SafeMove(e.Part.TempFilePath, e.Part.OldFilePath);
-                            AppendStateText("  (deadpatch)正在应用文件...\r\n");
+                            logFunc("  (deadpatch)正在应用文件...\r\n");
                         }
                     }
                     break;
                 case PatchingState.PrepareVerifyOldChecksumBegin:
-                    AppendStateText($"预检查旧文件checksum: {e.Part.FileName}");
+                    logFunc($"预检查旧文件checksum: {e.Part.FileName}");
                     break;
                 case PatchingState.PrepareVerifyOldChecksumEnd:
-                    AppendStateText(" 结束\r\n");
+                    logFunc(" 结束\r\n");
                     break;
                 case PatchingState.ApplyFile:
-                    AppendStateText($"应用文件: {e.Part.FileName}\r\n");
+                    logFunc($"应用文件: {e.Part.FileName}\r\n");
                     break;
-            }
-        }
-
-        private void AppendStateText(string text)
-        {
-            this.Invoke((Action<string>)(t => { this.txtPatchState.AppendText(t); }), text);
-            if (this.loggingFileName != null)
-            {
-                File.AppendAllText(this.loggingFileName, text, Encoding.UTF8);
             }
         }
 
@@ -510,7 +515,7 @@ namespace WzComparerR2
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Title = "请选择补丁文件路径";
             dlg.Filter = "*.patch;*.exe|*.patch;*.exe";
-            if (dlg.ShowDialog() == DialogResult.OK)
+            if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 txtPatchFile2.Text = dlg.FileName;
             }
@@ -520,7 +525,7 @@ namespace WzComparerR2
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
             dlg.Description = "请选择冒险岛文件夹路径";
-            if (dlg.ShowDialog() == DialogResult.OK)
+            if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 txtMSFolder2.Text = dlg.SelectedPath;
             }
@@ -542,7 +547,7 @@ namespace WzComparerR2
             dlg.InitialDirectory = Path.GetDirectoryName(txtPatchFile2.Text);
             dlg.FileName = Path.GetFileNameWithoutExtension(txtPatchFile2.Text) + "_reverse.patch";
 
-            if (dlg.ShowDialog() == DialogResult.OK)
+            if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 try
                 {
@@ -556,6 +561,60 @@ namespace WzComparerR2
                 {
                 }
             }
+        }
+
+        class PatcherSession
+        {
+            public PatcherSession()
+            {
+                this.cancellationTokenSource = new CancellationTokenSource();
+            }
+
+            public string PatchFile;
+            public string MSFolder;
+            public string CompareFolder;
+            public bool PrePatch;
+            public bool DeadPatch;
+
+            public Task PatchExecTask;
+            public string LoggingFileName;
+            public PatcherTaskState State;
+
+            public CancellationToken CancellationToken => this.cancellationTokenSource.Token;
+            private CancellationTokenSource cancellationTokenSource;
+            private TaskCompletionSource<bool> tcsWaiting;
+
+            public bool IsCompleted => this.PatchExecTask?.IsCompleted ?? true;
+
+            public void Cancel()
+            {
+                this.cancellationTokenSource.Cancel();
+            }
+
+            public async Task WaitForContinueAsync()
+            {
+                var tcs = new TaskCompletionSource<bool>();
+                this.tcsWaiting = tcs;
+                this.cancellationTokenSource.Token.Register(() => tcs.TrySetCanceled());
+                await tcs.Task;
+            }
+
+            public void Continue()
+            {
+                if (this.tcsWaiting != null)
+                {
+                    this.tcsWaiting.SetResult(true);
+                }
+            }
+        }
+
+        enum PatcherTaskState
+        {
+            NotStarted = 0,
+            Prepatch = 1,
+            WaitForContinue = 2,
+            Patching = 3,
+            Complete = 4,
         }
     }
 }

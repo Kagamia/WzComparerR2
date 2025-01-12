@@ -73,12 +73,18 @@ namespace WzComparerR2.Patcher.Builder
         // we should override it once more to calculate position.
         public override int ReadByte()
         {
-            byte[] buffer = new byte[1];
-            if (this.Read(buffer, 0, 1) != 0)
+            Span<byte> buffer = stackalloc byte[1];
+            if (this.Read(buffer) != 0)
             {
                 return buffer[0];
             }
             return -1;
+        }
+
+        public override int Read(Span<byte> buffer)
+        {
+            // it calls Read(byte[], int, int) internally
+            return base.Read(buffer);
         }
 #endif
 

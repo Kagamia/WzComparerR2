@@ -115,31 +115,17 @@ namespace WzComparerR2.Patcher.Builder
             return crc;
         }
 
-        public static uint ComputeHash(Stream stream, long length)
+        public static uint ComputeHash(Stream stream, long length, CancellationToken cancellationToken = default)
         {
-            FileStream fs = stream as FileStream;
-            if (fs != null && fs.IsAsync)
-            {
-                return ComputeHashAsync(fs, length, 0);
-            }
-            else
-            {
-                return ComputeHash(stream, length, 0);
-            }
+            return ComputeHash(stream, length, 0, cancellationToken);
         }
 
-        public static uint ComputeHashAsync(FileStream stream, long length, uint crc)
-        {
-            var hash = new AsyncFileHash(stream, length);
-            crc = hash.Compute(crc);
-            return crc;
-        }
-
-        public static unsafe uint ComputeHash(Stream stream, long length, uint crc)
+        public static unsafe uint ComputeHash(Stream stream, long length, uint crc, CancellationToken cancellationToken = default)
         {
             byte[] buffer = new byte[0x8000];
             while (length > 0)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 int count = stream.Read(buffer, 0, (int)Math.Min(buffer.Length, length));
                 if (count == 0)
                 {
@@ -186,67 +172,6 @@ namespace WzComparerR2.Patcher.Builder
                 }
             }
             return crc;
-        }
-
-
-        private class AsyncFileHash
-        {
-            public AsyncFileHash(FileStream fs, long length)
-            {
-                this.fs = fs;
-                this.length = length;
-                this.crc = 0;
-                this.evCheckSum = new AutoResetEvent(false);
-                this.evCallBack = new AutoResetEvent(true);
-            }
-
-            FileStream fs;
-            long length;
-            AutoResetEvent evCheckSum;
-            AutoResetEvent evCallBack;
-            uint crc;
-            byte[] buffer1 = new byte[0x20000];
-            byte[] buffer2 = new byte[0x20000];
-
-            public uint Compute(uint crc)
-            {
-                this.crc = crc;
-                this.Begin(buffer1);
-                this.evCheckSum.WaitOne();
-                return this.crc;
-            }
-
-            private void Begin(byte[] buffer)
-            {
-                IAsyncResult ir = fs.BeginRead(buffer, 0, (int)Math.Min(length, buffer.Length), CallBack, buffer);
-            }
-
-            private void CallBack(IAsyncResult ir)
-            {
-                byte[] buffer = (byte[])ir.AsyncState;
-                int count = fs.EndRead(ir);
-                this.length -= count;
-                bool doEnd = this.length <= 0;
-
-                this.evCallBack.WaitOne();
-                if (!doEnd)
-                {
-                    byte[] nextBuffer = buffer == buffer1 ? buffer2 : buffer1;
-                    Begin(nextBuffer);
-                }
-                this.crc = CheckSum.ComputeHash(buffer, 0, count, this.crc);
-                this.evCallBack.Set();
-
-                if (doEnd)
-                {
-                    this.End();
-                }
-            }
-
-            private void End()
-            {
-                this.evCheckSum.Set();
-            }
         }
     }
 }

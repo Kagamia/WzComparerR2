@@ -92,7 +92,7 @@ namespace WzComparerR2.Patcher
             set { action2 = value; }
         }
 
-        public ICollection<string> DependencyFiles
+        public ISet<string> DependencyFiles
         {
             get { return this.dependencyFiles; }
         }
