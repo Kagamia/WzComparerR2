@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using DevComponents.DotNetBar;
@@ -19,11 +20,13 @@ namespace WzComparerR2.LuaConsole
         public void LoadFile(string fileName)
         {
             this.textEditorControl1.LoadFile(fileName, false, true);
+            this.Text = Path.GetFileName(fileName);
         }
 
         public void SaveFile(string fileName)
         {
             this.textEditorControl1.SaveFile(fileName);
+            this.Text = Path.GetFileName(fileName);
         }
 
         public string FileName

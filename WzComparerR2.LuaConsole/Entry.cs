@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using WzComparerR2.Config;
 using WzComparerR2.PluginBase;
 using DevComponents.DotNetBar;
 
@@ -23,6 +24,7 @@ namespace WzComparerR2.LuaConsole
 
             btnItem.Click += btnItem_Click;
             bar.Items.Add(btnItem);
+            ConfigManager.RegisterAllSection();
         }
 
         FrmConsole frm;
