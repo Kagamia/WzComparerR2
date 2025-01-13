@@ -24,7 +24,7 @@ namespace WzComparerR2.Patcher
 
         private FileStream patchFile;
         private PartialStream patchBlock;
-        private Stream inflateStream;
+        private InflateStream inflateStream;
 
         private string noticeText;
         private List<PatchPartContext> patchParts;
@@ -57,9 +57,8 @@ namespace WzComparerR2.Patcher
         /// </summary>
         public void OpenDecompress(CancellationToken cancellationToken)
         {
-            this.patchBlock = TrySplit(this.patchFile);
-
-            if (this.patchBlock == null)
+            var patchBlock = TrySplit(this.patchFile);
+            if (patchBlock == null)
             {
                 throw new Exception("Decompress Error, cannot find patch block from the stream.");
             }
@@ -80,10 +79,12 @@ namespace WzComparerR2.Patcher
 
 #if NET6_0_OR_GREATER
             // wrap InflateStream with BufferedStream for better performance in net6+
-            this.inflateStream = new BufferedStream(new InflateStream(patchBlock));
+            bool buffered = true;
 #else
-            this.inflateStream = new InflateStream(patchBlock);
+            bool buffered = false;
 #endif
+            this.patchBlock = patchBlock;
+            this.inflateStream = new InflateStream(patchBlock, buffered);
         }
 
         private PartialStream TrySplit(Stream metaStream)
@@ -171,9 +172,9 @@ namespace WzComparerR2.Patcher
             {
                 this.OpenDecompress(cancellationToken);
             }
-            else if (this.inflateStream.Position > 0) //重置到初始化
+            else
             {
-                this.inflateStream = new InflateStream(this.inflateStream);
+                this.inflateStream.Reset();
             }
 
             var patchParts = new List<PatchPartContext>();
@@ -188,8 +189,7 @@ namespace WzComparerR2.Patcher
             {
                 this.IsKMST1125Format = false;
                 // reset file cursor
-                this.inflateStream = new InflateStream(this.inflateStream);
-                r = new BinaryReader(this.inflateStream);
+                this.inflateStream.Reset();
             }
 
             while (true)
@@ -215,7 +215,7 @@ namespace WzComparerR2.Patcher
                     case 0:
                         if (part.NewFileLength > 0)
                         {
-                            StreamSkip(this.inflateStream, part.NewFileLength);
+                            this.inflateStream.Seek(part.NewFileLength, SeekOrigin.Current);
                         }
                         break;
 
@@ -536,7 +536,7 @@ namespace WzComparerR2.Patcher
             if (part.NewFileLength <= 0)
                 return;
 
-            this.InflateStreamSeek(part.Offset);
+            this.inflateStream.Seek(part.Offset, SeekOrigin.Begin);
             FileStream tempFileStream = new FileStream(tempFileName, FileMode.Create, FileAccess.ReadWrite);
             part.TempFilePath = tempFileName;
             this.OnTempFileCreated(part);
@@ -627,7 +627,7 @@ namespace WzComparerR2.Patcher
                 this.OnTempFileCreated(part);
                 uint newCheckSum1 = 0;
 
-                this.InflateStreamSeek(part.Offset);
+                this.inflateStream.Seek(part.Offset, SeekOrigin.Begin);
                 BinaryReader r = new BinaryReader(this.inflateStream);
 
                 double patchProc = 0;
@@ -855,7 +855,7 @@ namespace WzComparerR2.Patcher
                 {
                     case 0x08:
                         blockLength = cmd & 0x0fffffff;
-                        this.StreamSkip(reader.BaseStream, blockLength); // skip len
+                        reader.BaseStream.Seek(blockLength, SeekOrigin.Current); // skip len
                         patchPart.Action0++;
                         break;
 
@@ -866,7 +866,7 @@ namespace WzComparerR2.Patcher
 
                     default:
                         blockLength = cmd;
-                        this.StreamSkip(reader.BaseStream, 4); // skip content
+                        reader.BaseStream.Seek(4, SeekOrigin.Current); // skip content
                         if (this.IsKMST1125Format == true)
                         {
                             // skip old file name
@@ -905,47 +905,11 @@ namespace WzComparerR2.Patcher
                 Directory.CreateDirectory(dir);
         }
 
-        private void VerifyCheckSum(uint checksum0, uint checksum1, string fileName, string reason)
+        private void VerifyCheckSum(uint expected, uint actual, string fileName, string reason)
         {
-            if (checksum0 != checksum1)
+            if (expected != actual)
             {
-                throw new Exception(string.Format("CheckSum Error on \"{0}\"({1}). (0x{2:x8}, 0x{3:x8})", fileName, reason, checksum0, checksum1));
-            }
-        }
-
-        private void InflateStreamSeek(long offset)
-        {
-            try
-            {
-                this.inflateStream.Seek(offset, SeekOrigin.Begin);
-            }
-            catch
-            {
-#if NET6_0_OR_GREATER
-                this.inflateStream = new BufferedStream(new InflateStream(this.inflateStream));
-#else
-                this.inflateStream = new InflateStream(this.inflateStream);
-#endif
-                this.inflateStream.Seek(offset, SeekOrigin.Begin);
-            }
-        }
-
-        private void StreamSkip(Stream stream, int count)
-        {
-            if (stream is BufferedStream bufferedStream)
-            {
-                var pool = ArrayPool<byte>.Shared;
-                byte[] buffer = pool.Rent(4096);
-                while (count > 0)
-                {
-                    int actual = stream.Read(buffer, 0, Math.Min(count, buffer.Length));
-                    count -= actual;
-                }
-                pool.Return(buffer);
-            }
-            else
-            {
-                stream.Seek(count, SeekOrigin.Current);
+                throw new Exception(string.Format("CheckSum Error on \"{0}\"({1}). (expected: 0x{2:x8}, actual: 0x{3:x8})", fileName, reason, expected, actual));
             }
         }
 
