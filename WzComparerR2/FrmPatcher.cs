@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -23,6 +24,7 @@ namespace WzComparerR2
         public FrmPatcher()
         {
             InitializeComponent();
+            this.FormClosing += new FormClosingEventHandler(FrmPatcher_FormClosing);
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
             this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
@@ -58,8 +60,12 @@ namespace WzComparerR2
             cmbComparePng.SelectedItem = WzPngComparison.SizeAndDataLength;
         }
 
+        SortedDictionary<string, long> patchedFileSizes = new SortedDictionary<string, long>();
+        List<string> patchedFileIndex = new List<string>();
+        Dictionary<string, string> finishedFileIndex = new Dictionary<string, string>();
         public Encoding PatcherNoticeEncoding { get; set; }
 
+        long availableDiskSpace;
         private bool isUpdating;
         private PatcherSession patcherSession;
 
@@ -176,7 +182,7 @@ namespace WzComparerR2
                 item.GetFileLength();
                 if (item.FileLength > 0)
                 {
-                    switch (MessageBoxEx.Show(string.Format("文件大小：{0:N0} bytes, 更新时间：{1:yyyy-MM-dd HH:mm:ss}\r\n是否立即开始下载文件？", item.FileLength, item.LastModified), "Patcher", MessageBoxButtons.YesNo))
+                    switch (MessageBoxEx.Show(string.Format("文件大小：{0:N0} bytes, 更新时间：{1:yyyy-MM-dd HH:mm:ss}\r\n是否立即开始下载文件？\r\nYes - 下载文件\r\nNo - 复制链接到剪贴板\r\nCancel - 不下载", item.FileLength, item.LastModified), "Patcher", MessageBoxButtons.YesNoCancel))
                     {
                         case DialogResult.Yes:
                         #if NET6_0_OR_GREATER
@@ -191,6 +197,10 @@ namespace WzComparerR2
                             return;
 
                         case DialogResult.No:
+                            Clipboard.SetText(txtUrl.Text);
+                            return;
+
+                        case DialogResult.Cancel:
                             return;
                     }
                 }
@@ -318,12 +328,85 @@ namespace WzComparerR2
                 patcher.PatchingStateChanged += (o, e) => this.patcher_PatchingStateChanged(o, e, session, AppendStateText);
                 AppendStateText($"补丁文件：{session.PatchFile}\r\n");
                 AppendStateText("正在检查补丁...");
+                long patchedAllFileSize = 0;
+                long decompressedSize = patcher.PrePatch(cancellationToken);
+                availableDiskSpace = RemainingDiskSpace(session.MSFolder);
                 patcher.OpenDecompress(cancellationToken);
                 AppendStateText("成功\r\n");
+                StringBuilder diskSpaceMessage = new StringBuilder();
+                patchedFileSizes.Add("ZOther", 0);
+                foreach (PatchPartContext part in patcher.PatchParts)
+                {
+                    switch (part.Type)
+                    {
+                        case 0:
+                        case 1:
+                            patchedAllFileSize += part.NewFileLength;
+                            break;
+                        case 2:
+                            patchedAllFileSize -= part.NewFileLength;
+                            break;
+                    }
+                    if (patcher.IsKMST1125Format.Value)
+                    {
+                        string[] patchedFileDirectory = part.FileName.Split('\\');
+                        if (part.Type == 1 && (patchedFileDirectory[0] == "Data" || patchedFileDirectory[0] == "NxOverlay")) patchedFileIndex.Add(part.FileName);
+                        if (patchedFileDirectory[0] == "Data")
+                        {
+                            if (!patchedFileSizes.ContainsKey(patchedFileDirectory[1])) patchedFileSizes.Add(patchedFileDirectory[1], 0);
+                            switch (part.Type)
+                            {
+                                case 0:
+                                case 1:
+                                    patchedFileSizes[patchedFileDirectory[1]] += part.NewFileLength;
+                                    break;
+                                case 2:
+                                    patchedFileSizes[patchedFileDirectory[1]] -= part.NewFileLength;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            switch (part.Type)
+                            {
+                                case 0:
+                                case 1:
+                                    patchedFileSizes["ZOther"] += part.NewFileLength;
+                                    break;
+                                case 2:
+                                    patchedFileSizes["ZOther"] -= part.NewFileLength;
+                                    break;
+                            }
+                        }
+                    }
+                }
+                foreach (string key in patchedFileSizes.Keys)
+                {
+                    switch (key)
+                    {
+                        case "ZOther":
+                            diskSpaceMessage.AppendLine(string.Format("其它文件所需空间: {0}", GetBothByteAndGBValue(patchedFileSizes[key])));
+                            break;
+                        default:
+                            diskSpaceMessage.AppendLine(string.Format("[{0}] 所需空间: {1}", key, GetBothByteAndGBValue(patchedFileSizes[key])));
+                            break;
+                    }
+                }
+                patchedFileIndex.Sort();
+                diskSpaceMessage.AppendLine(string.Format("总计所需空间: {0}", GetBothByteAndGBValue(patchedAllFileSize)));
+                diskSpaceMessage.AppendLine(string.Format("可用硬盘空间: {0}", GetBothByteAndGBValue(availableDiskSpace)));
+                AppendStateText(diskSpaceMessage.ToString());
+                if (patchedAllFileSize > availableDiskSpace)
+                {
+                    DialogResult PatcherPromptResult = MessageBoxEx.Show(this, diskSpaceMessage.ToString() + "\r\n硬盘空间可能不足以完成补丁更新。是否仍要继续？", "Patcher", MessageBoxButtons.YesNo);
+                    if (PatcherPromptResult == DialogResult.No)
+                    {
+                        throw new OperationCanceledException();
+                    }
+                }
                 if (session.PrePatch)
                 {
                     AppendStateText("正在预读补丁...\r\n");
-                    long decompressedSize = patcher.PrePatch(cancellationToken);
                     if (patcher.IsKMST1125Format.Value)
                     {
                         AppendStateText("补丁类型：KMST1125\r\n");
@@ -388,6 +471,9 @@ namespace WzComparerR2
             }
             finally
             {
+                patchedFileSizes.Clear();
+                patchedFileIndex.Clear();
+                finishedFileIndex.Clear();
                 session.State = PatcherTaskState.Complete;
                 if (patcher != null)
                 {
@@ -470,8 +556,36 @@ namespace WzComparerR2
                     {
                         if (patcher.IsKMST1125Format.Value)
                         {
-                            // TODO: we should build the file dependency tree to make sure all old files could be overridden safely.
-                            logFunc("  (deadpatch)延迟应用文件...\r\n");
+                            int targetDirectoryDepth = GetDirectoryDepth(e.Part.FileName);
+                            if (targetDirectoryDepth > 1 && e.Part.FileName.StartsWith("Data"))
+                            {
+                                string currentSubdirectory = e.Part.FileName.Split('\\')[1];
+                                if (patchedFileIndex.Contains(e.Part.FileName))
+                                {
+                                    patchedFileIndex.Remove(e.Part.FileName);
+                                    finishedFileIndex.Add(e.Part.TempFilePath, e.Part.OldFilePath);
+                                }
+                                if (FileInsideThisDirectoryExists(patchedFileIndex, Path.GetDirectoryName(e.Part.FileName)))
+                                {
+                                    logFunc("  (deadpatch)延迟应用文件...\r\n");
+                                }
+                                else
+                                {
+                                    long currentUsedDiskSpace = availableDiskSpace - RemainingDiskSpace(session.MSFolder);
+                                    logFunc(string.Format("  (deadpatch)已占用硬盘空间: {0}\r\n", GetBothByteAndGBValue(currentUsedDiskSpace)));
+                                    logFunc("  (deadpatch)正在应用文件...\r\n");
+                                    foreach (string k in finishedFileIndex.Keys)
+                                    {
+                                        patcher.SafeMove(k, finishedFileIndex[k]);
+                                        finishedFileIndex.Remove(k);
+                                    }
+
+                                }
+                            }
+                            else
+                            {
+                                logFunc("  (deadpatch)延迟应用文件...\r\n");
+                            }
                         }
                         else
                         {
@@ -492,6 +606,24 @@ namespace WzComparerR2
             }
         }
 
+        static int GetDirectoryDepth(string inputString)
+        {
+            int count = 0;
+            foreach (char c in inputString)
+            {
+                if (c == '\\') count++;
+            }
+            return count;
+        }
+
+        private bool FileInsideThisDirectoryExists(List<string> fileList, string directoryPath)
+        {
+            string normalizedDirectoryPath = directoryPath.TrimEnd('\\') + "\\";
+            bool exists = fileList.Any(filePath => filePath.StartsWith(normalizedDirectoryPath)
+                                                    && filePath.Substring(normalizedDirectoryPath.Length).IndexOf('\\') == -1);
+            return exists;
+        }
+
         private Node CreateFileNode(PatchPartContext part)
         {
             Node node = new Node(part.FileName) { CheckBoxVisible = true, Checked = true };
@@ -508,6 +640,42 @@ namespace WzComparerR2
             }
             node.Tag = part;
             return node;
+        }
+
+        private long RemainingDiskSpace(string path)
+        {
+            string diskDrive = path.Substring(0, 2);
+            try
+            {
+                DriveInfo dinfo = new DriveInfo(diskDrive);
+                return dinfo.AvailableFreeSpace;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        private string GetBothByteAndGBValue(long size)
+        {
+            string[] sizes = { "B", "KB", "MB", "GB" };
+            double targetbytes = size;
+            int order = 0;
+
+            while (targetbytes >= 1024 && order < sizes.Length)
+            {
+                order++;
+                targetbytes /= 1024;
+            }
+
+            if (size <= 1024)
+            {
+                return $"{size:N0} bytes";
+            }
+            else
+            {
+                return $"{size:N0} bytes ({targetbytes:0.##} {sizes[order]})";
+            }
         }
 
         private void buttonXOpen3_Click(object sender, EventArgs e)
@@ -557,8 +725,24 @@ namespace WzComparerR2
                     builder.outputFileName = dlg.FileName;
                     builder.Build();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
+                }
+            }
+        }
+
+        private void FrmPatcher_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (this.patcherSession != null && this.patcherSession.State != PatcherTaskState.NotStarted && this.patcherSession.State != PatcherTaskState.Complete)
+            {
+                DialogResult result = MessageBoxEx.Show(this, "游戏正在被更新，关闭更新装置可能会导致游戏文件损坏。\r\n是否仍要关闭？", "Patcher", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                {
+                    e.Cancel = false;
+                }
+                else
+                {
+                    e.Cancel = true;
                 }
             }
         }
