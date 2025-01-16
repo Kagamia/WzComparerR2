@@ -30,8 +30,6 @@ namespace WzComparerR2.MapRender
         private ButtonItem btnItemMapRenderV2;
         private FrmMapRender2 mapRenderGame2;
 
-        //NoOptimization防止Assembly.GetCallingAssembly因尾调用优化出错
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoOptimization)]
         protected override void OnLoad()
         {
             #if MapRenderV1
@@ -44,7 +42,7 @@ namespace WzComparerR2.MapRender
             btnItemMapRenderV2 = new ButtonItem("", "MapRenderV2");
             btnItemMapRenderV2.Click += btnItem_Click;
             bar2.Items.Add(btnItemMapRenderV2);
-            ConfigManager.RegisterAllSection();
+            ConfigManager.RegisterAllSection(this.GetType().Assembly);
         }
 
         void btnItem_Click(object sender, EventArgs e)

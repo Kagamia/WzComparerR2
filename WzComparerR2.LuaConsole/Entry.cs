@@ -24,7 +24,7 @@ namespace WzComparerR2.LuaConsole
 
             btnItem.Click += btnItem_Click;
             bar.Items.Add(btnItem);
-            ConfigManager.RegisterAllSection();
+            ConfigManager.RegisterAllSection(this.GetType().Assembly);
         }
 
         FrmConsole frm;

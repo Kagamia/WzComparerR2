@@ -118,7 +118,7 @@ namespace WzComparerR2
         /// </summary>
         internal void PluginOnLoad()
         {
-            ConfigManager.RegisterAllSection();
+            ConfigManager.RegisterAllSection(this.GetType().Assembly);
             var conf = ImageHandlerConfig.Default;
             //刷新最近打开文件列表
             refreshRecentDocItems();

@@ -75,7 +75,12 @@ namespace WzComparerR2.Config
         public static void RegisterAllSection()
         {
             var asm = Assembly.GetCallingAssembly();
-            var secTypes = asm.GetExportedTypes().Where(type => {
+            RegisterAllSection(asm);
+        }
+
+       public static void RegisterAllSection(Assembly assembly)
+        {
+            var secTypes = assembly.GetExportedTypes().Where(type => {
                 try
                 {
                     var baseType = type.BaseType;
