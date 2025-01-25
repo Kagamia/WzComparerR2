@@ -306,7 +306,7 @@ namespace WzComparerR2.Patcher
 
             if (this.inflateStream.Position > 0) //重置到初始化
             {
-                this.inflateStream = new InflateStream(this.inflateStream);
+                this.inflateStream.Reset();
             }
 
             if (this.patchParts == null) //边读取边执行
@@ -322,7 +322,7 @@ namespace WzComparerR2.Patcher
                 {
                     this.IsKMST1125Format = false;
                     // reset file cursor
-                    this.inflateStream = new InflateStream(this.inflateStream);
+                    this.inflateStream.Reset();
                     r = new BinaryReader(this.inflateStream);
                 }
 
