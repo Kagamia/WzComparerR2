@@ -170,7 +170,8 @@
             this.chkDeadPatch.Name = "chkDeadPatch";
             this.chkDeadPatch.Size = new System.Drawing.Size(82, 16);
             this.chkDeadPatch.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkDeadPatch, new DevComponents.DotNetBar.SuperTooltipInfo("DeadPatch", "", "开启此项后，每更新完一个子文件，将立即覆盖原文件并删除临时文件。这样做会减少临时文件空间的需要，但是伴随一定风险。", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 130)));
+            this.superTooltip1.SetSuperTooltip(this.chkDeadPatch, new DevComponents.DotNetBar.SuperTooltipInfo("DeadPatch", "", "开启此项后，每更新完一个子文件，将立即覆盖原文件并删除临时文件。这样做会减少临时文件空间的需要，但是伴随一定风险。\r\n\r\n在KMST1125格式的补丁上，需同时启" +
+            "用PrePatch才能生效。", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 180)));
             this.chkDeadPatch.TabIndex = 7;
             this.chkDeadPatch.Text = "DeadPatch";
             // 

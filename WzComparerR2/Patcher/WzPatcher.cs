@@ -18,6 +18,7 @@ namespace WzComparerR2.Patcher
             this.patchFile = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read,
                 0x4000, FileOptions.Asynchronous | FileOptions.RandomAccess);
             this.NoticeEncoding = Encoding.Default;
+            this.ThrowOnValidationFailed = true;
         }
 
         private const int MAX_PATH = 260;
@@ -28,7 +29,7 @@ namespace WzComparerR2.Patcher
 
         private string noticeText;
         private List<PatchPartContext> patchParts;
-        private Dictionary<string, uint> oldFileHash;
+        private Dictionary<string, FileHash> oldFileHash;
 
         public Encoding NoticeEncoding { get; set; }
 
@@ -42,12 +43,13 @@ namespace WzComparerR2.Patcher
             get { return noticeText; }
         }
 
-        public Dictionary<string, uint> OldFileHash
+        public Dictionary<string, FileHash> OldFileHash
         {
             get { return oldFileHash; }
         }
 
         public bool? IsKMST1125Format { get; private set; }
+        public bool ThrowOnValidationFailed { get; set; }
 
         public event EventHandler<PatchingEventArgs> PatchingStateChanged;
 
@@ -180,9 +182,9 @@ namespace WzComparerR2.Patcher
             var patchParts = new List<PatchPartContext>();
             var r = new BinaryReader(this.inflateStream);
 
-            if (this.TryReadKMST1125FileHashList(r, out var fileHash))
+            if (this.TryReadKMST1125FileHashList(r, out var fileHashMap))
             {
-                this.oldFileHash = fileHash;
+                this.oldFileHash = fileHashMap;
                 this.IsKMST1125Format = true;
             }
             else
@@ -202,9 +204,9 @@ namespace WzComparerR2.Patcher
                     break;
                 }
 
-                if (this.IsKMST1125Format.Value && this.oldFileHash.TryGetValue(part.FileName, out uint value))
+                if (this.IsKMST1125Format.Value && this.oldFileHash.TryGetValue(part.FileName, out var fileHash))
                 {
-                    part.OldChecksum = value;
+                    part.OldChecksum = fileHash.Hash;
                 }
 
                 patchParts.Add(part);
@@ -316,7 +318,7 @@ namespace WzComparerR2.Patcher
                 {
                     this.oldFileHash = fileHash;
                     this.IsKMST1125Format = true;
-                    this.ValidateFileHash(mapleStoryFolder, cancellationToken);
+                    this.ValidateFileHash(mapleStoryFolder, this.ThrowOnValidationFailed, cancellationToken);
                 }
                 else
                 {
@@ -355,7 +357,7 @@ namespace WzComparerR2.Patcher
             }
             else  //按照调整后顺序执行
             {
-                this.ValidateFileHash(mapleStoryFolder, cancellationToken);
+                this.ValidateFileHash(mapleStoryFolder, this.ThrowOnValidationFailed, cancellationToken);
 
                 foreach (PatchPartContext part in this.patchParts)
                 {
@@ -365,7 +367,7 @@ namespace WzComparerR2.Patcher
                             CreateNewFile(part, tempDir);
                             break;
                         case 1:
-                            RebuildFile(part, tempDir, mapleStoryFolder);
+                            RebuildFile(part, tempDir, mapleStoryFolder, cancellationToken);
                             break;
                         case 2:
                             break;
@@ -393,17 +395,20 @@ namespace WzComparerR2.Patcher
             SafeDeleteDirectory(tempDir);
         }
 
-        private bool TryReadKMST1125FileHashList(BinaryReader r, out Dictionary<string, uint> fileHash)
+        private bool TryReadKMST1125FileHashList(BinaryReader r, out Dictionary<string, FileHash> fileHash)
         {
-            fileHash = new Dictionary<string, uint>();
             try
             {
+                fileHash = new Dictionary<string, FileHash>();
                 int count = r.ReadInt32();
                 for (int i = 0; i < count; i++)
                 {
                     string fn = this.ReadStringWithLength(r, MAX_PATH);
                     uint checksum = r.ReadUInt32();
-                    fileHash.Add(fn, checksum);
+                    fileHash.Add(fn, new FileHash
+                    {
+                        Hash = checksum,
+                    });
                 }
                 return true;
             }
@@ -414,25 +419,42 @@ namespace WzComparerR2.Patcher
             }
         }
 
-        private void ValidateFileHash(string msDir, CancellationToken cancellationToken = default)
+        private void ValidateFileHash(string msDir, bool failOnValidationFailed, CancellationToken cancellationToken = default)
         {
             if (this.OldFileHash != null && this.OldFileHash.Count > 0)
             {
                 foreach(var kv in this.OldFileHash)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
+                    // The temporary context is only used for triggering event.
                     var part = new PatchPartContext(kv.Key, -1, -1)
                     {
                         OldFilePath = Path.Combine(msDir, kv.Key)
                     };
-                    uint oldCheckSum1;
+
                     this.OnPrepareVerifyOldChecksumBegin(part);
-                    using (var fs = new FileStream(part.OldFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    uint oldCheckSum = 0;
+                    if (!File.Exists(part.OldFilePath))
                     {
-                        oldCheckSum1 = CheckSum.ComputeHash(fs, fs.Length, cancellationToken);
+                        kv.Value.VerifyState = FileHashVerifyState.FileNotFound;
+                    }
+                    else
+                    {
+                        using (var fs = new FileStream(part.OldFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        {
+                            oldCheckSum = CheckSum.ComputeHash(fs, fs.Length, cancellationToken);
+                        }
+                        part.OldChecksum = kv.Value.Hash;
+                        part.OldChecksumActual = oldCheckSum;
+                        kv.Value.ActualHash = oldCheckSum;
+                        kv.Value.VerifyState = (oldCheckSum == kv.Value.Hash) ? FileHashVerifyState.Verified : FileHashVerifyState.HashNotMatch;
                     }
                     this.OnPrepareVerifyOldChecksumEnd(part);
-                    VerifyCheckSum(kv.Value, oldCheckSum1, part.FileName, "origin");
+
+                    if (failOnValidationFailed)
+                    {
+                        VerifyCheckSum(kv.Value.Hash, oldCheckSum, part.FileName, "origin");
+                    }
                 }
             }
         }
@@ -561,6 +583,7 @@ namespace WzComparerR2.Patcher
 
             var oldWzFiles = new Dictionary<string, FileStream>();
             FileStream tempFileStream = null;
+            bool deferredVerifyFileHash = false;
 
             FileStream openFile(string fileName)
             {
@@ -570,6 +593,10 @@ namespace WzComparerR2.Patcher
                 }
                 if (!oldWzFiles.TryGetValue(fileName, out var fs))
                 {
+                    if (deferredVerifyFileHash && this.oldFileHash != null)
+                    {
+                        verifyDependencyFileHash(fileName);
+                    }
                     fs = new FileStream(Path.Combine(msDir, fileName), FileMode.Open, FileAccess.Read, FileShare.Read);
                     oldWzFiles.Add(fileName, fs);
                 }
@@ -585,33 +612,108 @@ namespace WzComparerR2.Patcher
                 tempFileStream?.Close();
             }
 
+            void verifyDependencyFileHash(string depFileName)
+            {
+                if (!this.OldFileHash.TryGetValue(depFileName, out var fileHash))
+                {
+                    throw new Exception($"OldFileHash does not exist. FileName: {depFileName}");
+                }
+                switch (fileHash.VerifyState)
+                {
+                    case FileHashVerifyState.NotVerified:
+                        throw new Exception($"OldFile has not verified. FileName: {depFileName}");
+                    case FileHashVerifyState.FileNotFound:
+                        throw new Exception($"OldFile not found. FileName: {depFileName}");
+                    case FileHashVerifyState.HashNotMatch:
+                        throw new Exception($"OldFile hash not match. FileName: {depFileName}");
+                }
+            }
+
+            void verifyOldFileHash(out bool skipUpdate)
+            {
+                skipUpdate = false;
+                var oldWzFile = openFile(part.FileName);
+                this.OnVerifyOldChecksumBegin(part);
+                uint oldCheckSumActual = CheckSum.ComputeHash(oldWzFile, oldWzFile.Length);
+                this.OnVerifyOldChecksumEnd(part);
+
+                if (oldCheckSumActual == part.NewChecksum && (part.NewFileLength == 0 || oldWzFile.Length == part.NewFileLength)) // file is updated
+                {
+                    skipUpdate = true;
+                }
+                else if (part.OldChecksum != null)
+                {
+                    VerifyCheckSum(part.OldChecksum.Value, oldCheckSumActual, part.FileName, "origin");
+                }
+            }
+
+            void skipIfNeeded()
+            {
+                if (part.NewFileLength == 0)
+                {
+                    this.inflateStream.Seek(part.Offset, SeekOrigin.Begin);
+                    BinaryReader r = new BinaryReader(this.inflateStream);
+                    // Here is a trick that to leverage CalcNewFileLength method to skip this file.
+                    part.NewFileLength = CalcNewFileLength(part, r);
+                }
+                else
+                {
+                    // prepatch executed, patcher can jump to the next part outside.
+                }
+            }
+
             try
             {
                 if (this.IsKMST1125Format == true)
                 {
-                    // skip old file checking
+                    // prepatch enabled
+                    if (this.OldFileHash != null && part.DependencyFiles.Count > 0)
+                    {
+                        // verify self
+                        if (File.Exists(part.OldFilePath))
+                        {
+                            if (this.OldFileHash != null && this.OldFileHash.TryGetValue(part.FileName, out var fileHash))
+                            {
+                                if (fileHash.ActualHash == part.NewChecksum)
+                                {
+                                    // file already updated, skip.
+                                    skipIfNeeded();
+                                    OnFileSkipped(part);
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                verifyOldFileHash(out bool skipUpdate);
+                                if (skipUpdate)
+                                {
+                                    skipIfNeeded();
+                                    OnFileSkipped(part);
+                                    return;
+                                }
+                            }
+                        }
+
+                        // verify dependencies
+                        foreach (var depFileName in part.DependencyFiles)
+                        {
+                            verifyDependencyFileHash(depFileName);
+                        }
+                    }
+                    else
+                    {
+                        // no DependencyFiles means prepatch is disabled, check old files on-demand.
+                        deferredVerifyFileHash = true;
+                    }
                 }
                 else if (part.OldChecksum != null)
                 {
-                    var oldWzFile = openFile(part.FileName);
-                    this.OnVerifyOldChecksumBegin(part);
-                    uint oldCheckSum1 = CheckSum.ComputeHash(oldWzFile, oldWzFile.Length); //旧版本文件实际hash
-                    this.OnVerifyOldChecksumEnd(part);
-                    try
+                    verifyOldFileHash(out bool skipUpdate);
+                    if (skipUpdate)
                     {
-                        VerifyCheckSum(part.OldChecksum.Value, oldCheckSum1, part.FileName, "origin");
-                    }
-                    catch
-                    {
-                        if (oldWzFile.Length == part.NewFileLength && oldCheckSum1 == part.NewChecksum) //文件已更新的场合
-                        {
-                            oldWzFile.Close();
-                            return;
-                        }
-                        else
-                        {
-                            throw;
-                        }
+                        skipIfNeeded();
+                        OnFileSkipped(part);
+                        return;
                     }
                 }
 
@@ -977,6 +1079,11 @@ namespace WzComparerR2.Patcher
             PatchingEventArgs e = new PatchingEventArgs(part, PatchingState.ApplyFile);
             OnPatchingStateChanged(e);
         }
+        private void OnFileSkipped(PatchPartContext part)
+        {
+            PatchingEventArgs e = new PatchingEventArgs(part, PatchingState.FileSkipped);
+            OnPatchingStateChanged(e);
+        }
         #endregion
 
         ~WzPatcher()
@@ -1007,6 +1114,21 @@ namespace WzComparerR2.Patcher
             this.patchFile = null;
             this.patchBlock = null;
             this.inflateStream = null;
+        }
+
+        public class FileHash
+        {
+            public uint Hash { get; set; }
+            public uint ActualHash { get; set; }
+            public FileHashVerifyState VerifyState { get; set; }
+        }
+
+        public enum FileHashVerifyState
+        {
+            NotVerified = 0,
+            Verified,
+            HashNotMatch,
+            FileNotFound,
         }
     }
 }

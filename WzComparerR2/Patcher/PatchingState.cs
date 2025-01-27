@@ -18,5 +18,6 @@ namespace WzComparerR2.Patcher
         PrepareVerifyOldChecksumBegin,
         PrepareVerifyOldChecksumEnd,
         ApplyFile,
+        FileSkipped,
     }
 }
