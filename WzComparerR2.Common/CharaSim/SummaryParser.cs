@@ -230,10 +230,11 @@ namespace WzComparerR2.CharaSim
             string h = null;
             if (skill.PreBBSkill) //用level声明的技能
             {
-                string hs;
-                if (skill.Level == level && skill.Common.TryGetValue("hs", out hs))
+                string hsSummary;
+                if (skill.Level == level && skill.Common.TryGetValue("hs", out string hs) 
+                    && (hsSummary = sr[hs]) != null) // fix for skill 170001005, 170011005
                 {
-                    h = sr[hs];
+                    h = hsSummary;
                 }
                 else if (sr.SkillH.Count >= level)
                 {
