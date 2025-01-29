@@ -43,7 +43,7 @@ namespace WzComparerR2.Patcher.Builder
                 int count = src.Read(buffer, 0, Math.Min(buffer.Length, length));
                 if (count == 0)
                     break;
-                crc = CheckSum.ComputeHash2(buffer, 0, count, crc);
+                crc = CheckSum.ComputeHash(buffer, 0, count, crc);
                 dest.Write(buffer, 0, count);
                 length -= count;
             }
@@ -57,7 +57,7 @@ namespace WzComparerR2.Patcher.Builder
             {
                 buffer[i] = data;
             }
-            crc = CheckSum.ComputeHash2(buffer, 0, length, crc);
+            crc = CheckSum.ComputeHash(buffer, 0, length, crc);
             stream.Write(buffer, 0, length);
             return crc;
         }
