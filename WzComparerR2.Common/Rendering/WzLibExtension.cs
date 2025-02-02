@@ -5,6 +5,7 @@ using System.Text;
 using WzComparerR2.WzLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Buffers;
 
 namespace WzComparerR2.Rendering
 {
@@ -69,11 +70,9 @@ namespace WzComparerR2.Rendering
             }
             else
             {
-                byte[] plainData = png.GetRawData();
-                if (plainData == null)
-                {
-                    throw new Exception("png decoding failed.");
-                }
+                int bufferSize = png.GetRawDataSize();
+                byte[] plainData = ArrayPool<byte>.Shared.Rent(bufferSize);
+                png.GetRawData(plainData.AsSpan(0, bufferSize));
 
                 switch (png.Form)
                 {
@@ -83,7 +82,7 @@ namespace WzComparerR2.Rendering
                     case 513:
                     case 1026:
                     case 2050:
-                        texture.SetData(0, 0, rect, plainData, 0, plainData.Length);
+                        texture.SetData(0, 0, rect, plainData, 0, bufferSize);
                         break;
 
                     case 3:
@@ -99,6 +98,8 @@ namespace WzComparerR2.Rendering
                     default:
                         throw new Exception($"unknown png form ({png.Form}).");
                 }
+
+                ArrayPool<byte>.Shared.Return(plainData);
             }
         }
 

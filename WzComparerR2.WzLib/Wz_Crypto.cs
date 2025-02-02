@@ -3,9 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
+using AES = System.Security.Cryptography.Aes;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using WzComparerR2.WzLib.Utilities;
+
+#if NET6_0_OR_GREATER
+using System.Runtime.Intrinsics;
+using System.Runtime.Intrinsics.X86;
+#endif
 
 namespace WzComparerR2.WzLib
 {
@@ -21,7 +27,7 @@ namespace WzComparerR2.WzLib
     {
         public Wz_Crypto()
         {
-            this.keys_bms = new Wz_CryptoKey(iv_bms);
+            this.keys_bms = Wz_NonOpCryptoKey.Instance;
             this.keys_kms = new Wz_CryptoKey(iv_kms);
             this.keys_gms = new Wz_CryptoKey(iv_gms);
             this.listwz = false;
@@ -125,7 +131,7 @@ namespace WzComparerR2.WzLib
                 sb.Clear();
                 for (int i = 0; i < len; i++)
                 {
-                    sb.Append((char)(keys_bms[i] ^ bytes[i]));
+                    sb.Append((char)bytes[i]);
                 }
                 if (IsLegalNodeName(sb.ToString()))
                 {
@@ -174,15 +180,15 @@ namespace WzComparerR2.WzLib
 
         static readonly byte[] iv_gms = { 0x4d, 0x23, 0xc7, 0x2b };
         static readonly byte[] iv_kms = { 0xb9, 0x7d, 0x63, 0xe9 };
-        static readonly byte[] iv_bms = { 0x00, 0x00, 0x00, 0x00 };
 
-        private Wz_CryptoKey keys_bms, keys_gms, keys_kms;
+        private IWzDecrypter keys_bms;
+        private Wz_CryptoKey keys_gms, keys_kms;
         private Wz_CryptoKeyType enc_type;
 
         public bool encryption_detected = false;
         public bool listwz = false;
 
-        public Wz_CryptoKey keys { get; private set; }
+        public IWzDecrypter keys { get; private set; }
         public StringCollection List { get; private set; }
 
         public Wz_CryptoKeyType EncType
@@ -195,7 +201,7 @@ namespace WzComparerR2.WzLib
             }
         }
 
-        public Wz_CryptoKey GetKeys(Wz_CryptoKeyType keyType)
+        public IWzDecrypter GetKeys(Wz_CryptoKeyType keyType)
         {
             switch (keyType)
             {
@@ -212,24 +218,15 @@ namespace WzComparerR2.WzLib
             public Wz_CryptoKey(byte[] iv)
             {
                 this.iv = iv;
-                if (iv == null || BitConverter.ToInt32(iv, 0) == 0)
-                {
-                    this.isEmptyIV = true;
-                }
             }
 
             private byte[] keys;
             private byte[] iv;
-            private bool isEmptyIV;
 
             public byte this[int index]
             {
                 get
                 {
-                    if (isEmptyIV)
-                    {
-                        return 0;
-                    }
                     if (keys == null || keys.Length <= index)
                     {
                         EnsureKeySize(index + 1);
@@ -240,16 +237,12 @@ namespace WzComparerR2.WzLib
 
             public void EnsureKeySize(int size)
             {
-                if (isEmptyIV)
-                {
-                    return;
-                }
                 if (this.keys != null && this.keys.Length >= size)
                 {
                     return;
                 }
 
-                size = (int)Math.Ceiling(1.0 * size / 64) * 64;
+                size = (size + 63) & ~63;
                 int startIndex = 0;
 
                 if (this.keys == null)
@@ -262,7 +255,7 @@ namespace WzComparerR2.WzLib
                     Array.Resize(ref this.keys, size);
                 }
 
-                var aes = Aes.Create();
+                using var aes = AES.Create();
                 aes.KeySize = 256;
                 aes.BlockSize = 128;
                 aes.Key = aesKey;
@@ -291,27 +284,72 @@ namespace WzComparerR2.WzLib
                 ms.Close();
             }
 
-            public unsafe void Decrypt(byte[] buffer, int startIndex, int length)
+            public void Decrypt(byte[] buffer, int startIndex, int length)
             {
-                if (isEmptyIV)
-                    return;
+                this.Decrypt(buffer, startIndex, length, 0);
+            }
 
-                this.EnsureKeySize(length);
+            public void Decrypt(byte[] buffer, int startIndex, int length, int keyOffset)
+            {
+                this.Decrypt(buffer.AsSpan(startIndex, length), keyOffset);
+            }
 
-                fixed (byte* pBuffer = buffer, pKeys = this.keys)
+            public void Decrypt(Span<byte> data)
+            {
+                this.Decrypt(data, 0);
+            }
+
+            public unsafe void Decrypt(Span<byte> data, int keyOffset)
+            {
+                this.EnsureKeySize(keyOffset + data.Length);
+                ReadOnlySpan<byte> keys = this.keys.AsSpan(keyOffset, data.Length);
+
+#if NET6_0_OR_GREATER
+                if (Avx2.IsSupported && data.Length >= 32)
                 {
-                    int i = 0;
-                    byte* pData = pBuffer + startIndex;
-
-                    for (int i1 = length / 4 * 4; i < i1; i += 4, pData += 4)
+                    Vector256<byte> ymm0, ymm1;
+                    while (data.Length >= 32)
                     {
-                        *((int*)pData) ^= *(int*)(pKeys + i);
+                        fixed (byte* pData = data, pKeys = keys)
+                        {
+                            ymm0 = Avx.LoadVector256(pData);
+                            ymm1 = Avx.LoadVector256(pKeys);
+                            Avx.Store(pData, Avx2.Xor(ymm0, ymm1));
+                        }
+                        data = data.Slice(32);
+                        keys = keys.Slice(32);
                     }
+                }
 
-                    for (; i < length; i++, pData++)
+                if (Sse2.IsSupported && data.Length >= 16)
+                {
+                    Vector128<byte> xmm0, xmm1;
+                    while (data.Length >= 16)
                     {
-                        *pData ^= *(pKeys + i);
+                        fixed (byte* pData = data, pKeys = keys)
+                        {
+                            xmm0 = Sse2.LoadVector128(pData);
+                            xmm1 = Sse2.LoadVector128(pKeys);
+                            Sse2.Store(pData, Sse2.Xor(xmm0, xmm1));
+                        }
+                        data = data.Slice(16);
+                        keys = keys.Slice(16);
                     }
+                }
+#endif
+                while (data.Length >= 4)
+                {
+                    fixed (byte* pData = data, pKeys = keys)
+                    {
+                        *((int*)pData) ^= *(int*)(pKeys);
+                    }
+                    data = data.Slice(4);
+                    keys = keys.Slice(4);
+                }
+
+                for (int i = 0; i < data.Length; i++)
+                {
+                    data[i] ^= keys[i];
                 }
             }
 
@@ -323,6 +361,33 @@ namespace WzComparerR2.WzLib
                                         0x0F, 0x00, 0x00, 0x00,
                                         0x33, 0x00, 0x00, 0x00,
                                         0x52, 0x00, 0x00, 0x00 };
+        }
+
+        public sealed class Wz_NonOpCryptoKey : IWzDecrypter
+        {
+            public static readonly IWzDecrypter Instance = new Wz_NonOpCryptoKey();
+
+            public Wz_NonOpCryptoKey()
+            {
+            }
+
+            public byte this[int index] => 0;
+
+            public void Decrypt(byte[] buffer, int startIndex, int length)
+            {
+            }
+
+            public void Decrypt(byte[] buffer, int startIndex, int length, int keyOffset)
+            {
+            }
+
+            public void Decrypt(Span<byte> data)
+            {
+            }
+
+            public void Decrypt(Span<byte> data, int keyOffset)
+            {
+            }
         }
     }
 }

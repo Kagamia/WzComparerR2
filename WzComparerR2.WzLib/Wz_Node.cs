@@ -480,8 +480,7 @@ namespace WzComparerR2.WzLib
         {
             if (node == null)
                 return null;
-            Wz_Uol uol;
-            while ((uol = node?.GetValueEx<Wz_Uol>(null)) != null)
+            while (node?.Value is Wz_Uol uol)
             {
                 node = uol.HandleUol(node);
             }

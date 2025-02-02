@@ -73,5 +73,18 @@ namespace WzComparerR2.WzLib.Utilities
             }
         }
 #endif
+
+        public static int ReadAvailableBytes(this Stream stream, Span<byte> buffer)
+        {
+            int totalRead = 0;
+            while (buffer.Length > 0)
+            {
+                int bytesRead = stream.Read(buffer);
+                if (bytesRead == 0) break;
+                totalRead += bytesRead;
+                buffer = buffer.Slice(bytesRead);
+            }
+            return totalRead;
+        }
     }
 }

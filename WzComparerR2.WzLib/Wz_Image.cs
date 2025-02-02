@@ -54,7 +54,7 @@ namespace WzComparerR2.WzLib
             get { return this.Name.EndsWith(".lua"); }
         }
 
-        public Wz_Crypto.Wz_CryptoKey EncKeys
+        public IWzDecrypter EncKeys
         {
             get
             {
@@ -265,10 +265,11 @@ namespace WzComparerR2.WzLib
                     }
                     int w = reader.ReadCompressedInt32();
                     int h = reader.ReadCompressedInt32();
-                    int form = reader.ReadCompressedInt32() + reader.ReadByte();
+                    int form = reader.ReadCompressedInt32();
+                    int scale = reader.ReadByte();
                     reader.SkipBytes(4);
                     int dataLen = reader.ReadInt32();
-                    parent.Value = new Wz_Png(w, h, dataLen, form, (uint)reader.BaseStream.Position, this);
+                    parent.Value = new Wz_Png(w, h, dataLen, (Wz_TextureFormat)form, scale, (uint)reader.BaseStream.Position, this);
                     reader.SkipBytes(dataLen);
                     break;
 
