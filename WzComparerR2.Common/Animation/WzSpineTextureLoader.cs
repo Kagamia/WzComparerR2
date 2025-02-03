@@ -27,6 +27,8 @@ namespace WzComparerR2.Animation
 
         public GlobalFindNodeFunction FindNodeFunction { get; set; }
 
+        public bool EnableTextureMissingFallback { get; set; }
+
         public void Load(Spine.AtlasPage page, string path)
         {
             if (this.TryLoadTexture(path, out var texture))
@@ -34,6 +36,10 @@ namespace WzComparerR2.Animation
                 page.rendererObject = texture;
                 page.width = texture.Width;
                 page.height = texture.Height;
+            }
+            else if (this.EnableTextureMissingFallback && page.width > 0 && page.height > 0)
+            {
+                page.rendererObject = this.CreateEmptyTexture(page.width, page.height);
             }
         }
 
@@ -44,6 +50,10 @@ namespace WzComparerR2.Animation
                 page.rendererObject = texture;
                 page.width = texture.Width;
                 page.height = texture.Height;
+            }
+            else if (this.EnableTextureMissingFallback && page.width > 0 && page.height > 0)
+            {
+                page.rendererObject = this.CreateEmptyTexture(page.width, page.height);
             }
         }
 
@@ -58,7 +68,7 @@ namespace WzComparerR2.Animation
             var frameNode = this.TopNode.FindNodeByPath(path);
             frameNode = frameNode.ResolveUol();
 
-            if (frameNode.Value is Wz_Png)
+            if (frameNode?.Value is Wz_Png)
             {
                 var linkNode = frameNode.GetLinkedSourceNode(FindNodeFunction);
                 Wz_Png png = (linkNode ?? frameNode).GetValue<Wz_Png>();
@@ -67,6 +77,11 @@ namespace WzComparerR2.Animation
             }
 
             return false;
+        }
+
+        private Texture2D CreateEmptyTexture(int width, int height)
+        {
+            return new Texture2D(this.GraphicsDevice, width, height, false, SurfaceFormat.Alpha8);
         }
     }
 }

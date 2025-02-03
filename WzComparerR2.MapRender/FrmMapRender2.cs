@@ -33,6 +33,7 @@ namespace WzComparerR2.MapRender
             graphics = new GraphicsDeviceManager(this);
             graphics.DeviceCreated += Graphics_DeviceCreated;
             graphics.DeviceResetting += Graphics_DeviceResetting;
+            graphics.GraphicsProfile = GraphicsProfile.HiDef;
 
             this.MaxElapsedTime = TimeSpan.MaxValue;
             this.IsFixedTimeStep = false;
