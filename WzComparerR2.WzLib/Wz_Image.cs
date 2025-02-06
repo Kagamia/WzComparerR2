@@ -309,38 +309,23 @@ namespace WzComparerR2.WzLib
                             int fmtExLen = reader.ReadCompressedInt32();
                             var fmtExData = reader.ReadBytes(fmtExLen);
                             mediaType.CbFormat = (uint)fmtExLen;
-
-                            GCHandle gcHandle = GCHandle.Alloc(fmtExData, GCHandleType.Pinned);
-                            try
+                            
+                            if (!this.TryDecryptWaveFormatEx(fmtExData, out Interop.WAVEFORMATEX waveFormatEx))
                             {
-                                var waveFormatEx = Marshal.PtrToStructure<Interop.WAVEFORMATEX>(gcHandle.AddrOfPinnedObject());
-                                if (fmtExLen != waveFormatEx.CbSize + Marshal.SizeOf<Interop.WAVEFORMATEX>())
-                                {
-                                    //  parse waveFormatEx after decryption
-                                    this.EncKeys.Decrypt(fmtExData, 0, fmtExLen);
-                                    waveFormatEx = Marshal.PtrToStructure<Interop.WAVEFORMATEX>(gcHandle.AddrOfPinnedObject());
-                                    if (fmtExLen != waveFormatEx.CbSize + Marshal.SizeOf<Interop.WAVEFORMATEX>())
-                                    {
-                                        throw new Exception($"Failed to parse WAVEFORMATEX struct at offset {this.Offset}+{reader.BaseStream.Position}.");
-                                    }
-                                }
-                                switch (waveFormatEx.FormatTag)
-                                {
-                                    case Interop.WAVE_FORMAT_PCM:
-                                        mediaType.PbFormat = waveFormatEx;
-                                        break;
-
-                                    case Interop.WAVE_FORMAT_MPEGLAYER3:
-                                        mediaType.PbFormat = Marshal.PtrToStructure<Interop.MPEGLAYER3WAVEFORMAT>(gcHandle.AddrOfPinnedObject());
-                                        break;
-
-                                    default:
-                                        throw new Exception($"Unknown WAVEFORMATEX.FormatTag {waveFormatEx.FormatTag} at offset {this.Offset}+{reader.BaseStream.Position}.");
-                                }
+                                throw new Exception($"Failed to parse WAVEFORMATEX struct at offset {this.Offset}+{reader.BaseStream.Position}.");
                             }
-                            finally
+                            switch (waveFormatEx.FormatTag)
                             {
-                                gcHandle.Free();
+                                case Interop.WAVE_FORMAT_PCM:
+                                    mediaType.PbFormat = waveFormatEx;
+                                    break;
+
+                                case Interop.WAVE_FORMAT_MPEGLAYER3:
+                                    mediaType.PbFormat = MemoryMarshal.Read<Interop.MPEGLAYER3WAVEFORMAT>(fmtExData);
+                                    break;
+
+                                default:
+                                    throw new Exception($"Unknown WAVEFORMATEX.FormatTag {waveFormatEx.FormatTag} at offset {this.Offset}+{reader.BaseStream.Position}.");
                             }
                             break;
                     }
@@ -485,6 +470,29 @@ namespace WzComparerR2.WzLib
                 default:
                     throw new Exception($"Unknown value type {flag} at offset {this.Offset}+{reader.BaseStream.Position}.");
             }
+        }
+
+        private bool TryDecryptWaveFormatEx(Span<byte> data, out Interop.WAVEFORMATEX waveFormatEx)
+        {
+            // GMSv256: wz uses different keys on property name and waveFormatEx encryption.
+            Span<byte> dataCopy = stackalloc byte[data.Length];
+            foreach (var enc in new[] {
+                Wz_CryptoKeyType.BMS,
+                Wz_CryptoKeyType.KMS,
+                Wz_CryptoKeyType.GMS,
+            })
+            {
+                data.CopyTo(dataCopy);
+                this.WzFile.WzStructure.encryption.GetKeys(enc).Decrypt(dataCopy);
+                if (MemoryMarshal.TryRead(dataCopy, out waveFormatEx) && data.Length == waveFormatEx.CbSize + Marshal.SizeOf<Interop.WAVEFORMATEX>())
+                {
+                    // copy back to the original buffer
+                    dataCopy.CopyTo(data);
+                    return true;
+                }
+            }
+            waveFormatEx = default;
+            return false;
         }
 
         private void ExtractLua(WzBinaryReader reader)
