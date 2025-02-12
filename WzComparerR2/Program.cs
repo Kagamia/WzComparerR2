@@ -138,8 +138,11 @@ namespace WzComparerR2
             }
         }
 
+        // System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture requires .netfx 4.7.1, here we use env var instead.
         static string GetManagedDllDirectory() => Path.Combine(Application.StartupPath, "Lib");
-        static string GetUnmanagedDllDirectory() => Path.Combine(Application.StartupPath, "Lib", Environment.Is64BitProcess ? "x64" : "x86");
+        static string GetUnmanagedDllDirectory() => Path.Combine(Application.StartupPath, "Lib", 
+            string.Equals(Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE"), "arm64", StringComparison.OrdinalIgnoreCase) ? "ARM64" :
+            Environment.Is64BitProcess ? "x64" : "x86");
 
         [DllImport("kernel32.dll")]
         static extern bool SetDllDirectory(string path);

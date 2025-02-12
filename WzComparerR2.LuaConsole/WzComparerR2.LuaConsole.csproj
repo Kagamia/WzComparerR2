@@ -12,8 +12,8 @@
 
   </PropertyGroup>
   <PropertyGroup Condition="$(DotnetEdition) == 'framework'">
-    <!-- don't export native lua54.dll-->
-    <PreferredNativeLua>NONE</PreferredNativeLua>
+    <!-- manually export native lua54.dll-->
+    <ShouldIncludeNativeLua>false</ShouldIncludeNativeLua>
   </PropertyGroup>
   <ItemGroup Condition="$(DotnetEdition) == 'core'">
 
@@ -43,7 +43,7 @@
       <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <PackageReference Include="ICSharpCode.TextEditor" Version="3.2.1.6466" NoWarn="NU1701"/>
+    <PackageReference Include="ICSharpCode.TextEditor" Version="3.2.1.6466" NoWarn="NU1701" />
     <PackageReference Include="KeraLua" Version="1.4.1" GeneratePathProperty="true" />
     <PackageReference Include="NLua" Version="1.7.3" />
   </ItemGroup>
@@ -58,9 +58,10 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
-  <Target Name="PostBuildNet6" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Windows')) and $(DotnetEdition) == 'core'">
+  <Target Name="PostBuildNet6" AfterTargets="PostBuildEvent" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <Exec Command="xcopy &quot;$(PkgKeraLua)\runtimes\win-x86\native\*.dll&quot; &quot;$(TargetDir)x86&quot; /I /Y" />
     <Exec Command="xcopy &quot;$(PkgKeraLua)\runtimes\win-x64\native\*.dll&quot; &quot;$(TargetDir)x64&quot; /I /Y" />
+    <Exec Command="xcopy &quot;$(PkgKeraLua)\runtimes\win-arm64\native\*.dll&quot; &quot;$(TargetDir)ARM64&quot; /I /Y" />
   </Target>
   <Import Project="$(ProjectDir)..\Build\WcR2Plugin.targets" />
 </Project>
