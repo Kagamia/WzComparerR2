@@ -75,6 +75,11 @@ namespace WzComparerR2
             this.ShowAnimation(frameData);
         }
 
+        public FrameAnimationData LoadVideo(Wz_Video wzVideo)
+        {
+            return new MaplestoryCanvasVideoLoader().Load(wzVideo, this.GraphicsDevice);
+        }
+
         public FrameAnimationData LoadFrameAnimation(Wz_Node node, FrameAnimationCreatingOptions options = default)
         {
             return FrameAnimationData.CreateFromNode(node, this.GraphicsDevice, options, PluginBase.PluginManager.FindWz);

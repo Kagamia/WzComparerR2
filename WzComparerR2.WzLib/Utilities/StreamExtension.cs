@@ -4,7 +4,7 @@ using System.IO;
 
 namespace WzComparerR2.WzLib.Utilities
 {
-    internal static class StreamExtension
+    public static class StreamExtension
     {
 #if NETFRAMEWORK
         public static int Read(this Stream stream, Span<byte> buffer)
