@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WzComparerR2.WzLib
 {
@@ -30,5 +26,7 @@ namespace WzComparerR2.WzLib
         public int Unknown1 { get; internal set; }
         public int Unknown2 { get; internal set; }
         public byte[] Key { get; internal set; }
+
+        public int CalculatedCheckSum { get; set; }
     }
 }
