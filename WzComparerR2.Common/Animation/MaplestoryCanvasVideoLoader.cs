@@ -95,7 +95,7 @@ namespace WzComparerR2.Animation
                 texture.SetData(textureBuffer);
                 var frame = new Frame();
                 frame.Texture = texture;
-                frame.Delay = (int)fi.DelayTimeSpan.TotalMilliseconds;
+                frame.Delay = (int)fi.Delay.TotalMilliseconds;
                 frames.Add(frame);
             }
 

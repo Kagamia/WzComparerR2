@@ -66,7 +66,7 @@ namespace WzComparerR2.WzLib
                 {
                     foreach (var fi in frames)
                     {
-                        fi.DelayInNanoseconds = br.ReadInt64() * frameDelayUnit;
+                        fi.DelayInNanoseconds = br.ReadInt32() * frameDelayUnit;
                     }
                 }
                 else
@@ -76,19 +76,21 @@ namespace WzComparerR2.WzLib
                         fi.DelayInNanoseconds = defaultDelay * frameDelayUnit;
                     }
                 }
-                // read alpha map delay?
-                if ((dataFlag & McvDataFlags.AlphaMapPerFrameDelay) != 0)
+                // read frame timeline
+                if ((dataFlag & McvDataFlags.PerFrameTimeline) != 0)
                 {
                     foreach (var fi in frames)
                     {
-                        fi.AlphaDelayInNanoseconds = br.ReadInt64() * frameDelayUnit;
+                        fi.StartTimeInNanoseconds = br.ReadInt64() * frameDelayUnit;
                     }
                 }
                 else
                 {
+                    long time = 0;
                     foreach (var fi in frames)
                     {
-                        fi.AlphaDelayInNanoseconds = defaultDelay * frameDelayUnit;
+                        fi.StartTimeInNanoseconds = time;
+                        time += fi.DelayInNanoseconds;
                     }
                 }
 

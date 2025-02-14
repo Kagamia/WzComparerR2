@@ -20,7 +20,7 @@ namespace WzComparerR2.WzLib
         Default = 0,
         AlphaMap = 1,
         PerFrameDelay = 2,
-        AlphaMapPerFrameDelay = 4,
+        PerFrameTimeline = 4,
     }
 
     public class McvFrameInfo
@@ -36,9 +36,9 @@ namespace WzComparerR2.WzLib
         public long AlphaDataOffset { get; set; }
         public int AlphaDataCount { get; set; }
         public long DelayInNanoseconds { get; set; }
-        public long AlphaDelayInNanoseconds { get; set; }
+        public long StartTimeInNanoseconds { get; set; }
 
-        public TimeSpan DelayTimeSpan => TimeSpan.FromTicks(this.DelayInNanoseconds / 100);
-        public TimeSpan AlphaDelayTimeSpan => TimeSpan.FromTicks(this.AlphaDelayInNanoseconds / 100);
+        public TimeSpan Delay => TimeSpan.FromTicks(this.DelayInNanoseconds / 100);
+        public TimeSpan StartTime => TimeSpan.FromTicks(this.StartTimeInNanoseconds / 100);
     }
 }
