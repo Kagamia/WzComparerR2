@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using DevComponents.AdvTree;
 
 namespace WzComparerR2
@@ -22,7 +23,7 @@ namespace WzComparerR2
             this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
 #endif
 
-            this.lblClrVer.Text = string.Format("{0} ({1})", Environment.Version, Environment.Is64BitProcess ? "x64": "x86");
+            this.lblClrVer.Text = string.Format("{0} ({1})", Environment.Version, RuntimeInformation.ProcessArchitecture);
             this.lblAsmVer.Text = GetAsmVersion().ToString();
             this.lblFileVer.Text = GetFileVersion().ToString();
             this.lblCopyright.Text = GetAsmCopyright().ToString();

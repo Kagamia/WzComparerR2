@@ -13,7 +13,7 @@
     <ApplicationIcon>wcr2_256.ico</ApplicationIcon>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
   </PropertyGroup>
-  <PropertyGroup Condition="$(Platform) == 'AnyCPU '">
+  <PropertyGroup Condition="$(Platform) == 'AnyCPU'">
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <Import Project="$(ProjectDir)..\Build\Common.props" />
