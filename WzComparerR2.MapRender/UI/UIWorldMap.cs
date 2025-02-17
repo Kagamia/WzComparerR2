@@ -679,6 +679,20 @@ namespace WzComparerR2.MapRender.UI
                 }
 
                 var baseOrigin = new PointF((int)this.Width / 2, (int)this.Height / 2);
+                if (baseImg?.Texture != null)
+                {
+                    var baseImgRect = new Rect(baseOrigin.X - baseImg.Origin.X, baseOrigin.Y - baseImg.Origin.Y, baseImg.Texture.Width, baseImg.Texture.Height);
+                    // workaround for CMS WorldMap177
+                    int overflowThreshold = 10;
+                    if (baseImgRect.Left < -overflowThreshold || baseImgRect.Right > this.Width + overflowThreshold
+                        || baseImgRect.Top < -overflowThreshold || baseImgRect.Bottom > this.Height + overflowThreshold)
+                    {
+                        // draw baseImg aligned center by adjusting baseOrigin
+                        PointF baseImgOriginNew = new PointF(baseImg.Texture.Width / 2, baseImg.Texture.Height / 2);
+                        PointF originDiff = new PointF(baseImgOriginNew.X - baseImg.Origin.X, baseImgOriginNew.Y - baseImg.Origin.Y);
+                        baseOrigin = new PointF(baseOrigin.X - originDiff.X, baseOrigin.Y - originDiff.Y);
+                    }
+                }
 
                 var drawOrder = new List<DrawItem>();
                 var addItem = new Action<TextureItem, object>((texture, obj) =>
