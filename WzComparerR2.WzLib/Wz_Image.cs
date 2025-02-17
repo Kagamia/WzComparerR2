@@ -293,7 +293,19 @@ namespace WzComparerR2.WzLib
                     break;
 
                 case "Sound_DX8":
-                    reader.SkipBytes(1);
+                    int soundDX8Ver = reader.ReadByte();
+                    if (soundDX8Ver == 1) // introduced in KMST 1184
+                    {
+                        if (reader.ReadByte() == 0x01) // read sub property
+                        {
+                            reader.SkipBytes(2);
+                            entries = reader.ReadCompressedInt32();
+                            for (int i = 0; i < entries; i++)
+                            {
+                                ExtractValue(reader, parent);
+                            }
+                        }
+                    }
                     dataLen = reader.ReadCompressedInt32();
                     int duration = reader.ReadCompressedInt32();
                     int soundDecl = reader.ReadByte();
