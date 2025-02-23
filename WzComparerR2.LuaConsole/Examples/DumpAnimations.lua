@@ -1,38 +1,23 @@
 import 'WzComparerR2.PluginBase'
 import 'WzComparerR2.WzLib'
 import 'WzComparerR2.Common'
+import 'WzComparerR2.Encoders'
 import 'System.IO'
 import 'System.Xml'
 import 'System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
 import 'System.Drawing'
+import 'System.Drawing.Imaging'
+
+require 'Helper'
 
 ------------------------------------------------------------
 
 local function isPng(value)
-  if value and type(value) == "userdata" and value:GetType().Name == 'Wz_Png' then
-    return true
-  else 
-    return false
-  end
+  return value and type(value) == "userdata" and value:GetType().Name == 'Wz_Png'
 end
 
 local function isDelay(node)
-  if node.Text == "delay" and node:GetType().Name == 'Wz_Node' then
-    return true
-  else 
-    return false
-  end
-end
-
-local function enumAllWzNodes(node) 
-  return coroutine.wrap(function()
-    coroutine.yield(node)
-    for _,v in each(node.Nodes) do
-      for child in enumAllWzNodes(v) do
-        coroutine.yield(child)
-      end
-    end
-  end)
+  return node.Text == "delay" and node:GetType().Name == 'Wz_Node'
 end
 
 local function isPngWithDelay(node)
@@ -59,22 +44,39 @@ local function enumAllWzPngNodesWithDelay(node)
   end)
 end
 
-local function saveAnimatedImage(node, fn)
-  local gif = Gif.CreateFromNode(node, null)
-  local rect = gif:GetRect()
-  local enc = BuildInApngEncoder(fn, rect.Width, rect.Height)
-  enc.OptimizeEnabled = false
-  gif:SaveGif(enc, fn, Color.Transparent)
+local function findNodeFunc(path)
+  return PluginManager.FindWz(path)
 end
 
-local p = Path.GetInvalidFileNameChars()
-local ivStr = ""
-for i, v in each(p) do
-  if v >= 32 then
-    ivStr = ivStr .. string.char(v)
+local t_IGifFrame = {}
+t_IGifFrame.typeRef = luanet.import_type('WzComparerR2.Common.IGifFrame')
+t_IGifFrame.Draw = luanet.get_method_bysig(t_IGifFrame.typeRef, 'Draw', "System.Drawing.Graphics", "System.Drawing.Rectangle")
+
+local function saveAnimatedImage(node, fileName)
+  local gif = Gif.CreateFromNode(node, findNodeFunc)
+  local rect = gif:GetRect()
+  local enc = BuildInApngEncoder()
+  enc:Init(fileName, rect.Width, rect.Height)
+  enc.OptimizeEnabled = false
+  
+  for i,frame in each(gif.Frames) do
+    local bmp = Bitmap(rect.Width, rect.Height, PixelFormat.Format32bppArgb)
+    local g = Graphics.FromImage(bmp)
+    t_IGifFrame.Draw(frame, g, rect)
+    g:Dispose()
+    enc:AppendFrame(bmp, frame.Delay)
+    bmp:Dispose()
+    bmp = nil
   end
+  
+  enc:Dispose()
+  
+  for i,frame in each(gif.Frames) do
+    frame.Bitmap:Dispose();
+  end
+  gif = nil
 end
-local ivPattern = "["..ivStr.."]"
+
 ------------------------------------------------------------
 
 -- all variables
@@ -107,7 +109,8 @@ for n in enumAllWzNodes(topNode) do
 
         -- Skip if 'fullpath' already done
         if (not fullpaths[fullpath]) then
-          local fn = fullpath:sub(img.Name:len()+2):gsub("\\", "."):gsub(ivPattern, "")
+          local fn = fullpath:sub(img.Name:len()+2):gsub("\\", ".")
+          fn = removeInvalidPathChars(fn)
           fn = Path.Combine(dir, fn .. ".apng")
 
           --ensure dir exists

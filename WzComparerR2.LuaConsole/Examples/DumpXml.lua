@@ -3,18 +3,7 @@ import 'WzComparerR2.WzLib'
 import 'System.IO'
 import 'System.Xml'
 
-------------------------------------------------------------
-
-local function enumAllWzNodes(node) 
-  return coroutine.wrap(function()
-    coroutine.yield(node)
-    for _,v in each(node.Nodes) do
-      for child in enumAllWzNodes(v) do
-        coroutine.yield(child)
-      end
-    end
-  end)
-end
+require "helper"
 
 ------------------------------------------------------------
 
@@ -30,12 +19,10 @@ if not topNode then
   return
 end
 
-
-
 -- enum all wz_images
 for n in enumAllWzNodes(topNode) do
   local value = n.Value
-  if value and type(value) == "userdata" and value:GetType().Name == 'Wz_Image' then
+  if isWzImage(value) then
     local img = value
 
     --extract wz image
