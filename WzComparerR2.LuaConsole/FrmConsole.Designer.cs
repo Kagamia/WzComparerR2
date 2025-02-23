@@ -47,6 +47,7 @@
             this.menuNew = new DevComponents.DotNetBar.ButtonItem();
             this.menuOpen = new DevComponents.DotNetBar.ButtonItem();
             this.menuSave = new DevComponents.DotNetBar.ButtonItem();
+            this.menuSaveAs = new DevComponents.DotNetBar.ButtonItem();
             this.menuExit = new DevComponents.DotNetBar.ButtonItem();
             this.menuDebug = new DevComponents.DotNetBar.ButtonItem();
             this.menuReset = new DevComponents.DotNetBar.ButtonItem();
@@ -263,6 +264,7 @@
             this.menuNew,
             this.menuOpen,
             this.menuSave,
+            this.menuSaveAs,
             this.menuRecent,
             this.menuExit});
             this.menuFile.Text = "文件(&F)";
@@ -289,6 +291,12 @@
             this.menuSave.Text = "保存";
             this.menuSave.Click += new System.EventHandler(this.menuSave_Click);
             // 
+            // menuSaveAs
+            // 
+            this.menuSaveAs.Name = "menuSaveAs";
+            this.menuSaveAs.Text = "另存为...";
+            this.menuSaveAs.Click += new System.EventHandler(this.menuSaveAs_Click);
+            // 
             // menuExit
             // 
             this.menuExit.BeginGroup = true;
@@ -309,6 +317,9 @@
             // menuReset
             // 
             this.menuReset.Name = "menuReset";
+            this.menuReset.Symbol = "";
+            this.menuReset.SymbolColor = System.Drawing.Color.Gray;
+            this.menuReset.SymbolSize = 9F;
             this.menuReset.Text = "重置";
             this.menuReset.Click += new System.EventHandler(this.menuReset_Click);
             // 
@@ -317,6 +328,9 @@
             this.menuRun.BeginGroup = true;
             this.menuRun.Name = "menuRun";
             this.menuRun.Shortcuts.Add(DevComponents.DotNetBar.eShortcut.F5);
+            this.menuRun.Symbol = "";
+            this.menuRun.SymbolColor = System.Drawing.Color.FromArgb(((int)(((byte)(29)))), ((int)(((byte)(127)))), ((int)(((byte)(29)))));
+            this.menuRun.SymbolSize = 9F;
             this.menuRun.Text = "运行";
             this.menuRun.Tooltip = "F5";
             this.menuRun.Click += new System.EventHandler(this.menuRun_Click);
@@ -325,8 +339,12 @@
             // 
             this.menuStopRun.Name = "menuStopRun";
             this.menuStopRun.Shortcuts.Add(DevComponents.DotNetBar.eShortcut.ShiftF5);
+            this.menuStopRun.Symbol = "";
+            this.menuStopRun.SymbolColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.menuStopRun.SymbolSize = 9F;
             this.menuStopRun.Text = "停止运行";
             this.menuStopRun.Tooltip = "Shift+F5";
+            this.menuStopRun.Click += new System.EventHandler(this.menuStopRun_Click);
             // 
             // dockSite3
             // 
@@ -430,5 +448,6 @@
         private DevComponents.DotNetBar.ButtonItem menuDebug;
         private DevComponents.DotNetBar.ButtonItem menuReset;
         private DevComponents.DotNetBar.ButtonItem menuRecent;
+        private DevComponents.DotNetBar.ButtonItem menuSaveAs;
     }
 }

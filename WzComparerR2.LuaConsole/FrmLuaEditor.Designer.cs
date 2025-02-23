@@ -39,6 +39,8 @@ namespace WzComparerR2.LuaConsole
             this.textEditorControl1.Name = "textEditorControl1";
             this.textEditorControl1.Size = new System.Drawing.Size(284, 261);
             this.textEditorControl1.TabIndex = 0;
+            this.textEditorControl1.TextChanged += new System.EventHandler(this.textEditorControl1_TextChanged);
+            this.textEditorControl1.FileNameChanged += new System.EventHandler(this.textEditorControl1_FileNameChanged);
             // 
             // FrmLuaEditor
             // 
