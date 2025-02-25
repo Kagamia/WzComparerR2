@@ -505,6 +505,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         totem = 120,
         /// <summary>
+        /// 珠宝 178
+        /// </summary>
+        jewel = 178,
+        /// <summary>
         /// 宠物装备 180
         /// </summary>
         petEquip = 180,

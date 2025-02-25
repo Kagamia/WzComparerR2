@@ -360,6 +360,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.chakram: return "环刃";
                 case GearType.hexSeeker: return "索魂器";
 
+                case GearType.jewel: return "珠宝";
+
                 default: return null;
             }
         }
