@@ -333,7 +333,18 @@ namespace WzComparerR2.WzLib
                                     break;
 
                                 case Interop.WAVE_FORMAT_MPEGLAYER3:
-                                    mediaType.PbFormat = MemoryMarshal.Read<Interop.MPEGLAYER3WAVEFORMAT>(fmtExData);
+                                    if (fmtExLen == Interop.MPEGLAYER3WAVEFORMAT_SIZE)
+                                    {
+                                        mediaType.PbFormat = MemoryMarshal.Read<Interop.MPEGLAYER3WAVEFORMAT>(fmtExData);
+                                    }
+                                    else
+                                    {
+                                        // workaround for KMST1185
+                                        mediaType.PbFormat = new Interop.MPEGLAYER3WAVEFORMAT
+                                        {
+                                            Wfx = waveFormatEx
+                                        };
+                                    }
                                     break;
 
                                 default:
@@ -496,11 +507,17 @@ namespace WzComparerR2.WzLib
             {
                 data.CopyTo(dataCopy);
                 this.WzFile.WzStructure.encryption.GetKeys(enc).Decrypt(dataCopy);
-                if (MemoryMarshal.TryRead(dataCopy, out waveFormatEx) && data.Length == waveFormatEx.CbSize + Marshal.SizeOf<Interop.WAVEFORMATEX>())
+                if (MemoryMarshal.TryRead(dataCopy, out waveFormatEx))
                 {
-                    // copy back to the original buffer
-                    dataCopy.CopyTo(data);
-                    return true;
+                    if ((data.Length == waveFormatEx.CbSize + Interop.WAVEFORMATEX_SIZE)
+                        // workaround for KMST1185, waveFormatEx only has 18 bytes but cbsize is also 18.
+                        || (data.Length == waveFormatEx.CbSize && waveFormatEx.FormatTag == Interop.WAVE_FORMAT_MPEGLAYER3)
+                        )
+                    {
+                        // copy back to the original buffer
+                        dataCopy.CopyTo(data);
+                        return true;
+                    } 
                 }
             }
             waveFormatEx = default;

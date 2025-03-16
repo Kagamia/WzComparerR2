@@ -59,6 +59,8 @@ namespace WzComparerR2.WzLib
         public static readonly Guid MEDIASUBTYPE_MPEG1Audio = Guid.Parse("{e436eb87-524f-11ce-9f53-0020af0ba770}");
         public static readonly Guid MEDIASUBTYPE_WAVE = Guid.Parse("{e436eb8b-524f-11ce-9f53-0020af0ba770}");
         public static readonly Guid FORMAT_WaveFormatEx = Guid.Parse("{05589f81-c356-11ce-bf01-00aa0055595a}");
+        public static readonly int WAVEFORMATEX_SIZE = Marshal.SizeOf<WAVEFORMATEX>();
+        public static readonly int MPEGLAYER3WAVEFORMAT_SIZE = Marshal.SizeOf<MPEGLAYER3WAVEFORMAT>();
         public const ushort WAVE_FORMAT_PCM = 0x0001;
         public const ushort WAVE_FORMAT_MPEGLAYER3 = 0x0055;
         public const uint MPEGLAYER3_WFX_EXTRA_BYTES = 12;
