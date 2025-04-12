@@ -267,9 +267,9 @@ namespace WzComparerR2.WzLib
                     int h = reader.ReadCompressedInt32();
                     int form = reader.ReadCompressedInt32();
                     int scale = reader.ReadByte();
-                    reader.SkipBytes(4);
+                    int pages = reader.ReadInt32(); // introduced in KMST 1186
                     int dataLen = reader.ReadInt32();
-                    parent.Value = new Wz_Png(w, h, dataLen, (Wz_TextureFormat)form, scale, (uint)reader.BaseStream.Position, this);
+                    parent.Value = new Wz_Png(w, h, dataLen, (Wz_TextureFormat)form, scale, pages,(uint)reader.BaseStream.Position, this);
                     reader.SkipBytes(dataLen);
                     break;
 

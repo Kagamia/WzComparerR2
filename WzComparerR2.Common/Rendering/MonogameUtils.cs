@@ -11,8 +11,6 @@ namespace WzComparerR2.Rendering
 {
     public static class MonogameUtils
     {
-        internal const SharpDX.DXGI.Format DXGI_FORMAT_B4G4R4A4_UNORM = (SharpDX.DXGI.Format)115;
-
         public static Color ToXnaColor(this GdipColor color)
         {
             return new Color(color.R, color.G, color.B, color.A);
@@ -85,6 +83,18 @@ namespace WzComparerR2.Rendering
             return (Device)device.Handle;
         }
 
+        public static DeviceContext _d3dContext(this GraphicsDevice device)
+        {
+            var d3dContextField = typeof(GraphicsDevice).GetField("_d3dContext", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            return (DeviceContext)d3dContextField.GetValue(device);
+        }
+
+        public static Resource _texture(this Texture texture)
+        {
+            var _textureField = typeof(Texture).GetField("_texture", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            return (Resource)_textureField.GetValue(texture);
+        }
+
         public static bool IsSupportFormat(this GraphicsDevice device, SharpDX.DXGI.Format format)
         {
             var d3dDevice = device._d3dDevice();
@@ -94,7 +104,7 @@ namespace WzComparerR2.Rendering
 
         public static bool IsSupportBgra4444(this GraphicsDevice device)
         {
-            return device.IsSupportFormat(DXGI_FORMAT_B4G4R4A4_UNORM);
+            return device.IsSupportFormat(SharpDX.DXGI.Format.B4G4R4A4_UNorm);
         }
 
         public static bool IsSupportBgr565(this GraphicsDevice device)

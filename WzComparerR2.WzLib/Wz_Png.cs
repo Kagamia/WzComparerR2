@@ -19,13 +19,14 @@ namespace WzComparerR2.WzLib
 {
     public class Wz_Png
     {
-        public Wz_Png(int w, int h, int data_length, Wz_TextureFormat format, int scale, uint offs, Wz_Image wz_i)
+        public Wz_Png(int w, int h, int data_length, Wz_TextureFormat format, int scale, int pages, uint offs, Wz_Image wz_i)
         {
             this.Width = w;
             this.Height = h;
             this.DataLength = data_length;
             this.Format = format;
             this.Scale = scale;
+            this.Pages = pages;
             this.Offset = offs;
             this.WzImage = wz_i;
         }
@@ -57,7 +58,12 @@ namespace WzComparerR2.WzLib
 
         public Wz_TextureFormat Format { get; set; }
 
+        /// <summary>
+        /// The actual width and height sacale is pow(2, value).
+        /// </summary>
         public int Scale { get; set; }
+
+        public int Pages { get; set; }
 
         /// <summary>
         /// 获取或设置图片所属的WzFile
@@ -72,7 +78,7 @@ namespace WzComparerR2.WzLib
         /// </summary>
         public Wz_Image WzImage { get; set; }
 
-        public int GetRawDataSize() => GetUncompressedDataSize(this.Format, this.Scale, this.Width, this.Height);
+        public int GetRawDataSize() => GetUncompressedDataSize(this.Format, this.Scale > 0 ? (1 << this.Scale) : 0, this.Width, this.Height);
 
         public byte[] GetRawData()
         {
@@ -90,33 +96,38 @@ namespace WzComparerR2.WzLib
         {
             lock (this.WzFile.ReadLock)
             {
-                DeflateStream zlib;
-
-                var stream = this.WzImage.OpenRead();
-                long endPosition = this.Offset + this.DataLength;
-                stream.Position = this.Offset + 1; // skip the first byte
-                Span<byte> zlibHeader = stackalloc byte[2];
-                stream.ReadExactly(zlibHeader);
-
-                if (MemoryMarshal.Read<ushort>(zlibHeader) == 0x9C78) //TODO: more generic zlib header validation
-                {
-                    Stream dataStream = new PartialStream(stream, stream.Position, endPosition - stream.Position, true);
-                    zlib = new DeflateStream(dataStream, CompressionMode.Decompress);
-                }
-                else
-                {
-                    stream.Position -= 2;
-                    Stream dataStream = new PartialStream(stream, stream.Position, endPosition - stream.Position, true);
-                    Stream chunkStream = new ChunkedEncryptedInputStream(dataStream, this.WzImage.EncKeys);
-                    chunkStream.ReadExactly(zlibHeader);
-                    zlib = new DeflateStream(chunkStream, CompressionMode.Decompress);
-                }
-
-                using (zlib)
+                using (var zlib = this.UnsafeOpenRead())
                 {
                     return zlib.ReadAvailableBytes(buffer);
                 }
             }
+        }
+
+        public Stream UnsafeOpenRead()
+        {
+            DeflateStream zlib;
+
+            var stream = this.WzImage.OpenRead();
+            long endPosition = this.Offset + this.DataLength;
+            stream.Position = this.Offset + 1; // skip the first byte
+            Span<byte> zlibHeader = stackalloc byte[2];
+            stream.ReadExactly(zlibHeader);
+
+            if (MemoryMarshal.Read<ushort>(zlibHeader) == 0x9C78) //TODO: more generic zlib header validation
+            {
+                Stream dataStream = new PartialStream(stream, stream.Position, endPosition - stream.Position, true);
+                zlib = new DeflateStream(dataStream, CompressionMode.Decompress);
+            }
+            else
+            {
+                stream.Position -= 2;
+                Stream dataStream = new PartialStream(stream, stream.Position, endPosition - stream.Position, true);
+                Stream chunkStream = new ChunkedEncryptedInputStream(dataStream, this.WzImage.EncKeys);
+                chunkStream.ReadExactly(zlibHeader);
+                zlib = new DeflateStream(chunkStream, CompressionMode.Decompress);
+            }
+
+            return zlib;
         }
 
         public Bitmap ExtractPng()
@@ -578,9 +589,20 @@ namespace WzComparerR2.WzLib
                 Wz_TextureFormat.ARGB4444 or
                 Wz_TextureFormat.ARGB1555 or
                 Wz_TextureFormat.RGB565 => width * height * 2,
-                Wz_TextureFormat.ARGB8888 => width * height * 4,
+
+                Wz_TextureFormat.ARGB8888 or
+                Wz_TextureFormat.RGBA1010102 => width * height * 4,
+
                 Wz_TextureFormat.DXT3 or
-                Wz_TextureFormat.DXT5 => width * height,
+                Wz_TextureFormat.DXT5 or
+                Wz_TextureFormat.BC7 => ((width + 3) / 4) * ((height + 3) / 4) * 16,
+
+                Wz_TextureFormat.DXT1 => ((width + 3) / 4) * ((height + 3) / 4) * 8,
+
+                Wz_TextureFormat.A8 => width * height,
+
+                Wz_TextureFormat.RGBA32Float => width * height * 16,
+
                 _ => throw new ArgumentException($"Unknown texture format {(int)format}.")
             };
         }
@@ -595,5 +617,11 @@ namespace WzComparerR2.WzLib
         RGB565 = 513,
         DXT3 = 1026,
         DXT5 = 2050,
+        // introduced in KMST 1186
+        A8 = 2304,
+        RGBA1010102 = 2562,
+        DXT1 = 4097,
+        BC7 = 4098,
+        RGBA32Float = 4100,
     }
 }
