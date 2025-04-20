@@ -68,16 +68,6 @@ namespace WzComparerR2.Rendering
             texture.SetData(0, 0, new Rectangle(origin.X, origin.Y, rect.Width, rect.Height), buffer, 0, buffer.Length);
         }
 
-        public static void BgraToColor(byte[] pixelData)
-        {
-            for (int i = 0; i < pixelData.Length; i += 4)
-            {
-                byte temp = pixelData[i];
-                pixelData[i] = pixelData[i + 2];
-                pixelData[i + 2] = temp;
-            }
-        }
-
         public static Device _d3dDevice(this GraphicsDevice device)
         {
             return (Device)device.Handle;

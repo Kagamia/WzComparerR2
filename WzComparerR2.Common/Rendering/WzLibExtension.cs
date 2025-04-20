@@ -13,6 +13,11 @@ namespace WzComparerR2.Rendering
     {
         public static Texture2D ToTexture(this Wz_Png png, GraphicsDevice graphicsDevice)
         {
+            return ToTexture(png, 0, graphicsDevice);
+        }
+
+        public static Texture2D ToTexture(this Wz_Png png, int page, GraphicsDevice graphicsDevice)
+        {
             var format = GetTextureFormatOfPng(png.Format);
             if (format == SurfaceFormat.Bgra4444)
             {
@@ -48,11 +53,11 @@ namespace WzComparerR2.Rendering
             {
                 t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, format);
             }
-            png.ToTexture(t2d, Point.Zero);
+            png.ToTexture(page, t2d, Point.Zero);
             return t2d;
         }
 
-        public static void ToTexture(this Wz_Png png, Texture2D texture, Point origin)
+        public static void ToTexture(this Wz_Png png, int page, Texture2D texture, Point origin)
         {
             Rectangle rect = new Rectangle(origin, new Point(png.Width, png.Height));
 
@@ -76,9 +81,9 @@ namespace WzComparerR2.Rendering
             }
             else
             {
-                int bufferSize = png.GetRawDataSize();
+                int bufferSize = png.GetRawDataSizePerPage();
                 byte[] plainData = ArrayPool<byte>.Shared.Rent(bufferSize);
-                int actualBytes = png.GetRawData(plainData.AsSpan(0, bufferSize));
+                int actualBytes = png.GetRawData(bufferSize * page, plainData.AsSpan(0, bufferSize));
                 if (actualBytes != bufferSize)
                 {
                     throw new ArgumentException($"Not enough bytes have been read. (actual:{actualBytes}, expected:{bufferSize})");

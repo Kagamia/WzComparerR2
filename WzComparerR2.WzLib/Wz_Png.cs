@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
@@ -8,7 +9,6 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using WzComparerR2.WzLib.Utilities;
-
 
 #if NET6_0_OR_GREATER
 using System.Runtime.Intrinsics;
@@ -58,12 +58,16 @@ namespace WzComparerR2.WzLib
 
         public Wz_TextureFormat Format { get; set; }
 
+        public int Scale { get; set; }
+
         /// <summary>
         /// The actual width and height sacale is pow(2, value).
         /// </summary>
-        public int Scale { get; set; }
+        public int ActualScale => this.Scale > 0 ? (1 << this.Scale) : 1;
 
         public int Pages { get; set; }
+
+        public int ActualPages => this.Pages > 0 ? this.Pages : 1;
 
         /// <summary>
         /// 获取或设置图片所属的WzFile
@@ -78,7 +82,9 @@ namespace WzComparerR2.WzLib
         /// </summary>
         public Wz_Image WzImage { get; set; }
 
-        public int GetRawDataSize() => GetUncompressedDataSize(this.Format, this.Scale > 0 ? (1 << this.Scale) : 0, this.Width, this.Height);
+        public int GetRawDataSize() => this.GetRawDataSizePerPage() * this.ActualPages;
+
+        public int GetRawDataSizePerPage() => GetUncompressedDataSize(this.Format, this.ActualScale, this.Width, this.Height);
 
         public byte[] GetRawData()
         {
@@ -94,10 +100,37 @@ namespace WzComparerR2.WzLib
 
         public int GetRawData(Span<byte> buffer)
         {
+            return this.GetRawData(0, buffer);
+        }
+
+        public int GetRawData(int skipBytes, Span<byte> buffer)
+        {
             lock (this.WzFile.ReadLock)
             {
                 using (var zlib = this.UnsafeOpenRead())
                 {
+                    if (skipBytes > 0)
+                    {
+                        var pool = ArrayPool<byte>.Shared;
+                        byte[] tempBuffer = pool.Rent(4096);
+                        try
+                        {
+                            while (skipBytes > 0)
+                            {
+                                int len = zlib.Read(tempBuffer, 0, (int)Math.Min(skipBytes, buffer.Length));
+                                if (len == 0)
+                                {
+                                    break;
+                                }
+                                skipBytes -= len;
+                            }
+                        }
+                        finally
+                        {
+                            pool.Return(tempBuffer);
+                        }
+                    }
+
                     return zlib.ReadAvailableBytes(buffer);
                 }
             }
@@ -132,6 +165,24 @@ namespace WzComparerR2.WzLib
 
         public Bitmap ExtractPng()
         {
+            return this.ExtractPng(page: 0);
+        }
+
+        public Bitmap ExtractPng(int page)
+        {
+            if (this.Pages > 0)
+            {
+                if (page < 0 || page >= this.Pages)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(page));
+                }
+            }
+            else
+            {
+                // ignore it, always pick the first page.
+                page = 0;
+            }
+
             byte[] pixel = this.GetRawData();
             Bitmap pngDecoded = null;
             BitmapData bmpdata;
@@ -219,6 +270,30 @@ namespace WzComparerR2.WzLib
                     pngDecoded = new Bitmap(this.Width, this.Height, PixelFormat.Format32bppArgb);
                     bmpdata = pngDecoded.LockBits(new Rectangle(new Point(), pngDecoded.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                     Marshal.Copy(argb, 0, bmpdata.Scan0, argb.Length);
+                    pngDecoded.UnlockBits(bmpdata);
+                    break;
+
+                case 2562: //r10g10b10a2
+                    pngDecoded = new Bitmap(this.Width, this.Height, PixelFormat.Format32bppArgb);
+                    bmpdata = pngDecoded.LockBits(new Rectangle(0, 0, this.Width, this.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    unsafe
+                    {
+                        int pageSize = this.Width * this.Height * 4;
+                        Span<byte> outputPixels = new Span<byte>(bmpdata.Scan0.ToPointer(), bmpdata.Stride * bmpdata.Height);
+                        ImageCodec.R10G10B10A2ToBGRA32(pixel.AsSpan(pageSize * page, pageSize), outputPixels);
+                    }
+                    pngDecoded.UnlockBits(bmpdata);
+                    break;
+
+                case 4098: //bc7
+                    pngDecoded = new Bitmap(this.Width, this.Height, PixelFormat.Format32bppArgb);
+                    bmpdata = pngDecoded.LockBits(new Rectangle(0, 0, this.Width, this.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    unsafe
+                    {
+                        Span<byte> outputPixels = new Span<byte>(bmpdata.Scan0.ToPointer(), bmpdata.Stride * bmpdata.Height);
+                        ImageCodec.BC7ToRGBA32(pixel, outputPixels, bmpdata.Width, bmpdata.Stride, bmpdata.Height);
+                        ImageCodec.RGBA32ToBGRA32(outputPixels, outputPixels);
+                    }
                     pngDecoded.UnlockBits(bmpdata);
                     break;
             }
@@ -617,7 +692,7 @@ namespace WzComparerR2.WzLib
         RGB565 = 513,
         DXT3 = 1026,
         DXT5 = 2050,
-        // introduced in KMST 1186
+        /* introduced in KMST 1186 */
         A8 = 2304,
         RGBA1010102 = 2562,
         DXT1 = 4097,
