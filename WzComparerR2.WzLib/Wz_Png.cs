@@ -645,9 +645,9 @@ namespace WzComparerR2.WzLib
 
         public static int GetUncompressedDataSize(Wz_TextureFormat format, int scale, int width, int height)
         {
-            if (scale > 0)
+            if (scale > 1)
             {
-                if ((width % scale) != 0 || (height & scale) != 0)
+                if ((width % scale) != 0 || (height % scale) != 0)
                 {
                     throw new ArgumentException("Width or height cannot be divided by scale");
                 }
