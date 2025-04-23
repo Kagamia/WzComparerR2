@@ -31,6 +31,7 @@ namespace WzComparerR2.Animation
         public Texture2D Texture { get; set; }
         public Rectangle? AtlasRect { get; set; }
         public Wz_Png Png { get; set; }
+        public int Page { get; set; }
         public Point Origin { get; set; }
         public int Z { get; set; }
         public int Delay { get; set; }

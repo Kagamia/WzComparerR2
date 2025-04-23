@@ -369,6 +369,17 @@ namespace WzComparerR2
                     aniItem.SelectedAnimationName = aniName;
                     this.cmbItemAniNames.Tooltip = aniName;
                 }
+                else if (this.pictureBoxEx1.Items[0] is FrameAnimator frameAni && this.cmbItemAniNames.SelectedItem is int selectedpage)
+                {
+                    if (frameAni.Data.Frames.Count == 1)
+                    {
+                        var png = frameAni.Data.Frames[0].Png;
+                        if (png != null && png.ActualPages > 1 && 0 <= selectedpage && selectedpage < png.ActualPages)
+                        {
+                            this.pictureBoxEx1.ShowImage(png, selectedpage);
+                        }
+                    }
+                }
             }
         }
 
@@ -574,7 +585,8 @@ namespace WzComparerR2
             if (frame.Png != null)
             {
                 var config = ImageHandlerConfig.Default;
-                string pngFileName = pictureBoxEx1.PictureName + ".png";
+                int page = frame.Page;
+                string pngFileName = pictureBoxEx1.PictureName + (frame.Png.ActualPages > 1 ? $".{page}" : null) + ".png";
 
                 if (config.AutoSaveEnabled)
                 {
@@ -593,7 +605,7 @@ namespace WzComparerR2
                     pngFileName = dlg.FileName;
                 }
 
-                using (var bmp = frame.Png.ExtractPng())
+                using (var bmp = frame.Png.ExtractPng(page))
                 {
                     bmp.Save(pngFileName, System.Drawing.Imaging.ImageFormat.Png);
                 }
@@ -1069,7 +1081,7 @@ namespace WzComparerR2
             switch (value)
             {
                 case Wz_Png png:
-                    return $"png {png.Width}*{png.Height} ({png.Form})";
+                    return $"png {png.Width}*{png.Height} ({(int)png.Format}{(png.Scale > 0 ? $", {png.Scale}" : null)})";
 
                 case Wz_Vector vector:
                     return $"({vector.X}, {vector.Y})";
@@ -1144,11 +1156,19 @@ namespace WzComparerR2
                     pictureBoxEx1.PictureName = GetSelectedNodeImageName();
                     pictureBoxEx1.ShowImage(png);
                     this.cmbItemAniNames.Items.Clear();
+                    if (png.ActualPages > 1)
+                    {
+                        for (int i = 0; i < png.ActualPages; i++)
+                            this.cmbItemAniNames.Items.Add(i);
+                    }
+
                     advTree3.PathSeparator = ".";
                     textBoxX1.Text = "dataLength: " + png.DataLength + " bytes\r\n" +
                         "offset: " + png.Offset + "\r\n" +
                         "size: " + png.Width + "*" + png.Height + "\r\n" +
-                        "png format: " + png.Form;
+                        "png format: " + png.Format + "(" + (int)png.Format + ")\r\n" +
+                        "scale: " + png.Scale + "(x" + png.ActualScale + ")\r\n" +
+                        "pages: " + png.Pages + "(" + png.ActualPages + ")";
                     break;
 
                 case Wz_Vector vector:
@@ -1225,9 +1245,11 @@ namespace WzComparerR2
                                         this.cmbItemAniNames.Items.Clear();
                                         advTree3.PathSeparator = ".";
                                         textBoxX1.AppendText("\r\n\r\ndataLength: " + png.DataLength + " bytes\r\n" +
-                                        "offset: " + png.Offset + "\r\n" +
-                                        "size: " + png.Width + "*" + png.Height + "\r\n" +
-                                            "png format: " + png.Form);
+                                            "offset: " + png.Offset + "\r\n" +
+                                            "size: " + png.Width + "*" + png.Height + "\r\n" +
+                                            "png format: " + png.Format + "(" + (int)png.Format + ")\r\n" +
+                                            "scale: " + png.Scale + "(x" + png.ActualScale + ")\r\n" +
+                                            "pages: " + png.Pages + "(" + png.ActualPages + ")");
                                     }
                                 }
                             }
@@ -2329,6 +2351,29 @@ namespace WzComparerR2
                         {
                             f.Write(data, 0, data.Length);
                             f.Flush();
+                        }
+                        this.labelItemStatus.Text = "保存成功。";
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBoxEx.Show("文件保存失败。\r\n" + ex.ToString(), "提示");
+                    }
+                }
+            }
+            else if (item is Wz_Png png)
+            {
+                SaveFileDialog dlg = new SaveFileDialog();
+                dlg.Title = "保存Canvas的原始数据";
+                dlg.FileName = advTree3.SelectedNode.Text + ".bin";
+                dlg.Filter = "*.*|*.*";
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        using (var dataReader = png.UnsafeOpenRead())
+                        using (var outputFile = dlg.OpenFile())
+                        {
+                            dataReader.CopyTo(outputFile);
                         }
                         this.labelItemStatus.Text = "保存成功。";
                     }

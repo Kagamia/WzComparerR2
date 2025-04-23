@@ -401,8 +401,9 @@ namespace WzComparerR2.Comparer
                                     && png.DataLength == pngOld.DataLength;
 
                             case WzPngComparison.Pixel:
-                                if (!(png.Width == pngOld.Width && png.Height == pngOld.Height && png.Form == pngOld.Form))
+                                if (!(png.Width == pngOld.Width && png.Height == pngOld.Height && png.Format == pngOld.Format && png.Scale == pngOld.Scale))
                                 {
+                                    // we don't compare 'Pages' because KMST set pages to 1 for all PNGs.
                                     return false;
                                 }
                                 byte[] pixelNew = png.GetRawData();
@@ -411,14 +412,7 @@ namespace WzComparerR2.Comparer
                                 {
                                     return false;
                                 }
-                                for (int i = 0, i1 = pixelNew.Length; i < i1; i++)
-                                {
-                                    if (pixelNew[i] != pixelOld[i])
-                                    {
-                                        return false;
-                                    }
-                                }
-                                return true;
+                                return pixelNew.SequenceEqual(pixelOld);
 
                             default:
                                 goto case WzPngComparison.SizeAndDataLength;

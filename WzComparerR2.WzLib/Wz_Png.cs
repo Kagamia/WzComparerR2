@@ -117,7 +117,7 @@ namespace WzComparerR2.WzLib
                         {
                             while (skipBytes > 0)
                             {
-                                int len = zlib.Read(tempBuffer, 0, (int)Math.Min(skipBytes, buffer.Length));
+                                int len = zlib.Read(tempBuffer, 0, (int)Math.Min(skipBytes, tempBuffer.Length));
                                 if (len == 0)
                                 {
                                     break;

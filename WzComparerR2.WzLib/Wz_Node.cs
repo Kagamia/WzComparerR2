@@ -577,14 +577,20 @@ namespace WzComparerR2.WzLib
                 writer.WriteAttributeString("name", node.Text);
                 writer.WriteAttributeString("width", png.Width.ToString());
                 writer.WriteAttributeString("height", png.Height.ToString());
-                writer.WriteAttributeString("format", png.Format.ToString());
-                using (var bmp = png.ExtractPng())
+                writer.WriteAttributeString("format", ((int)png.Format).ToString());
+                writer.WriteAttributeString("scale", png.Scale.ToString());
+                writer.WriteAttributeString("pages", png.Pages.ToString());
+                for(int i = 0; i < png.ActualPages; i++)
                 {
-                    using (var ms = new MemoryStream())
+                    using (var bmp = png.ExtractPng())
                     {
-                        bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                        byte[] data = ms.ToArray();
-                        writer.WriteAttributeString("value", Convert.ToBase64String(data));
+                        using (var ms = new MemoryStream())
+                        {
+                            bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                            byte[] data = ms.ToArray();
+                            string attrName = "value" + (i > 0 ? (i + 1).ToString() : null);
+                            writer.WriteAttributeString(attrName, Convert.ToBase64String(data));
+                        }
                     }
                 }
             }

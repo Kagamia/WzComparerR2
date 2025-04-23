@@ -61,11 +61,17 @@ namespace WzComparerR2
 
         public void ShowImage(Wz_Png png)
         {
+            this.ShowImage(png, 0);
+        }
+
+        public void ShowImage(Wz_Png png, int page)
+        {
             //添加到动画控件
             var frame = new Animation.Frame()
             {
-                Texture = png.ToTexture(this.GraphicsDevice),
+                Texture = png.ToTexture(page, this.GraphicsDevice),
                 Png = png,
+                Page = page,
                 Delay = 0,
                 Origin = Point.Zero,
             };
