@@ -90,8 +90,7 @@ namespace WzComparerR2.CharaSim
                             break;
 
                         default:
-                            ItemPropType type;
-                            if (Enum.TryParse(subNode.Text, out type))
+                            if (!int.TryParse(subNode.Text, out _) && Enum.TryParse(subNode.Text, out ItemPropType type))
                             {
                                 try
                                 {
