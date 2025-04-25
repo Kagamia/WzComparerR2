@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+
 #if NET6_0_OR_GREATER
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
@@ -11,6 +12,157 @@ namespace WzComparerR2.WzLib.Utilities
 {
     public static class ImageCodec
     {
+        public static void BGRA4444ToBGRA32(ReadOnlySpan<byte> bgra4444Pixels, Span<byte> outputBgraPixels)
+        {
+#if NET6_0_OR_GREATER
+            /*
+                      0        1        2        3
+              data    ggggbbbb aaaarrrr -------- --------
+              xmm0 = unpack_low(data, data)
+                      ggggbbbb ggggbbbb aaaarrrr aaaarrrr
+              xmm1 = (ushort[])xmm0 >> 4
+                      bbbbgggg 0000gggg rrrraaaa 0000aaaa
+              xmm0 &= 0F F0 0F F0
+                      0000bbbb gggg0000 0000rrrr aaaa0000
+              xmm1 &= F0 0F F0 0F
+                      bbbb0000 0000gggg rrrr0000 0000aaaa
+              xmm0 |= xmm1
+                      bbbbbbbb gggggggg rrrrrrrr aaaaaaaa
+            */
+            if (bgra4444Pixels.Length >= 16 && Avx2.IsSupported)
+            {
+                var mask0 = Vector256.Create(
+                        0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0,
+                        0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0,
+                        0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0,
+                        0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0);
+                var mask1 = Vector256.Create(
+                        0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f,
+                        0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f,
+                        0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f,
+                        0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f);
+                Vector128<byte> xmm;
+
+                unsafe
+                {
+                    while (bgra4444Pixels.Length >= 16)
+                    {
+                        fixed (byte* pInput = bgra4444Pixels)
+                            xmm = Sse2.LoadVector128(pInput);
+                        var ymm0 = Vector256.Create(Avx.UnpackLow(xmm, xmm), Avx.UnpackHigh(xmm, xmm));
+                        var ymm1 = Avx2.ShiftRightLogical(ymm0.AsUInt16(), 4).AsByte();
+                        var ymm2 = Avx2.Or(Avx2.And(ymm0, mask0), Avx2.And(ymm1, mask1));
+                        fixed (byte* pOutput = outputBgraPixels)
+                            Avx.Store(pOutput, ymm2);
+                        bgra4444Pixels = bgra4444Pixels.Slice(16);
+                        outputBgraPixels = outputBgraPixels.Slice(32);
+                    }
+                }
+            }
+#endif
+            int p;
+            for (int i = 0; i < bgra4444Pixels.Length; i++)
+            {
+                p = bgra4444Pixels[i] & 0x0F; p |= (p << 4); outputBgraPixels[i * 2] = (byte)p;
+                p = bgra4444Pixels[i] & 0xF0; p |= (p >> 4); outputBgraPixels[i * 2 + 1] = (byte)p;
+            }
+        }
+
+        public static void ScalePixels(ReadOnlySpan<byte> srcPixels, int bytesPerPixel, int width, int stride, int height, int scaleX, int scaleY, Span<byte> outputPixels, int outputStride)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                ReadOnlySpan<byte> srcRow = srcPixels.Slice(0, stride);
+                Span<byte> dstRow = outputPixels.Slice(0, outputStride);
+                // copy pixels
+                for (int x = 0; x < width; x++)
+                {
+                    ReadOnlySpan<byte> srcPixel = srcRow.Slice(0, bytesPerPixel);
+                    int writeBytes = 0;
+                    for (int s = 0; s < scaleX; s++)
+                    {
+                        srcPixel.CopyTo(dstRow.Slice(writeBytes));
+                        writeBytes += bytesPerPixel;
+                    }
+                    srcRow = srcRow.Slice(bytesPerPixel);
+                    dstRow = dstRow.Slice(writeBytes);
+                }
+                srcPixels = srcPixels.Slice(stride);
+
+                // duplicate rows
+                int rowSize = width * bytesPerPixel * scaleX;
+                for (int s = 1; s < scaleY; s++)
+                {
+                    outputPixels.Slice(0, rowSize).CopyTo(outputPixels.Slice(outputStride * s, rowSize));
+                }
+                outputPixels = outputPixels.Slice(scaleY * outputStride);
+            }
+        }
+
+        public static void DXT3ToBGRA32(ReadOnlySpan<byte> blockData, Span<byte> outputBgraPixels, int width, int stride, int height)
+        {
+            Span<ColorBgra> colorTable = stackalloc ColorBgra[4];
+            Span<int> colorIdxTable = stackalloc int[16];
+            Span<byte> alphaTable = stackalloc byte[16];
+            Span<ColorBgra> outputPixels = stackalloc ColorBgra[16];
+
+            for (int y = 0; y < height; y += 4)
+            {
+                for (int x = 0; x < width; x += 4)
+                {
+                    ExpandAlphaTableDXT3(blockData.Slice(0, 8), alphaTable);
+                    ReadOnlySpan<ushort> baseColor = MemoryMarshal.Cast<byte, ushort>(blockData.Slice(8, 4));
+                    ExpandColorTable(baseColor[0], baseColor[1], colorTable);
+                    ExpandColorIndexTable(blockData.Slice(12, 4), colorIdxTable);
+                    for(int i = 0; i < 16; i++)
+                    {
+                        outputPixels[i] = new ColorBgra(alphaTable[i], colorTable[colorIdxTable[i]]);
+                    }
+
+                    ReadOnlySpan<byte> bgraBytes = MemoryMarshal.AsBytes(outputPixels);
+                    bgraBytes.Slice(0, 16).CopyTo(outputBgraPixels.Slice(y * stride + x * 4));
+                    bgraBytes.Slice(16, 16).CopyTo(outputBgraPixels.Slice((y + 1) * stride + x * 4));
+                    bgraBytes.Slice(32, 16).CopyTo(outputBgraPixels.Slice((y + 2) * stride + x * 4));
+                    bgraBytes.Slice(48, 16).CopyTo(outputBgraPixels.Slice((y + 3) * stride + x * 4));
+
+                    blockData = blockData.Slice(16);
+                }
+            }
+        }
+
+        public static void DXT5ToBGRA32(ReadOnlySpan<byte> blockData, Span<byte> outputBgraPixels, int width, int stride, int height)
+        {
+            Span<ColorBgra> colorTable = stackalloc ColorBgra[4];
+            Span<int> colorIdxTable = stackalloc int[16];
+            Span<byte> alphaTable = stackalloc byte[8];
+            Span<int> alphaIdxTable = stackalloc int[16];
+            Span<ColorBgra> outputPixels = stackalloc ColorBgra[16];
+
+            for (int y = 0; y < height; y += 4)
+            {
+                for (int x = 0; x < width; x += 4)
+                {
+                    ExpandAlphaTableDXT5(blockData[0], blockData[1], alphaTable);
+                    ExpandAlphaIndexTableDXT5(blockData.Slice(2, 6), alphaIdxTable);
+                    ReadOnlySpan<ushort> baseColor = MemoryMarshal.Cast<byte, ushort>(blockData.Slice(8, 4));
+                    ExpandColorTable(baseColor[0], baseColor[1], colorTable);
+                    ExpandColorIndexTable(blockData.Slice(12, 4), colorIdxTable);
+                    for (int i = 0; i < 16; i++)
+                    {
+                        outputPixels[i] = new ColorBgra(alphaTable[alphaIdxTable[i]], colorTable[colorIdxTable[i]]);
+                    }
+
+                    ReadOnlySpan<byte> bgraBytes = MemoryMarshal.AsBytes(outputPixels);
+                    bgraBytes.Slice(0, 16).CopyTo(outputBgraPixels.Slice(y * stride + x * 4));
+                    bgraBytes.Slice(16, 16).CopyTo(outputBgraPixels.Slice((y + 1) * stride + x * 4));
+                    bgraBytes.Slice(32, 16).CopyTo(outputBgraPixels.Slice((y + 2) * stride + x * 4));
+                    bgraBytes.Slice(48, 16).CopyTo(outputBgraPixels.Slice((y + 3) * stride + x * 4));
+
+                    blockData = blockData.Slice(16);
+                }
+            }
+        }
+
         public static void BC7ToRGBA32(ReadOnlySpan<byte> blockData, Span<byte> outputRgbaPixels, int width, int stride, int height)
         {
             Span<BC7Decomp.color_rgba> rgba = stackalloc BC7Decomp.color_rgba[16];
@@ -177,8 +329,138 @@ namespace WzComparerR2.WzLib.Utilities
                 output32[i] = outputPixel;
             }
         }
+
+        #region DXT1 Color
+        private static ColorBgra RGB565ToBGRA32(ushort val)
+        {
+            const uint rgb565_mask_r = 0xf800;
+            const uint rgb565_mask_g = 0x07e0;
+            const uint rgb565_mask_b = 0x001f;
+            uint r = (val & rgb565_mask_r) >> 11;
+            uint g = (val & rgb565_mask_g) >> 5;
+            uint b = (val & rgb565_mask_b);
+            r = (r << 3) | (r >> 2);
+            g = (g << 2) | (g >> 4);
+            b = (b << 3) | (b >> 2);
+            return new ColorBgra(0xff, (byte)r, (byte)g, (byte)b);
+        }
+
+        private struct ColorBgra
+        {
+            public ColorBgra(uint value)
+            {
+                this.Value = value;
+            }
+
+            public ColorBgra(byte a, ColorBgra baseColor)
+            {
+                this.Value = (uint)(a << 24) | (baseColor.Value & 0x00ffffffu);
+            }
+
+            public ColorBgra(byte a, byte r, byte g, byte b)
+            {
+                this.Value = (uint)((a << 24) | (r << 16) | (g << 8) | b);
+            }
+
+            public uint Value { get; set; }
+
+            public byte B => (byte)(this.Value);
+            public byte G => (byte)(this.Value >> 8);
+            public byte R => (byte)(this.Value >> 16);
+            public byte A => (byte)(this.Value >> 24);
+        }
+
+        private static void ExpandColorTable(ushort c0, ushort c1, Span<ColorBgra> colorTable)
+        {
+            colorTable[0] = RGB565ToBGRA32(c0);
+            colorTable[1] = RGB565ToBGRA32(c1);
+            if (c0 > c1)
+            {
+                colorTable[2] = new ColorBgra(0xff,
+                    (byte)((colorTable[0].R * 2 + colorTable[1].R + 1) / 3),
+                    (byte)((colorTable[0].G * 2 + colorTable[1].G + 1) / 3),
+                    (byte)((colorTable[0].B * 2 + colorTable[1].B + 1) / 3));
+                colorTable[3] = new ColorBgra(0xff,
+                    (byte)((colorTable[0].R + colorTable[1].R * 2 + 1) / 3),
+                    (byte)((colorTable[0].G + colorTable[1].G * 2 + 1) / 3),
+                    (byte)((colorTable[0].B + colorTable[1].B * 2 + 1) / 3));
+            }
+            else
+            {
+                colorTable[2] = new ColorBgra(0xff,
+                    (byte)((colorTable[0].R + colorTable[1].R) / 2),
+                    (byte)((colorTable[0].G + colorTable[1].G) / 2),
+                    (byte)((colorTable[0].B + colorTable[1].B) / 2));
+                colorTable[3] = new ColorBgra(0xff, 0, 0, 0);
+            }
+        }
+
+        private static void ExpandColorIndexTable(ReadOnlySpan<byte> blockData, Span<int> colorIndexTable)
+        {
+            for (int i = 0, j = 0; i < 16; i += 4, j++)
+            {
+                colorIndexTable[i + 0] = (blockData[j] & 0x03);
+                colorIndexTable[i + 1] = (blockData[j] & 0x0c) >> 2;
+                colorIndexTable[i + 2] = (blockData[j] & 0x30) >> 4;
+                colorIndexTable[i + 3] = (blockData[j] & 0xc0) >> 6;
+            }
+        }
+        #endregion
+
+        #region DXT3/DXT5 Alpha
+        private static void ExpandAlphaTableDXT3(ReadOnlySpan<byte> blockData, Span<byte> alphaTable)
+        {
+            for (int i = 0, j = 0; i < 16; i += 2, j++)
+            {
+                alphaTable[i + 0] = (byte)(blockData[j] & 0x0f);
+                alphaTable[i + 1] = (byte)((blockData[j] & 0xf0) >> 4);
+            }
+            for (int i = 0; i < 16; i++)
+            {
+                alphaTable[i] = (byte)(alphaTable[i] | (alphaTable[i] << 4));
+            }
+        }
+
+        private static void ExpandAlphaTableDXT5(byte a0, byte a1, Span<byte> alphaTable)
+        {
+            alphaTable[0] = a0;
+            alphaTable[1] = a1;
+            if (a0 > a1)
+            {
+                for (int i = 2; i < 8; i++)
+                {
+                    alphaTable[i] = (byte)(((8 - i) * a0 + (i - 1) * a1 + 3) / 7);
+                }
+            }
+            else
+            {
+                for (int i = 2; i < 6; i++)
+                {
+                    alphaTable[i] = (byte)(((6 - i) * a0 + (i - 1) * a1 + 2) / 5);
+                }
+                alphaTable[6] = 0;
+                alphaTable[7] = 255;
+            }
+        }
+
+        private static void ExpandAlphaIndexTableDXT5(ReadOnlySpan<byte> blockData, Span<int> alphaIndexTable)
+        {
+            for (int i = 0, i2 = 0; i < 16; i += 8, i2 += 3)
+            {
+                int flags = blockData[i2 + 0]
+                    | (blockData[i2 + 1] << 8)
+                    | (blockData[i2 + 2] << 16);
+                for (int j = 0, j2 = 0; j < 8; j++, j2 += 3)
+                {
+                    int mask = 0x07 << j2;
+                    alphaIndexTable[i + j] = (flags & mask) >> j2;
+                }
+            }
+        }
+        #endregion
     }
 
+    #region BC7
     /// <summary>
     /// This class is ported from https://github.com/richgel999/bc7enc_rdo/blob/master/bc7decomp.cpp under MIT license.
     /// </summary>
@@ -896,4 +1178,5 @@ namespace WzComparerR2.WzLib.Utilities
             right = temp;
         }
     }
+    #endregion
 }

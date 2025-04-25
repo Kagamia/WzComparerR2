@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Buffers;
 using WzComparerR2.WzLib;
+using WzComparerR2.WzLib.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Buffers;
 
 namespace WzComparerR2.Rendering
 {
@@ -70,56 +68,55 @@ namespace WzComparerR2.Rendering
             if (texture.Format == SurfaceFormat.Bgra32 && png.Format != Wz_TextureFormat.ARGB8888)
             {
                 // soft decoding
-                using (var bmp = png.ExtractPng())
+                using (var bmp = png.ExtractPng(page))
                 {
                     bmp.ToTexture(texture, origin);
                 }
             }
             else if (texture.Format != GetTextureFormatOfPng(png.Format))
             {
-                throw new ArgumentException($"Texture format({texture.Format}) does not fit the png form({png.Form}).");
+                throw new ArgumentException($"Texture format({texture.Format}) does not fit the png form({png.Format}).");
             }
             else
             {
                 int bufferSize = png.GetRawDataSizePerPage();
-                byte[] plainData = ArrayPool<byte>.Shared.Rent(bufferSize);
-                int actualBytes = png.GetRawData(bufferSize * page, plainData.AsSpan(0, bufferSize));
+                byte[] rawData = ArrayPool<byte>.Shared.Rent(bufferSize);
+                int actualBytes = png.GetRawData(bufferSize * page, rawData.AsSpan(0, bufferSize));
                 if (actualBytes != bufferSize)
                 {
                     throw new ArgumentException($"Not enough bytes have been read. (actual:{actualBytes}, expected:{bufferSize})");
                 }
 
-                switch (png.Form)
+                switch (png.Format)
                 {
-                    case 1:
-                    case 2:
-                    case 257:
-                    case 513:
-                    case 1026:
-                    case 2050:
-                    case 2562:
-                        texture.SetData(0, 0, rect, plainData, 0, bufferSize);
+                    case Wz_TextureFormat.ARGB4444 when png.ActualScale == 1:
+                    case Wz_TextureFormat.ARGB8888 when png.ActualScale == 1:
+                    case Wz_TextureFormat.ARGB1555 when png.ActualScale == 1:
+                    case Wz_TextureFormat.RGB565 when png.ActualScale == 1:
+                    case Wz_TextureFormat.DXT3 when png.ActualScale == 1:
+                    case Wz_TextureFormat.DXT5 when png.ActualScale == 1:
+                    case Wz_TextureFormat.RGBA1010102 when png.ActualScale == 1:
+                        texture.SetData(0, 0, rect, rawData, 0, bufferSize);
                         break;
 
-                    case 3:
-                        var pixel = Wz_Png.GetPixelDataForm3(plainData, png.Width, png.Height);
-                        texture.SetData(0, 0, rect, pixel, 0, pixel.Length);
+                    case Wz_TextureFormat.RGB565 when png.ActualScale == 16:
+                        int textureDataSize = png.Width * png.Height * 2;
+                        byte[] textureData = ArrayPool<byte>.Shared.Rent(textureDataSize);
+                        ImageCodec.ScalePixels(rawData, 2, png.Width / png.ActualScale, png.Width / png.ActualScale * 2, png.Height / png.ActualScale,
+                            png.ActualScale, png.ActualScale, textureData.AsSpan(0, textureDataSize), png.Width * 2);
+                        texture.SetData(0, 0, rect, textureData, 0, textureDataSize);
+                        ArrayPool<byte>.Shared.Return(textureData);
                         break;
 
-                    case 517:
-                        pixel = Wz_Png.GetPixelDataForm517(plainData, png.Width, png.Height);
-                        texture.SetData(0, 0, rect, pixel, 0, pixel.Length);
-                        break;
-
-                    case 4098:
-                        texture.SetDataBC7(plainData.AsSpan(0, bufferSize));
+                    case Wz_TextureFormat.BC7 when png.ActualScale == 1:
+                        texture.SetDataBC7(rawData.AsSpan(0, bufferSize));
                         break;
 
                     default:
-                        throw new Exception($"unknown png form ({png.Form}).");
+                        throw new Exception($"Unsupported png format ({png.Format}, scale={png.ActualScale}).");
                 }
 
-                ArrayPool<byte>.Shared.Return(plainData);
+                ArrayPool<byte>.Shared.Return(rawData);
             }
         }
 
