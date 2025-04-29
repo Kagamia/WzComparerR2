@@ -429,6 +429,30 @@ namespace WzComparerR2.Comparer
                     case Wz_Sound sound:
                         Wz_Sound soundOld = (Wz_Sound)dataOld;
                         return sound.Ms == soundOld.Ms && sound.DataLength == soundOld.DataLength;
+
+                    case Wz_Convex convex:
+                        Wz_Convex convexOld = (Wz_Convex)dataOld;
+                        if (convex.Points.Length != convexOld.Points.Length)
+                        {
+                            return false;
+                        }
+                        for (int i = 0; i < convex.Points.Length; i++)
+                        {
+                            var vectorNew = convex.Points[i];
+                            vectorOld = convexOld.Points[i];
+                            if (vectorNew.X != vectorOld.X || vectorNew.Y != vectorOld.Y) 
+                                return false;
+                        }
+                        return true;
+
+                    case Wz_RawData rawData:
+                        Wz_RawData rawDataOld = (Wz_RawData)dataOld;
+                        return rawData.Length == rawDataOld.Length;
+
+
+                    case Wz_Video video:
+                        Wz_Video videoOld = (Wz_Video)dataOld;
+                        return video.Length == videoOld.Length;
                 }
             }
 
