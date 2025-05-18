@@ -20,6 +20,7 @@ namespace WzComparerR2.MapRender.Patches2
         public int MoveW { get; set; }
         public int MoveH { get; set; }
         public int MoveP { get; set; }
+        public int MoveDelay { get; set; }
         public bool Flip { get; set; }
         public bool Light { get; set; }
         public string SpineAni { get; set; }
@@ -45,6 +46,7 @@ namespace WzComparerR2.MapRender.Patches2
                 MoveW = 0,
                 MoveH = 0,
                 MoveP = 5000,
+                MoveDelay = 0,
 
                 Flip = node.Nodes["f"].GetValueEx(false),
                 Light = node.Nodes["light"].GetValueEx<int>(0) != 0,
@@ -104,6 +106,7 @@ namespace WzComparerR2.MapRender.Patches2
                 item.MoveW = obj_node.Nodes["moveW"].GetValueEx(0);
                 item.MoveH = obj_node.Nodes["moveH"].GetValueEx(0);
                 item.MoveP = obj_node.Nodes["moveP"].GetValueEx(5000);
+                item.MoveDelay = obj_node.Nodes["moveDelay"].GetValueEx(0);
             }
 
             return item;
@@ -120,6 +123,11 @@ namespace WzComparerR2.MapRender.Patches2
             /// 动画资源。
             /// </summary>
             public object Animator { get; set; }
+
+            /// <summary>
+            /// Flip state of item.
+            /// </summary>
+            public bool Flip { get; set; }
         }
     }
 }

@@ -667,7 +667,8 @@ namespace WzComparerR2.MapRender
             var aniItem = resLoader.LoadAnimationData(path);
             obj.View = new ObjItem.ItemView()
             {
-                Animator = CreateAnimator(aniItem, obj.SpineAni)
+                Animator = CreateAnimator(aniItem, obj.SpineAni),
+                Flip = obj.Flip
             };
         }
 
