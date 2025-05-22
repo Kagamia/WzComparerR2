@@ -1044,7 +1044,7 @@ namespace WzComparerR2.Avatar.UI
                             if (i == aniActIndex)
                             {
                                 actionIndices[i] = act[fIdx].index;
-                                delay = act[i].actionFrame.AbsoluteDelay;
+                                delay = act[fIdx].actionFrame.AbsoluteDelay;
                             }
                             else if (act != null)
                             {
