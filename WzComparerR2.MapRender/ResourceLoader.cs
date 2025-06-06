@@ -300,6 +300,10 @@ namespace WzComparerR2.MapRender
                     return new Music(sound);
                 }
             }
+            else if (assetType == typeof(MsShader))
+            {
+                return this.LoadMsShader(node);
+            }
             return null;
         }
 
@@ -322,8 +326,16 @@ namespace WzComparerR2.MapRender
                 }
                 else if (node.Value == null && node.Nodes.Count > 0) //分析目录
                 {
-                    string spine = node.Nodes["spine"].GetValueEx<string>(null);
-                    if (spine != null) //读取spine动画
+                    if (node.Nodes["type"]?.Value is string type)
+                    {
+                        switch (type)
+                        {
+                            case "sprite":
+                                var msSprite = this.LoadMsSpriteData(node);
+                                return msSprite;
+                        }
+                    }
+                    else if (node.Nodes["spine"]?.Value is string spine)
                     {
                         var textureLoader = new SpineTextureLoader(this, node);
                         textureLoader.EnableTextureMissingFallback = true;
@@ -418,6 +430,96 @@ namespace WzComparerR2.MapRender
 
             //特殊处理
             return (Texture2D)holder.Resource;
+        }
+
+        private MsCustomSpriteData LoadMsSpriteData(Wz_Node node)
+        {
+            var textures = new List<MsCustomTexture>();
+            // load textures
+            for (int i = 0; ; i++)
+            {
+                Wz_Node textureNode = node.Nodes[i.ToString()];
+                if (textureNode == null)
+                {
+                    break;
+                }
+                var textureArray = new List<Texture2D>();
+                for (int j = 0; ; j++)
+                {
+                    Wz_Node textureIndexNode = textureNode.Nodes[j.ToString()];
+                    if (textureIndexNode == null)
+                    {
+                        break;
+                    }
+                    var linkNode = textureIndexNode.GetLinkedSourceNode(PluginManager.FindWz);
+                    textureArray.Add(this.Load<Texture2D>(linkNode));
+                }
+                var addressU = textureNode.Nodes["address_u"].GetValueEx<int>(0);
+                var addressV = textureNode.Nodes["address_v"].GetValueEx<int>(0);
+                textures.Add(new MsCustomTexture
+                {
+                    Texture = textureArray.FirstOrDefault(),
+                    Textures = textureArray.ToArray(),
+                    AddressU = addressU,
+                    AddressV = addressV,
+                });
+            }
+            // load shader
+            string shaderName = node.Nodes["shader"].GetValueEx<string>(null);
+            MsShader shader = null;
+            if (shaderName != null)
+            {
+                Wz_Node shaderNode = node.GetNodeWzImage()?.Node.FindNodeByPath(false, shaderName.Split('/'));
+                if (shaderNode != null)
+                {
+                    shader = this.Load<MsShader>(shaderNode);
+                }
+            }
+
+            var msSprite = new MsCustomSpriteData()
+            {
+                Textures = textures.ToArray(),
+                Shader = shader,
+            };
+            return msSprite;
+        }
+
+        private MsShader LoadMsShader(Wz_Node node)
+        {
+            var shader = new MsShader();
+            shader.ID = node.Nodes["id"]?.GetValueEx<string>(null);
+            if (node.Nodes["constant"] is Wz_Node constantRoot)
+            {
+                foreach (var constantNode in constantRoot.Nodes)
+                {
+                    if (constantNode.Nodes.Count > 0) // read as vector
+                    {
+                        if (constantNode.Nodes["x"]?.Value is float x)
+                        {
+                            if (constantNode.Nodes["y"]?.Value is float y)
+                            {
+                                if (constantNode.Nodes["z"]?.Value is float z)
+                                {
+                                    shader.Constants.Add(constantNode.Text, new MsShaderConstant(x, y, z));
+                                }
+                                else
+                                {
+                                    shader.Constants.Add(constantNode.Text, new MsShaderConstant(x, y));
+                                }
+                            }
+                            else
+                            {
+                                shader.Constants.Add(constantNode.Text, new MsShaderConstant(x));
+                            }
+                        }
+                    }
+                    else if (constantNode.Value is float x) // read as scalar
+                    {
+                        shader.Constants.Add(constantNode.Text, new MsShaderConstant(x));
+                    }
+                }
+            }
+            return shader;
         }
 
         protected virtual void Dispose(bool disposing)

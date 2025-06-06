@@ -73,5 +73,8 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Effects\Resources\Native\*" />
+  </ItemGroup>
   <Import Project="$(ProjectDir)..\Build\WcR2Plugin.targets" />
 </Project>

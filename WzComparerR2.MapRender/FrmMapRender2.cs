@@ -22,6 +22,7 @@ using RelayCommand = EmptyKeys.UserInterface.Input.RelayCommand;
 using KeyCode = EmptyKeys.UserInterface.Input.KeyCode;
 using ModifierKeys = EmptyKeys.UserInterface.Input.ModifierKeys;
 using ServiceManager = EmptyKeys.UserInterface.Mvvm.ServiceManager;
+using WzComparerR2.MapRender.Effects;
 #endregion
 
 namespace WzComparerR2.MapRender

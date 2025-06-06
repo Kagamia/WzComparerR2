@@ -25,6 +25,7 @@ namespace WzComparerR2.MapRender
         SpriteBatchEx sprite;
         Spine.SkeletonRenderer spineRender;
         D2DRenderer d2dRender;
+        MsSpriteRenderer msSpriteRenderer;
         ItemType lastItem;
         Stack<MeshItem> meshPool;
 
@@ -33,7 +34,9 @@ namespace WzComparerR2.MapRender
         private readonly BlendState maskState;
 
         //start参数
-        private Matrix? matrix;
+        private Matrix matrix;
+        private Vector2 camaraOriginWorldPosition;
+        private float gameTime;
         private bool isInBeginEndPair;
 
         //culling参数
@@ -41,9 +44,11 @@ namespace WzComparerR2.MapRender
         private Rectangle viewport;
 
 
-        public void Begin(Matrix? matrix = null)
+        public void Begin(Vector2 camaraOriginWorldPosition, float gameTime)
         {
-            this.matrix = matrix;
+            this.matrix = Matrix.CreateTranslation(-camaraOriginWorldPosition.X, -camaraOriginWorldPosition.Y, 0);
+            this.camaraOriginWorldPosition = camaraOriginWorldPosition;
+            this.gameTime = gameTime;
             this.lastItem = ItemType.Unknown;
             this.isInBeginEndPair = true;
             this.PrepareCullingParameters();
@@ -51,28 +56,21 @@ namespace WzComparerR2.MapRender
 
         private void PrepareCullingParameters()
         {
-            if (this.matrix == null)
+            if (this.matrix.M12 == 0 && this.matrix.M21 == 0)
             {
                 matrixNoRot = true;
             }
             else
             {
-                var mt = this.matrix.Value;
-                if (mt.M12 == 0 && mt.M21 == 0)
-                {
-                    matrixNoRot = true;
-                }
-                else
-                {
-                    matrixNoRot = false;
-                }
+                matrixNoRot = false;
             }
+
 
             //重新计算viewport
             this.viewport = this.GraphicsDevice.Viewport.Bounds;
             if (matrixNoRot)
             {
-                var invmt = Matrix.Invert(this.matrix.Value);
+                var invmt = Matrix.Invert(this.matrix);
                 var lt = Vector2.Transform(this.viewport.Location.ToVector2(), invmt);
                 var rb = Vector2.Transform(new Vector2(this.viewport.Right, this.viewport.Bottom), invmt);
                 int l = (int)Math.Floor(lt.X);
@@ -108,6 +106,10 @@ namespace WzComparerR2.MapRender
             else if (mesh.RenderObject is ParticleSystem particle)
             {
                 this.DrawItem(mesh, particle);
+            }
+            else if (mesh.RenderObject is MsCustomSprite msCustomSprite)
+            {
+                this.DrawItem(mesh, msCustomSprite);
             }
         }
 
@@ -362,6 +364,12 @@ namespace WzComparerR2.MapRender
             }
         }
 
+        private void DrawItem(MeshItem mesh, MsCustomSprite msCustomSprite)
+        {
+            Prepare(ItemType.MsSprite);
+            this.msSpriteRenderer.Draw(mesh.Position, msCustomSprite.Size, msCustomSprite.Material);
+        }
+
         public Rectangle[] Measure(MeshItem mesh)
         {
             Rectangle[] region = null;
@@ -480,6 +488,7 @@ namespace WzComparerR2.MapRender
                 case ItemType.Sprite_BlendAdditive:
                 case ItemType.Sprite_BlendNonPremultiplied:
                 case ItemType.Sprite_BlendMask:
+                case ItemType.MsSprite:
                     InnerFlush();
                     lastItem = itemType;
                     InnerBegin();
@@ -506,7 +515,7 @@ namespace WzComparerR2.MapRender
                     }
                     if (this.spineRender.Effect is BasicEffect basicEff)
                     {
-                        basicEff.World = matrix ?? Matrix.Identity;
+                        basicEff.World = this.matrix;
                         basicEff.Projection = Matrix.CreateOrthographicOffCenter(0, this.GraphicsDevice.Viewport.Width, this.GraphicsDevice.Viewport.Height, 0, 1, 0);
                     }
                     this.spineRender.Begin();
@@ -517,14 +526,7 @@ namespace WzComparerR2.MapRender
                     {
                         this.d2dRender = new D2DRenderer(this.GraphicsDevice);
                     }
-                    if (this.matrix == null)
-                    {
-                        this.d2dRender.Begin();
-                    }
-                    else
-                    {
-                        this.d2dRender.Begin(this.matrix.Value);
-                    }
+                    this.d2dRender.Begin(this.matrix);
                     break;
 
                 case ItemType.Sprite_BlendAdditive:
@@ -549,6 +551,14 @@ namespace WzComparerR2.MapRender
                     }
                     this.sprite.Begin(SpriteSortMode.Deferred, this.maskState, transformMatrix: this.matrix);
                     break;
+
+                case ItemType.MsSprite:
+                    if (this.msSpriteRenderer == null)
+                    {
+                        this.msSpriteRenderer = new MsSpriteRenderer(this.GraphicsDevice);
+                    }
+                    this.msSpriteRenderer.Begin(this.camaraOriginWorldPosition, this.gameTime);
+                    break;
             }
         }
 
@@ -570,6 +580,10 @@ namespace WzComparerR2.MapRender
                 case ItemType.D2DObject:
                     this.d2dRender.End();
                     break;
+
+                case ItemType.MsSprite:
+                    this.msSpriteRenderer.End();
+                    break;
             }
         }
 
@@ -583,7 +597,7 @@ namespace WzComparerR2.MapRender
             }
             else
             {
-                var mt = this.matrix.Value;
+                var mt = this.matrix;
                 Vector2 lt = new Vector2(rect.Left, rect.Top),
                     rt = new Vector2(rect.Right, rect.Top),
                     lb = new Vector2(rect.Left, rect.Bottom),
@@ -649,6 +663,7 @@ namespace WzComparerR2.MapRender
             Sprite_BlendAdditive = 4,
             Sprite_BlendNonPremultiplied = 5,
             Sprite_BlendMask = 6,
+            MsSprite = 7,
         }
     }
 }
