@@ -381,7 +381,17 @@ namespace WzComparerR2.WzLib
                     break;
 
                 case "Canvas#Video": // introduced in KMST v1181
-                    reader.SkipBytes(3);
+                    reader.SkipBytes(1);
+                    if (reader.ReadByte() == 0x01) // introduced in KMST 1188, read sub property
+                    {
+                        reader.SkipBytes(2);
+                        entries = reader.ReadCompressedInt32();
+                        for (int i = 0; i < entries; i++)
+                        {
+                            ExtractValue(reader, parent);
+                        }
+                    }
+                    int unknown = reader.ReadByte();
                     int videoLen = reader.ReadCompressedInt32();
                     parent.Value = new Wz_Video((uint)reader.BaseStream.Position, videoLen, this);
                     reader.SkipBytes(videoLen);
