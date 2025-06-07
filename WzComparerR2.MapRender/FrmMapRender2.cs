@@ -543,7 +543,7 @@ namespace WzComparerR2.MapRender
             }
         }
 
-        private void ChatCommand(string command)
+        private async void ChatCommand(string command)
         {
             string[] arguments = command.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
             if (arguments.Length <= 0)
@@ -564,6 +564,7 @@ namespace WzComparerR2.MapRender
                     this.ui.ChatBox.AppendTextHelp(@"/scene 设置地图场景显示状态。");
                     this.ui.ChatBox.AppendTextHelp(@"/quest 任务设置");
                     this.ui.ChatBox.AppendTextHelp(@"/questex 设置任务Key的值");
+                    this.ui.ChatBox.AppendTextHelp(@"/multibgm 多重BGM设置");
                     break;
 
                 case "/map":
@@ -747,6 +748,67 @@ namespace WzComparerR2.MapRender
 
                         default:
                             this.ui.ChatBox.AppendTextHelp(@"/scene tag 设置tag相关的显示状态。");
+                            break;
+                    }
+                    break;
+
+                case "/multibgm":
+                    switch (arguments.ElementAtOrDefault(1))
+                    {
+                        case "list":
+                            if (!string.IsNullOrEmpty(this.mapData.Bgm))
+                            {
+                                var path = new List<string>() { "Sound" };
+                                path.AddRange(this.mapData.Bgm.Split('/'));
+                                path[1] += ".img";
+                                var bgmNode = PluginBase.PluginManager.FindWz(string.Join("\\", path));
+                                var subNodes = bgmNode?.Nodes ?? new Wz_Node.WzNodeCollection(null);
+                                this.ui.ChatBox.AppendTextHelp($"多重BGM: {subNodes.Count}");
+                                foreach (Wz_Node subNode in subNodes)
+                                {
+                                    this.ui.ChatBox.AppendTextHelp($"  {subNode.Text}");
+                                }
+                            }
+                            else
+                            {
+                                this.ui.ChatBox.AppendTextHelp($"多重BGM: 0");
+                            }
+                            break;
+
+                        case "set":
+                            string bgmName = string.Join(" ", arguments.Skip(2));
+                            Music multiBgm = LoadBgm(this.mapData, bgmName);
+                            if (multiBgm != null)
+                            {
+                                this.ui.ChatBox.AppendTextSystem($"多重BGM已更改为{bgmName}。");
+
+                                Task bgmTask = null;
+                                bool willSwitchBgm = this.bgm != multiBgm;
+                                if (willSwitchBgm && this.bgm != null) //准备切换
+                                {
+                                    bgmTask = FadeOut(this.bgm, 1000);
+                                }
+
+                                if (bgmTask != null)
+                                {
+                                    await bgmTask;
+                                }
+
+                                this.bgm = multiBgm;
+                                if (willSwitchBgm && this.bgm != null)
+                                {
+                                    bgmTask = FadeIn(this.bgm, 1000);
+                                }
+                            }
+                            else
+                            {
+                                this.ui.ChatBox.AppendTextHelp($"请输入正确的多重BGM名称");
+                            }
+                            break;
+
+                        default:
+                            this.ui.ChatBox.AppendTextHelp(@"/multibgm list 显示多重BGM列表");
+                            this.ui.ChatBox.AppendTextHelp(@"/multibgm set (multiBgm) 播放指定的多重BGM");
                             break;
                     }
                     break;
