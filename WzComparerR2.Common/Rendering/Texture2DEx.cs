@@ -69,7 +69,7 @@ namespace WzComparerR2.Rendering
 
                 var d3dContext = texture.GraphicsDevice._d3dContext();
                 lock (d3dContext)
-                    d3dContext.UpdateSubresource(texture._texture(), subresourceIndex, region, dataPtr, pitch, 0);
+                    d3dContext.UpdateSubresource(texture.GetTexture(), subresourceIndex, region, dataPtr, pitch, 0);
             }
         }
     }

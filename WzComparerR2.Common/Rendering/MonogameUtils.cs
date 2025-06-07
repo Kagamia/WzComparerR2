@@ -79,10 +79,34 @@ namespace WzComparerR2.Rendering
             return (DeviceContext)d3dContextField.GetValue(device);
         }
 
-        public static Resource _texture(this Texture texture)
+        public static SharpDX.DXGI.SwapChain _swapChain(this GraphicsDevice device)
         {
-            var _textureField = typeof(Texture).GetField("_texture", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-            return (Resource)_textureField.GetValue(texture);
+            var _swapChainField = typeof(GraphicsDevice).GetField("_swapChain", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            return (SharpDX.DXGI.SwapChain)_swapChainField.GetValue(device);
+        }
+
+        public static Resource GetTexture(this Texture texture)
+        {
+            var _getTextureFunc = typeof(Texture).GetMethod("GetTexture", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            return (Resource)_getTextureFunc.Invoke(texture, Array.Empty<object>());
+        }
+
+        public static void CopyBackBuffer(this GraphicsDevice graphicsDevice, Texture2D destTexture)
+        {
+            var pp = graphicsDevice.PresentationParameters;
+            if (pp.BackBufferWidth != destTexture.Width || pp.BackBufferHeight != destTexture.Height || pp.BackBufferFormat != destTexture.Format)
+            {
+                throw new Exception("Destination texture size or format does not compatible with back buffer.");
+            }
+
+            var d3dContext = graphicsDevice._d3dContext();
+            var swapChain = graphicsDevice._swapChain();
+            var dest = destTexture.GetTexture();
+            using SharpDX.Direct3D11.Texture2D source = SharpDX.Direct3D11.Resource.FromSwapChain<SharpDX.Direct3D11.Texture2D>(swapChain, 0);
+            lock (d3dContext)
+            {
+                d3dContext.CopyResource(source, dest);
+            }
         }
 
         public static bool IsSupportFormat(this GraphicsDevice device, SharpDX.DXGI.Format format)

@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using WzComparerR2.MapRender.Effects;
+using WzComparerR2.Rendering;
 
 namespace WzComparerR2.MapRender
 {
@@ -31,7 +32,6 @@ namespace WzComparerR2.MapRender
         private Effect vertexShader;
         private readonly Dictionary<string, Effect> loadedPixelShaders;
         private Texture2D cachedBackBufferTexture;
-        private byte[] cachedBackBufferData;
 
         private ShaderMaterial lastShaderMaterial;
         private VertexPosition4ColorTexture[] vertices;
@@ -158,21 +158,7 @@ namespace WzComparerR2.MapRender
                 {
                     bgTex = this.cachedBackBufferTexture;
                 }
-
-                int backBufferDataSize = bgTex.Width * bgTex.Height * 4;
-                byte[] backBufferData = null;
-                if (this.cachedBackBufferData == null || this.cachedBackBufferData.Length != backBufferDataSize)
-                {
-                    backBufferData = new byte[backBufferDataSize];
-                    this.cachedBackBufferData = backBufferData;
-                }
-                else
-                {
-                    backBufferData = this.cachedBackBufferData;
-                }
-                // TODO: GetBackBufferData is very heavy, we'd better to refactor it with rt2d in future.
-                this.GraphicsDevice.GetBackBufferData(backBufferData);
-                bgTex.SetData(backBufferData);
+                this.GraphicsDevice.CopyBackBuffer(bgTex);
                 bgTexEffect.BackgroundTexture = bgTex;
             }
             shaderMaterial.ApplyParameters(pixelShader);
@@ -222,7 +208,6 @@ namespace WzComparerR2.MapRender
                 }
             }
 
-            this.cachedBackBufferData = null;
             this.lastShaderMaterial = null;
             this.vertices = null;
             this.indices = null;
