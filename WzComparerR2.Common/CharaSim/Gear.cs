@@ -206,7 +206,7 @@ namespace WzComparerR2.CharaSim
         public static bool IsLeftWeapon(GearType type)
         {
             return (int)type >= 121 && (int)type <= 139 && type != GearType.katara
-                || ((int)type / 10) == 121;
+                || ((int)type / 10) == 121 || ((int)type / 10) == 125;
         }
 
         public static bool IsSubWeapon(GearType type)
