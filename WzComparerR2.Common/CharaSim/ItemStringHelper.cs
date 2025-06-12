@@ -325,7 +325,8 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.energySword: return "能量剑";
                 case GearType.desperado: return "亡命剑";
-                case GearType.magicStick: return "记忆长杖";
+                case GearType.memorialStaff: return "记忆长杖";
+                case GearType.magicStick: return "驯兽魔法棒";
                 case GearType.whistle: return "飞越";
                 case GearType.boxingClaw: return "拳爪";
                 case GearType.katana2: return "小太刀";
@@ -361,6 +362,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.hexSeeker: return "索魂器";
 
                 case GearType.jewel: return "珠宝";
+
+                case GearType.celestialLight: return "星光权杖";
+                case GearType.compass: return "罗盘";
 
                 default: return null;
             }
@@ -472,6 +476,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.swordZL: return GetExtraJobReqString(101);
 
                 case GearType.whistle:
+                case GearType.memorialStaff: return GetExtraJobReqString(172);
+
                 case GearType.magicStick: return GetExtraJobReqString(112);
 
                 case GearType.espLimiter:
@@ -494,6 +500,9 @@ namespace WzComparerR2.CharaSim
 
                 case GearType.chakram:
                 case GearType.hexSeeker: return GetExtraJobReqString(154);
+
+                case GearType.celestialLight:
+                case GearType.compass: return GetExtraJobReqString(182);
                 default: return null;
             }
         }
@@ -524,7 +533,7 @@ namespace WzComparerR2.CharaSim
                 case 64: return "魔链影士可穿戴装备";
                 case 65: return "爆莉萌天使可穿戴装备";
                 case 101: return "神之子可穿戴装备";
-                case 112: return "琳可穿戴装备";
+                case 112: return "林之灵可穿戴装备";
                 case 142: return "超能力者可穿戴装备";
                 case 151: return "御剑骑士可穿戴装备";
                 case 152: return "圣晶使徒可穿戴装备";
@@ -532,7 +541,9 @@ namespace WzComparerR2.CharaSim
                 case 155: return "影魂异人可穿戴装备";
                 case 162: return "元素师可穿戴装备";
                 case 164: return "虎影可穿戴装备";
+                case 172: return "琳可穿戴装备";
                 case 175: return "墨玄可穿戴装备";
+                case 182: return "施亚可穿戴装备";
                 default: return null;
             }
         }
