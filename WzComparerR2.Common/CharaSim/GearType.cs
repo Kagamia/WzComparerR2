@@ -168,9 +168,17 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         energySword = 124,
         /// <summary>
-        /// 驯兽魔法棒 125
+        /// 记忆长杖 1252
         /// </summary>
-        magicStick = 125,
+        memorialStaff = 1252,
+        /// <summary>
+        /// 星灵权杖 1253
+        /// </summary>
+        celestialLight = 1253,
+        /// <summary>
+        /// 驯兽魔法棒 1259
+        /// </summary>
+        magicStick = 1259,
         /// <summary>
         /// ESP限制器
         /// </summary>
@@ -291,6 +299,10 @@ namespace WzComparerR2.CharaSim
         /// 拳天 135_86
         /// </summary>
         boxingSky = 135286,
+        /// <summary>
+        /// 罗盘 135_87
+        /// </summary>
+        compass = 135287,
         /// <summary>
         /// 手腕护带 135_90
         /// </summary>
@@ -508,6 +520,13 @@ namespace WzComparerR2.CharaSim
         /// 珠宝 178
         /// </summary>
         jewel = 178,
+        /// <summary>
+        /// MSN纸娃娃 179
+        /// </summary>
+        face_n = 1790,
+        hair_n = 1791,
+        head_n = 1792,
+        hair2_n = 1793,
         /// <summary>
         /// 宠物装备 180
         /// </summary>
