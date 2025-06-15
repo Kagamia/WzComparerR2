@@ -374,6 +374,20 @@ namespace WzComparerR2.CharaSim
                         return (GearType)(code / 10);
                 }
             }
+            // MSN support
+            if (code / 10000 == 179)
+            {
+                switch (code / 1000)
+                {
+                    case 1790:
+                    case 1791:
+                    case 1792:
+                    case 1793:
+                        return (GearType)(code / 1000);
+                    default:
+                        return (GearType)(code / 100 * 10);
+                }
+            }
             return (GearType)(code / 10000);
         }
 

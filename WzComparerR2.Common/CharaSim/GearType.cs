@@ -521,6 +521,13 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         jewel = 178,
         /// <summary>
+        /// MSN纸娃娃 179
+        /// </summary>
+        face_n = 1790,
+        hair_n = 1791,
+        head_n = 1792,
+        hair2_n = 1793,
+        /// <summary>
         /// 宠物装备 180
         /// </summary>
         petEquip = 180,
