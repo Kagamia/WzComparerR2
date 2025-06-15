@@ -339,14 +339,14 @@ namespace WzComparerR2.CharaSim
                     return GearType.shiningRod;
                 case 1213:
                     return GearType.tuner;
+                case 1214:
+                    return GearType.breathShooter;
                 case 1252:
                     return GearType.memorialStaff;
                 case 1253:
                     return GearType.celestialLight;
                 case 1259:
                     return GearType.magicStick;
-                case 1214:
-                    return GearType.breathShooter;
                 case 1403:
                     return GearType.boxingCannon;
                 case 1404:
