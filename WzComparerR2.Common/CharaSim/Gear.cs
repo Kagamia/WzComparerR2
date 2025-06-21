@@ -206,7 +206,7 @@ namespace WzComparerR2.CharaSim
         public static bool IsLeftWeapon(GearType type)
         {
             return (int)type >= 121 && (int)type <= 139 && type != GearType.katara
-                || ((int)type / 10) == 121;
+                || ((int)type / 10) == 121 || ((int)type / 10) == 125;
         }
 
         public static bool IsSubWeapon(GearType type)
@@ -341,6 +341,12 @@ namespace WzComparerR2.CharaSim
                     return GearType.tuner;
                 case 1214:
                     return GearType.breathShooter;
+                case 1252:
+                    return GearType.memorialStaff;
+                case 1253:
+                    return GearType.celestialLight;
+                case 1259:
+                    return GearType.magicStick;
                 case 1403:
                     return GearType.boxingCannon;
                 case 1404:
@@ -366,6 +372,20 @@ namespace WzComparerR2.CharaSim
                 {
                     case 11902:
                         return (GearType)(code / 10);
+                }
+            }
+            // MSN support
+            if (code / 10000 == 179)
+            {
+                switch (code / 1000)
+                {
+                    case 1790:
+                    case 1791:
+                    case 1792:
+                    case 1793:
+                        return (GearType)(code / 1000);
+                    default:
+                        return (GearType)(code / 100 * 10);
                 }
             }
             return (GearType)(code / 10000);
