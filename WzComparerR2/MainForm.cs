@@ -1806,6 +1806,9 @@ namespace WzComparerR2
                 case 2:
                     searchAdvTree(advTree3, 1, textBoxItemSearchWz.Text, checkBoxItemExact1.Checked, checkBoxItemRegex1.Checked);
                     break;
+                case 3: //full path
+                    searchAdvTreeFullPath(textBoxItemSearchWz.Text);
+                    break;
             }
         }
 
@@ -1856,6 +1859,82 @@ namespace WzComparerR2
             }
             
             return null;
+        }
+
+        private void searchAdvTreeFullPath(string fullPath)
+        {
+            string[] pathSegments = fullPath.Split('/');
+
+            bool isNodePathMatches(string pathSegment, string nodeName, StringComparison stringComparison)
+            {
+                if (string.Equals(pathSegment, nodeName, stringComparison))
+                {
+                    return true;
+                }
+                int pathExtIndex = pathSegment.LastIndexOf('.');
+                int nodeExtIndex = nodeName.LastIndexOf(".");
+                if (pathExtIndex != -1 || nodeExtIndex != -1)
+                {
+                    ReadOnlySpan<char> pathWithoutExt = pathExtIndex == -1 ? pathSegment.AsSpan() : pathSegment.AsSpan(0, pathExtIndex);
+                    ReadOnlySpan<char> nodeWithoutExt = nodeExtIndex == -1 ? nodeName.AsSpan() : nodeName.AsSpan(0, nodeExtIndex);
+                    return pathWithoutExt.Equals(nodeWithoutExt, stringComparison);
+                }
+                return false;
+            }
+
+            IEnumerable<(Node result, int resultPathLevel)> searchNode(Node treeNode, int pathLevel)
+            {
+                string pathSegment = pathSegments[pathLevel];
+                if (isNodePathMatches(pathSegment, treeNode.Text, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (treeNode.Nodes.Count == 0 || pathLevel == pathSegments.Length - 1)
+                    {
+                        yield return (treeNode, pathLevel);
+                    }
+                    foreach (Node childNode in treeNode.Nodes)
+                    {
+                        foreach (var resultTuple in searchNode(childNode, pathLevel + 1))
+                        {
+                            yield return resultTuple;
+                        }
+                    }
+                }
+            }
+
+            foreach (var node in findNextNode(this.advTree1))
+            {
+                foreach ((Node result, int resultPathLevel) in searchNode(node, 0))
+                {
+                    if (resultPathLevel == pathSegments.Length - 1)
+                    {
+                        this.advTree1.SelectedNode = node;
+                        return;
+                    }
+
+                    var wzNode = result.AsWzNode();
+                    if (wzNode != null && wzNode.Value is Wz_Image wzImg && wzImg.TryExtract(out _))
+                    {
+                        // find remaining path in wzImg
+                        wzNode = wzImg.Node;
+                        for (int i = resultPathLevel + 1; i < pathSegments.Length; i++)
+                        {
+                            string pathSegment = pathSegments[i];
+                            wzNode = wzNode.Nodes.FirstOrDefault(child => isNodePathMatches(pathSegment, child.Text, StringComparison.OrdinalIgnoreCase));
+                            if (wzNode == null)
+                            {
+                                break;
+                            }
+                        }
+                        if (wzNode != null && this.OnSelectedWzNode(wzNode))
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+
+            this.advTree1.SelectedNode = null;
+            MessageBoxEx.Show(this, "已经搜索到末尾。");
         }
 
         private IEnumerable<Node> findNextNode(AdvTree advTree)
@@ -2496,6 +2575,17 @@ namespace WzComparerR2
             {
                 historySelecting = true;
                 advTree3.SelectedNode = historyNodeList.MoveNext();
+            }
+        }
+
+        private void tsmi2CopyFullPath_Click(object sender, EventArgs e)
+        {
+            var selectedWzNode = advTree3.SelectedNode.AsWzNode();
+            if (selectedWzNode != null)
+            {
+                string fullPath = selectedWzNode.FullPathToFile.Replace('\\', '/');
+                Clipboard.SetText(fullPath);
+                ToastNotification.Show(this, "已经复制当前所选节点完整路径", 1000, eToastPosition.TopCenter);
             }
         }
 

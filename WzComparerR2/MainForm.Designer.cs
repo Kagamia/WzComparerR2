@@ -253,6 +253,9 @@
             this.chkHashPngFileName = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.btnItemOpenImg = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItemSaveWithOptions = new DevComponents.DotNetBar.ButtonItem();
+            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmi2CopyFullPath = new System.Windows.Forms.ToolStripMenuItem();
+            this.comboItem19 = new DevComponents.Editors.ComboItem();
             this.ribbonControl1.SuspendLayout();
             this.ribbonPanel1.SuspendLayout();
             this.ribbonPanel2.SuspendLayout();
@@ -1321,7 +1324,8 @@
             this.comboBoxItem1.Items.AddRange(new object[] {
             this.comboItem10,
             this.comboItem11,
-            this.comboItem12});
+            this.comboItem12,
+            this.comboItem19});
             this.comboBoxItem1.Name = "comboBoxItem1";
             // 
             // comboItem10
@@ -2031,9 +2035,9 @@
             // 
             // 
             this.itemContainer36.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            //
+            // 
             // buttonItemExtractGifEx
-            //
+            // 
             this.buttonItemExtractGifEx.Name = "buttonItemExtractGifEx";
             this.buttonItemExtractGifEx.Text = "ExtractGifEx";
             this.buttonItemExtractGifEx.Tooltip = "对所选节点的全部子节点提取帧动画，而不使用序数节点名称。";
@@ -2176,9 +2180,11 @@
             this.tsmi2CollapseLevel,
             this.toolStripMenuItem2,
             this.tsmi2Prev,
-            this.tsmi2Next});
+            this.tsmi2Next,
+            this.toolStripMenuItem4,
+            this.tsmi2CopyFullPath});
             this.contextMenuStrip2.Name = "contextMenuStrip2";
-            this.contextMenuStrip2.Size = new System.Drawing.Size(196, 198);
+            this.contextMenuStrip2.Size = new System.Drawing.Size(196, 226);
             this.contextMenuStrip2.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip2_Opening);
             // 
             // tsmi2SaveAs
@@ -2953,6 +2959,22 @@
             this.chkHashPngFileName.TabIndex = 10;
             this.chkHashPngFileName.Text = "HashPngFileName";
             // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(192, 6);
+            // 
+            // tsmi2CopyFullPath
+            // 
+            this.tsmi2CopyFullPath.Name = "tsmi2CopyFullPath";
+            this.tsmi2CopyFullPath.Size = new System.Drawing.Size(195, 22);
+            this.tsmi2CopyFullPath.Text = "Copy Full Path";
+            this.tsmi2CopyFullPath.Click += new System.EventHandler(this.tsmi2CopyFullPath_Click);
+            // 
+            // comboItem19
+            // 
+            this.comboItem19.Text = "fullPath";
+            // 
             // MainForm
             // 
             this.ClientSize = new System.Drawing.Size(750, 512);
@@ -3225,5 +3247,8 @@
         private DevComponents.DotNetBar.SuperTooltip superTooltip1;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkEnableDarkMode;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHashPngFileName;
+        private DevComponents.Editors.ComboItem comboItem19;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
+        private System.Windows.Forms.ToolStripMenuItem tsmi2CopyFullPath;
     }
 }
