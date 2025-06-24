@@ -104,22 +104,20 @@ namespace WzComparerR2.Controls
             //绘制背景色
             this.DrawBackground();
             //绘制场景
+            Matrix mtViewport = Matrix.CreateTranslation(this.Padding.Left, this.Padding.Top, 0);
+            Matrix mtAnimation = Matrix.CreateScale(GlobalScale, GlobalScale, 1) * mtViewport;
+
             foreach (var animation in this.Items)
             {
                 if (animation != null)
                 {
-                    Matrix mt = Matrix.CreateRotationZ(MathHelper.PiOver2)
-                        * Matrix.CreateTranslation(100, 100, 0);
-
-                    mt = Matrix.CreateScale(GlobalScale, GlobalScale, 1);
-
                     if (animation is FrameAnimator frameAni)
                     {
-                        graphics.Draw(frameAni, mt);
+                        graphics.Draw(frameAni, mtAnimation);
                     }
                     else if (animation is ISpineAnimator spineAni)
                     {
-                        graphics.Draw(spineAni, mt);
+                        graphics.Draw(spineAni, mtAnimation);
                     }
                 }
             }
@@ -128,7 +126,7 @@ namespace WzComparerR2.Controls
             if (ShowPositionGridOnDrag && this.mouseDragContext.IsDragging && this.mouseDragContext.DraggingItem != null)
             {
                 var pos = this.mouseDragContext.DraggingItem.Position;
-                this.sprite.Begin();
+                this.sprite.Begin(transformMatrix: mtViewport);
                 this.sprite.DrawLine(new Point(0, pos.Y), new Point(this.Width, pos.Y), 1, Color.Indigo);
                 this.sprite.DrawLine(new Point(pos.X, 0), new Point(pos.X, this.Height), 1, Color.Indigo);
                 this.sprite.End();
