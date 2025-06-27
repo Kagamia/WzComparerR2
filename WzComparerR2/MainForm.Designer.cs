@@ -171,6 +171,7 @@
             this.itemContainer36 = new DevComponents.DotNetBar.ItemContainer();
             this.buttonItemExtractGifEx = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItemGifSetting = new DevComponents.DotNetBar.ButtonItem();
+            this.colorPickerPicBoxBgColor = new DevComponents.DotNetBar.ColorPickerDropDown();
             this.textBoxX1 = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.expandableSplitter1 = new DevComponents.DotNetBar.ExpandableSplitter();
             this.panelEx1 = new DevComponents.DotNetBar.PanelEx();
@@ -1915,7 +1916,8 @@
             this.cmbItemAniNames,
             this.cmbItemSkins,
             this.buttonItemSaveImage,
-            this.buttonItemGif});
+            this.buttonItemGif,
+            this.colorPickerPicBoxBgColor});
             this.ribbonBar5.Location = new System.Drawing.Point(0, 202);
             this.ribbonBar5.Name = "ribbonBar5";
             this.ribbonBar5.Size = new System.Drawing.Size(292, 26);
@@ -2049,6 +2051,23 @@
             this.buttonItemGifSetting.Name = "buttonItemGifSetting";
             this.buttonItemGifSetting.Text = "GifSettings";
             this.buttonItemGifSetting.Click += new System.EventHandler(this.buttonItemGifSetting_Click);
+            // 
+            // colorPickerPicBoxBgColor
+            // 
+            this.colorPickerPicBoxBgColor.AutoExpandOnClick = true;
+            this.colorPickerPicBoxBgColor.BeginGroup = true;
+            this.colorPickerPicBoxBgColor.ImagePaddingHorizontal = 6;
+            this.colorPickerPicBoxBgColor.ImagePaddingVertical = 0;
+            this.colorPickerPicBoxBgColor.ImagePosition = DevComponents.DotNetBar.eImagePosition.Bottom;
+            this.colorPickerPicBoxBgColor.Name = "colorPickerPicBoxBgColor";
+            this.colorPickerPicBoxBgColor.SelectedColorImageRectangle = new System.Drawing.Rectangle(0, 0, 100, 100);
+            this.colorPickerPicBoxBgColor.ShowSubItems = false;
+            this.colorPickerPicBoxBgColor.SubItemsExpandWidth = 14;
+            this.colorPickerPicBoxBgColor.Symbol = "57914";
+            this.colorPickerPicBoxBgColor.SymbolSet = DevComponents.DotNetBar.eSymbolSet.Material;
+            this.colorPickerPicBoxBgColor.SymbolSize = 12F;
+            this.colorPickerPicBoxBgColor.Tooltip = "Set Background Color for Image Viewer";
+            this.colorPickerPicBoxBgColor.SelectedColorChanged += new System.EventHandler(this.colorPickerPicBoxBgColor_SelectedColorChanged);
             // 
             // textBoxX1
             // 
@@ -3251,5 +3270,6 @@
         private DevComponents.Editors.ComboItem comboItem19;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem tsmi2CopyFullPath;
+        private DevComponents.DotNetBar.ColorPickerDropDown colorPickerPicBoxBgColor;
     }
 }
