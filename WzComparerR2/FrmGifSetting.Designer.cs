@@ -79,6 +79,13 @@
             this.labelX12 = new DevComponents.DotNetBar.LabelX();
             this.textBoxX3 = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.labelX13 = new DevComponents.DotNetBar.LabelX();
+            this.btnPreset = new DevComponents.DotNetBar.ButtonX();
+            this.btnNonTransparentMP4Preset = new DevComponents.DotNetBar.ButtonItem();
+            this.btnGreenBackdropMP4Preset = new DevComponents.DotNetBar.ButtonItem();
+            this.btnBlueBackdropMP4Preset = new DevComponents.DotNetBar.ButtonItem();
+            this.btnTransparentMOVPreset = new DevComponents.DotNetBar.ButtonItem();
+            this.btnTransparentWebMPreset = new DevComponents.DotNetBar.ButtonItem();
+            this.btnDefaultPreset = new DevComponents.DotNetBar.ButtonItem();
             this.panelExMosaic.SuspendLayout();
             this.panelExColor.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.integerInput1)).BeginInit();
@@ -115,6 +122,59 @@
             this.labelX1.Size = new System.Drawing.Size(99, 16);
             this.labelX1.TabIndex = 0;
             this.labelX1.Text = "BackGroundColor";
+            //
+            // btnPreset
+            //
+            this.btnPreset.Location = new System.Drawing.Point(160, 6);
+            this.btnPreset.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnPreset.Size = new System.Drawing.Size(56, 23);
+            this.btnPreset.AutoExpandOnClick = true;
+            this.btnPreset.Name = "btnPreset";
+            this.btnPreset.TabIndex = 4;
+            this.btnPreset.Text = "Preset";
+            this.btnPreset.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.btnNonTransparentMP4Preset,
+            this.btnGreenBackdropMP4Preset,
+            this.btnBlueBackdropMP4Preset,
+            this.btnTransparentMOVPreset,
+            this.btnTransparentWebMPreset,
+            this.btnDefaultPreset});
+            //
+            // btnNonTransparentMP4Preset
+            //
+            this.btnNonTransparentMP4Preset.Name = "btnNonTransparentMP4Preset";
+            this.btnNonTransparentMP4Preset.Text = "NonTransparentMP4";
+            this.btnNonTransparentMP4Preset.Click += new System.EventHandler(this.btnNonTransparentMP4Preset_Click);
+            //
+            // btnGreenBackdropMP4Preset
+            //
+            this.btnGreenBackdropMP4Preset.Name = "btnGreenBackdropMP4Preset";
+            this.btnGreenBackdropMP4Preset.Text = "GreenBackdropMP4";
+            this.btnGreenBackdropMP4Preset.Click += new System.EventHandler(this.btnGreenBackdropMP4Preset_Click);
+            //
+            // btnBlueBackdropMP4Preset
+            //
+            this.btnBlueBackdropMP4Preset.Name = "btnBlueBackdropMP4Preset";
+            this.btnBlueBackdropMP4Preset.Text = "BlueBackdropMP4";
+            this.btnBlueBackdropMP4Preset.Click += new System.EventHandler(this.btnBlueBackdropMP4Preset_Click);
+            //
+            // btnTransparentMOVPreset
+            //
+            this.btnTransparentMOVPreset.Name = "btnTransparentMOVPreset";
+            this.btnTransparentMOVPreset.Text = "TransparentMOV";
+            this.btnTransparentMOVPreset.Click += new System.EventHandler(this.btnTransparentMOVPreset_Click);
+            //
+            // btnTransparentWebMPreset
+            //
+            this.btnTransparentWebMPreset.Name = "btnTransparentWebMPreset";
+            this.btnTransparentWebMPreset.Text = "TransparentWebM";
+            this.btnTransparentWebMPreset.Click += new System.EventHandler(this.btnTransparentWebMPreset_Click);
+            //
+            // btnDefaultPreset
+            //
+            this.btnDefaultPreset.Name = "btnDefaultPreset";
+            this.btnDefaultPreset.Text = "Default";
+            this.btnDefaultPreset.Click += new System.EventHandler(this.btnDefaultPreset_Click);
             // 
             // checkBoxX1
             // 
@@ -358,6 +418,7 @@
             this.panelExColor.Controls.Add(this.checkBoxX1);
             this.panelExColor.Controls.Add(this.labelX3);
             this.panelExColor.Controls.Add(this.slider1);
+            this.panelExColor.Controls.Add(this.btnPreset);
             this.panelExColor.DisabledBackColor = System.Drawing.Color.Empty;
             this.panelExColor.Enabled = false;
             this.panelExColor.Location = new System.Drawing.Point(80, 14);
@@ -852,5 +913,12 @@
         private DevComponents.DotNetBar.LabelX labelX12;
         private DevComponents.DotNetBar.Controls.TextBoxX textBoxX3;
         private DevComponents.DotNetBar.LabelX labelX13;
+        private DevComponents.DotNetBar.ButtonX btnPreset;
+        private DevComponents.DotNetBar.ButtonItem btnNonTransparentMP4Preset;
+        private DevComponents.DotNetBar.ButtonItem btnGreenBackdropMP4Preset;
+        private DevComponents.DotNetBar.ButtonItem btnBlueBackdropMP4Preset;
+        private DevComponents.DotNetBar.ButtonItem btnTransparentMOVPreset;
+        private DevComponents.DotNetBar.ButtonItem btnTransparentWebMPreset;
+        private DevComponents.DotNetBar.ButtonItem btnDefaultPreset;
     }
 }

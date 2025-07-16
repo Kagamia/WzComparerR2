@@ -205,6 +205,63 @@ namespace WzComparerR2
             config.FFmpegOutputFileExtension = this.FFmpegDefaultExtension;
         }
 
+        private void btnNonTransparentMP4Preset_Click(object sender, EventArgs e)
+        {
+            GifEncoder = 3;
+            BackgroundType = ImageBackgroundType.Color;
+            BackgroundColor = Color.White;
+            FFmpegArgument = string.Empty;
+            FFmpegDefaultExtension = string.Empty;
+        }
+
+        private void btnGreenBackdropMP4Preset_Click(object sender, EventArgs e)
+        {
+            GifEncoder = 3;
+            BackgroundType = ImageBackgroundType.Color;
+            BackgroundColor = Color.FromArgb(0, 255, 0);
+            FFmpegArgument = string.Empty;
+            FFmpegDefaultExtension = string.Empty;
+        }
+
+        private void btnBlueBackdropMP4Preset_Click(object sender, EventArgs e)
+        {
+            GifEncoder = 3;
+            BackgroundType = ImageBackgroundType.Color;
+            BackgroundColor = Color.Blue;
+            FFmpegArgument = string.Empty;
+            FFmpegDefaultExtension = string.Empty;
+        }
+
+        private void btnTransparentMOVPreset_Click(object sender, EventArgs e)
+        {
+            GifEncoder = 3;
+            BackgroundType = ImageBackgroundType.Transparent;
+            MinMixedAlpha = 0;
+            BackgroundColor = Color.White;
+            FFmpegArgument = @$"-y -f rawvideo -pixel_format bgra -s %w*%h -r 1000/%t -i ""%i"" -vf ""crop=trunc(iw/2)*2:trunc(ih/2)*2"" -vcodec qtrle -pix_fmt argb ""%o""";
+            FFmpegDefaultExtension = ".mov";
+        }
+
+        private void btnTransparentWebMPreset_Click(object sender, EventArgs e)
+        {
+            GifEncoder = 3;
+            BackgroundType = ImageBackgroundType.Transparent;
+            MinMixedAlpha = 0;
+            BackgroundColor = Color.White;
+            FFmpegArgument = @$"-y -f rawvideo -pixel_format bgra -s %w*%h -r 1000/%t -i ""%i"" -vf ""crop=trunc(iw/2)*2:trunc(ih/2)*2"" -vcodec libvpx-vp9 -pix_fmt yuva420p ""%o""";
+            FFmpegDefaultExtension = ".webm";
+        }
+
+        private void btnDefaultPreset_Click(object sender, EventArgs e)
+        {
+            GifEncoder = 0;
+            BackgroundType = ImageBackgroundType.Transparent;
+            MinMixedAlpha = 0;
+            BackgroundColor = Color.White;
+            FFmpegArgument = string.Empty;
+            FFmpegDefaultExtension = string.Empty;
+        }
+
         private void slider1_ValueChanged(object sender, EventArgs e)
         {
             var slider = sender as DevComponents.DotNetBar.Controls.Slider;
