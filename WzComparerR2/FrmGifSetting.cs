@@ -236,7 +236,7 @@ namespace WzComparerR2
         {
             GifEncoder = 3;
             BackgroundType = ImageBackgroundType.Transparent;
-            slider1.Value = 0;
+            MinMixedAlpha = 0;
             BackgroundColor = Color.White;
             FFmpegArgument = @$"-y -f rawvideo -pixel_format bgra -s %w*%h -r 1000/%t -i ""%i"" -vf ""crop=trunc(iw/2)*2:trunc(ih/2)*2"" -vcodec qtrle -pix_fmt argb ""%o""";
             FFmpegDefaultExtension = ".mov";
@@ -246,7 +246,7 @@ namespace WzComparerR2
         {
             GifEncoder = 3;
             BackgroundType = ImageBackgroundType.Transparent;
-            slider1.Value = 0;
+            MinMixedAlpha = 0;
             BackgroundColor = Color.White;
             FFmpegArgument = @$"-y -f rawvideo -pixel_format bgra -s %w*%h -r 1000/%t -i ""%i"" -vf ""crop=trunc(iw/2)*2:trunc(ih/2)*2"" -vcodec libvpx-vp9 -pix_fmt yuva420p ""%o""";
             FFmpegDefaultExtension = ".webm";
@@ -256,7 +256,7 @@ namespace WzComparerR2
         {
             GifEncoder = 0;
             BackgroundType = ImageBackgroundType.Transparent;
-            slider1.Value = 0;
+            MinMixedAlpha = 0;
             BackgroundColor = Color.White;
             FFmpegArgument = string.Empty;
             FFmpegDefaultExtension = string.Empty;
