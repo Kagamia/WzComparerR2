@@ -45,7 +45,7 @@ namespace WzComparerR2.Rendering
             Texture2D t2d;
             if (format == SurfaceFormatEx.BC7)
             {
-                t2d = Texture2DEx.Create_BC7(graphicsDevice, png.Width, png.Height);
+                t2d = Texture2DEx.Create_BC7(graphicsDevice, png.Width & ~3, png.Height & ~3);
             }
             else
             {
@@ -58,6 +58,11 @@ namespace WzComparerR2.Rendering
         public static void ToTexture(this Wz_Png png, int page, Texture2D texture, Point origin)
         {
             Rectangle rect = new Rectangle(origin, new Point(png.Width, png.Height));
+            if (png.Format == Wz_TextureFormat.BC7)
+            {
+                rect.Width = png.Width & ~3;
+                rect.Height = png.Height & ~3;
+            }
 
             //检查大小
             if (rect.X < 0 || rect.Y < 0 || rect.Right > texture.Width || rect.Bottom > texture.Height)
@@ -109,7 +114,7 @@ namespace WzComparerR2.Rendering
                         break;
 
                     case Wz_TextureFormat.BC7 when png.ActualScale == 1:
-                        texture.SetDataBC7(rawData.AsSpan(0, bufferSize));
+                        texture.SetDataBC7(rawData.AsSpan(0, bufferSize), png.Width * 4);
                         break;
 
                     default:

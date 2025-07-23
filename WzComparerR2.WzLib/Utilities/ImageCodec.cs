@@ -163,21 +163,23 @@ namespace WzComparerR2.WzLib.Utilities
             }
         }
 
-        public static void BC7ToRGBA32(ReadOnlySpan<byte> blockData, Span<byte> outputRgbaPixels, int width, int stride, int height)
+        public static void BC7ToRGBA32(ReadOnlySpan<byte> blockData, int srcStride, Span<byte> outputRgbaPixels, int width, int stride, int height)
         {
             Span<BC7Decomp.color_rgba> rgba = stackalloc BC7Decomp.color_rgba[16];
             Span<byte> rgbaBytes = MemoryMarshal.AsBytes(rgba);
 
-            for (int y = 0; y < height; y += 4)
+            int blocksPerRow = width & ~3;
+            for (int y = 0, dataStart = 0; y < height; y += 4, dataStart += srcStride)
             {
+                ReadOnlySpan<byte> dataRow = blockData.Slice(dataStart, srcStride);
                 for (int x = 0; x < width; x += 4)
                 {
-                    BC7Decomp.unpack_bc7(blockData, rgba);
+                    BC7Decomp.unpack_bc7(dataRow, rgba);
                     rgbaBytes.Slice(0, 16).CopyTo(outputRgbaPixels.Slice(y * stride + x * 4));
                     rgbaBytes.Slice(16, 16).CopyTo(outputRgbaPixels.Slice((y + 1) * stride + x * 4));
                     rgbaBytes.Slice(32, 16).CopyTo(outputRgbaPixels.Slice((y + 2) * stride + x * 4));
                     rgbaBytes.Slice(48, 16).CopyTo(outputRgbaPixels.Slice((y + 3) * stride + x * 4));
-                    blockData = blockData.Slice(16);
+                    dataRow = dataRow.Slice(16);
                 }
             }
         }

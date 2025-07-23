@@ -41,18 +41,15 @@ namespace WzComparerR2.Rendering
             return t2d;
         }
 
-        public static unsafe void SetDataBC7(this Texture2D texture, Span<byte> data)
+        public static unsafe void SetDataBC7(this Texture2D texture, Span<byte> data, int pitch)
         {
             if (texture.Format != SurfaceFormatEx.BC7)
                 throw new ArgumentException($"{nameof(SetDataBC7)} can only be used for BC7 format texture.", nameof(texture));
 
             int w = texture.Width;
             int h = texture.Height;
-            w = (w + 3) & ~3;
-            h = (h + 3) & ~3;
-            int pitch = w * 4; //(width+3)/4*16
             int subresourceIndex = 0;
-            int expectedDataSize = w * h; // (w/4)*(h/4)*16
+            int expectedDataSize = pitch * (h / 4); // (w/4)*(h/4)*16
             if (data.Length < expectedDataSize)
                 throw new ArgumentException($"Incorrect data length ({data.Length} < {expectedDataSize}).", nameof(data));
 
