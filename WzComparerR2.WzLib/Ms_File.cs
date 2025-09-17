@@ -36,7 +36,18 @@ namespace WzComparerR2.WzLib
             this.BaseStream = baseStream;
             this.WzStructure = wzs;
             this.leaveOpen = leaveOpen;
-            this.ReadHeader(originalFileName);
+            try
+            {
+                this.ReadHeader(originalFileName);
+            }
+            catch
+            {
+                if (!leaveOpen)
+                {
+                    baseStream.Dispose();
+                }
+                throw;
+            }
             this.Entries = new List<Ms_Entry>(0);
         }
 
