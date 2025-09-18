@@ -695,7 +695,7 @@ namespace WzComparerR2
             advTree1.BeginUpdate();
             try
             {
-                string[] msFileExtensions = { "*.ms", "*.mn" };
+                string[] msFileExtensions = { ".ms", ".mn" };
                 if (msFileExtensions.Any(ext => string.Equals(Path.GetExtension(wzFilePath), ext, StringComparison.OrdinalIgnoreCase)))
                 {
                     wz.LoadMsFile(wzFilePath);
@@ -708,9 +708,9 @@ namespace WzComparerR2
                         string packsDir = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(wzFilePath)), "Packs");
                         if (Directory.Exists(packsDir))
                         {
-                            foreach (var extFilter in msFileExtensions)
+                            foreach (var ext in msFileExtensions)
                             {
-                                foreach (var msFile in Directory.GetFiles(packsDir, extFilter))
+                                foreach (var msFile in Directory.GetFiles(packsDir, $"*{ext}"))
                                 {
                                     wz.LoadMsFile(msFile);
                                 }
