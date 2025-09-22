@@ -74,27 +74,26 @@ namespace WzComparerR2.WzLib
             uint counter = MemoryMarshal.Read<uint>(keyHashData.Slice(8, 4));
 
             using var ps = new PartialStream(this.WzFile.FileStream, this.MsEntry.StartPos, this.MsEntry.SizeAligned, true);
-            var buffer = new byte[this.MsEntry.Size];
-            Span<byte> span = buffer;
+            int cryptedSize = Math.Min(this.MsEntry.Size, 1024);
+            var buffer = new byte[cryptedSize];
+            var part1 = new MemoryStream(buffer);
             ps.Position = 0;
 
             // decrypt initial 1024 bytes
             {
                 var cs = new CryptoStream(ps, new ChaCha20CryptoTransform(imgKey, nonce, counter), CryptoStreamMode.Read);
-                int dataLen = Math.Min(span.Length, 1024);
-                cs.ReadExactly(span.Slice(0, dataLen));
-                span = span.Slice(dataLen);
+                cs.ReadExactly(buffer);
             }
 
-            // copy subsequent bytes
-            // TODO: Use a new Stream class to concat the crypto stream and the original stream to reduce memory usage
-            if (span.Length > 0)
+            if (this.MsEntry.Size <= 1024)
             {
-                ps.ReadExactly(span);
+                return part1;
             }
-
-            var ms = new MemoryStream(buffer);
-            return ms;
+            else
+            {
+                var part2 = new PartialStream(this.WzFile.FileStream, this.MsEntry.StartPos + 1024, this.MsEntry.SizeAligned - 1024, true);
+                return new ConcatenatedStream(part1, part2);
+            }
         }
     }
 }
