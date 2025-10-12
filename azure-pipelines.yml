@@ -38,25 +38,26 @@ steps:
     script: |
       echo [assembly: global::System.Reflection.AssemblyInformationalVersion("2.2.$(Build.BuildNumber)")] >> Build\CommonAssemblyInfo.cs
 
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
   displayName: Restore NuGet packages
   inputs:
     command: 'restore'
-    restoreSolution: '**/*.sln'
+    projects: '$(solution)'
+    feedsToUse: 'select'
 
-- task: VSBuild@1
+- task: DotNetCoreCLI@2
   displayName: Build anycpu
   inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform_anycpu)'
-    configuration: '$(buildConfiguration)'
+    command: 'build'
+    projects: '$(solution)'
+    arguments: '/p:Platform="$(buildPlatform_anycpu)" -c $(buildConfiguration)'
 
-- task: VSBuild@1
+- task: DotNetCoreCLI@2
   displayName: Build x86
   inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform_x86)'
-    configuration: '$(buildConfiguration)'
+    command: 'build'
+    projects: '$(solution)'
+    arguments: '/p:Platform="$(buildPlatform_x86)" -c $(buildConfiguration)'
 
 - task: CmdLine@2
   displayName: Prepare output files
