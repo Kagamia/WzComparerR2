@@ -27,16 +27,15 @@ namespace WzComparerR2.WzLib
         {
             // calc snow key for entry
             uint keyHash = 0x811C9DC5;
-            foreach(var c in (this.WzFile as Ms_File)?.Header.KeySalt)
+            foreach (var c in (this.WzFile as Ms_File)?.Header.KeySalt)
             {
                 keyHash = (keyHash ^ c) * 0x1000193;
-
             }
             byte[] keyHashDigits = keyHash.ToString().Select(v => (byte)(v - '0')).ToArray();
 
-            byte[] imgKey = new byte[16];
+            Span<byte> imgKey = stackalloc byte[16];
             string entryName = this.MsEntry.Name;
-            byte[] entryKey = this.MsEntry.Key;
+            ReadOnlySpan<byte> entryKey = this.MsEntry.Key;
             for (int i = 0; i < imgKey.Length; i++)
             {
                 imgKey[i] = (byte)(i + entryName[i % entryName.Length] * (
@@ -65,7 +64,7 @@ namespace WzComparerR2.WzLib
             {
                 cs.ReadExactly(span);
             }
-            
+
             var ms = new MemoryStream(buffer);
             return ms;
         }

@@ -11,7 +11,7 @@ namespace WzComparerR2.WzLib
         public Wz_Structure()
         {
             this.wz_files = new List<Wz_File>();
-            this.ms_files = new List<Ms_File>();
+            this.ms_files = new List<IMapleStoryFile>();
             this.encryption = new Wz_Crypto();
             this.img_number = 0;
             this.has_basewz = false;
@@ -22,7 +22,7 @@ namespace WzComparerR2.WzLib
         }
 
         public List<Wz_File> wz_files;
-        public List<Ms_File> ms_files;
+        public List<IMapleStoryFile> ms_files;
         public Wz_Crypto encryption;
         public Wz_Node WzNode;
         public int img_number;
@@ -41,9 +41,9 @@ namespace WzComparerR2.WzLib
                 f.Close();
             }
             this.wz_files.Clear();
-            foreach (Ms_File f in this.ms_files)
+            foreach (IMapleStoryFile f in this.ms_files)
             {
-                f.Close();
+                f.Dispose();
             }
             this.ms_files.Clear();
             this.encryption.Reset();
@@ -272,26 +272,63 @@ namespace WzComparerR2.WzLib
 
         private void LoadMsFile(string fileName, ref Wz_Node node)
         {
-            Ms_File file = null;
+            List<Exception> exceptions = new(2);
             if (node == null)
             {
                 node = new Wz_Node(Path.GetFileName(fileName));
             }
-            try
+
+            bool loaded = false;
+            // try ms file v1
+            if (!loaded)
             {
-                file = new Ms_File(fileName, this);
-                file.ReadEntries();
-                file.GetDirTree(node);
-                this.ms_files.Add(file);
-            }
-            catch
-            {
-                if (file != null)
+                Ms_File file = null;
+                try
                 {
-                    file.Close();
-                    this.ms_files.Remove(file);
+                    file = new Ms_File(fileName, this);
+                    file.ReadEntries();
+                    file.GetDirTree(node);
+                    this.ms_files.Add(file);
+                    loaded = true;
                 }
-                throw;
+                catch(Exception ex)
+                {
+                    if (file != null)
+                    {
+                        file.Close();
+                        this.ms_files.Remove(file);
+                    }
+                    exceptions.Add(ex);
+                }
+            }
+
+            // try ms file v2
+            if (!loaded)
+            {
+                Ms_FileV2 file = null;
+                try
+                {
+                    file = new Ms_FileV2(fileName, this);
+                    file.ReadEntries();
+                    file.GetDirTree(node);
+                    this.ms_files.Add(file);
+                    loaded = true;
+                }
+                catch (Exception ex)
+                {
+                    if (file != null)
+                    {
+                        file.Close();
+                        this.ms_files.Remove(file);
+                    }
+                    exceptions.Add(ex);
+                }
+            }
+            
+            // return errors
+            if (!loaded)
+            {
+                throw new AggregateException("Failed to load ms files.", exceptions.ToArray());
             }
         }
 
