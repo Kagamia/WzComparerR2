@@ -673,7 +673,7 @@ namespace WzComparerR2.WzLib
             //输出子节点
             foreach (var child in node.Nodes)
             {
-                DumpAsXml(child, writer);
+                DumpAsXml(child, writer, filterTags);
             }
 
             //结束标识
