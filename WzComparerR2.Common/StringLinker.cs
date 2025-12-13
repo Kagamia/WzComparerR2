@@ -10,6 +10,7 @@ namespace WzComparerR2.Common
         public StringLinker()
         {
             stringEqp = new Dictionary<int, StringResult>();
+            stringFamiliarSkill = new Dictionary<int, StringResult>();
             stringItem = new Dictionary<int, StringResult>();
             stringMap = new Dictionary<int, StringResult>();
             stringMob = new Dictionary<int, StringResult>();
@@ -66,6 +67,31 @@ namespace WzComparerR2.Common
 
                                     AddAllValue(strResult, linkNode);
                                     stringItem[id] = strResult;
+                                }
+                            }
+                        }
+                        break;
+                    case "Familiar.img":
+                    case "FamiliarSkill.img":
+                        if (!image.TryExtract()) break;
+                        foreach (Wz_Node tree0 in image.Node.Nodes)
+                        {
+                            if (tree0.Text == "skill")
+                            {
+                                foreach (Wz_Node tree1 in tree0.Nodes)
+                                {
+                                    if (Int32.TryParse(tree1.Text, out id) && tree1.ResolveUol() is Wz_Node linkNode)
+                                    {
+                                        StringResult strResult = null;
+                                        if (strResult == null) strResult = new StringResult();
+
+                                        strResult.Name = GetDefaultString(linkNode, "name") ?? strResult.Name ?? string.Empty;
+                                        strResult.Desc = GetDefaultString(linkNode, "desc") ?? strResult.Desc;
+                                        strResult.FullPath = tree1.FullPath;
+
+                                        AddAllValue(strResult, linkNode);
+                                        stringFamiliarSkill[id] = strResult;
+                                    }
                                 }
                             }
                         }
@@ -191,6 +217,7 @@ namespace WzComparerR2.Common
         public void Clear()
         {
             stringEqp.Clear();
+            stringFamiliarSkill.Clear();
             stringItem.Clear();
             stringMob.Clear();
             stringMap.Clear();
@@ -209,6 +236,7 @@ namespace WzComparerR2.Common
         }
 
         private Dictionary<int, StringResult> stringEqp;
+        private Dictionary<int, StringResult> stringFamiliarSkill;
         private Dictionary<int, StringResult> stringItem;
         private Dictionary<int, StringResult> stringMap;
         private Dictionary<int, StringResult> stringMob;
@@ -236,6 +264,11 @@ namespace WzComparerR2.Common
         public Dictionary<int, StringResult> StringEqp
         {
             get { return stringEqp; }
+        }
+
+        public Dictionary<int, StringResult> StringFamiliarSkill
+        {
+            get { return stringFamiliarSkill; }
         }
 
         public Dictionary<int, StringResult> StringItem
