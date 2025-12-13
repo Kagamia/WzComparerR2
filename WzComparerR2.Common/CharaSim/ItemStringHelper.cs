@@ -804,34 +804,196 @@ namespace WzComparerR2.CharaSim
             return null;
         }
 
-        private static string ToChineseNumberExpr(long value)
+        public static string ToChineseNumberExpr(long value, bool detailedExpr = false)
         {
-            var sb = new StringBuilder(16);
+            var sb = new StringBuilder(32);
             bool firstPart = true;
             if (value < 0)
             {
                 sb.Append("-");
                 value = -value; // just ignore the exception -2147483648
             }
-            if (value >= 1_0000_0000)
+            if (detailedExpr)
             {
-                long part = value / 1_0000_0000;
-                sb.AppendFormat("{0}亿", part);
-                value -= part * 1_0000_0000;
-                firstPart = false;
+                string[] smallUnits = { "", "十", "百", "千" };
+                string[] bigUnits = { "", "万", "亿", "兆", "京" };
+
+                string digits = value.ToString();
+                int len = digits.Length;
+
+                bool blockHasValue = false;
+                int zeroCount = 0;
+
+                for (int i = 0; i < len; i++)
+                {
+                    int posFromRight = len - i - 1;
+                    int smallUnitIndex = posFromRight % 4;
+                    int bigUnitIndex = posFromRight / 4;
+
+                    char d = digits[i];
+
+                    if (d == '0')
+                    {
+                        zeroCount++;
+                    }
+                    else
+                    {
+                        if (zeroCount > 0 && zeroCount <= 3)
+                        {
+                            sb.Append('0');
+                        }
+
+                        zeroCount = 0;
+
+                        sb.Append(d);
+                        if (smallUnitIndex > 0)
+                            sb.Append(smallUnits[smallUnitIndex]);
+
+                        blockHasValue = true;
+                    }
+
+                    if (smallUnitIndex == 0)
+                    {
+                        if (blockHasValue && bigUnitIndex > 0 && bigUnitIndex < bigUnits.Length)
+                            sb.Append(bigUnits[bigUnitIndex]);
+
+                        blockHasValue = false;
+                        zeroCount = 0;
+                    }
+                }
             }
-            if (value >= 1_0000)
+            else
             {
-                long part = value / 1_0000;
-                sb.Append(firstPart ? null : " ");
-                sb.AppendFormat("{0}万", part);
-                value -= part * 1_0000;
-                firstPart = false;
+                if (value >= 1_0000_0000_0000_0000)
+                {
+                    long part = value / 1_0000_0000_0000_0000;
+                    sb.Append(firstPart ? null : " ");
+                    sb.AppendFormat("{0}京", part);
+                    value -= part * 1_0000_0000_0000_0000;
+                    firstPart = false;
+                }
+                if (value >= 1_0000_0000_0000)
+                {
+                    long part = value / 1_0000_0000_0000;
+                    sb.Append(firstPart ? null : " ");
+                    sb.AppendFormat("{0}兆", part);
+                    value -= part * 1_0000_0000_0000;
+                    firstPart = false;
+                }
+                if (value >= 1_0000_0000)
+                {
+                    long part = value / 1_0000_0000;
+                    sb.Append(firstPart ? null : " ");
+                    sb.AppendFormat("{0}亿", part);
+                    value -= part * 1_0000_0000;
+                    firstPart = false;
+                }
+                if (value >= 1_0000)
+                {
+                    long part = value / 1_0000;
+                    sb.Append(firstPart ? null : " ");
+                    sb.AppendFormat("{0}万", part);
+                    value -= part * 1_0000;
+                    firstPart = false;
+                }
+                if (value > 0)
+                {
+                    sb.Append(firstPart ? null : " ");
+                    sb.AppendFormat("{0}", value);
+                }
             }
-            if (value > 0)
+
+            return sb.Length > 0 ? sb.ToString() : "0";
+        }
+
+        public static string ToThousandsNumberExpr(long value, bool isMsea = false)
+        {
+            var sb = new StringBuilder(32);
+            bool firstPart = true;
+            if (isMsea)
             {
-                sb.Append(firstPart ? null : " ");
-                sb.AppendFormat("{0}", value);
+                if (value < 0)
+                {
+                    sb.Append("-");
+                    value = -value; // just ignore the exception -2147483648
+                }
+                if (value >= 1_0000_0000_0000_0000)
+                {
+                    long part = value / 1_0000_0000_0000_0000;
+                    sb.Append(firstPart ? null : " ");
+                    sb.AppendFormat("{0}Q", part);
+                    value -= part * 1_0000_0000_0000_0000;
+                    firstPart = false;
+                }
+                if (value >= 1_000_000_000_000)
+                {
+                    long part = value / 1_000_000_000_000;
+                    sb.Append(firstPart ? null : " ");
+                    sb.AppendFormat("{0}T", part);
+                    value -= part * 1_000_000_000_000;
+                    firstPart = false;
+                }
+                if (value >= 1_000_000_000)
+                {
+                    long part = value / 1_000_000_000;
+                    sb.Append(firstPart ? null : " ");
+                    sb.AppendFormat("{0}B", part);
+                    value -= part * 1_000_000_000;
+                    firstPart = false;
+                }
+                if (value >= 1_000_000)
+                {
+                    long part = value / 1_000_000;
+                    sb.Append(firstPart ? null : " ");
+                    sb.AppendFormat("{0}M", part);
+                    value -= part * 1_000_000;
+                    firstPart = false;
+                }
+                if (value >= 1_000)
+                {
+                    long part = value / 1_000;
+                    sb.Append(firstPart ? null : " ");
+                    sb.AppendFormat("{0}K", part);
+                    value -= part * 1_000;
+                    firstPart = false;
+                }
+                if (value > 0)
+                {
+                    sb.Append(firstPart ? null : " ");
+                    sb.AppendFormat("{0}", value);
+                }
+            }
+            else
+            {
+                if (value < 0)
+                {
+                    sb.Append("-");
+                    value = -value; // just ignore the exception -2147483648
+                }
+                /* if (value >= 1_000_000_000_000) // For future proofing
+                {
+                    double part = Math.Round((double)value / 1_000_000_000_000, 1);
+                    sb.AppendFormat("{0}T", part);
+                } */
+                if (value >= 1_000_000_000)
+                {
+                    double part = Math.Round((double)value / 1_000_000_000, 1);
+                    sb.AppendFormat("{0}B", part);
+                }
+                else if (value >= 1_000_000)
+                {
+                    double part = Math.Round((double)value / 1_000_000, 1);
+                    sb.AppendFormat("{0}M", part);
+                }
+                else if (value >= 1_000)
+                {
+                    double part = Math.Round((double)value / 1_000, 1);
+                    sb.AppendFormat("{0}K", part);
+                }
+                else if (value > 0)
+                {
+                    sb.AppendFormat("{0}", value);
+                }
             }
 
             return sb.Length > 0 ? sb.ToString() : "0";
