@@ -101,7 +101,33 @@ namespace WzComparerR2.CharaSim
                             break;
 
                         case "grade":
-                            item.Grade = Convert.ToInt32(subNode.Value);
+                            bool isNumeric = int.TryParse(Convert.ToString(subNode.Value), out _);
+                            if (isNumeric)
+                            {
+                                item.Grade = Convert.ToInt32(subNode.Value);
+                            }
+                            else
+                            {
+                                switch (Convert.ToString(subNode.Value))
+                                {
+                                    default:
+                                    case "normal":
+                                        item.Grade = 0;
+                                        break;
+                                    case "rare":
+                                        item.Grade = 1;
+                                        break;
+                                    case "epic":
+                                        item.Grade = 2;
+                                        break;
+                                    case "unique":
+                                        item.Grade = 3;
+                                        break;
+                                    case "legendary":
+                                        item.Grade = 4;
+                                        break;
+                                }
+                            }
                             break;
 
                         default:
