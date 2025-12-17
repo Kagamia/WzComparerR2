@@ -101,8 +101,7 @@ namespace WzComparerR2.CharaSim
                             break;
 
                         case "grade":
-                            bool isNumeric = int.TryParse(Convert.ToString(subNode.Value), out _);
-                            if (isNumeric)
+                            if (int.TryParse(Convert.ToString(subNode.Value), out _))
                             {
                                 item.Grade = Convert.ToInt32(subNode.Value);
                             }
