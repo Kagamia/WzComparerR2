@@ -111,7 +111,12 @@ namespace WzComparerR2.WzLib
             int old_off = (int)f.FileStream.Position;
             f.FileStream.Position = f.Header.DataStartPosition;
             var br = new WzBinaryReader(f.FileStream, false);
-            if (br.ReadCompressedInt32() <= 0) //只有文件头 无法预判
+            int nodeCount = br.ReadCompressedInt32();
+            if (f.Header.Signature == Wz_Header.PKG2)
+            {
+                nodeCount = f.DecryptPkg2EntryCount(nodeCount);
+            }
+            if (nodeCount <= 0) //只有文件头 无法预判
             {
                 return;
             }

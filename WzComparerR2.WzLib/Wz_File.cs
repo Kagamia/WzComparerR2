@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using WzComparerR2.WzLib.Utilities;
 
@@ -113,64 +113,81 @@ namespace WzComparerR2.WzLib
 
             long filesize = this.FileStream.Length;
             if (filesize < 4) { goto __failed; }
-            
+
             string signature = new string(br.ReadChars(4));
-            if (signature != "PKG1") { goto __failed; }
+            if (signature != Wz_Header.PKG1 && signature != Wz_Header.PKG2) { goto __failed; }
 
             long dataSize = br.ReadInt64();
             int headerSize = br.ReadInt32();
             string copyright = new string(br.ReadChars(headerSize - (int)this.FileStream.Position));
 
-            // encver detecting:
-            // Since KMST1132, wz removed the 2 bytes encver, and use a fixed wzver '777'.
-            // Here we try to read the first 2 bytes from data part and guess if it looks like an encver.
-            bool encverMissing = false;
-            int encver = -1;
-            if (dataSize >= 2)
+            if (signature == Wz_Header.PKG1)
             {
-                this.fileStream.Position = headerSize;
-                encver = br.ReadUInt16();
-                // encver always less than 256
-                if (encver > 0xff)
+                // encver detecting:
+                // Since KMST1132, wz removed the 2 bytes encver, and use a fixed wzver '777'.
+                // Here we try to read the first 2 bytes from data part and guess if it looks like an encver.
+                bool encverMissing = false;
+                int encver = -1;
+                if (dataSize >= 2)
                 {
-                    encverMissing = true;
-                }
-                else if (encver == 0x80)
-                {
-                    // there's an exceptional case that the first field of data part is a compressed int which determined property count,
-                    // if the value greater than 127 and also to be a multiple of 256, the first 5 bytes will become to
-                    //   80 00 xx xx xx
-                    // so we additional check the int value, at most time the child node count in a wz won't greater than 65536.
-                    if (dataSize >= 5)
+                    this.fileStream.Position = headerSize;
+                    encver = br.ReadUInt16();
+                    // encver always less than 256
+                    if (encver > 0xff)
                     {
-                        this.fileStream.Position = headerSize;
-                        int propCount = br.ReadCompressedInt32();
-                        if (propCount > 0 && (propCount & 0xff) == 0 && propCount <= 0xffff)
+                        encverMissing = true;
+                    }
+                    else if (encver == 0x80)
+                    {
+                        // there's an exceptional case that the first field of data part is a compressed int which determined property count,
+                        // if the value greater than 127 and also to be a multiple of 256, the first 5 bytes will become to
+                        //   80 00 xx xx xx
+                        // so we additional check the int value, at most time the child node count in a wz won't greater than 65536.
+                        if (dataSize >= 5)
                         {
-                            encverMissing = true;
+                            this.fileStream.Position = headerSize;
+                            int propCount = br.ReadCompressedInt32();
+                            if (propCount > 0 && (propCount & 0xff) == 0 && propCount <= 0xffff)
+                            {
+                                encverMissing = true;
+                            }
                         }
                     }
                 }
+                else
+                {
+                    // Obviously, if data part have only 1 byte, encver must be deleted.
+                    encverMissing = true;
+                }
+
+                int dataStartPos = headerSize + (encverMissing ? 0 : 2);
+                this.Header = new Wz_Header(signature, copyright, fileName, headerSize, dataSize, filesize, dataStartPos);
+
+                if (encverMissing)
+                {
+                    // not sure if nexon will change this magic version, just hard coded.
+                    this.Header.SetWzVersion(777);
+                    this.Header.VersionChecked = true;
+                    this.Header.Capabilities |= Wz_Capabilities.EncverMissing;
+                }
+                else
+                {
+                    this.Header.SetOrdinalVersionDetector(encver);
+                }
+            }
+            else if (signature == Wz_Header.PKG2)
+            {
+                uint hash1 = br.ReadUInt32();
+                uint hash2 = br.ReadUInt32();
+                int dataStartPos = (int)this.fileStream.Position;
+                Wz_Header header = new(signature, copyright, fileName, headerSize, dataSize, filesize, dataStartPos);
+                header.SetWzVersionPkg2(hash1, hash2);
+                header.VersionChecked = true;
+                this.header = header;
             }
             else
             {
-                // Obviously, if data part have only 1 byte, encver must be deleted.
-                encverMissing = true;
-            }
-
-            int dataStartPos = headerSize + (encverMissing ? 0 : 2);
-            this.Header = new Wz_Header(signature, copyright, fileName, headerSize, dataSize, filesize, dataStartPos);
-
-            if (encverMissing)
-            {
-                // not sure if nexon will change this magic version, just hard coded.
-                this.Header.SetWzVersion(777);
-                this.Header.VersionChecked = true;
-                this.Header.Capabilities |= Wz_Capabilities.EncverMissing;
-            }
-            else
-            {
-                this.Header.SetOrdinalVersionDetector(encver);
+                goto __failed;
             }
 
             return true;
@@ -195,6 +212,35 @@ namespace WzComparerR2.WzLib
             return offset;
         }
 
+        public uint CalcOffsetPkg2(uint filePos, uint hashedOffset)
+        {
+            uint headerLen = (uint)this.header.HeaderSize;
+            uint hashVersion = this.header.HashVersion;
+            uint hash1 = this.header.Pkg2Hash1;
+
+            uint offset = 0xFFFFFFFC + filePos - headerLen;
+            int distance;
+
+            offset = ~offset;
+            offset *= hashVersion;
+            offset -= 0x581C3F6D;
+            offset ^= hash1 * 0x01010101;
+            distance = (byte)((hashVersion ^ hash1) & 0x1F);
+            offset = (offset << distance) | (offset >> (32 - distance));
+            offset ^= hashedOffset;
+            offset += headerLen;
+
+            return offset;
+        }
+
+        public int DecryptPkg2EntryCount(int encryptedEntryCount)
+        {
+            uint hash1 = this.header.Pkg2Hash1;
+            uint hashVersion = this.header.HashVersion;
+            int entryCount = (int)(encryptedEntryCount ^ ((hash1 << 24) + (0x7F4A7C15 * hashVersion)));
+            return entryCount;
+        }
+
         public void GetDirTree(Wz_Node parent, bool useBaseWz = false, bool loadWzAsFolder = false)
         {
             var ps = new PartialStream(this.FileStream, this.header.DataStartPosition, this.fileStream.Length - this.header.DataStartPosition, true);
@@ -206,48 +252,18 @@ namespace WzComparerR2.WzLib
         private void GetDirTree(WzBinaryReader reader, Wz_Node parent, bool useBaseWz = false, bool loadWzAsFolder = false)
         {
             List<string> dirs = new List<string>();
-            int count = reader.ReadCompressedInt32();
-            var cryptoKey = this.WzStructure.encryption.keys;
 
-            for (int i = 0; i < count; i++)
+            if (this.header.Signature == Wz_Header.PKG1)
             {
-                byte nodeType = reader.ReadByte();
-                string name;
-                switch (nodeType)
-                {
-                    case 0x02:
-                        int stringOffAdd = this.Header.HasCapabilities(Wz_Capabilities.EncverMissing) ? 2 : -1;
-                        name = reader.ReadStringAt(reader.ReadInt32() + stringOffAdd, cryptoKey);
-                        break;
-                    case 0x04:
-                    case 0x03:
-                        name = reader.ReadString(cryptoKey);
-                        break;
-                    default:
-                        throw new Exception($"Unknown type {nodeType} in WzDirTree.");
-                }
-
-                int size = reader.ReadCompressedInt32();
-                int cs32 = reader.ReadCompressedInt32();
-                uint pos = (uint)this.fileStream.Position;
-                uint hashOffset = reader.ReadUInt32();
-
-                switch (nodeType)
-                {
-                    case 0x02:
-                    case 0x04:
-                        Wz_Image img = new Wz_Image(name, size, cs32, hashOffset, pos, this);
-                        Wz_Node childNode = parent.Nodes.Add(name);
-                        childNode.Value = img;
-                        img.OwnerNode = childNode;
-                        this.imageCount++;
-                        break;
-
-                    case 0x03:
-                        this.directories.Add(new Wz_Directory(name, size, cs32, hashOffset, pos, this));
-                        dirs.Add(name);
-                        break;
-                }
+                this.ReadDirTree(reader, parent, ref dirs);
+            }
+            else if (this.header.Signature == Wz_Header.PKG2)
+            {
+                this.ReadDirTreePkg2(reader, parent, ref dirs);
+            }
+            else
+            {
+                throw new Exception($"Unknown signature: {this.header.Signature}");
             }
 
             int dirCount = dirs.Count;
@@ -350,6 +366,112 @@ namespace WzComparerR2.WzLib
             parent.Nodes.Trim();
         }
 
+        private void ReadDirTree(WzBinaryReader reader, Wz_Node parent, ref List<string> dirs)
+        {
+            var cryptoKey = this.WzStructure.encryption.keys;
+            int count = reader.ReadCompressedInt32();
+
+            for (int i = 0; i < count; i++)
+            {
+                byte nodeType = reader.ReadByte();
+                string name;
+                switch (nodeType)
+                {
+                    case 0x02:
+                        int stringOffAdd = this.Header.HasCapabilities(Wz_Capabilities.EncverMissing) ? 2 : -1;
+                        name = reader.ReadStringAt(reader.ReadInt32() + stringOffAdd, cryptoKey);
+                        break;
+                    case 0x04:
+                    case 0x03:
+                        name = reader.ReadString(cryptoKey);
+                        break;
+                    default:
+                        throw new Exception($"Unknown type {nodeType} in WzDirTree.");
+                }
+
+                int size = reader.ReadCompressedInt32();
+                int cs32 = reader.ReadCompressedInt32();
+                uint pos = (uint)this.fileStream.Position;
+                uint hashOffset = reader.ReadUInt32();
+
+                switch (nodeType)
+                {
+                    case 0x02:
+                    case 0x04:
+                        Wz_Image img = new Wz_Image(name, size, cs32, hashOffset, pos, this);
+                        Wz_Node childNode = parent.Nodes.Add(name);
+                        childNode.Value = img;
+                        img.OwnerNode = childNode;
+                        this.imageCount++;
+                        break;
+
+                    case 0x03:
+                        this.directories.Add(new Wz_Directory(name, size, cs32, hashOffset, pos, this));
+                        dirs.Add(name);
+                        break;
+                }
+            }
+        }
+
+        private void ReadDirTreePkg2(WzBinaryReader reader, Wz_Node parent, ref List<string> dirs)
+        {
+            var cryptoKey = this.WzStructure.encryption.keys;
+            int count = this.DecryptPkg2EntryCount(reader.ReadCompressedInt32());
+
+            Pkg2DirEntry[] entries = new Pkg2DirEntry[count];
+            for (int i = 0; i < count; i++)
+            {
+                byte nodeType = reader.ReadByte();
+                string name;
+                switch (nodeType)
+                {
+                    case 0x04:
+                    case 0x03:
+                        name = reader.ReadString(cryptoKey);
+                        break;
+                    default:
+                        throw new Exception($"Unknown type {nodeType} in WzDirTree.");
+                }
+
+                int size = reader.ReadCompressedInt32();
+                int cs32 = reader.ReadCompressedInt32();
+                entries[i] = new Pkg2DirEntry
+                {
+                    NodeType = nodeType,
+                    Name = name,
+                    DataLength = size,
+                    Checksum = cs32
+                };
+            }
+
+            int offsetCount = this.DecryptPkg2EntryCount(reader.ReadCompressedInt32());
+            if (offsetCount == count && count > 0)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    uint hashOffset = reader.ReadUInt32();
+                    // use the fie pos after reading hashOffset, this is by design
+                    uint pos = (uint)this.fileStream.Position;
+                    ref Pkg2DirEntry entry = ref entries[i];
+                    switch (entry.NodeType)
+                    {
+                        case 0x04:
+                            Wz_Image img = new Wz_Image(entry.Name, entry.DataLength, entry.Checksum, hashOffset, pos, this);
+                            Wz_Node childNode = parent.Nodes.Add(entry.Name);
+                            childNode.Value = img;
+                            img.OwnerNode = childNode;
+                            this.imageCount++;
+                            break;
+
+                        case 0x03:
+                            this.directories.Add(new Wz_Directory(entry.Name, entry.DataLength, entry.Checksum, hashOffset, pos, this));
+                            dirs.Add(entry.Name);
+                            break;
+                    }
+                }
+            }
+        }
+
         private string getFullPath(Wz_Node parent, string name)
         {
             List<string> path = new List<string>(5);
@@ -449,16 +571,27 @@ namespace WzComparerR2.WzLib
         {
             IWzVersionVerifier wzVersionVerifier;
 
-            switch (this.wzStructure?.WzVersionVerifyMode)
+            if (this.Header.Signature == Wz_Header.PKG1)
             {
-                default:
-                case WzVersionVerifyMode.Default:
-                    wzVersionVerifier = new DefaultVersionVerifier();
-                    break;
+                switch (this.wzStructure?.WzVersionVerifyMode)
+                {
+                    default:
+                    case WzVersionVerifyMode.Default:
+                        wzVersionVerifier = new DefaultVersionVerifier();
+                        break;
 
-                case WzVersionVerifyMode.Fast:
-                    wzVersionVerifier = new FastVersionVerifier();
-                    break;
+                    case WzVersionVerifyMode.Fast:
+                        wzVersionVerifier = new FastVersionVerifier();
+                        break;
+                }
+            }
+            else if (this.header.Signature == Wz_Header.PKG2)
+            {
+                wzVersionVerifier = new Pkg2VersionVerifier();
+            }
+            else
+            {
+                throw new Exception($"Unknown signature: {this.header.Signature}");
             }
 
             wzVersionVerifier.Verify(this);
@@ -727,6 +860,39 @@ namespace WzComparerR2.WzLib
 
                 return wzFile.header.VersionChecked;
             }
+        }
+
+        public class Pkg2VersionVerifier : WzVersionVerifier, IWzVersionVerifier
+        {
+            public bool Verify(Wz_File wzFile)
+            {
+                List<Wz_Image> imgList = EnumerableAllWzImage(wzFile.node).Where(_img => _img.WzFile == wzFile).ToList();
+                this.CalcOffsetPkg2(wzFile, imgList);
+                foreach (Wz_Image img in imgList)
+                {
+                    if (img.Offset < wzFile.header.DirEndPosition || img.Offset + img.Size > wzFile.fileStream.Length)  //img offset out of file size
+                    {
+                        wzFile.header.VersionChecked = false;
+                    }
+                }
+                return wzFile.header.VersionChecked;
+            }
+
+            protected void CalcOffsetPkg2(Wz_File wzFile, IEnumerable<Wz_Image> imgList)
+            {
+                foreach (var img in imgList)
+                {
+                    img.Offset = wzFile.CalcOffsetPkg2(img.HashedOffsetPosition, img.HashedOffset);
+                }
+            }
+        }
+
+        private struct Pkg2DirEntry
+        {
+            public int NodeType;
+            public string Name;
+            public int DataLength;
+            public int Checksum;
         }
     }
 
