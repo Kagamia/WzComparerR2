@@ -293,7 +293,7 @@ namespace WzComparerR2.WzLib
                 });
 #else
                 char[] strBuf = new char[strLen];
-                this.ReadBytes(MemoryMarshal.Cast<char, byte>(strBuf));
+                this.ReadBytes(MemoryMarshal.Cast<char, byte>(strBuf.AsSpan()));
                 return new string(strBuf);
 #endif
             }

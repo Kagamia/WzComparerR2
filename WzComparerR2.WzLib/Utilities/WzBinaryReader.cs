@@ -132,7 +132,7 @@ namespace WzComparerR2.WzLib.Utilities
                     this.BaseStream.ReadExactly(buffer, 0, size * 2);
                     decrypter.Decrypt(buffer, 0, size * 2);
 
-                    Span<char> chars = MemoryMarshal.Cast<byte, char>(buffer).Slice(0, size);
+                    Span<char> chars = MemoryMarshal.Cast<byte, char>(buffer.AsSpan()).Slice(0, size);
                     // TODO: SIMD optimization for net6
                     ushort mask = 0xAAAA;
                     for (int i = 0; i < size; i++)
