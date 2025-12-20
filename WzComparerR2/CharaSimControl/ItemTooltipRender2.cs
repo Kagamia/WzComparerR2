@@ -43,11 +43,19 @@ namespace WzComparerR2.CharaSimControl
         public bool LinkRecipeInfo { get; set; }
         public bool LinkRecipeItem { get; set; }
         public bool ShowNickTag { get; set; }
+        public bool ShowDamageSkin { get; set; }
+        public bool ShowDamageSkinID { get; set; }
+        public bool UseMiniSizeDamageSkin { get; set; }
+        public bool AlwaysUseMseaFormatDamageSkin { get; set; }
+        public bool DisplayUnitOnSingleLine { get; set; }
+        public long DamageSkinNumber { get; set; }
 
         public TooltipRender LinkRecipeInfoRender { get; set; }
         public TooltipRender LinkRecipeGearRender { get; set; }
         public TooltipRender LinkRecipeItemRender { get; set; }
+        public TooltipRender FamiliarRender { get; set; }
         public TooltipRender SetItemRender { get; set; }
+        public TooltipRender DamageSkinRender { get; set; }
 
         public override Bitmap Render()
         {
@@ -142,6 +150,24 @@ namespace WzComparerR2.CharaSimControl
                 if (CharaSimLoader.LoadedSetItems.TryGetValue((int)setID, out setItem))
                 {
                     setItemBmp = RenderSetItem(setItem);
+                }
+            }
+
+            if (this.item.DamageSkinID != null && ShowDamageSkin)
+            {
+                DamageSkin damageSkin = DamageSkin.CreateFromNode(PluginManager.FindWz($@"Etc\DamageSkin.img\{item.DamageSkinID}"), PluginManager.FindWz) ?? DamageSkin.CreateFromNode(PluginManager.FindWz($@"Effect\DamageSkin.img\{item.DamageSkinID}"), PluginManager.FindWz);
+                if (damageSkin != null)
+                {
+                    setItemBmp = RenderDamageSkin(damageSkin);
+                }
+            }
+
+            if (this.item.FamiliarID != null)
+            {
+                Familiar familiar = Familiar.CreateFromNode(PluginManager.FindWz($@"Character\Familiar\{item.FamiliarID}.img"), PluginManager.FindWz);
+                if (familiar != null)
+                {
+                    return RenderFamiliar(familiar);
                 }
             }
 
@@ -526,6 +552,43 @@ namespace WzComparerR2.CharaSimControl
             }
 
             return tags.Count > 0 ? string.Join(", ", tags.ToArray()) : null;
+        }
+
+        private Bitmap RenderDamageSkin(DamageSkin damageSkin)
+        {
+            TooltipRender renderer = this.DamageSkinRender;
+            if (renderer == null)
+            {
+                DamageSkinTooltipRender defaultRenderer = new DamageSkinTooltipRender();
+                defaultRenderer.StringLinker = this.StringLinker;
+                defaultRenderer.ShowObjectID = this.ShowDamageSkinID;
+                defaultRenderer.UseMiniSize = this.UseMiniSizeDamageSkin;
+                defaultRenderer.AlwaysUseMseaFormat = this.AlwaysUseMseaFormatDamageSkin;
+                defaultRenderer.DisplayUnitOnSingleLine = this.DisplayUnitOnSingleLine;
+                defaultRenderer.DamageSkinNumber = this.DamageSkinNumber;
+                renderer = defaultRenderer;
+                defaultRenderer.DamageSkin = damageSkin;
+            }
+            renderer.TargetItem = damageSkin;
+            return renderer.Render();
+        }
+
+        private Bitmap RenderFamiliar(Familiar familiar)
+        {
+            TooltipRender renderer = this.FamiliarRender;
+            if (renderer == null)
+            {
+                FamiliarTooltipRender defaultRenderer = new FamiliarTooltipRender();
+                defaultRenderer.StringLinker = this.StringLinker;
+                defaultRenderer.ShowObjectID = this.ShowObjectID;
+                defaultRenderer.AllowOutOfBounds = false;
+                defaultRenderer.ItemID = this.item.ItemID;
+                defaultRenderer.FamiliarTier = this.item.Grade;
+                defaultRenderer.UseAssembleUI = false;
+                renderer = defaultRenderer;
+            }
+            renderer.TargetItem = familiar;
+            return renderer.Render();
         }
 
         private Bitmap RenderLinkRecipeInfo(Recipe recipe)

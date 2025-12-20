@@ -153,6 +153,7 @@ namespace WzComparerR2
             tooltipQuickView.SkillRender.IgnoreEvalError = Setting.Skill.IgnoreEvalError;
             this.skillDefaultLevel = Setting.Skill.DefaultLevel;
             this.skillInterval = Setting.Skill.IntervalLevel;
+            tooltipQuickView.FamiliarRender.ShowObjectID = Setting.Gear.ShowID;
             tooltipQuickView.GearRender.ShowObjectID = Setting.Gear.ShowID;
             tooltipQuickView.GearRender.ShowSpeed = Setting.Gear.ShowWeaponSpeed;
             tooltipQuickView.GearRender.ShowLevelOrSealed = Setting.Gear.ShowLevelOrSealed;
@@ -161,6 +162,12 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.LinkRecipeInfo = Setting.Item.LinkRecipeInfo;
             tooltipQuickView.ItemRender.LinkRecipeItem = Setting.Item.LinkRecipeItem;
             tooltipQuickView.ItemRender.ShowNickTag = Setting.Item.ShowNickTag;
+            tooltipQuickView.ItemRender.ShowDamageSkin = Setting.DamageSkin.ShowDamageSkin;
+            tooltipQuickView.ItemRender.ShowDamageSkinID = Setting.DamageSkin.ShowDamageSkinID;
+            tooltipQuickView.ItemRender.UseMiniSizeDamageSkin = Setting.DamageSkin.UseMiniSize;
+            tooltipQuickView.ItemRender.AlwaysUseMseaFormatDamageSkin = Setting.DamageSkin.AlwaysUseMseaFormat;
+            tooltipQuickView.ItemRender.DisplayUnitOnSingleLine = Setting.DamageSkin.DisplayUnitOnSingleLine;
+            tooltipQuickView.ItemRender.DamageSkinNumber = Setting.DamageSkin.DamageSkinNumber;
             tooltipQuickView.RecipeRender.ShowObjectID = Setting.Recipe.ShowID;
         }
 
@@ -2681,13 +2688,25 @@ namespace WzComparerR2
                         return;
                     CharaSimLoader.LoadSetItemsIfEmpty();
                     CharaSimLoader.LoadExclusiveEquipsIfEmpty();
-                    var gear = Gear.CreateFromNode(image.Node, PluginManager.FindWz);
-                    obj = gear;
-                    if (gear != null)
+                    if (selectedNode.FullPathToFile.Contains("Familiar"))
                     {
-                        fileName = gear.ItemID + ".png";
+                        var familiar = Familiar.CreateFromNode(image.Node, PluginManager.FindWz);
+                        obj = familiar;
+                        if (familiar != null)
+                        {
+                            fileName = "familiar_" + familiar.FamiliarID + ".png";
+                        }
                     }
-                    break;
+                    else
+                    {
+                        var gear = Gear.CreateFromNode(image.Node, PluginManager.FindWz);
+                        obj = gear;
+                        if (gear != null)
+                        {
+                            fileName = gear.ItemID + ".png";
+                        }
+                    }
+                        break;
                 case Wz_Type.Item:
                     Wz_Node itemNode = selectedNode;
                     if (Regex.IsMatch(itemNode.FullPathToFile, @"^Item\\(Cash|Consume|Etc|Install|Cash)\\\d{4,6}.img\\\d+$"))
