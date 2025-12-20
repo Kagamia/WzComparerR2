@@ -562,10 +562,25 @@ namespace WzComparerR2.WzLib
             return wzImg;
         }
 
-        public static void DumpAsXml(this Wz_Node node, XmlWriter writer)
+        public static void DumpAsXml(this Wz_Node node, XmlWriter writer) 
+        {
+            DumpAsXml(node, writer, null);
+        }
+
+        public static void DumpAsXml(this Wz_Node node, XmlWriter writer, IList<string> filterTags)
         {
             object value = node.Value;
 
+            // 过滤：根据 tag 名称（类名小写）匹配
+            if (filterTags != null && value != null) {
+                var currentTag = value.GetType().Name.ToLower();  // 例如 "wz_int"
+                foreach (var tag in filterTags) {
+                    if (tag != null && currentTag == tag.Trim().ToLower()) {
+                        return; // 匹配到，跳过输出
+                    }
+                }
+            }
+            
             if (value == null || value is Wz_Image)
             {
                 writer.WriteStartElement("dir");
@@ -658,7 +673,7 @@ namespace WzComparerR2.WzLib
             //输出子节点
             foreach (var child in node.Nodes)
             {
-                DumpAsXml(child, writer);
+                DumpAsXml(child, writer, filterTags);
             }
 
             //结束标识
