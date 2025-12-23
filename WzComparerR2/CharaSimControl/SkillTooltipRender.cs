@@ -57,8 +57,7 @@ namespace WzComparerR2.CharaSimControl
 
             picH = 33; //iconY
 
-            StringResult sr;
-            if (!StringLinker.StringSkill.TryGetValue(skill.SkillID, out sr))
+            if (!(StringLinker.StringSkill.TryGetValue(skill.SkillID, out var _sr) && _sr is StringResultSkill sr))
             {
                 sr = new StringResultSkill();
                 sr.Name = "(null)";

@@ -70,7 +70,7 @@ namespace WzComparerR2
             skillHTable.Columns.Add("ph", typeof(string));
             skillHTable.Columns.Add("hch", typeof(string));
 
-            StringResult sr;
+            StringResultSkill sr;
 
             foreach (Wz_Node node in skillWz.Nodes)
             {
@@ -87,8 +87,8 @@ namespace WzComparerR2
                 }
                 //导入职业
                 string jobID = m.Result("$1");
-                sl.StringSkill2.TryGetValue(jobID, out sr);
-                jobTable.Rows.Add(jobID, (sr != null ? sr["bookName"] : null));
+                sl.StringSkill2.TryGetValue(jobID, out var _sr);
+                jobTable.Rows.Add(jobID, (_sr != null ? _sr["bookName"] : null));
 
                 //获取技能
                 Wz_Node skillListNode = img.Node.FindNodeByPath("skill");
@@ -108,8 +108,8 @@ namespace WzComparerR2
 
                     //导入技能
                     string skillID = skillNode.Text;
-                    sl.StringSkill2.TryGetValue(skillID, out sr);
-
+                    sl.StringSkill2.TryGetValue(skillID, out _sr);
+                    sr = _sr as StringResultSkill;
                     string reqSkill = null;
                     int reqSkillLevel = 0;
                     if (skill.ReqSkill.Count > 0)

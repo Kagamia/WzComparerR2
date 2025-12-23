@@ -215,14 +215,14 @@ namespace WzComparerR2.CharaSim
             return false;
         }
 
-        public static string GetSkillSummary(Skill skill, StringResult sr, SummaryParams param)
+        public static string GetSkillSummary(Skill skill, StringResultSkill sr, SummaryParams param)
         {
             if (skill == null)
                 return null;
             return GetSkillSummary(skill, skill.Level, sr, param);
         }
 
-        public static string GetSkillSummary(Skill skill, int level, StringResult sr, SummaryParams param, SkillSummaryOptions options = default)
+        public static string GetSkillSummary(Skill skill, int level, StringResultSkill sr, SummaryParams param, SkillSummaryOptions options = default)
         {
             if (skill == null || sr == null)
                 return null;
@@ -231,7 +231,7 @@ namespace WzComparerR2.CharaSim
             if (skill.PreBBSkill) //用level声明的技能
             {
                 string hsSummary;
-                if (skill.Level == level && skill.Common.TryGetValue("hs", out string hs) 
+                if (skill.Level == level && skill.Common.TryGetValue("hs", out string hs)
                     && (hsSummary = sr[hs]) != null) // fix for skill 170001005, 170011005
                 {
                     h = hsSummary;
@@ -252,6 +252,18 @@ namespace WzComparerR2.CharaSim
                 if (sr.SkillH.Count > 0)
                 {
                     h = sr.SkillH[0];
+                }
+                if (sr.SkillExtraH.Count > 0)
+                {
+                    // SkillExtraH is always sorted
+                    foreach (var kv in sr.SkillExtraH)
+                    {
+                        if (level < kv.Key)
+                        {
+                            break;
+                        }
+                        h = kv.Value;
+                    }
                 }
                 return GetSkillSummary(h, level, skill.Common, param, options);
             }

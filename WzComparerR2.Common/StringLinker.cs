@@ -156,7 +156,7 @@ namespace WzComparerR2.Common
                             {
                                 continue;
                             }
-                            StringResult strResult = new StringResultSkill();
+                            StringResultSkill strResult = new StringResultSkill();
                             strResult.Name = GetDefaultString(linkNode, "name");//?? GetDefaultString(tree, "bookName");
                             strResult.Desc = GetDefaultString(linkNode, "desc");
                             strResult.Pdesc = GetDefaultString(linkNode, "pdesc");
@@ -173,6 +173,18 @@ namespace WzComparerR2.Common
                                         break;
                                     strResult.SkillH.Add(hi);
                                 }
+                            }
+                            // KMST1196, add h_ prefix strings
+                            foreach (Wz_Node child in linkNode.Nodes)
+                            {
+                                if (child.Text.StartsWith("h_") && int.TryParse(child.Text.Substring(2), out int level) && level > 0 && child.Value != null)
+                                {
+                                    strResult.SkillExtraH.Add(new KeyValuePair<int, string>(level, child.GetValue<string>()));
+                                }
+                            }
+                            if (strResult.SkillExtraH.Count > 1)
+                            {
+                                strResult.SkillExtraH.Sort((left, right) => left.Key.CompareTo(right.Key));
                             }
                             strResult.SkillH.TrimExcess();
                             strResult.SkillpH.TrimExcess();

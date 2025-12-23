@@ -89,8 +89,7 @@ namespace WzComparerR2.CharaSimControl
             splitterH = new List<int>();
 
             //获取文字
-            StringResult sr;
-            if (StringLinker == null || !StringLinker.StringSkill.TryGetValue(Skill.SkillID, out sr))
+            if (StringLinker == null || !(StringLinker.StringSkill.TryGetValue(Skill.SkillID, out var _sr) && _sr is StringResultSkill sr))
             {
                 sr = new StringResultSkill();
                 sr.Name = "(null)";
@@ -216,9 +215,9 @@ namespace WzComparerR2.CharaSimControl
                 foreach (var kv in Skill.ReqSkill)
                 {
                     string skillName;
-                    if (this.StringLinker != null && this.StringLinker.StringSkill.TryGetValue(kv.Key, out sr))
+                    if (this.StringLinker != null && this.StringLinker.StringSkill.TryGetValue(kv.Key, out var sr2))
                     {
-                        skillName = sr.Name;
+                        skillName = sr2.Name;
                     }
                     else
                     {
