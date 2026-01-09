@@ -12,6 +12,7 @@ namespace WzComparerR2.MapRender.Patches2
         public int Ani { get; set; }
         public string No { get; set; }
         public string SpineAni { get; set; }
+        public int? SpineNo { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
         public int Cx { get; set; }
@@ -35,6 +36,7 @@ namespace WzComparerR2.MapRender.Patches2
                 Ani = node.Nodes["ani"].GetValueEx<int>(0),
                 No = node.Nodes["no"].GetValueEx<string>(null),
                 SpineAni = node.Nodes["spineAni"].GetValueEx<string>(null),
+                SpineNo = node.Nodes["spineNo"].GetValueEx<int?>(null),
 
                 X = node.Nodes["x"].GetValueEx(0),
                 Y = node.Nodes["y"].GetValueEx(0),
