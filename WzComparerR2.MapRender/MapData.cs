@@ -650,7 +650,7 @@ namespace WzComparerR2.MapRender
             {
                 case 0: aniDir = "back"; break;
                 case 1: aniDir = "ani"; break;
-                case 2: aniDir = "spine"; break;
+                case 2: aniDir = $"spine{back.SpineNo}"; break;
                 default: throw new Exception($"Unknown back ani value: {back.Ani}.");
             }
             string path = $@"Map\Back\{back.BS}.img\{aniDir}\{back.No}";
