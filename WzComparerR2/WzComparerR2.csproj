@@ -47,6 +47,7 @@
     <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj" />
     <ProjectReference Include="..\CharaSimResource\CharaSimResource.csproj" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="$(MonogameFrameworkVersion)" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="SharpDX" Version="$(SharpDXVersion)" />
     <PackageReference Include="ManagedBass" Version="3.1.1" />
     <PackageReference Include="System.Resources.Extensions" Version="$(SystemResourcesExtensionsVersion)" />
