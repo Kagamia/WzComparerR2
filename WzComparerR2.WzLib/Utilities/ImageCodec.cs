@@ -332,6 +332,70 @@ namespace WzComparerR2.WzLib.Utilities
             }
         }
 
+        public static void R16ToBGRA64(ReadOnlySpan<byte> r16Pixels, Span<byte> outputBgraPixels)
+        {
+#if NET6_0_OR_GREATER
+            //    0                        8                        16                       24
+            //    r1 r1 r2 r2 r3 r3 r4 r4  r1 r1 r2 r2 r3 r3 r4 r4  r1 r1 r2 r2 r3 r3 r4 r4  r1 r1 r2 r2 r3 r3 r4 r4
+            // => 00 00 00 00 r1 r1 ff ff  00 00 00 00 r2 r2 ff ff  00 00 00 00 r3 r3 ff ff  00 00 00 00 r4 r4 ff ff
+            if (r16Pixels.Length >= 8 && Avx2.IsSupported)
+            {
+                var mask1 = Vector256.Create((byte)255, 255, 255, 255, 0, 1, 255, 255, 
+                    255, 255, 255, 255, 2, 3, 255, 255,
+                    255, 255, 255, 255, 4, 5, 255, 255, 
+                    255, 255, 255, 255, 6, 7, 255, 255);
+                var mask2 = Vector256.Create(0xffff_0000_0000_0000u).AsByte();
+                unsafe
+                {
+                    while (r16Pixels.Length >= 8)
+                    {
+                        ulong vec64 = MemoryMarshal.Read<ulong>(r16Pixels);
+                        var ymm0 = Vector256.Create(vec64);
+                        var ymm1 = Avx2.Shuffle(ymm0.AsByte(), mask1);
+                        ymm1 = Avx2.Or(ymm1, mask2);
+                        fixed (byte* pOutput = outputBgraPixels)
+                            Avx.Store(pOutput, ymm1);
+                        r16Pixels = r16Pixels.Slice(8);
+                        outputBgraPixels = outputBgraPixels.Slice(32);
+                    }
+                }
+            }
+            if (r16Pixels.Length >= 4 && Ssse3.IsSupported)
+            {
+                //    0                        8                      
+                //    r1 r1 r2 r2 r1 r1 r2 r2  r1 r1 r2 r2 r1 r1 r2 r2
+                // => 00 00 00 00 r1 r1 ff ff  00 00 00 00 r2 r2 ff ff
+                var mask1 = Vector128.Create((byte)255, 255, 255, 255, 0, 1, 255, 255, 
+                    255, 255, 255, 255, 2, 3, 255, 255);
+                var mask2 = Vector128.Create(0xffff_0000_0000_0000u).AsByte();
+                unsafe
+                {
+                    while (r16Pixels.Length >= 4)
+                    {
+                        uint vec32 = MemoryMarshal.Read<uint>(r16Pixels);
+                        var xmm0 = Vector128.Create(vec32);
+                        var xmm1 = Ssse3.Shuffle(xmm0.AsByte(), mask1);
+                        xmm1 = Sse2.Or(xmm1, mask2);
+                        fixed (byte* pOutput = outputBgraPixels)
+                            Sse2.Store(pOutput, xmm1);
+                        r16Pixels = r16Pixels.Slice(4);
+                        outputBgraPixels = outputBgraPixels.Slice(16);
+                    }
+                }
+            }
+#endif
+            if (r16Pixels.Length >= 2)
+            {
+                while (r16Pixels.Length >= 2)
+                {
+                    ulong pixel = 0xffff0000_00000000 | ((ulong)MemoryMarshal.Read<ushort>(r16Pixels) << 32);
+                    MemoryMarshal.Write(outputBgraPixels, ref pixel);
+                    r16Pixels = r16Pixels.Slice(2);
+                    outputBgraPixels = outputBgraPixels.Slice(8);
+                }
+            }
+        }
+
         #region DXT1 Color
         private static ColorBgra RGB565ToBGRA32(ushort val)
         {

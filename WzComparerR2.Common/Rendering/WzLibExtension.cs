@@ -42,15 +42,12 @@ namespace WzComparerR2.Rendering
                 }
             }
 
-            Texture2D t2d;
-            if (format == SurfaceFormatEx.BC7)
+            Texture2D t2d = format switch
             {
-                t2d = Texture2DEx.Create_BC7(graphicsDevice, png.Width & ~3, png.Height & ~3);
-            }
-            else
-            {
-                t2d = new Texture2D(graphicsDevice, png.Width, png.Height, false, format);
-            }
+                SurfaceFormatEx.BC7 => Texture2DEx.CreateEx(graphicsDevice, png.Width & ~3, png.Height & ~3, format),
+                SurfaceFormatEx.R16 => Texture2DEx.CreateEx(graphicsDevice, png.Width, png.Height, format),
+                _ => new Texture2D(graphicsDevice, png.Width, png.Height, false, format),
+            };
             png.ToTexture(page, t2d, Point.Zero);
             return t2d;
         }
@@ -114,7 +111,11 @@ namespace WzComparerR2.Rendering
                         break;
 
                     case Wz_TextureFormat.BC7 when png.ActualScale == 1:
-                        texture.SetDataBC7(rawData.AsSpan(0, bufferSize), png.Width * 4);
+                        texture.SetDataEx(rawData.AsSpan(0, bufferSize), png.Width * 4);
+                        break;
+
+                    case Wz_TextureFormat.R16 when png.ActualScale == 1:
+                        texture.SetDataEx(rawData.AsSpan(0, bufferSize), png.Width * 2);
                         break;
 
                     default:
@@ -133,6 +134,7 @@ namespace WzComparerR2.Rendering
                 case Wz_TextureFormat.ARGB8888: return SurfaceFormat.Bgra32;
                 case Wz_TextureFormat.ARGB1555: return SurfaceFormat.Bgra5551;
                 case Wz_TextureFormat.RGB565: return SurfaceFormat.Bgr565;
+                case Wz_TextureFormat.R16: return SurfaceFormatEx.R16;
                 case Wz_TextureFormat.DXT3: return SurfaceFormat.Dxt3;
                 case Wz_TextureFormat.DXT5: return SurfaceFormat.Dxt5;
                 case Wz_TextureFormat.A8: return SurfaceFormat.Alpha8;

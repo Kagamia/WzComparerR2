@@ -293,6 +293,17 @@ namespace WzComparerR2.WzLib
                     pngDecoded.UnlockBits(bmpdata);
                     break;
 
+                case Wz_TextureFormat.R16:
+                    pngDecoded = new Bitmap(this.Width, this.Height, PixelFormat.Format64bppArgb);
+                    bmpdata = pngDecoded.LockBits(new Rectangle(Point.Empty, pngDecoded.Size), ImageLockMode.WriteOnly, pngDecoded.PixelFormat);
+                    unsafe
+                    {
+                        Span<byte> output = new Span<byte>(bmpdata.Scan0.ToPointer(), bmpdata.Stride * bmpdata.Height);
+                        ImageCodec.R16ToBGRA64(pixel, output);
+                    }
+                    pngDecoded.UnlockBits(bmpdata);
+                    break;
+
                 default:
                     throw new Exception($"Unsupported format ({this.Format}, scale={this.ActualScale}).");
             }
@@ -335,7 +346,8 @@ namespace WzComparerR2.WzLib
             {
                 Wz_TextureFormat.ARGB4444 or
                 Wz_TextureFormat.ARGB1555 or
-                Wz_TextureFormat.RGB565 => width * height * 2,
+                Wz_TextureFormat.RGB565 or
+                Wz_TextureFormat.R16 => width * height * 2,
 
                 Wz_TextureFormat.ARGB8888 or
                 Wz_TextureFormat.RGBA1010102 => width * height * 4,
@@ -364,6 +376,8 @@ namespace WzComparerR2.WzLib
         ARGB8888 = 2,
         ARGB1555 = 257,
         RGB565 = 513,
+        /* introduced in KMST 1197 */
+        R16 = 769,
         DXT3 = 1026,
         DXT5 = 2050,
         /* introduced in KMST 1186 */
