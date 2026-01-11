@@ -178,13 +178,10 @@ namespace WzComparerR2
                         }
                     }
                 }
-                if (!File.Exists(Path.Combine(currentDirectory, "Updater.exe")))
+                object UpdaterFile = Properties.Resources.ResourceManager.GetObject("Updater");
+                if (UpdaterFile is byte[] fileData)
                 {
-                    object UpdaterFile = Properties.Resources.ResourceManager.GetObject("Updater");
-                    if (UpdaterFile is byte[] fileData)
-                    {
-                        File.WriteAllBytes(Path.Combine(currentDirectory, "Updater.exe"), fileData);
-                    }
+                    File.WriteAllBytes(Path.Combine(currentDirectory, "Updater.exe"), fileData);
                 }
                 RunProgram("Updater.exe", "\"" + savePath + "\"");
             }
