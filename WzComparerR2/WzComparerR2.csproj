@@ -38,6 +38,17 @@
     <Reference Include="System.Configuration" />
     <PackageReference Include="System.ValueTuple" Version="4.6.1" />
   </ItemGroup>
+  <ItemGroup Condition="$(DotnetEdition) == 'core'">
+    <EmbeddedResource Include="..\WzComparerR2.Updater\bin\$(Configuration)\$(TargetFramework)\Updater.deps.json" />
+    <EmbeddedResource Include="..\WzComparerR2.Updater\bin\$(Configuration)\$(TargetFramework)\Updater.dll" />
+    <EmbeddedResource Include="..\WzComparerR2.Updater\bin\$(Configuration)\$(TargetFramework)\Updater.dll.config" />
+    <EmbeddedResource Include="..\WzComparerR2.Updater\bin\$(Configuration)\$(TargetFramework)\Updater.exe" />
+    <EmbeddedResource Include="..\WzComparerR2.Updater\bin\$(Configuration)\$(TargetFramework)\Updater.runtimeconfig.json" />
+  </ItemGroup>
+  <ItemGroup Condition="$(DotnetEdition) == 'framework'">
+    <EmbeddedResource Include="..\WzComparerR2.Updater\bin\$(Configuration)\$(TargetFramework)\Updater.exe" />
+    <EmbeddedResource Include="..\WzComparerR2.Updater\bin\$(Configuration)\$(TargetFramework)\Updater.exe.config" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="wcr2_256.ico" />
   </ItemGroup>
@@ -45,8 +56,12 @@
     <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj" />
     <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj" />
     <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj" />
+    <ProjectReference Include="..\WzComparerR2.Updater\WzComparerR2.Updater.csproj">
+        <Private>false</Private>
+    </ProjectReference>
     <ProjectReference Include="..\CharaSimResource\CharaSimResource.csproj" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="$(MonogameFrameworkVersion)" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="SharpDX" Version="$(SharpDXVersion)" />
     <PackageReference Include="ManagedBass" Version="3.1.1" />
     <PackageReference Include="System.Resources.Extensions" Version="$(SystemResourcesExtensionsVersion)" />

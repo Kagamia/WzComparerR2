@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2.Avatar", "WzCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2.Network", "WzComparerR2.Network\WzComparerR2.Network.csproj", "{EBDA4AE9-4BCE-4824-84B5-B15660437141}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WzComparerR2.Updater", "WzComparerR2.Updater\WzComparerR2.Updater.csproj", "{C884A04D-D8B9-4F68-BD9D-FD701A27E661}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +143,18 @@ Global
 		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Release|x64.Build.0 = Release|Any CPU
 		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Release|x86.ActiveCfg = Release|Any CPU
 		{EBDA4AE9-4BCE-4824-84B5-B15660437141}.Release|x86.Build.0 = Release|Any CPU
+		{C884A04D-D8B9-4F68-BD9D-FD701A27E661}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C884A04D-D8B9-4F68-BD9D-FD701A27E661}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C884A04D-D8B9-4F68-BD9D-FD701A27E661}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C884A04D-D8B9-4F68-BD9D-FD701A27E661}.Debug|x64.Build.0 = Debug|Any CPU
+		{C884A04D-D8B9-4F68-BD9D-FD701A27E661}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C884A04D-D8B9-4F68-BD9D-FD701A27E661}.Debug|x86.Build.0 = Debug|Any CPU
+		{C884A04D-D8B9-4F68-BD9D-FD701A27E661}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C884A04D-D8B9-4F68-BD9D-FD701A27E661}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C884A04D-D8B9-4F68-BD9D-FD701A27E661}.Release|x64.ActiveCfg = Release|Any CPU
+		{C884A04D-D8B9-4F68-BD9D-FD701A27E661}.Release|x64.Build.0 = Release|Any CPU
+		{C884A04D-D8B9-4F68-BD9D-FD701A27E661}.Release|x86.ActiveCfg = Release|Any CPU
+		{C884A04D-D8B9-4F68-BD9D-FD701A27E661}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

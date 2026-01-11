@@ -18,6 +18,7 @@ namespace WzComparerR2.Config
             this.SortWzOnOpened = true;
             this.AutoDetectExtFiles = true;
             this.WzVersionVerifyMode = WzLib.WzVersionVerifyMode.Fast;
+            this.EnableAutoUpdate = true;
         }
 
         /// <summary>
@@ -125,6 +126,17 @@ namespace WzComparerR2.Config
         public PatcherSettingCollection PatcherSettings
         {
             get { return (PatcherSettingCollection)this["patcherSettings"]; }
+        }
+
+
+        /// <summary>
+        /// 获取或设置一个值，指示Release版本下是否需要自动检查更新。
+        /// </summary>
+        [ConfigurationProperty("EnableAutoUpdate")]
+        public ConfigItem<bool> EnableAutoUpdate
+        {
+            get { return (ConfigItem<bool>)this["EnableAutoUpdate"]; }
+            set { this["EnableAutoUpdate"] = value; }
         }
     }
 }
