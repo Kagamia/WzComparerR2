@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using WzComparerR2.WzLib.Utilities;
@@ -182,7 +183,6 @@ namespace WzComparerR2.WzLib
                 int dataStartPos = (int)this.fileStream.Position;
                 Wz_Header header = new(signature, copyright, fileName, headerSize, dataSize, filesize, dataStartPos);
                 header.SetWzVersionPkg2(hash1, hash2);
-                header.VersionChecked = true;
                 this.header = header;
             }
             else
@@ -239,6 +239,13 @@ namespace WzComparerR2.WzLib
             uint hashVersion = this.header.HashVersion;
             int entryCount = (int)(encryptedEntryCount ^ ((hash1 << 24) + (0x7F4A7C15 * hashVersion)));
             return entryCount;
+        }
+
+        public uint CalcHashVersionFromEntryCount(int encryptedEntryCount, int entryCount)
+        {
+            // calculate with modular inverse:
+            uint hash1 = this.header.Pkg2Hash1;
+            return ((uint)(entryCount ^ encryptedEntryCount) - (hash1 << 24)) * 0x9937733D;
         }
 
         public void GetDirTree(Wz_Node parent, bool useBaseWz = false, bool loadWzAsFolder = false)
@@ -416,43 +423,49 @@ namespace WzComparerR2.WzLib
         private void ReadDirTreePkg2(WzBinaryReader reader, Wz_Node parent, ref List<string> dirs)
         {
             var cryptoKey = this.WzStructure.encryption.keys;
-            int count = this.DecryptPkg2EntryCount(reader.ReadCompressedInt32());
+            int encryptedEntryCount = reader.ReadCompressedInt32();
 
-            Pkg2DirEntry[] entries = new Pkg2DirEntry[count];
-            for (int i = 0; i < count; i++)
+            List<Pkg2DirEntry> entries = new();
+            while (true)
             {
                 byte nodeType = reader.ReadByte();
                 string name;
-                switch (nodeType)
+                if (nodeType == 0x03 || nodeType == 0x04)
                 {
-                    case 0x04:
-                    case 0x03:
-                        name = reader.ReadString(cryptoKey);
-                        break;
-                    default:
-                        throw new Exception($"Unknown type {nodeType} in WzDirTree.");
+                    name = reader.ReadString(cryptoKey);
+                }
+                else if (nodeType == 0x80 || (-127 <= encryptedEntryCount && encryptedEntryCount <= 127 && nodeType == encryptedEntryCount))
+                {
+                    // next byte is encryptedOffsetCount
+                    reader.BaseStream.Position--;
+                    break;
+                }
+                else
+                {
+                    throw new Exception($"Unknown type {nodeType} in WzDirTree.");
                 }
 
                 int size = reader.ReadCompressedInt32();
                 int cs32 = reader.ReadCompressedInt32();
-                entries[i] = new Pkg2DirEntry
+                entries.Add(new Pkg2DirEntry
                 {
                     NodeType = nodeType,
                     Name = name,
                     DataLength = size,
                     Checksum = cs32
-                };
+                });
             }
 
-            int offsetCount = this.DecryptPkg2EntryCount(reader.ReadCompressedInt32());
-            if (offsetCount == count && count > 0)
+            int encryptedOffsetCount = reader.ReadCompressedInt32();
+            if (encryptedOffsetCount == encryptedEntryCount && entries.Count > 0)
             {
-                for (int i = 0; i < count; i++)
+                Span<Pkg2DirEntry> list = CollectionsMarshal.AsSpan(entries);
+                for (int i = 0; i < list.Length; i++)
                 {
                     uint hashOffset = reader.ReadUInt32();
                     // use the fie pos after reading hashOffset, this is by design
                     uint pos = (uint)this.fileStream.Position;
-                    ref Pkg2DirEntry entry = ref entries[i];
+                    ref Pkg2DirEntry entry = ref list[i];
                     switch (entry.NodeType)
                     {
                         case 0x04:
@@ -623,6 +636,8 @@ namespace WzComparerR2.WzLib
 
         public abstract class WzVersionVerifier
         {
+            protected abstract uint CalcOffset(Wz_File wzFile, uint filePos, uint hashedOffset);
+
             protected IEnumerable<Wz_Image> EnumerableAllWzImage(Wz_Node parentNode)
             {
                 foreach (var node in parentNode.Nodes)
@@ -661,7 +676,7 @@ namespace WzComparerR2.WzLib
             {
                 foreach (var img in imgList)
                 {
-                    img.Offset = wzFile.CalcOffset(img.HashedOffsetPosition, img.HashedOffset);
+                    img.Offset = this.CalcOffset(wzFile, img.HashedOffsetPosition, img.HashedOffset);
                 }
             }
 
@@ -669,7 +684,7 @@ namespace WzComparerR2.WzLib
             {
                 while (wzFile.header.TryGetNextVersion())
                 {
-                    uint offs = wzFile.CalcOffset(testWzImg.HashedOffsetPosition, testWzImg.HashedOffset);
+                    uint offs = this.CalcOffset(wzFile, testWzImg.HashedOffsetPosition, testWzImg.HashedOffset);
 
                     if (offs < wzFile.header.DirEndPosition || offs + testWzImg.Size > wzFile.fileStream.Length)  //img offset out of file size
                     {
@@ -703,7 +718,7 @@ namespace WzComparerR2.WzLib
                 {
                     bool isSuccess = wzFile.directories.All(testDir =>
                     {
-                        uint offs = wzFile.CalcOffset(testDir.HashedOffsetPosition, testDir.HashedOffset);
+                        uint offs = this.CalcOffset(wzFile, testDir.HashedOffsetPosition, testDir.HashedOffset);
 
                         if (offs < wzFile.header.DataStartPosition || offs + 1 > wzFile.header.DirEndPosition) // dir offset out of file size.
                         {
@@ -737,7 +752,7 @@ namespace WzComparerR2.WzLib
                     int count = 0;
                     bool isSuccess = imgList.All(img =>
                     {
-                        uint offs = wzFile.CalcOffset(img.HashedOffsetPosition, img.HashedOffset);
+                        uint offs = this.CalcOffset(wzFile, img.HashedOffsetPosition, img.HashedOffset);
                         if (offs < wzFile.header.DirEndPosition || offs + img.Size > wzFile.fileStream.Length)  //img offset out of file size
                         {
                             return false;
@@ -829,6 +844,8 @@ namespace WzComparerR2.WzLib
 
                 return wzFile.header.VersionChecked;
             }
+
+            protected override uint CalcOffset(Wz_File wzFile, uint filePos, uint hashedOffset) => wzFile.CalcOffset(filePos, hashedOffset);
         }
 
         public class FastVersionVerifier : WzVersionVerifier, IWzVersionVerifier
@@ -860,31 +877,13 @@ namespace WzComparerR2.WzLib
 
                 return wzFile.header.VersionChecked;
             }
+
+            protected override uint CalcOffset(Wz_File wzFile, uint filePos, uint hashedOffset) => wzFile.CalcOffset(filePos, hashedOffset);
         }
 
-        public class Pkg2VersionVerifier : WzVersionVerifier, IWzVersionVerifier
+        public class Pkg2VersionVerifier : FastVersionVerifier, IWzVersionVerifier
         {
-            public bool Verify(Wz_File wzFile)
-            {
-                List<Wz_Image> imgList = EnumerableAllWzImage(wzFile.node).Where(_img => _img.WzFile == wzFile).ToList();
-                this.CalcOffsetPkg2(wzFile, imgList);
-                foreach (Wz_Image img in imgList)
-                {
-                    if (img.Offset < wzFile.header.DirEndPosition || img.Offset + img.Size > wzFile.fileStream.Length)  //img offset out of file size
-                    {
-                        wzFile.header.VersionChecked = false;
-                    }
-                }
-                return wzFile.header.VersionChecked;
-            }
-
-            protected void CalcOffsetPkg2(Wz_File wzFile, IEnumerable<Wz_Image> imgList)
-            {
-                foreach (var img in imgList)
-                {
-                    img.Offset = wzFile.CalcOffsetPkg2(img.HashedOffsetPosition, img.HashedOffset);
-                }
-            }
+            protected override uint CalcOffset(Wz_File wzFile, uint filePos, uint hashedOffset) => wzFile.CalcOffsetPkg2(filePos, hashedOffset);
         }
 
         private struct Pkg2DirEntry

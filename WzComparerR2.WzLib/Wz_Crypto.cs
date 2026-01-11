@@ -114,14 +114,32 @@ namespace WzComparerR2.WzLib
             int nodeCount = br.ReadCompressedInt32();
             if (f.Header.Signature == Wz_Header.PKG2)
             {
-                nodeCount = f.DecryptPkg2EntryCount(nodeCount);
+                var filePos = br.BaseStream.Position;
+                byte nextByte = br.ReadByte();
+                if (nextByte != 0x04 && nextByte != 0x03)
+                {
+                    br.BaseStream.Position = filePos;
+                    int offsetCount = br.ReadCompressedInt32();
+                    if (offsetCount == nodeCount)
+                    {
+                        // no dir entry
+                        return;
+                    }
+                    else
+                    {
+                        // unknown file format
+                        return;
+                    }
+                }
+                br.BaseStream.Position = filePos;
+                nodeCount = 1; // at least one node
             }
             if (nodeCount <= 0) //只有文件头 无法预判
             {
                 return;
             }
             f.FileStream.Position++;
-            int len = (int)(-br.ReadSByte());
+            int len = (int)(-br.ReadSByte()); // always cp1252
             byte[] bytes = br.ReadBytes(len);
 
             for (int i = 0; i < len; i++)
