@@ -222,7 +222,7 @@ namespace WzComparerR2.CharaSim
             return GetSkillSummary(skill, skill.Level, sr, param);
         }
 
-        public static string GetSkillSummary(Skill skill, int level, StringResultSkill sr, SummaryParams param, SkillSummaryOptions options = default)
+        public static string GetSkillSummary(Skill skill, int level, StringResultSkill sr, SummaryParams param, SkillSummaryOptions options = default, Dictionary<string, string> overrideSkillCommon = null)
         {
             if (skill == null || sr == null)
                 return null;
@@ -265,7 +265,7 @@ namespace WzComparerR2.CharaSim
                         h = kv.Value;
                     }
                 }
-                return GetSkillSummary(h, level, skill.Common, param, options);
+                return GetSkillSummary(h, level, overrideSkillCommon ?? skill.Common, param, options);
             }
         }
 
