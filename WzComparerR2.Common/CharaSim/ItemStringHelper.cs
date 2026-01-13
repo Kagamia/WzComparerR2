@@ -373,8 +373,8 @@ namespace WzComparerR2.CharaSim
                 case GearType.longSword: return "长剑";
                 case GearType.yeouiGem: return "如意宝珠";
 
-                // case GearType.onmyoSen: return "阴阳扇";
-                // case GearType.kannaReifu: return "灵符";
+                case GearType.onmyoSen: return "阴阳扇";
+                case GearType.kannaReifu: return "灵符";
 
                 default: return null;
             }
@@ -467,8 +467,8 @@ namespace WzComparerR2.CharaSim
                 //4xxx
                 case GearType.katana:
                 case GearType.katana2: return "剑豪可穿戴装备";
-                // case GearType.onmyoSen:
-                // case GearType.kannaReifu:
+                case GearType.onmyoSen:
+                case GearType.kannaReifu:
                 case GearType.fan: return "阴阳师可穿戴装备";
 
                 //5xxx
