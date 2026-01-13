@@ -180,6 +180,10 @@ namespace WzComparerR2.CharaSim
         /// </summary>
         celestialLight = 1253,
         /// <summary>
+        /// 阴阳扇 1254
+        /// </summary>
+        onmyoSen = 1254,
+        /// <summary>
         /// 驯兽魔法棒 1259
         /// </summary>
         magicStick = 1259,
@@ -399,6 +403,10 @@ namespace WzComparerR2.CharaSim
         /// 如意宝珠 135404
         /// </summary>
         yeouiGem = 135404,
+        /// <summary>
+        /// 灵符 135430
+        /// </summary>
+        kannaReifu = 135430,
         /// <summary>
         /// 手杖
         /// </summary>
