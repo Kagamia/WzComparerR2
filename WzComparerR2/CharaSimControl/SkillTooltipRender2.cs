@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using System.Linq;
 using Resource = CharaSimResource.Resource;
 using WzComparerR2.Common;
 using WzComparerR2.CharaSim;
@@ -123,7 +124,16 @@ namespace WzComparerR2.CharaSimControl
 
             if (sr.Desc != null)
             {
-                string hdesc = SummaryParser.GetSkillSummary(sr.Desc, Skill.Level, Skill.Common, SummaryParams.Default);
+                Dictionary<string, string> skillCommon = Skill.Common;
+                if (Skill.PerJobAttackInfo.Count > 0)
+                {
+                    var perJobInfo = Skill.PerJobAttackInfo.Values.ToList()[Skill.PerJobIndex];
+                    foreach (var i in perJobInfo.Keys)
+                    {
+                        skillCommon[i] = perJobInfo[i];
+                    }
+                }
+                string hdesc = SummaryParser.GetSkillSummary(sr.Desc, Skill.Level, skillCommon, SummaryParams.Default);
                 //string hStr = SummaryParser.GetSkillSummary(skill, skill.Level, sr, SummaryParams.Default);
                 GearGraphics.DrawString(g, hdesc, GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, region.SkillDescLeft, region.TextRight, ref picH, 16);
             }
@@ -225,6 +235,12 @@ namespace WzComparerR2.CharaSimControl
                     }
                     skillDescEx.Add("#c[前置技能] " + skillName + ": " + kv.Value + " 级#");
                 }
+            }
+            
+            if (Skill.PerJobAttackInfo.Count > 0)
+            {
+                int jobID = Skill.PerJobAttackInfo.Keys.ToList()[Skill.PerJobIndex];
+                skillDescEx.Add($"#c[适用职业] {ItemStringHelper.GetJobName(jobID)}({jobID})#");
             }
 
             if (skillDescEx.Count > 0)

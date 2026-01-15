@@ -178,7 +178,7 @@
             this.labelX3.Name = "labelX3";
             this.labelX3.Size = new System.Drawing.Size(142, 30);
             this.labelX3.TabIndex = 6;
-            this.labelX3.Text = "对tooltip窗口为焦点，<br/>\r\n使用 <b>- + [ ]</b> 键调整等级";
+            this.labelX3.Text = "对tooltip窗口为焦点，<br/>\r\n使用 <b>- + [ ]</b> 键调整等级<br/>\r\n使用 <b>PgUp / PgDn</b> 键调整适用职业";
             // 
             // comboBoxEx2
             // 
