@@ -807,7 +807,6 @@ namespace WzComparerR2.WzLib
                             valueStr = reader.ReadLine();
                             if (valueStr == MultiLineStart)
                             {
-                                reader.SkipLine();
                                 StringBuilder sb = new StringBuilder();
                                 while (!reader.EndOfStream)
                                 {
