@@ -79,5 +79,26 @@ namespace WzComparerR2.WzLib.Utilities
             }
             return this.charBuffer.ToString();
         }
+
+        public int ReadRepeatChars(char c, int maxLength = -1)
+        {
+            int totalLen = 0;
+            while (!this.streamReader.EndOfStream)
+            {
+                int nextChar = this.streamReader.Peek();
+                if (nextChar != c)
+                {
+                    break;
+                }
+
+                this.streamReader.Read();
+                ++totalLen;
+                if (maxLength > 0 && totalLen >= maxLength)
+                {
+                    break;
+                }
+            }
+            return totalLen;
+        }
     }
 }
