@@ -124,10 +124,10 @@ namespace WzComparerR2.CharaSimControl
 
             if (sr.Desc != null)
             {
-                Dictionary<string, string> skillCommon = Skill.Common;
+                Dictionary<string, string> skillCommon = new Dictionary<string, string>(Skill.Common);
                 if (Skill.PerJobAttackInfo.Count > 0)
                 {
-                    var perJobInfo = Skill.PerJobAttackInfo.Values.ToList()[Skill.PerJobIndex];
+                    var perJobInfo = Skill.PerJobAttackInfo.ElementAt(Skill.PerJobIndex).Value;
                     foreach (var i in perJobInfo.Keys)
                     {
                         skillCommon[i] = perJobInfo[i];
@@ -239,7 +239,7 @@ namespace WzComparerR2.CharaSimControl
             
             if (Skill.PerJobAttackInfo.Count > 0)
             {
-                int jobID = Skill.PerJobAttackInfo.Keys.ToList()[Skill.PerJobIndex];
+                int jobID = Skill.PerJobAttackInfo.ElementAt(Skill.PerJobIndex).Key;
                 skillDescEx.Add($"#c[适用职业] {ItemStringHelper.GetJobName(jobID)}({jobID})#");
             }
 
