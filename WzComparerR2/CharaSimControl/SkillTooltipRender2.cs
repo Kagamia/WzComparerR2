@@ -86,6 +86,17 @@ namespace WzComparerR2.CharaSimControl
                 { "c", GearGraphics.SkillSummaryOrangeTextColor },
             };
 
+            //初始化 skillCommon
+            Dictionary<string, string> skillCommon = new Dictionary<string, string>(Skill.Common);
+            if (Skill.PerJobAttackInfo.Count > 0)
+            {
+                var perJobInfo = Skill.PerJobAttackInfo.ElementAt(Skill.PerJobIndex).Value;
+                foreach (var i in perJobInfo.Keys)
+                {
+                    skillCommon[i] = perJobInfo[i];
+                }
+            }
+
             picH = 0;
             splitterH = new List<int>();
 
@@ -124,15 +135,6 @@ namespace WzComparerR2.CharaSimControl
 
             if (sr.Desc != null)
             {
-                Dictionary<string, string> skillCommon = new Dictionary<string, string>(Skill.Common);
-                if (Skill.PerJobAttackInfo.Count > 0)
-                {
-                    var perJobInfo = Skill.PerJobAttackInfo.ElementAt(Skill.PerJobIndex).Value;
-                    foreach (var i in perJobInfo.Keys)
-                    {
-                        skillCommon[i] = perJobInfo[i];
-                    }
-                }
                 string hdesc = SummaryParser.GetSkillSummary(sr.Desc, Skill.Level, skillCommon, SummaryParams.Default);
                 //string hStr = SummaryParser.GetSkillSummary(skill, skill.Level, sr, SummaryParams.Default);
                 GearGraphics.DrawString(g, hdesc, GearGraphics.ItemDetailFont2, v6SkillSummaryFontColorTable, region.SkillDescLeft, region.TextRight, ref picH, 16);
@@ -162,7 +164,7 @@ namespace WzComparerR2.CharaSimControl
 
             if (Skill.Level > 0)
             {
-                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default, skillSummaryOptions);
+                string hStr = SummaryParser.GetSkillSummary(Skill, Skill.Level, sr, SummaryParams.Default, skillSummaryOptions, skillCommon);
                 GearGraphics.DrawString(g, "[现在等级 " + Skill.Level + "]", GearGraphics.ItemDetailFont, region.LevelDescLeft, region.TextRight, ref picH, 16);
                 if (hStr != null)
                 {
