@@ -2875,6 +2875,14 @@ namespace WzComparerR2
                         skill.Level -= 1;
                         break;
 
+                    case Keys.PageDown:
+                        skill.PerJobIndex += 1;
+                        break;
+
+                    case Keys.PageUp:
+                        skill.PerJobIndex -= 1;
+                        break;
+
                     case Keys.OemOpenBrackets:
                         skill.Level -= this.skillInterval;
                         break;

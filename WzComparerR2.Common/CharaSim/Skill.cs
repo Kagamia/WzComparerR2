@@ -15,9 +15,12 @@ namespace WzComparerR2.CharaSim
             this.PVPcommon = new Dictionary<string, string>();
             this.ReqSkill = new Dictionary<int, int>();
             this.Action = new List<string>();
+            this.PerJobAttackInfo = new Dictionary<int, Dictionary<string, string>>();
+            this.perJobIndex = 0;
         }
 
         private int level;
+        private int perJobIndex;
         internal List<Dictionary<string, string>> levelCommon;
         internal Dictionary<string, string> common;
 
@@ -52,6 +55,15 @@ namespace WzComparerR2.CharaSim
             }
         }
 
+        public int PerJobIndex
+        {
+            get { return perJobIndex; }
+            set
+            {
+                perJobIndex = Math.Max(0, Math.Min(value, this.PerJobAttackInfo.Count - 1));
+            }
+        }
+
         public int ReqLevel { get; set; }
         public int ReqAmount { get; set; }
         public bool PreBBSkill { get; set; }
@@ -63,6 +75,7 @@ namespace WzComparerR2.CharaSim
         public int MasterLevel { get; set; }
         public Dictionary<int, int> ReqSkill { get; private set; }
         public List<string> Action { get; private set; }
+        public Dictionary<int, Dictionary<string, string>> PerJobAttackInfo { get; private set; }
 
         public int MaxLevel
         {
@@ -104,6 +117,25 @@ namespace WzComparerR2.CharaSim
                             if (commonNode.Value != null && !(commonNode.Value is Wz_Vector))
                             {
                                 skill.common[commonNode.Text] = commonNode.Value.ToString();
+                            }
+                            else if (commonNode.Text == "attackInfo")
+                            {
+                                if (commonNode.Nodes.Count > 0)
+                                {
+                                    foreach (Wz_Node jobNode in commonNode.Nodes)
+                                    {
+                                        int jobID;
+                                        if (Int32.TryParse(jobNode.Text, out jobID))
+                                        {
+                                            Dictionary<string, string> attackInfo = new Dictionary<string, string>();
+                                            foreach (Wz_Node infoNode in jobNode.Nodes)
+                                            {
+                                                attackInfo[infoNode.Text] = infoNode.Value.ToString();
+                                            }
+                                            skill.PerJobAttackInfo[jobID] = attackInfo;
+                                        }
+                                    }
+                                }
                             }
                         }
                         break;
