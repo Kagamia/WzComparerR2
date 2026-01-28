@@ -3013,6 +3013,7 @@
             this.MinimumSize = new System.Drawing.Size(750, 513);
             this.Name = "MainForm";
             this.Text = "WzComparerR2";
+            this.Shown += new System.EventHandler(MainForm_Shown);
             this.ribbonControl1.ResumeLayout(false);
             this.ribbonControl1.PerformLayout();
             this.ribbonPanel1.ResumeLayout(false);
