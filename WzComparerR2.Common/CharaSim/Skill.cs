@@ -75,7 +75,7 @@ namespace WzComparerR2.CharaSim
         public int MasterLevel { get; set; }
         public Dictionary<int, int> ReqSkill { get; private set; }
         public List<string> Action { get; private set; }
-        public Dictionary<int, Dictionary<string, string>> PerJobAttackInfo { get; set; }
+        public Dictionary<int, Dictionary<string, string>> PerJobAttackInfo { get; private set; }
 
         public int MaxLevel
         {
