@@ -189,6 +189,20 @@ namespace WzComparerR2
             Wz_Structure.DefaultWzVersionVerifyMode = config.WzVersionVerifyMode;
         }
 
+        async Task<bool> AutomaticCheckUpdate()
+        {
+            var config = WcR2Config.Default;
+            if (config.EnableAutoUpdate)
+            {
+                FrmUpdater updater = new FrmUpdater();
+                return await updater.QueryUpdate();
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         void CharaSimLoader_WzFileFinding(object sender, FindWzEventArgs e)
         {
             string[] fullPath = null;
@@ -3258,15 +3272,9 @@ namespace WzComparerR2
 
         private void buttonItemUpdate_Click(object sender, EventArgs e)
         {
-#if NET6_0_OR_GREATER
-            Process.Start(new ProcessStartInfo
-            {
-                UseShellExecute = true,
-                FileName = "https://github.com/Kagamia/WzComparerR2/releases",
-            });
-#else
-            Process.Start("https://github.com/Kagamia/WzComparerR2/releases");
-#endif
+            var frm = new FrmUpdater();
+            frm.Load(WcR2Config.Default);
+            frm.ShowDialog();
         }
 
         private void btnItemOptions_Click(object sender, System.EventArgs e)
@@ -3285,6 +3293,17 @@ namespace WzComparerR2
         private void colorPickerPicBoxBgColor_SelectedColorChanged(object sender, EventArgs e)
         {
             this.pictureBoxEx1.BackColor = ((ColorPickerDropDown)sender).SelectedColor;
+        }
+
+        private async void MainForm_Shown(object sender, EventArgs e)
+        {
+            //Automatic Update Check
+            bool isUpdateRequired = await AutomaticCheckUpdate();
+            if (isUpdateRequired)
+            {
+                var frm = new FrmUpdater();
+                frm.ShowDialog();
+            }
         }
     }
 
