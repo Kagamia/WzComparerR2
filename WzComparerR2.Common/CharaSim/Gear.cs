@@ -345,6 +345,8 @@ namespace WzComparerR2.CharaSim
                     return GearType.memorialStaff;
                 case 1253:
                     return GearType.celestialLight;
+                case 1254:
+                    return GearType.onmyoSen;
                 case 1259:
                     return GearType.magicStick;
                 case 1403:
@@ -399,6 +401,7 @@ namespace WzComparerR2.CharaSim
                 case GearType.emblem:
                 case GearType.bit:
                 case GearType.jewel:
+                case GearType.astra:
                 case (GearType)3: //发型
                     return 2;
             }
