@@ -1193,7 +1193,8 @@ namespace WzComparerR2
                         "size: " + png.Width + "*" + png.Height + "\r\n" +
                         "png format: " + png.Format + "(" + (int)png.Format + ")\r\n" +
                         "scale: " + png.Scale + "(x" + png.ActualScale + ")\r\n" +
-                        "pages: " + png.Pages + "(" + png.ActualPages + ")";
+                        "pages: " + png.Pages + "(" + png.ActualPages + ")\r\n" +
+                        "unknown1: " + png.Unknown1;
                     break;
 
                 case Wz_Vector vector:

@@ -103,8 +103,8 @@ namespace WzComparerR2.WzLib.Utilities
                     this.BaseStream.ReadExactly(buffer, 0, size);
                     decrypter.Decrypt(buffer, 0, size);
 
-                    using var charBuffer = MemoryPool<byte>.Shared.Rent(size * 2);
-                    Span<char> chars = MemoryMarshal.Cast<byte, char>(charBuffer.Memory.Span).Slice(0, size);
+                    using var charBuffer = MemoryPool<char>.Shared.Rent(size);
+                    Span<char> chars = charBuffer.Memory.Span.Slice(0, size);
                     // TODO: SIMD optimization for net6
                     byte mask = 0xAA;
                     for (int i = 0; i < size; i++)
@@ -125,14 +125,14 @@ namespace WzComparerR2.WzLib.Utilities
                 {
                     size = this.bReader.ReadInt32();
                 }
-
-                var buffer = ArrayPool<byte>.Shared.Rent(size * 2);
+                int byteSize = size * 2;
+                var buffer = ArrayPool<byte>.Shared.Rent(byteSize);
                 try
                 {
-                    this.BaseStream.ReadExactly(buffer, 0, size * 2);
-                    decrypter.Decrypt(buffer, 0, size * 2);
+                    this.BaseStream.ReadExactly(buffer, 0, byteSize);
+                    decrypter.Decrypt(buffer, 0, byteSize);
 
-                    Span<char> chars = MemoryMarshal.Cast<byte, char>(buffer.AsSpan()).Slice(0, size);
+                    Span<char> chars = MemoryMarshal.Cast<byte, char>(buffer.AsSpan(0, byteSize));
                     // TODO: SIMD optimization for net6
                     ushort mask = 0xAAAA;
                     for (int i = 0; i < size; i++)
@@ -146,6 +146,39 @@ namespace WzComparerR2.WzLib.Utilities
                 {
                     ArrayPool<byte>.Shared.Return(buffer);
                 }
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        // Introduced in KMST1198
+        public string ReadPkg2DirString(IWzDecrypter decrypter)
+        {
+            long currentPos = this.BaseStream.Position;
+
+            int size = this.ReadSByte();
+            if (size < 0)
+            {
+                size = -size;
+                int byteSize = size * 2;
+                var buffer = ArrayPool<byte>.Shared.Rent(byteSize);
+                try
+                {
+                    this.BaseStream.ReadExactly(buffer, 0, byteSize);
+                    decrypter.Decrypt(buffer, 0, byteSize);
+                    Span<char> chars = MemoryMarshal.Cast<byte, char>(buffer.AsSpan(0, byteSize));
+                    return this.stringPool != null ? this.stringPool.GetOrAdd(currentPos, chars) : chars.ToString();
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(buffer);
+                }
+            }
+            else if (size > 0)
+            {
+                throw new Exception($"Unexpected string length: {size}");
             }
             else
             {

@@ -93,7 +93,7 @@ namespace WzComparerR2.WzLib
                 }
                 this.wz_files.Add(file);
                 file.TextEncoding = this.TextEncoding;
-                if (!this.encryption.encryption_detected)
+                if (!this.encryption.IsDirEncDetected(file))
                 {
                     this.encryption.DetectEncryption(file);
                 }
@@ -180,7 +180,7 @@ namespace WzComparerR2.WzLib
                     return false;
                 }
                 var tempNode = new Wz_Node();
-                if (!this.encryption.encryption_detected)
+                if (!this.encryption.IsDirEncDetected(file))
                 {
                     this.encryption.DetectEncryption(file);
                 }

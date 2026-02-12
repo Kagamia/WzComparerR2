@@ -17,7 +17,7 @@ namespace WzComparerR2.WzLib
 {
     public class Wz_Png
     {
-        public Wz_Png(int w, int h, int data_length, Wz_TextureFormat format, int scale, int pages, uint offs, Wz_Image wz_i)
+        public Wz_Png(int w, int h, int data_length, Wz_TextureFormat format, int scale, int pages, int unknown1, uint offs, Wz_Image wz_i)
         {
             this.Width = w;
             this.Height = h;
@@ -25,6 +25,7 @@ namespace WzComparerR2.WzLib
             this.Format = format;
             this.Scale = scale;
             this.Pages = pages;
+            this.Unknown1 = unknown1;
             this.Offset = offs;
             this.WzImage = wz_i;
         }
@@ -67,6 +68,8 @@ namespace WzComparerR2.WzLib
         public int Pages { get; set; }
 
         public int ActualPages => this.Pages > 0 ? this.Pages : 1;
+
+        public int Unknown1 { get; set; }
 
         /// <summary>
         /// 获取或设置图片所属的WzFile

@@ -212,13 +212,14 @@ namespace WzComparerR2.WzLib
             return offset;
         }
 
-        public uint CalcOffsetPkg2(uint filePos, uint hashedOffset)
+        // for KMST 1196-1197
+        public uint CalcOffsetPkg2V1(uint filePos, uint hashedOffset)
         {
             uint headerLen = (uint)this.header.HeaderSize;
             uint hashVersion = this.header.HashVersion;
             uint hash1 = this.header.Pkg2Hash1;
 
-            uint offset = 0xFFFFFFFC + filePos - headerLen;
+            uint offset = filePos - headerLen;
             int distance;
 
             offset = ~offset;
@@ -233,7 +234,30 @@ namespace WzComparerR2.WzLib
             return offset;
         }
 
-        public int DecryptPkg2EntryCount(int encryptedEntryCount)
+        // for KMST 1198
+        public uint CalcOffsetPkg2V2(uint filePos, uint hashedOffset)
+        {
+            uint headerLen = (uint)this.header.HeaderSize;
+            uint hashVersion = this.header.HashVersion;
+            uint hash1 = this.header.Pkg2Hash1;
+
+            uint offset = filePos - headerLen;
+            int distance;
+
+            offset = ~offset;
+            offset *= hashVersion ^ hash1;
+            offset -= 0x581C3F6D;
+            offset ^= hash1 * 0x01010101;
+            distance = (byte)((hashVersion ^ hash1) & 0x1F);
+            offset = (offset << distance) | (offset >> (32 - distance));
+            offset ^= ~hashedOffset;
+            offset += headerLen;
+
+            return offset;
+        }
+
+        // for KMST 1196-1197
+        public int DecryptPkg2EntryCountV1(int encryptedEntryCount)
         {
             uint hash1 = this.header.Pkg2Hash1;
             uint hashVersion = this.header.HashVersion;
@@ -241,7 +265,16 @@ namespace WzComparerR2.WzLib
             return entryCount;
         }
 
-        public uint CalcHashVersionFromEntryCount(int encryptedEntryCount, int entryCount)
+        // for KMST 1198
+        public int DecryptPkg2EntryCountV2(int encryptedEntryCount)
+        {
+            uint hash1 = this.header.Pkg2Hash1;
+            uint hashVersion = this.header.HashVersion;
+            int entryCount = (int)(encryptedEntryCount ^ ((hash1 << 16) + (0x21524111 * hashVersion)));
+            return entryCount;
+        }
+
+        public uint CalcHashVersionFromEntryCountV1(int encryptedEntryCount, int entryCount)
         {
             // calculate with modular inverse:
             uint hash1 = this.header.Pkg2Hash1;
@@ -375,7 +408,7 @@ namespace WzComparerR2.WzLib
 
         private void ReadDirTree(WzBinaryReader reader, Wz_Node parent, ref List<string> dirs)
         {
-            var cryptoKey = this.WzStructure.encryption.keys;
+            var cryptoKey = this.WzStructure.encryption.Pkg1Keys;
             int count = reader.ReadCompressedInt32();
 
             for (int i = 0; i < count; i++)
@@ -422,7 +455,9 @@ namespace WzComparerR2.WzLib
 
         private void ReadDirTreePkg2(WzBinaryReader reader, Wz_Node parent, ref List<string> dirs)
         {
-            var cryptoKey = this.WzStructure.encryption.keys;
+            var encType = this.WzStructure.encryption.Pkg2EncType;
+            var pkg1Keys = this.WzStructure.encryption.Pkg1Keys ?? this.WzStructure.encryption.GetKeys(Wz_CryptoKeyType.BMS);
+            var pkg2Keys = this.WzStructure.encryption.Pkg2Keys;
             int encryptedEntryCount = reader.ReadCompressedInt32();
 
             List<Pkg2DirEntry> entries = new();
@@ -432,7 +467,14 @@ namespace WzComparerR2.WzLib
                 string name;
                 if (nodeType == 0x03 || nodeType == 0x04)
                 {
-                    name = reader.ReadString(cryptoKey);
+                    if (encType == Wz_CryptoKeyType.KMST1198)
+                    {
+                        name = entries.Count == 0 ? reader.ReadPkg2DirString(pkg2Keys) : reader.ReadString(pkg1Keys);
+                    }
+                    else
+                    {
+                        name = reader.ReadString(pkg2Keys);
+                    }
                 }
                 else if (nodeType == 0x80 || (-127 <= encryptedEntryCount && encryptedEntryCount <= 127 && nodeType == encryptedEntryCount))
                 {
@@ -462,9 +504,8 @@ namespace WzComparerR2.WzLib
                 Span<Pkg2DirEntry> list = CollectionsMarshal.AsSpan(entries);
                 for (int i = 0; i < list.Length; i++)
                 {
-                    uint hashOffset = reader.ReadUInt32();
-                    // use the fie pos after reading hashOffset, this is by design
                     uint pos = (uint)this.fileStream.Position;
+                    uint hashOffset = reader.ReadUInt32();
                     ref Pkg2DirEntry entry = ref list[i];
                     switch (entry.NodeType)
                     {
@@ -850,7 +891,7 @@ namespace WzComparerR2.WzLib
 
         public class FastVersionVerifier : WzVersionVerifier, IWzVersionVerifier
         {
-            public bool Verify(Wz_File wzFile)
+            public virtual bool Verify(Wz_File wzFile)
             {
                 List<Wz_Image> imgList = EnumerableAllWzImage(wzFile.node).Where(_img => _img.WzFile == wzFile).ToList();
 
@@ -883,7 +924,29 @@ namespace WzComparerR2.WzLib
 
         public class Pkg2VersionVerifier : FastVersionVerifier, IWzVersionVerifier
         {
-            protected override uint CalcOffset(Wz_File wzFile, uint filePos, uint hashedOffset) => wzFile.CalcOffsetPkg2(filePos, hashedOffset);
+            private const int CryptoVersionMin = 1;
+            private const int CryptoVersionMax = 2;
+            public override bool Verify(Wz_File wzFile)
+            {
+                for (int i = CryptoVersionMax; i >= CryptoVersionMin; i--)
+                {
+                    this.cryptoVersion = i;
+                    wzFile.header.ResetVersionDetector();
+                    if (base.Verify(wzFile))
+                    {
+                        break;
+                    }
+                }
+                return wzFile.header.VersionChecked;
+            }
+
+            private int cryptoVersion;
+            protected override uint CalcOffset(Wz_File wzFile, uint filePos, uint hashedOffset) => this.cryptoVersion switch
+            {
+                1 => wzFile.CalcOffsetPkg2V1(filePos, hashedOffset),
+                2 => wzFile.CalcOffsetPkg2V2(filePos, hashedOffset),
+                _ => throw new InvalidOperationException($"Unknown cryptoVersion {this.cryptoVersion}."),
+            };
         }
 
         private struct Pkg2DirEntry

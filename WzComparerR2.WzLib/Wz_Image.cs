@@ -64,7 +64,7 @@ namespace WzComparerR2.WzLib
                 {
                     return crypto.GetKeys(this.encType);
                 }
-                return crypto.keys;
+                return crypto.Pkg1Keys;
             }
         }
 
@@ -286,9 +286,11 @@ namespace WzComparerR2.WzLib
                     int h = reader.ReadCompressedInt32();
                     int form = reader.ReadCompressedInt32();
                     int scale = reader.ReadByte();
-                    int pages = reader.ReadInt32(); // introduced in KMST 1186
+                    int pages = reader.ReadCompressedInt32(); // introduced in KMST 1186
+                    int unknown1 = reader.ReadCompressedInt32(); // introduced in KMST1198
+                    reader.SkipBytes(2); //TBD
                     int dataLen = reader.ReadInt32();
-                    parent.Value = new Wz_Png(w, h, dataLen, (Wz_TextureFormat)form, scale, pages,(uint)reader.BaseStream.Position, this);
+                    parent.Value = new Wz_Png(w, h, dataLen, (Wz_TextureFormat)form, scale, pages, unknown1, (uint)reader.BaseStream.Position, this);
                     reader.SkipBytes(dataLen);
                     break;
 
@@ -426,7 +428,7 @@ namespace WzComparerR2.WzLib
             this.encType = default;
             this.checEnc = false;
 
-            var wzsEncType = this.WzFile.WzStructure.encryption.EncType;
+            var wzsEncType = this.WzFile.WzStructure.encryption.Pkg1EncType;
             if (wzsEncType != default)
             {
                 if (this.IsIllegalTag(wzsEncType))
