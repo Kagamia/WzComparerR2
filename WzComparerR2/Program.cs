@@ -148,6 +148,20 @@ namespace WzComparerR2
             _ => null,
         });
 
+        internal static T GetAsmAttr<T>()
+        {
+            object[] attr = typeof(WzComparerR2.Program).Assembly.GetCustomAttributes(typeof(T), true);
+            if (attr != null && attr.Length > 0)
+            {
+                return (T)attr[0];
+            }
+            return default(T);
+        }
+
+        private static string _appVersion;
+        internal static string ApplicationVersion => _appVersion ?? (_appVersion = GetAsmAttr<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+                ?? GetAsmAttr<AssemblyFileVersionAttribute>()?.Version);
+
         [DllImport("kernel32.dll")]
         static extern bool SetDllDirectory(string path);
 

@@ -36,6 +36,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Net.Http" />
     <PackageReference Include="System.ValueTuple" Version="4.6.1" />
   </ItemGroup>
   <ItemGroup Condition="$(DotnetEdition) == 'core'">

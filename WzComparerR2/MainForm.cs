@@ -189,17 +189,27 @@ namespace WzComparerR2
             Wz_Structure.DefaultWzVersionVerifyMode = config.WzVersionVerifyMode;
         }
 
-        async Task<bool> AutomaticCheckUpdate()
+        async Task AutomaticCheckUpdate()
         {
             var config = WcR2Config.Default;
             if (config.EnableAutoUpdate)
             {
-                FrmUpdater updater = new FrmUpdater();
-                return await updater.QueryUpdate();
-            }
-            else
-            {
-                return false;
+                var updater = new Updater();
+                try
+                {
+                    await updater.QueryUpdateAsync();
+                    if (updater.UpdateAvailable)
+                    {
+                        ToastNotification.Show(this, $"检查到更新版本{updater.LatestVersionString}", 5000, eToastPosition.TopCenter);
+                        var frmUpdater = new FrmUpdater(updater);
+                        frmUpdater.LoadConfig(config);
+                        frmUpdater.ShowDialog(this);
+                    }
+                }
+                catch
+                {
+                    // ignore error
+                }
             }
         }
 
@@ -3274,7 +3284,7 @@ namespace WzComparerR2
         private void buttonItemUpdate_Click(object sender, EventArgs e)
         {
             var frm = new FrmUpdater();
-            frm.Load(WcR2Config.Default);
+            frm.LoadConfig(WcR2Config.Default);
             frm.ShowDialog();
         }
 
@@ -3298,13 +3308,7 @@ namespace WzComparerR2
 
         private async void MainForm_Shown(object sender, EventArgs e)
         {
-            //Automatic Update Check
-            bool isUpdateRequired = await AutomaticCheckUpdate();
-            if (isUpdateRequired)
-            {
-                var frm = new FrmUpdater();
-                frm.ShowDialog();
-            }
+            await this.AutomaticCheckUpdate();
         }
     }
 
