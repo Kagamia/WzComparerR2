@@ -112,11 +112,17 @@ namespace WzComparerR2.Animation
             }
         }
 
+        public Queue<string> NextAnimationName { get; set; } = new Queue<string>();
+
         private int _selectedAniIndex;
         private AnimationState _animationState;
 
         public override void Update(TimeSpan elapsedTime)
         {
+            if (this.NextAnimationName.Count() > 0 && CurrentTime > Length)
+            {
+                this.SelectedAnimationName = this.NextAnimationName.Dequeue();
+            }
             this._animationState.Update((float)elapsedTime.TotalSeconds);
             this._animationState.Apply(Skeleton);
             this.Skeleton.UpdateWorldTransform();
@@ -126,6 +132,20 @@ namespace WzComparerR2.Animation
         {
             ModelBound bound = ModelBound.Empty;
             UpdateBounds(ref bound, this.Skeleton);
+            return bound.GetBound();
+        }
+
+        public Rectangle GetSlotBounds(string slotName)
+        {
+            Skeleton skeleton = this.Skeleton;
+            if (!string.IsNullOrEmpty(slotName))
+            {
+                Slot slot = skeleton.FindSlot(slotName);
+                if (slot != null)
+                    return GetSlotBoundingBox(slot);
+            }
+            ModelBound bound = ModelBound.Empty;
+            UpdateBounds(ref bound, skeleton);
             return bound.GetBound();
         }
 
@@ -160,6 +180,21 @@ namespace WzComparerR2.Animation
                     bound.Update(vertices, vertexCount);
                 }
             }
+        }
+
+        private Rectangle GetSlotBoundingBox(Slot slot)
+        {
+            ModelBound bound = ModelBound.Empty;
+
+            if (slot.Attachment is BoundingBoxAttachment)
+            {
+                BoundingBoxAttachment bb = (BoundingBoxAttachment)slot.Attachment;
+                int vertexCount = bb.Vertices.Length;
+                float[] vertices = new float[vertexCount];
+                bb.ComputeWorldVertices(slot.Bone, vertices);
+                bound.Update(vertices, vertexCount);
+            }
+            return bound.GetBound();
         }
 
         public override object Clone()
