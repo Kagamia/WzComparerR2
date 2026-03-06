@@ -472,9 +472,19 @@ namespace WzComparerR2
                             comparer.OutputPng = chkOutputPng.Checked;
                             comparer.OutputAddedImg = chkOutputAddedImg.Checked;
                             comparer.OutputRemovedImg = chkOutputRemovedImg.Checked;
-                            comparer.EnableDarkMode = chkEnableDarkMode.Checked;
                             comparer.Comparer.PngComparison = (WzPngComparison)cmbComparePng.SelectedItem;
                             comparer.Comparer.ResolvePngLink = chkResolvePngLink.Checked;
+                            comparer.ColorTable = new List<System.Drawing.Color>()
+                            {
+                                CustomCSSConfig.Default.BackgroundColor,
+                                CustomCSSConfig.Default.NormalTextColor,
+                                CustomCSSConfig.Default.ChangedBackgroundColor,
+                                CustomCSSConfig.Default.AddedBackgroundColor,
+                                CustomCSSConfig.Default.RemovedBackgroundColor,
+                                CustomCSSConfig.Default.ChangedTextColor,
+                                CustomCSSConfig.Default.AddedTextColor,
+                                CustomCSSConfig.Default.RemovedTextColor
+                            };
                             wznew.Load(e.Part.TempFilePath, false);
                             wzold.Load(e.Part.OldFilePath, false);
                             comparer.EasyCompareWzFiles(wznew.wz_files[0], wzold.wz_files[0], session.CompareFolder);

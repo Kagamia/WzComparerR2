@@ -3124,10 +3124,20 @@ namespace WzComparerR2
                     comparer.OutputPng = chkOutputPng.Checked;
                     comparer.OutputAddedImg = chkOutputAddedImg.Checked;
                     comparer.OutputRemovedImg = chkOutputRemovedImg.Checked;
-                    comparer.EnableDarkMode = chkEnableDarkMode.Checked;
                     comparer.HashPngFileName = chkHashPngFileName.Checked;
                     comparer.StateInfoChanged += new EventHandler(comparer_StateInfoChanged);
                     comparer.StateDetailChanged += new EventHandler(comparer_StateDetailChanged);
+                    comparer.ColorTable = new List<System.Drawing.Color>()
+                    {
+                        CustomCSSConfig.Default.BackgroundColor,
+                        CustomCSSConfig.Default.NormalTextColor,
+                        CustomCSSConfig.Default.ChangedBackgroundColor,
+                        CustomCSSConfig.Default.AddedBackgroundColor,
+                        CustomCSSConfig.Default.RemovedBackgroundColor,
+                        CustomCSSConfig.Default.ChangedTextColor,
+                        CustomCSSConfig.Default.AddedTextColor,
+                        CustomCSSConfig.Default.RemovedTextColor
+                    };
                     try
                     {
                         Wz_File fileNew = openedWz[0].wz_files[0];
@@ -3224,6 +3234,21 @@ namespace WzComparerR2
                     fs.Dispose();
                 }
                 MessageBoxEx.Show("数据导出完毕。");
+            }
+        }
+
+        private void btnCustomCSS_Click(object sender, EventArgs e)
+        {
+            ConfigManager.Reload();
+            var Setting = CustomCSSConfig.Default;
+            using (FrmCustomCSS frm = new FrmCustomCSS())
+            {
+                frm.LoadConfig(Setting);
+                if (frm.ShowDialog() == DialogResult.OK)
+                {
+                    frm.SaveConfig(Setting);
+                    ConfigManager.Save();
+                }
             }
         }
 
