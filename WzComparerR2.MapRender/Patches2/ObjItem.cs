@@ -110,9 +110,9 @@ namespace WzComparerR2.MapRender.Patches2
                     var slotName = condNode?.FindNodeByPath("slotName").GetValueEx<string>(null);
                     var animation = eventNode?.FindNodeByPath("animation").GetValueEx<string>(null);
                     var target = condNode?.FindNodeByPath("target").GetValueEx<string>(null);
-                    var actionKey = (eventNode.FindNodeByPath("action\\playEffect")?.Nodes ?? new Wz_Node.WzNodeCollection(null)).Select(node => node.GetValueEx<string>(null)).FirstOrDefault();
+                    var actionKeys = (eventNode.FindNodeByPath("action\\playEffect")?.Nodes ?? new Wz_Node.WzNodeCollection(null)).Select(node => node.GetValueEx<string>(null)).ToList();
 
-                    item.Events.Add(new ItemEvent(index, collision, animation, slotName, target, actionKey));
+                    item.Events.Add(new ItemEvent(index, collision, animation, slotName, target, actionKeys));
                 }
             }
             
