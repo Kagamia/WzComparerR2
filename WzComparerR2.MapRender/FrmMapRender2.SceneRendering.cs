@@ -32,6 +32,7 @@ namespace WzComparerR2.MapRender
                     else if (item is ObjItem)
                     {
                         var _item = (ObjItem)item;
+                        ApplyMapEvents(_item.Events, _item.View.Animator, _item.SpineAni);
                         (_item.View.Animator as WzComparerR2.Controls.AnimationItem)?.Update(elapsed);
                         _item.View.Time += (int)elapsed.TotalMilliseconds;
                     }
@@ -124,6 +125,76 @@ namespace WzComparerR2.MapRender
                 for (int i = 0, i1 = node.Nodes.Count; i < i1; i++)
                 {
                     UpdateAllItems(node.Nodes[i], elapsed);
+                }
+            }
+        }
+
+        private void ApplyMapEvents(IEnumerable<ItemEvent> itemEvents, object animator, string defaultAniName)
+        {
+            if (itemEvents.Count() == 0 || animator is not ISpineAnimator)
+            {
+                return;
+            }
+            var cursorPos = renderEnv.Camera.CameraToWorld(renderEnv.Input.MousePosition);
+            var eventList = itemEvents.Select(ie =>
+                {
+                    return new
+                    {
+                        SlotName = ie.SlotName,
+                        Animation = ie.Animation,
+                        MapEvent = this.mapData.MapEvents.Where(me => ie.ActionKeys.Contains(me.Index)),
+                        Rect = (animator as ISpineAnimator).GetSlotBounds(ie.SlotName),
+                    };
+                }).Where(data => data.MapEvent != null || !string.IsNullOrEmpty(data.Animation));
+
+            foreach (var data in eventList)
+            {
+                var sensorRect = data.Rect;
+                if (sensorRect.Contains(cursorPos))
+                {
+                    if (!string.IsNullOrEmpty(data.Animation))
+                    {
+                        var tmpMapEvent = new MapEvent(null, "SetAnimationOnceAndReturn", defaultAniName, data.Animation, null);
+                        InvokeMapEvent(animator as ISpineAnimator, new List<MapEvent>() { tmpMapEvent });
+                    }
+                    else InvokeMapEvent(animator as ISpineAnimator, data.MapEvent.ToList());
+                }
+            }
+        }
+
+        private void InvokeMapEvent(ISpineAnimator sender, List<MapEvent> mapEvents)
+        {
+            if (sender != null)
+            {
+                foreach (var mapEvent in mapEvents)
+                {
+                    if (mapEvent == null) continue;
+
+                    List<ISpineAnimator> targets = mapEvent.Tags == null ? new List<ISpineAnimator>() { sender as ISpineAnimator } :
+                        GetSceneContainers(this.mapData?.Scene)
+                        .SelectMany(container => container.Slots)
+                        .Where(sceneItem => sceneItem.Tags != null && sceneItem.Tags.Contains(mapEvent.Tags))
+                        .Select(sceneItem => (ISpineAnimator)((sceneItem as ObjItem)?.View?.Animator) ?? null)
+                        .Where(spine => spine != null)
+                        .Distinct()
+                        .ToList();
+                    switch (mapEvent.Type)
+                    {
+                        case MapEventType.SetAnimationOnceAndReturn:
+                            foreach (var spine in targets)
+                            {
+                                if (spine.NextAnimationName.Count > 0)
+                                {
+                                    return;
+                                }
+                                else
+                                {
+                                    spine.SelectedAnimationName = mapEvent.ChangedAnimation;
+                                    spine.NextAnimationName.Enqueue(mapEvent.DefaultAnimation);
+                                }
+                            }
+                            break;
+                    }
                 }
             }
         }

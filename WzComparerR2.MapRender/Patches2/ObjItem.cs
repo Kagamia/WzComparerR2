@@ -26,6 +26,7 @@ namespace WzComparerR2.MapRender.Patches2
         public string SpineAni { get; set; }
         public List<QuestInfo> Quest { get; private set; } = new List<QuestInfo>();
         public List<QuestExInfo> Questex { get; private set; } = new List<QuestExInfo>();
+        public List<ItemEvent> Events { get; private set; } = new List<ItemEvent>();
 
         public ItemView View { get; set; }
 
@@ -98,6 +99,23 @@ namespace WzComparerR2.MapRender.Patches2
                 }
             }
 
+            if (node.Nodes["event"] != null)
+            {
+                foreach (Wz_Node eventNode in node.Nodes["event"].Nodes)
+                {
+                    var index = eventNode.Text;
+                    var condNode = eventNode.Nodes["condition"];
+
+                    var collision = condNode?.FindNodeByPath("collision").GetValueEx<string>(null);
+                    var slotName = condNode?.FindNodeByPath("slotName").GetValueEx<string>(null);
+                    var animation = eventNode?.FindNodeByPath("animation").GetValueEx<string>(null);
+                    var target = condNode?.FindNodeByPath("target").GetValueEx<string>(null);
+                    var actionKeys = (eventNode.FindNodeByPath("action\\playEffect")?.Nodes ?? new Wz_Node.WzNodeCollection(null)).Select(node => node.GetValueEx<string>(null)).ToList();
+
+                    item.Events.Add(new ItemEvent(index, collision, animation, slotName, target, actionKeys));
+                }
+            }
+            
             string path = $@"Map\Obj\{item.OS}.img\{item.L0}\{item.L1}\{item.L2}\0";
             var obj_node = PluginManager.FindWz(path);
             if (obj_node != null)
