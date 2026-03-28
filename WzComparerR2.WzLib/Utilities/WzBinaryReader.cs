@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace WzComparerR2.WzLib.Utilities
 {
-    internal class WzBinaryReader
+    public class WzBinaryReader
     {
         public WzBinaryReader(Stream stream, bool useStringPool)
             : this(stream, useStringPool ? new SimpleWzStringPool() : null)
@@ -101,17 +101,11 @@ namespace WzComparerR2.WzLib.Utilities
                 try
                 {
                     this.BaseStream.ReadExactly(buffer, 0, size);
-                    decrypter.Decrypt(buffer, 0, size);
+                    decrypter.Decrypt(buffer.AsSpan(0, size));
 
                     using var charBuffer = MemoryPool<char>.Shared.Rent(size);
                     Span<char> chars = charBuffer.Memory.Span.Slice(0, size);
-                    // TODO: SIMD optimization for net6
-                    byte mask = 0xAA;
-                    for (int i = 0; i < size; i++)
-                    {
-                        chars[i] = (char)(buffer[i] ^ mask);
-                        mask++;
-                    }
+                    MathHelper.XorWidenToChar(buffer.AsSpan(0, size), chars);
                     return this.stringPool != null ? this.stringPool.GetOrAdd(currentPos, chars) : chars.ToString();
                 }
                 finally
@@ -130,16 +124,10 @@ namespace WzComparerR2.WzLib.Utilities
                 try
                 {
                     this.BaseStream.ReadExactly(buffer, 0, byteSize);
-                    decrypter.Decrypt(buffer, 0, byteSize);
+                    decrypter.Decrypt(buffer.AsSpan(0, byteSize));
 
                     Span<char> chars = MemoryMarshal.Cast<byte, char>(buffer.AsSpan(0, byteSize));
-                    // TODO: SIMD optimization for net6
-                    ushort mask = 0xAAAA;
-                    for (int i = 0; i < size; i++)
-                    {
-                        chars[i] = (char)(chars[i] ^ mask);
-                        mask++;
-                    }
+                    MathHelper.XorChars(chars, chars);
                     return this.stringPool != null ? this.stringPool.GetOrAdd(currentPos, chars) : chars.ToString();
                 }
                 finally
@@ -167,7 +155,7 @@ namespace WzComparerR2.WzLib.Utilities
                 try
                 {
                     this.BaseStream.ReadExactly(buffer, 0, byteSize);
-                    decrypter.Decrypt(buffer, 0, byteSize);
+                    decrypter.Decrypt(buffer.AsSpan(0, byteSize));
                     Span<char> chars = MemoryMarshal.Cast<byte, char>(buffer.AsSpan(0, byteSize));
                     return this.stringPool != null ? this.stringPool.GetOrAdd(currentPos, chars) : chars.ToString();
                 }
