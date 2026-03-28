@@ -23,7 +23,7 @@ namespace WzComparerR2.Comparer
         public bool OutputPng { get; set; }
         public bool OutputAddedImg { get; set; }
         public bool OutputRemovedImg { get; set; }
-        public bool EnableDarkMode { get; set; }
+        public List<Color> ColorTable { get; set; }
         public bool HashPngFileName { get; set; }
 
         public string StateInfo
@@ -217,7 +217,6 @@ namespace WzComparerR2.Comparer
                     this.OutputPng ? "-OutputPng" : null,
                     this.OutputAddedImg ? "-OutputAddedImg" : null,
                     this.OutputRemovedImg ? "-OutputRemovedImg" : null,
-                    this.EnableDarkMode ? "-EnableDarkMode" : null,
                     "-PngComparison " + this.Comparer.PngComparison,
                     this.Comparer.ResolvePngLink ? "-ResolvePngLink" : null,
                 }.Where(p => p != null)));
@@ -535,42 +534,24 @@ namespace WzComparerR2.Comparer
             string path = Path.Combine(outputDir, "style.css");
             if (File.Exists(path))
                 return;
+            StringBuilder css = new StringBuilder();
+            css.AppendLine($"body {{ font-size:12px; background-color:{ColorToHex(ColorTable[0])}; color:{ColorToHex(ColorTable[1])}; }}");
+            css.AppendLine($"a {{ color:white; }}");
+            css.AppendLine($"p.wzf {{ }}");
+            css.AppendLine($"table, tr, th, td {{ border:1px solid #ff8000; border-collapse:collapse; }}");
+            css.AppendLine($"table {{ margin-bottom:16px; }}");
+            css.AppendLine($"th {{ text-align:left; }}");
+            css.AppendLine($"table.lst0 {{ }}");
+            css.AppendLine($"table.lst1 {{ }}");
+            css.AppendLine($"table.lst2 {{ }}");
+            css.AppendLine($"table.img {{ }}");
+            css.AppendLine($"table.img tr.r0 {{ background-color:{ColorToHex(ColorTable[2])}; color:{ColorToHex(ColorTable[5])}; }}");
+            css.AppendLine($"table.img tr.r1 {{ background-color:{ColorToHex(ColorTable[3])}; color:{ColorToHex(ColorTable[6])}; }}");
+            css.AppendLine($"table.img tr.r2 {{ background-color:{ColorToHex(ColorTable[4])}; color:{ColorToHex(ColorTable[7])}; }}");
+            css.AppendLine($"table.img.noChange {{ display:none; }}");
             FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write);
             StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-            if (EnableDarkMode)
-            {
-
-                sw.WriteLine("body { font-size:12px; background-color:black; color:white; }");
-                sw.WriteLine("a { color:white; }");
-                sw.WriteLine("p.wzf { }");
-                sw.WriteLine("table, tr, th, td { border:1px solid #ff8000; border-collapse:collapse; }");
-                sw.WriteLine("table { margin-bottom:16px; }");
-                sw.WriteLine("th { text-align:left; }");
-                sw.WriteLine("table.lst0 { }");
-                sw.WriteLine("table.lst1 { }");
-                sw.WriteLine("table.lst2 { }");
-                sw.WriteLine("table.img { }");
-                sw.WriteLine("table.img tr.r0 { background-color:#003049; }");
-                sw.WriteLine("table.img tr.r1 { background-color:#000000; }");
-                sw.WriteLine("table.img tr.r2 { background-color:#462306; }");
-                sw.WriteLine("table.img.noChange { display:none; }");
-            }
-            else
-            {
-                sw.WriteLine("body { font-size:12px; }");
-                sw.WriteLine("p.wzf { }");
-                sw.WriteLine("table, tr, th, td { border:1px solid #ff8000; border-collapse:collapse; }");
-                sw.WriteLine("table { margin-bottom:16px; }");
-                sw.WriteLine("th { text-align:left; }");
-                sw.WriteLine("table.lst0 { }");
-                sw.WriteLine("table.lst1 { }");
-                sw.WriteLine("table.lst2 { }");
-                sw.WriteLine("table.img { }");
-                sw.WriteLine("table.img tr.r0 { background-color:#fff4c4; }");
-                sw.WriteLine("table.img tr.r1 { background-color:#ebf2f8; }");
-                sw.WriteLine("table.img tr.r2 { background-color:#ffffff; }");
-                sw.WriteLine("table.img.noChange { display:none; }");
-            }
+            sw.Write(css.ToString());
             sw.Flush();
             sw.Close();
         }
@@ -591,6 +572,11 @@ namespace WzComparerR2.Comparer
                 hex.AppendFormat("{0:x2}", b);
             }
             return hex.ToString();
+        }
+        
+        private static string ColorToHex(Color color)
+        {
+            return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
         }
     }
 }

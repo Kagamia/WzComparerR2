@@ -200,7 +200,7 @@
             this.superTabItem1 = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.chkResolvePngLink = new DevComponents.DotNetBar.Controls.CheckBoxX();
-            this.chkEnableDarkMode = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.btnCustomCSS = new DevComponents.DotNetBar.ButtonX();
             this.superTooltip1 = new DevComponents.DotNetBar.SuperTooltip();
             this.chkOutputRemovedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkOutputAddedImg = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -2341,7 +2341,7 @@
             // superTabControlPanel2
             // 
             this.superTabControlPanel2.Controls.Add(this.chkHashPngFileName);
-            this.superTabControlPanel2.Controls.Add(this.chkEnableDarkMode);
+            this.superTabControlPanel2.Controls.Add(this.btnCustomCSS);
             this.superTabControlPanel2.Controls.Add(this.chkResolvePngLink);
             this.superTabControlPanel2.Controls.Add(this.chkOutputRemovedImg);
             this.superTabControlPanel2.Controls.Add(this.chkOutputAddedImg);
@@ -2372,19 +2372,21 @@
             this.chkResolvePngLink.TabIndex = 9;
             this.chkResolvePngLink.Text = "ResolvePngLink";
             // 
-            // chkEnableDarkMode
+            // btnCustomCSS
             // 
             // 
             // 
             // 
-            this.chkEnableDarkMode.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkEnableDarkMode.Location = new System.Drawing.Point(280, 61);
-            this.chkEnableDarkMode.Name = "chkEnableDarkMode";
-            this.chkEnableDarkMode.Size = new System.Drawing.Size(115, 23);
-            this.chkEnableDarkMode.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.superTooltip1.SetSuperTooltip(this.chkEnableDarkMode, new DevComponents.DotNetBar.SuperTooltipInfo("EnableDarkMode", "", "将比对结果以暗黑模式 HTML 输出", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 80)));
-            this.chkEnableDarkMode.TabIndex = 9;
-            this.chkEnableDarkMode.Text = "EnableDarkMode";
+            this.btnCustomCSS.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.btnCustomCSS.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.btnCustomCSS.Location = new System.Drawing.Point(400, 61);
+            this.btnCustomCSS.Name = "btnCustomCSS";
+            this.btnCustomCSS.Size = new System.Drawing.Size(80, 23);
+            this.btnCustomCSS.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.superTooltip1.SetSuperTooltip(this.btnCustomCSS, new DevComponents.DotNetBar.SuperTooltipInfo("CustomCSS", "", "修改对比报告的配色。", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 90)));
+            this.btnCustomCSS.TabIndex = 10;
+            this.btnCustomCSS.Text = "CustomCSS";
+            this.btnCustomCSS.Click += new System.EventHandler(this.btnCustomCSS_Click);
             // 
             // chkOutputRemovedImg
             // 
@@ -2971,12 +2973,12 @@
             // 
             // 
             this.chkHashPngFileName.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.chkHashPngFileName.Location = new System.Drawing.Point(391, 61);
+            this.chkHashPngFileName.Location = new System.Drawing.Point(280, 61);
             this.chkHashPngFileName.Name = "chkHashPngFileName";
             this.chkHashPngFileName.Size = new System.Drawing.Size(115, 23);
             this.chkHashPngFileName.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.superTooltip1.SetSuperTooltip(this.chkHashPngFileName, new DevComponents.DotNetBar.SuperTooltipInfo("HashPngFileName", "", "以 MD5 校验值输出 PNG 文件名称", null, null, DevComponents.DotNetBar.eTooltipColor.System, true, false, new System.Drawing.Size(180, 80)));
-            this.chkHashPngFileName.TabIndex = 10;
+            this.chkHashPngFileName.TabIndex = 9;
             this.chkHashPngFileName.Text = "HashPngFileName";
             // 
             // toolStripMenuItem4
@@ -3266,7 +3268,7 @@
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex1;
         private DevComponents.DotNetBar.CheckBoxItem checkBoxItemRegex2;
         private DevComponents.DotNetBar.SuperTooltip superTooltip1;
-        private DevComponents.DotNetBar.Controls.CheckBoxX chkEnableDarkMode;
+        private DevComponents.DotNetBar.ButtonX btnCustomCSS;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkHashPngFileName;
         private DevComponents.Editors.ComboItem comboItem19;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
