@@ -32,12 +32,6 @@ namespace WzComparerR2
                 new ComboItem("GMS(iso-8859-1)"){ Value = 1252 },
                 new ComboItem("自定义"){ Value = -1 },
             });
-
-            cmbWzVersionVerifyMode.Items.AddRange(new[]
-            {
-                new ComboItem("快速"){ Value = WzLib.WzVersionVerifyMode.Fast },
-                new ComboItem("传统"){ Value = WzLib.WzVersionVerifyMode.Default },
-            });
         }
 
         public bool SortWzOnOpened
@@ -80,18 +74,6 @@ namespace WzComparerR2
             set { chkImgCheckDisabled.Checked = value; }
         }
 
-        public WzLib.WzVersionVerifyMode WzVersionVerifyMode
-        {
-            get { return ((cmbWzVersionVerifyMode.SelectedItem as ComboItem)?.Value as WzLib.WzVersionVerifyMode?) ?? default; }
-            set
-            {
-                var items = cmbWzVersionVerifyMode.Items.Cast<ComboItem>();
-                var item = items.FirstOrDefault(_item => _item.Value as WzLib.WzVersionVerifyMode? == value)
-                    ?? items.First();
-                cmbWzVersionVerifyMode.SelectedItem = item;
-            }
-        }
-
         public void Load(WcR2Config config)
         {
             this.SortWzOnOpened = config.SortWzOnOpened;
@@ -99,7 +81,6 @@ namespace WzComparerR2
             this.DefaultWzCodePage = config.WzEncoding;
             this.AutoDetectExtFiles = config.AutoDetectExtFiles;
             this.ImgCheckDisabled = config.ImgCheckDisabled;
-            this.WzVersionVerifyMode = config.WzVersionVerifyMode;
         }
 
         public void Save(WcR2Config config)
@@ -109,7 +90,6 @@ namespace WzComparerR2
             config.WzEncoding = this.DefaultWzCodePage;
             config.AutoDetectExtFiles = this.AutoDetectExtFiles;
             config.ImgCheckDisabled = this.ImgCheckDisabled;
-            config.WzVersionVerifyMode = this.WzVersionVerifyMode;
         }
     }
 }

@@ -59,6 +59,32 @@ namespace WzComparerR2.WzLib.Utilities
                     }
                 }
             }
+            if (bgra4444Pixels.Length >= 8 && Sse2.IsSupported)
+            {
+                var mask0 = Vector128.Create(
+                        (byte)0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0,
+                        0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0);
+                var mask1 = Vector128.Create(
+                        (byte)0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f,
+                        0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f);
+
+                unsafe
+                {
+                    while (bgra4444Pixels.Length >= 8)
+                    {
+                        Vector128<byte> xmm;
+                        fixed (byte* pInput = bgra4444Pixels)
+                            xmm = Sse2.LoadScalarVector128((long*)pInput).AsByte();
+                        var xmm0 = Sse2.UnpackLow(xmm, xmm);
+                        var xmm1 = Sse2.ShiftRightLogical(xmm0.AsUInt16(), 4).AsByte();
+                        var xmm2 = Sse2.Or(Sse2.And(xmm0, mask0), Sse2.And(xmm1, mask1));
+                        fixed (byte* pOutput = outputBgraPixels)
+                            Sse2.Store(pOutput, xmm2);
+                        bgra4444Pixels = bgra4444Pixels.Slice(8);
+                        outputBgraPixels = outputBgraPixels.Slice(16);
+                    }
+                }
+            }
 #endif
             int p;
             for (int i = 0; i < bgra4444Pixels.Length; i++)
@@ -725,9 +751,16 @@ namespace WzComparerR2.WzLib.Utilities
         }
 
 #if NET6_0_OR_GREATER
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static Vector128<short> bc7_interp_sse2(Vector128<short> l, Vector128<short> h, Vector128<short> w, Vector128<short> iw)
         {
             return Sse2.ShiftRightLogical(Sse2.Add(Sse2.Add(Sse2.MultiplyLow(l, iw), Sse2.MultiplyLow(h, w)), Vector128.Create((short)32)), 6);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static Vector256<short> bc7_interp_avx2(Vector256<short> l, Vector256<short> h, Vector256<short> w, Vector256<short> iw)
+        {
+            return Avx2.ShiftRightLogical(Avx2.Add(Avx2.Add(Avx2.MultiplyLow(l, iw), Avx2.MultiplyLow(h, w)), Vector256.Create((short)32)), 6);
         }
 
         static unsafe void bc7_interp2_sse2(ReadOnlySpan<color_rgba> endpoint_pair, Span<color_rgba> out_colors)
@@ -761,6 +794,40 @@ namespace WzComparerR2.WzLib.Utilities
             Vector128<short> interpolated_16 = bc7_interp_sse2(endpoints_16bit, endpoints_16bit_swapped, Vector128.Create((short)9), Vector128.Create((short)55));
             Vector128<short> interpolated_23 = bc7_interp_sse2(endpoints_16bit, endpoints_16bit_swapped, Vector128.Create(18, 18, 18, 18, 37, 37, 37, 37), Vector128.Create(46, 46, 46, 46, 27, 27, 27, 27));
             Vector128<short> interpolated_45 = bc7_interp_sse2(endpoints_16bit, endpoints_16bit_swapped, Vector128.Create(37, 37, 37, 37, 18, 18, 18, 18), Vector128.Create(27, 27, 27, 27, 46, 46, 46, 46));
+
+            Vector128<short> interpolated_01 = Sse2.UnpackLow(endpoints_16bit.AsInt64(), interpolated_16.AsInt64()).AsInt16();
+            Vector128<short> interpolated_67 = Sse2.UnpackHigh(interpolated_16.AsInt64(), endpoints_16bit.AsInt64()).AsInt16();
+
+            Vector128<byte> all_colors_0 = Sse2.PackUnsignedSaturate(interpolated_01, interpolated_23);
+            Vector128<byte> all_colors_1 = Sse2.PackUnsignedSaturate(interpolated_45, interpolated_67);
+
+            fixed (color_rgba* pOutput = out_colors)
+            {
+                Sse2.Store((byte*)pOutput, all_colors_0);
+                Sse2.Store((byte*)(pOutput + 4), all_colors_1);
+            }
+        }
+
+        static unsafe void bc7_interp3_avx2(ReadOnlySpan<color_rgba> endpoint_pair, Span<color_rgba> out_colors)
+        {
+            Vector128<byte> endpoints;
+            fixed (color_rgba* pInput = endpoint_pair)
+                endpoints = Sse2.LoadScalarVector128((long*)pInput).AsByte();
+            Vector128<short> endpoints_16bit = Sse2.UnpackLow(endpoints, new Vector128<byte>()).AsInt16();
+            Vector128<short> endpoints_16bit_swapped = Sse2.Shuffle(endpoints_16bit.AsInt32(), 0b_01_00_11_10).AsInt16();
+
+            // Colors 1 and 6
+            Vector128<short> interpolated_16 = bc7_interp_sse2(endpoints_16bit, endpoints_16bit_swapped, Vector128.Create((short)9), Vector128.Create((short)55));
+
+            // Colors 2,3 and 4,5 (batched with AVX2)
+            Vector256<short> ep_256 = Vector256.Create(endpoints_16bit, endpoints_16bit);
+            Vector256<short> eps_256 = Vector256.Create(endpoints_16bit_swapped, endpoints_16bit_swapped);
+            Vector256<short> interpolated_2345 = bc7_interp_avx2(ep_256, eps_256,
+                Vector256.Create((short)18, 18, 18, 18, 37, 37, 37, 37, 37, 37, 37, 37, 18, 18, 18, 18),
+                Vector256.Create((short)46, 46, 46, 46, 27, 27, 27, 27, 27, 27, 27, 27, 46, 46, 46, 46));
+
+            Vector128<short> interpolated_23 = interpolated_2345.GetLower();
+            Vector128<short> interpolated_45 = interpolated_2345.GetUpper();
 
             Vector128<short> interpolated_01 = Sse2.UnpackLow(endpoints_16bit.AsInt64(), interpolated_16.AsInt64()).AsInt16();
             Vector128<short> interpolated_67 = Sse2.UnpackHigh(interpolated_16.AsInt64(), endpoints_16bit.AsInt64()).AsInt16();
@@ -855,6 +922,8 @@ namespace WzComparerR2.WzLib.Utilities
                 {
                     if (WEIGHT_BITS == 2)
                         bc7_interp2_sse2(endpoints.Slice(s * 2), block_colors.Slice(s * 8));
+                    else if (Avx2.IsSupported)
+                        bc7_interp3_avx2(endpoints.Slice(s * 2), block_colors.Slice(s * 8));
                     else
                         bc7_interp3_sse2(endpoints.Slice(s * 2), block_colors.Slice(s * 8));
                 }
@@ -961,6 +1030,8 @@ namespace WzComparerR2.WzLib.Utilities
                 {
                     if (WEIGHT_BITS == 2)
                         bc7_interp2_sse2(endpoints.Slice(s * 2), block_colors.Slice(s * 8));
+                    else if (Avx2.IsSupported)
+                        bc7_interp3_avx2(endpoints.Slice(s * 2), block_colors.Slice(s * 8));
                     else
                         bc7_interp3_sse2(endpoints.Slice(s * 2), block_colors.Slice(s * 8));
                 }
@@ -1069,7 +1140,12 @@ namespace WzComparerR2.WzLib.Utilities
             if (Sse2.IsSupported)
             {
                 if (weight_bits[0] == 3)
-                    bc7_interp3_sse2(endpoints, block_colors);
+                {
+                    if (Avx2.IsSupported)
+                        bc7_interp3_avx2(endpoints, block_colors);
+                    else
+                        bc7_interp3_sse2(endpoints, block_colors);
+                }
                 else
                     bc7_interp2_sse2(endpoints, block_colors);
             }

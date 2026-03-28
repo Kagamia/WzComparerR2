@@ -6,6 +6,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using WzComparerR2.WzLib.Utilities;
+using WzComparerR2.WzLib.Compatibility;
+using static WzComparerR2.WzLib.Utilities.MathHelper;
 
 namespace WzComparerR2.WzLib
 {
@@ -17,7 +19,6 @@ namespace WzComparerR2.WzLib
             this.wzStructure = wz;
             this.fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             this.loaded = this.GetHeader(fileName);
-            this.directories = new List<Wz_Directory>();
         }
 
         private FileStream fileStream;
@@ -30,7 +31,11 @@ namespace WzComparerR2.WzLib
         private Wz_Type type;
         private List<Wz_File> mergedWzFiles;
         private Wz_File ownerWzFile;
-        private readonly List<Wz_Directory> directories;
+
+        /// <summary>
+        /// The offset calculator assigned during version detection, used for dir tree reading and image offset calculation.
+        /// </summary>
+        internal IWzImageOffsetCalc OffsetCalc { get; set; }
 
         public Encoding TextEncoding { get; set; }
 
@@ -162,28 +167,14 @@ namespace WzComparerR2.WzLib
                 }
 
                 int dataStartPos = headerSize + (encverMissing ? 0 : 2);
-                this.Header = new Wz_Header(signature, copyright, fileName, headerSize, dataSize, filesize, dataStartPos);
-
-                if (encverMissing)
-                {
-                    // not sure if nexon will change this magic version, just hard coded.
-                    this.Header.SetWzVersion(777);
-                    this.Header.VersionChecked = true;
-                    this.Header.Capabilities |= Wz_Capabilities.EncverMissing;
-                }
-                else
-                {
-                    this.Header.SetOrdinalVersionDetector(encver);
-                }
+                this.Header = new Wz_Header.WzPkg1Header(signature, copyright, fileName, headerSize, dataSize, filesize, dataStartPos, encverMissing, encver);
             }
             else if (signature == Wz_Header.PKG2)
             {
                 uint hash1 = br.ReadUInt32();
                 uint hash2 = br.ReadUInt32();
                 int dataStartPos = (int)this.fileStream.Position;
-                Wz_Header header = new(signature, copyright, fileName, headerSize, dataSize, filesize, dataStartPos);
-                header.SetWzVersionPkg2(hash1, hash2);
-                this.header = header;
+                this.Header = new Wz_Header.WzPkg2Header(signature, copyright, fileName, headerSize, dataSize, filesize, dataStartPos, hash1, hash2);
             }
             else
             {
@@ -197,93 +188,9 @@ namespace WzComparerR2.WzLib
             return false;
         }
 
-        public uint CalcOffset(uint filePos, uint hashedOffset)
-        {
-            uint offset = (uint)(filePos - 0x3C) ^ 0xFFFFFFFF;
-            int distance;
-
-            offset *= this.Header.HashVersion;
-            offset -= 0x581C3F6D;
-            distance = (int)offset & 0x1F;
-            offset = (offset << distance) | (offset >> (32 - distance));
-            offset ^= hashedOffset;
-            offset += 0x78;
-
-            return offset;
-        }
-
-        // for KMST 1196-1197
-        public uint CalcOffsetPkg2V1(uint filePos, uint hashedOffset)
-        {
-            uint headerLen = (uint)this.header.HeaderSize;
-            uint hashVersion = this.header.HashVersion;
-            uint hash1 = this.header.Pkg2Hash1;
-
-            uint offset = filePos - headerLen;
-            int distance;
-
-            offset = ~offset;
-            offset *= hashVersion;
-            offset -= 0x581C3F6D;
-            offset ^= hash1 * 0x01010101;
-            distance = (byte)((hashVersion ^ hash1) & 0x1F);
-            offset = (offset << distance) | (offset >> (32 - distance));
-            offset ^= hashedOffset;
-            offset += headerLen;
-
-            return offset;
-        }
-
-        // for KMST 1198
-        public uint CalcOffsetPkg2V2(uint filePos, uint hashedOffset)
-        {
-            uint headerLen = (uint)this.header.HeaderSize;
-            uint hashVersion = this.header.HashVersion;
-            uint hash1 = this.header.Pkg2Hash1;
-
-            uint offset = filePos - headerLen;
-            int distance;
-
-            offset = ~offset;
-            offset *= hashVersion ^ hash1;
-            offset -= 0x581C3F6D;
-            offset ^= hash1 * 0x01010101;
-            distance = (byte)((hashVersion ^ hash1) & 0x1F);
-            offset = (offset << distance) | (offset >> (32 - distance));
-            offset ^= ~hashedOffset;
-            offset += headerLen;
-
-            return offset;
-        }
-
-        // for KMST 1196-1197
-        public int DecryptPkg2EntryCountV1(int encryptedEntryCount)
-        {
-            uint hash1 = this.header.Pkg2Hash1;
-            uint hashVersion = this.header.HashVersion;
-            int entryCount = (int)(encryptedEntryCount ^ ((hash1 << 24) + (0x7F4A7C15 * hashVersion)));
-            return entryCount;
-        }
-
-        // for KMST 1198
-        public int DecryptPkg2EntryCountV2(int encryptedEntryCount)
-        {
-            uint hash1 = this.header.Pkg2Hash1;
-            uint hashVersion = this.header.HashVersion;
-            int entryCount = (int)(encryptedEntryCount ^ ((hash1 << 16) + (0x21524111 * hashVersion)));
-            return entryCount;
-        }
-
-        public uint CalcHashVersionFromEntryCountV1(int encryptedEntryCount, int entryCount)
-        {
-            // calculate with modular inverse:
-            uint hash1 = this.header.Pkg2Hash1;
-            return ((uint)(entryCount ^ encryptedEntryCount) - (hash1 << 24)) * 0x9937733D;
-        }
-
         public void GetDirTree(Wz_Node parent, bool useBaseWz = false, bool loadWzAsFolder = false)
         {
-            var ps = new PartialStream(this.FileStream, this.header.DataStartPosition, this.fileStream.Length - this.header.DataStartPosition, true);
+            var ps = new PartialStream(this.FileStream, this.header.DirStartPosition, this.fileStream.Length - this.header.DirStartPosition, true);
             ps.Position = 0;
             var reader = new WzBinaryReader(ps, false);
             this.GetDirTree(reader, parent, useBaseWz, loadWzAsFolder);
@@ -291,13 +198,13 @@ namespace WzComparerR2.WzLib
 
         private void GetDirTree(WzBinaryReader reader, Wz_Node parent, bool useBaseWz = false, bool loadWzAsFolder = false)
         {
-            List<string> dirs = new List<string>();
+            List<Wz_Directory> dirs = new List<Wz_Directory>();
 
-            if (this.header.Signature == Wz_Header.PKG1)
+            if (this.header.IsPkg1)
             {
                 this.ReadDirTree(reader, parent, ref dirs);
             }
-            else if (this.header.Signature == Wz_Header.PKG2)
+            else if (this.header.IsPkg2)
             {
                 this.ReadDirTreePkg2(reader, parent, ref dirs);
             }
@@ -316,7 +223,7 @@ namespace WzComparerR2.WzLib
                 for (int i = 0; i < dirCount; i++)
                 {
                     //检测文件名
-                    var m = Regex.Match(dirs[i], @"^([A-Za-z]+)$");
+                    var m = Regex.Match(dirs[i].Name, @"^([A-Za-z]+)$");
                     if (m.Success)
                     {
                         string wzTypeName = m.Result("$1");
@@ -328,9 +235,9 @@ namespace WzComparerR2.WzLib
                             string extWzFile = Path.Combine(baseFolder, extDirName + ".wz");
                             if (File.Exists(extWzFile))
                             {
-                                if (!dirs.Take(dirCount).Any(dir => extDirName.Equals(dir, StringComparison.OrdinalIgnoreCase)))
+                                if (!dirs.Take(dirCount).Any(dir => extDirName.Equals(dir.Name, StringComparison.OrdinalIgnoreCase)))
                                 {
-                                    dirs.Add(extDirName);
+                                    dirs.Add(new Wz_Directory(extDirName, 0, 0, 0, 0, this));
                                 }
                             }
                             else
@@ -345,9 +252,9 @@ namespace WzComparerR2.WzLib
                             string extWzFile = Path.Combine(baseFolder, extDirName + ".wz");
                             if (File.Exists(extWzFile))
                             {
-                                if (!dirs.Take(dirCount).Any(dir => extDirName.Equals(dir, StringComparison.OrdinalIgnoreCase)))
+                                if (!dirs.Take(dirCount).Any(dir => extDirName.Equals(dir.Name, StringComparison.OrdinalIgnoreCase)))
                                 {
-                                    dirs.Add(extDirName);
+                                    dirs.Add(new Wz_Directory(extDirName, 0, 0, 0, 0, this));
                                 }
                             }
                             else
@@ -361,7 +268,7 @@ namespace WzComparerR2.WzLib
 
             for (int i = 0; i < dirs.Count; i++)
             {
-                string dir = dirs[i];
+                string dir = dirs[i].Name;
                 Wz_Node t = parent.Nodes.Add(dir);
                 if (i < dirCount)
                 {
@@ -406,7 +313,7 @@ namespace WzComparerR2.WzLib
             parent.Nodes.Trim();
         }
 
-        private void ReadDirTree(WzBinaryReader reader, Wz_Node parent, ref List<string> dirs)
+        private void ReadDirTree(WzBinaryReader reader, Wz_Node parent, ref List<Wz_Directory> dirs)
         {
             var cryptoKey = this.WzStructure.encryption.Pkg1Keys;
             int count = reader.ReadCompressedInt32();
@@ -439,6 +346,8 @@ namespace WzComparerR2.WzLib
                     case 0x02:
                     case 0x04:
                         Wz_Image img = new Wz_Image(name, size, cs32, hashOffset, pos, this);
+                        if (this.OffsetCalc != null)
+                            img.Offset = this.OffsetCalc.CalcOffset(pos, hashOffset);
                         Wz_Node childNode = parent.Nodes.Add(name);
                         childNode.Value = img;
                         img.OwnerNode = childNode;
@@ -446,41 +355,30 @@ namespace WzComparerR2.WzLib
                         break;
 
                     case 0x03:
-                        this.directories.Add(new Wz_Directory(name, size, cs32, hashOffset, pos, this));
-                        dirs.Add(name);
+                        var dir = new Wz_Directory(name, size, cs32, hashOffset, pos, this);
+                        if (this.OffsetCalc != null)
+                            dir.Offset = this.OffsetCalc.CalcOffset(pos, hashOffset);
+                        dirs.Add(dir);
                         break;
                 }
             }
         }
 
-        private void ReadDirTreePkg2(WzBinaryReader reader, Wz_Node parent, ref List<string> dirs)
+        private void ReadDirTreePkg2(WzBinaryReader reader, Wz_Node parent, ref List<Wz_Directory> dirs)
         {
-            var encType = this.WzStructure.encryption.Pkg2EncType;
-            var pkg1Keys = this.WzStructure.encryption.Pkg1Keys ?? this.WzStructure.encryption.GetKeys(Wz_CryptoKeyType.BMS);
-            var pkg2Keys = this.WzStructure.encryption.Pkg2Keys;
+            var dirReader = ((Wz_Header.WzPkg2Header)this.Header).DirStringReader;
+            var pkg2Calc = this.OffsetCalc as IPkg2ImageOffsetCalc;
             int encryptedEntryCount = reader.ReadCompressedInt32();
+            int entryCount = pkg2Calc?.DecryptEntryCount(encryptedEntryCount) ?? 0;
 
             List<Pkg2DirEntry> entries = new();
-            while (true)
+            for (int i = 0; i < entryCount; i++)
             {
                 byte nodeType = reader.ReadByte();
                 string name;
                 if (nodeType == 0x03 || nodeType == 0x04)
                 {
-                    if (encType == Wz_CryptoKeyType.KMST1198)
-                    {
-                        name = entries.Count == 0 ? reader.ReadPkg2DirString(pkg2Keys) : reader.ReadString(pkg1Keys);
-                    }
-                    else
-                    {
-                        name = reader.ReadString(pkg2Keys);
-                    }
-                }
-                else if (nodeType == 0x80 || (-127 <= encryptedEntryCount && encryptedEntryCount <= 127 && nodeType == encryptedEntryCount))
-                {
-                    // next byte is encryptedOffsetCount
-                    reader.BaseStream.Position--;
-                    break;
+                    name = dirReader.ReadName(reader, entries.Count == 0);
                 }
                 else
                 {
@@ -511,6 +409,8 @@ namespace WzComparerR2.WzLib
                     {
                         case 0x04:
                             Wz_Image img = new Wz_Image(entry.Name, entry.DataLength, entry.Checksum, hashOffset, pos, this);
+                            if (this.OffsetCalc != null)
+                                img.Offset = this.OffsetCalc.CalcOffset(pos, hashOffset);
                             Wz_Node childNode = parent.Nodes.Add(entry.Name);
                             childNode.Value = img;
                             img.OwnerNode = childNode;
@@ -518,8 +418,10 @@ namespace WzComparerR2.WzLib
                             break;
 
                         case 0x03:
-                            this.directories.Add(new Wz_Directory(entry.Name, entry.DataLength, entry.Checksum, hashOffset, pos, this));
-                            dirs.Add(entry.Name);
+                            var dir = new Wz_Directory(entry.Name, entry.DataLength, entry.Checksum, hashOffset, pos, this);
+                            if (this.OffsetCalc != null)
+                                dir.Offset = this.OffsetCalc.CalcOffset(pos, hashOffset);
+                            dirs.Add(dir);
                             break;
                     }
                 }
@@ -621,36 +523,6 @@ namespace WzComparerR2.WzLib
             }
         }
 
-        public void DetectWzVersion()
-        {
-            IWzVersionVerifier wzVersionVerifier;
-
-            if (this.Header.Signature == Wz_Header.PKG1)
-            {
-                switch (this.wzStructure?.WzVersionVerifyMode)
-                {
-                    default:
-                    case WzVersionVerifyMode.Default:
-                        wzVersionVerifier = new DefaultVersionVerifier();
-                        break;
-
-                    case WzVersionVerifyMode.Fast:
-                        wzVersionVerifier = new FastVersionVerifier();
-                        break;
-                }
-            }
-            else if (this.header.Signature == Wz_Header.PKG2)
-            {
-                wzVersionVerifier = new Pkg2VersionVerifier();
-            }
-            else
-            {
-                throw new Exception($"Unknown signature: {this.header.Signature}");
-            }
-
-            wzVersionVerifier.Verify(this);
-        }
-
         public void MergeWzFile(Wz_File wz_File)
         {
             var children = wz_File.node.Nodes.ToList();
@@ -670,285 +542,6 @@ namespace WzComparerR2.WzLib
         }
 
 
-        public interface IWzVersionVerifier
-        {
-            bool Verify(Wz_File wzFile);
-        }
-
-        public abstract class WzVersionVerifier
-        {
-            protected abstract uint CalcOffset(Wz_File wzFile, uint filePos, uint hashedOffset);
-
-            protected IEnumerable<Wz_Image> EnumerableAllWzImage(Wz_Node parentNode)
-            {
-                foreach (var node in parentNode.Nodes)
-                {
-                    Wz_Image img = node.Value as Wz_Image;
-                    if (img != null)
-                    {
-                        yield return img;
-                    }
-
-                    if (!(node.Value is Wz_File) && node.Nodes.Count > 0)
-                    {
-                        foreach (var imgChild in EnumerableAllWzImage(node))
-                        {
-                            yield return imgChild;
-                        }
-                    }
-                }
-            }
-
-            protected bool FastCheckFirstByte(Wz_Image image, byte firstByte)
-            {
-                if (image.IsLuaImage)
-                {
-                    // for lua image, the first byte is always 01
-                    return firstByte == 0x01;
-                }
-                else
-                {
-                    // first element is always a string
-                    return firstByte == 0x73 || firstByte == 0x1b;
-                }
-            }
-
-            protected void CalcOffset(Wz_File wzFile, IEnumerable<Wz_Image> imgList)
-            {
-                foreach (var img in imgList)
-                {
-                    img.Offset = this.CalcOffset(wzFile, img.HashedOffsetPosition, img.HashedOffset);
-                }
-            }
-
-            protected bool DetectWithWzImage(Wz_File wzFile, Wz_Image testWzImg)
-            {
-                while (wzFile.header.TryGetNextVersion())
-                {
-                    uint offs = this.CalcOffset(wzFile, testWzImg.HashedOffsetPosition, testWzImg.HashedOffset);
-
-                    if (offs < wzFile.header.DirEndPosition || offs + testWzImg.Size > wzFile.fileStream.Length)  //img offset out of file size
-                    {
-                        continue;
-                    }
-
-                    wzFile.fileStream.Position = offs;
-                    var firstByte = (byte)wzFile.fileStream.ReadByte();
-                    if (!FastCheckFirstByte(testWzImg, firstByte))
-                    {
-                        continue;
-                    }
-
-                    testWzImg.Offset = offs;
-                    if (!testWzImg.TryExtract())
-                    {
-                        continue;
-                    }
-
-                    testWzImg.Unextract();
-                    wzFile.header.VersionChecked = true;
-                    break;
-                }
-
-                return wzFile.header.VersionChecked;
-            }
-
-            protected bool DetectWithAllWzDir(Wz_File wzFile)
-            {
-                while (wzFile.header.TryGetNextVersion())
-                {
-                    bool isSuccess = wzFile.directories.All(testDir =>
-                    {
-                        uint offs = this.CalcOffset(wzFile, testDir.HashedOffsetPosition, testDir.HashedOffset);
-
-                        if (offs < wzFile.header.DataStartPosition || offs + 1 > wzFile.header.DirEndPosition) // dir offset out of file size.
-                        {
-                            return false;
-                        }
-
-                        wzFile.fileStream.Position = offs;
-                        if (wzFile.fileStream.ReadByte() != 0) // for splitted wz format, dir data only contains one byte: 0x00
-                        {
-                            return false;
-                        }
-
-                        return true;
-                    });
-
-                    if (isSuccess)
-                    {
-                        wzFile.header.VersionChecked = true;
-                        break;
-                    }
-                }
-
-                return wzFile.header.VersionChecked;
-            }
-
-            protected bool FastDetectWithAllWzImages(Wz_File wzFile, IList<Wz_Image> imgList)
-            {
-                var imageSizes = new SizeRange[imgList.Count];
-                while (wzFile.header.TryGetNextVersion())
-                {
-                    int count = 0;
-                    bool isSuccess = imgList.All(img =>
-                    {
-                        uint offs = this.CalcOffset(wzFile, img.HashedOffsetPosition, img.HashedOffset);
-                        if (offs < wzFile.header.DirEndPosition || offs + img.Size > wzFile.fileStream.Length)  //img offset out of file size
-                        {
-                            return false;
-                        }
-
-                        imageSizes[count++] = new SizeRange()
-                        {
-                            Start = offs,
-                            End = offs + img.Size,
-                        };
-                        return true;
-                    });
-
-                    if (isSuccess)
-                    {
-                        // check if there's any image overlaps with another image.
-                        Array.Sort(imageSizes, 0, count);
-                        for (int i = 1; i < count; i++)
-                        {
-                            if (imageSizes[i - 1].End > imageSizes[i].Start)
-                            {
-                                isSuccess = false;
-                                break;
-                            }
-                        }
-
-                        if (isSuccess)
-                        {
-                            wzFile.header.VersionChecked = true;
-                            break;
-                        }
-                    }
-                }
-
-                return wzFile.header.VersionChecked;
-            }
-
-            private struct SizeRange : IComparable<SizeRange>
-            {
-                public long Start;
-                public long End;
-
-                public int CompareTo(SizeRange sr)
-                {
-                    int result = this.Start.CompareTo(sr.Start);
-                    if (result == 0)
-                    {
-                        result = this.End.CompareTo(sr.End);
-                    }
-                    return result;
-                }
-            }
-        }
-
-        public class DefaultVersionVerifier : WzVersionVerifier, IWzVersionVerifier
-        {
-            public bool Verify(Wz_File wzFile)
-            {
-                List<Wz_Image> imgList = EnumerableAllWzImage(wzFile.node).Where(_img => _img.WzFile == wzFile).ToList();
-
-                if (wzFile.header.VersionChecked)
-                {
-                    this.CalcOffset(wzFile, imgList);
-                }
-                else
-                {
-                    // find the wzImage with minimum size.
-                    Wz_Image minSizeImg = imgList.DefaultIfEmpty().Aggregate((_img1, _img2) => _img1.Size < _img2.Size ? _img1 : _img2);
-
-                    if (minSizeImg == null && imgList.Count > 0)
-                    {
-                        minSizeImg = imgList[0];
-                    }
-
-                    if (minSizeImg != null)
-                    {
-                        this.DetectWithWzImage(wzFile, minSizeImg);
-                    }
-                    else if (wzFile.directories.Count > 0)
-                    {
-                        this.DetectWithAllWzDir(wzFile);
-                    }
-
-                    if (wzFile.header.VersionChecked)
-                    {
-                        this.CalcOffset(wzFile, imgList);
-                    }
-                }
-
-                return wzFile.header.VersionChecked;
-            }
-
-            protected override uint CalcOffset(Wz_File wzFile, uint filePos, uint hashedOffset) => wzFile.CalcOffset(filePos, hashedOffset);
-        }
-
-        public class FastVersionVerifier : WzVersionVerifier, IWzVersionVerifier
-        {
-            public virtual bool Verify(Wz_File wzFile)
-            {
-                List<Wz_Image> imgList = EnumerableAllWzImage(wzFile.node).Where(_img => _img.WzFile == wzFile).ToList();
-
-                if (wzFile.header.VersionChecked)
-                {
-                    this.CalcOffset(wzFile, imgList);
-                }
-                else
-                {
-                    if (imgList.Count > 0)
-                    {
-                        this.FastDetectWithAllWzImages(wzFile, imgList);
-                    }
-                    else if (wzFile.directories.Count > 0)
-                    {
-                        this.DetectWithAllWzDir(wzFile);
-                    }
-
-                    if (wzFile.header.VersionChecked)
-                    {
-                        this.CalcOffset(wzFile, imgList);
-                    }
-                }
-
-                return wzFile.header.VersionChecked;
-            }
-
-            protected override uint CalcOffset(Wz_File wzFile, uint filePos, uint hashedOffset) => wzFile.CalcOffset(filePos, hashedOffset);
-        }
-
-        public class Pkg2VersionVerifier : FastVersionVerifier, IWzVersionVerifier
-        {
-            private const int CryptoVersionMin = 1;
-            private const int CryptoVersionMax = 2;
-            public override bool Verify(Wz_File wzFile)
-            {
-                for (int i = CryptoVersionMax; i >= CryptoVersionMin; i--)
-                {
-                    this.cryptoVersion = i;
-                    wzFile.header.ResetVersionDetector();
-                    if (base.Verify(wzFile))
-                    {
-                        break;
-                    }
-                }
-                return wzFile.header.VersionChecked;
-            }
-
-            private int cryptoVersion;
-            protected override uint CalcOffset(Wz_File wzFile, uint filePos, uint hashedOffset) => this.cryptoVersion switch
-            {
-                1 => wzFile.CalcOffsetPkg2V1(filePos, hashedOffset),
-                2 => wzFile.CalcOffsetPkg2V2(filePos, hashedOffset),
-                _ => throw new InvalidOperationException($"Unknown cryptoVersion {this.cryptoVersion}."),
-            };
-        }
-
         private struct Pkg2DirEntry
         {
             public int NodeType;
@@ -958,9 +551,4 @@ namespace WzComparerR2.WzLib
         }
     }
 
-    public enum WzVersionVerifyMode
-    {
-        Default = 0,
-        Fast = 1,
-    }
 }
