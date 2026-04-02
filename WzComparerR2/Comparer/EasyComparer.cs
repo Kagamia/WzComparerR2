@@ -536,7 +536,7 @@ namespace WzComparerR2.Comparer
                 return;
             StringBuilder css = new StringBuilder();
             css.AppendLine($"body {{ font-size:12px; background-color:{ColorToHex(ColorTable[0])}; color:{ColorToHex(ColorTable[1])}; }}");
-            css.AppendLine($"a {{ color:white; }}");
+            css.AppendLine($"a {{ color:{ColorToHex(ColorTable[8])}; }}");
             css.AppendLine($"p.wzf {{ }}");
             css.AppendLine($"table, tr, th, td {{ border:1px solid #ff8000; border-collapse:collapse; }}");
             css.AppendLine($"table {{ margin-bottom:16px; }}");

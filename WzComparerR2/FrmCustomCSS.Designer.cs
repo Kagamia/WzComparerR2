@@ -37,6 +37,7 @@
             this.lblChangedTextColor = new DevComponents.DotNetBar.LabelX();
             this.lblAddedTextColor = new DevComponents.DotNetBar.LabelX();
             this.lblRemovedTextColor = new DevComponents.DotNetBar.LabelX();
+            this.lblHyperlinkColor = new DevComponents.DotNetBar.LabelX();
             this.btnOk = new DevComponents.DotNetBar.ButtonX();
             this.btnCancel = new DevComponents.DotNetBar.ButtonX();
             this.btnDefault = new DevComponents.DotNetBar.ButtonX();
@@ -49,6 +50,7 @@
             this.colorPickerChangedTextColor = new DevComponents.DotNetBar.ColorPickerButton();
             this.colorPickerAddedTextColor = new DevComponents.DotNetBar.ColorPickerButton();
             this.colorPickerRemovedTextColor = new DevComponents.DotNetBar.ColorPickerButton();
+            this.colorPickerHyperlinkColor = new DevComponents.DotNetBar.ColorPickerButton();
             this.SuspendLayout();
             // 
             // lblBackgroundColor
@@ -154,6 +156,19 @@
             this.lblRemovedTextColor.Size = new System.Drawing.Size(222, 16);
             this.lblRemovedTextColor.TabIndex = 0;
             this.lblRemovedTextColor.Text = "[Removed] foreColor";
+            // 
+            // lblHyperlinkColor
+            // 
+            this.lblHyperlinkColor.AutoSize = true;
+            // 
+            // 
+            // 
+            this.lblHyperlinkColor.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.lblHyperlinkColor.Location = new System.Drawing.Point(10, 122);
+            this.lblHyperlinkColor.Name = "lblHyperlinkColor";
+            this.lblHyperlinkColor.Size = new System.Drawing.Size(222, 16);
+            this.lblHyperlinkColor.TabIndex = 0;
+            this.lblHyperlinkColor.Text = "[Hyperlink] Color";
             // 
             // colorPickerBackgroundColor
             // 
@@ -267,6 +282,20 @@
             this.colorPickerRemovedTextColor.TabIndex = 8;
             this.colorPickerRemovedTextColor.SelectedColorChanged += new System.EventHandler(this.colorPickers_SelectedColorChanged);
             // 
+            // colorPickerHyperlinkColor
+            // 
+            this.colorPickerHyperlinkColor.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.colorPickerHyperlinkColor.AutoExpandOnClick = true;
+            this.colorPickerHyperlinkColor.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.colorPickerHyperlinkColor.Image = ((System.Drawing.Image)(resources.GetObject("colorPickerButton1.Image")));
+            this.colorPickerHyperlinkColor.Location = new System.Drawing.Point(120, 119);
+            this.colorPickerHyperlinkColor.Name = "colorPickerHyperlinkColor";
+            this.colorPickerHyperlinkColor.SelectedColorImageRectangle = new System.Drawing.Rectangle(2, 2, 12, 12);
+            this.colorPickerHyperlinkColor.Size = new System.Drawing.Size(37, 23);
+            this.colorPickerHyperlinkColor.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.colorPickerHyperlinkColor.TabIndex = 9;
+            this.colorPickerHyperlinkColor.SelectedColorChanged += new System.EventHandler(this.colorPickers_SelectedColorChanged);
+            // 
             // richTextBoxEx1
             // 
             // 
@@ -274,21 +303,21 @@
             // 
             this.richTextBoxEx1.BackgroundStyle.Class = "RichTextBoxBorder";
             this.richTextBoxEx1.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.richTextBoxEx1.Location = new System.Drawing.Point(12, 119);
+            this.richTextBoxEx1.Location = new System.Drawing.Point(12, 144);
             this.richTextBoxEx1.Name = "richTextBoxEx1";
             this.richTextBoxEx1.Rtf = "{\\rtf1\\ansi\\ansicpg936\\deff0\\deflang1033\\deflangfe1042{\\fonttbl{\\f0\\fnil\\fcharset" +
     "129 \\\'b5\\\'b8\\\'bf\\\'f2;}}\r\n\\viewkind4\\uc1\\pard\\lang1042\\f0\\fs18\\par\r\n}\r\n";
-            this.richTextBoxEx1.Size = new System.Drawing.Size(305, 67);
-            this.richTextBoxEx1.TabIndex = 9;
+            this.richTextBoxEx1.Size = new System.Drawing.Size(305, 83);
+            this.richTextBoxEx1.TabIndex = 10;
             this.richTextBoxEx1.Font = new System.Drawing.Font("SimSun", 9f);
             // 
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(12, 200);
+            this.btnOk.Location = new System.Drawing.Point(12, 231);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(100, 35);
-            this.btnOk.TabIndex = 10;
+            this.btnOk.TabIndex = 11;
             this.btnOk.Text = "OK";
             this.btnOk.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
             this.btnOk.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -296,10 +325,10 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(117, 200);
+            this.btnCancel.Location = new System.Drawing.Point(117, 231);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(100, 35);
-            this.btnCancel.TabIndex = 11;
+            this.btnCancel.TabIndex = 12;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
             this.btnCancel.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -307,10 +336,10 @@
             // 
             // btnDefault
             // 
-            this.btnDefault.Location = new System.Drawing.Point(222, 200);
+            this.btnDefault.Location = new System.Drawing.Point(222, 231);
             this.btnDefault.Name = "btnDefault";
             this.btnDefault.Size = new System.Drawing.Size(100, 35);
-            this.btnDefault.TabIndex = 5;
+            this.btnDefault.TabIndex = 13;
             this.btnDefault.Text = "Default";
             this.btnDefault.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
             this.btnDefault.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -320,7 +349,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(329, 250);
+            this.ClientSize = new System.Drawing.Size(329, 280);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnDefault);
@@ -333,6 +362,7 @@
             this.Controls.Add(this.colorPickerChangedTextColor);
             this.Controls.Add(this.colorPickerAddedTextColor);
             this.Controls.Add(this.colorPickerRemovedTextColor);
+            this.Controls.Add(this.colorPickerHyperlinkColor);
             this.Controls.Add(this.lblBackgroundColor);
             this.Controls.Add(this.lblNormalTextColor);
             this.Controls.Add(this.lblChangedBackgroundColor);
@@ -341,6 +371,7 @@
             this.Controls.Add(this.lblAddedTextColor);
             this.Controls.Add(this.lblRemovedBackgroundColor);
             this.Controls.Add(this.lblRemovedTextColor);
+            this.Controls.Add(this.lblHyperlinkColor);
             this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("SimSun", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -364,6 +395,7 @@
         private DevComponents.DotNetBar.LabelX lblChangedTextColor;
         private DevComponents.DotNetBar.LabelX lblAddedTextColor;
         private DevComponents.DotNetBar.LabelX lblRemovedTextColor;
+        private DevComponents.DotNetBar.LabelX lblHyperlinkColor;
         private DevComponents.DotNetBar.ButtonX btnOk;
         private DevComponents.DotNetBar.ButtonX btnCancel;
         private DevComponents.DotNetBar.ButtonX btnDefault;
@@ -375,6 +407,7 @@
         private DevComponents.DotNetBar.ColorPickerButton colorPickerChangedTextColor;
         private DevComponents.DotNetBar.ColorPickerButton colorPickerAddedTextColor;
         private DevComponents.DotNetBar.ColorPickerButton colorPickerRemovedTextColor;
+        private DevComponents.DotNetBar.ColorPickerButton colorPickerHyperlinkColor;
         private DevComponents.DotNetBar.Controls.RichTextBoxEx richTextBoxEx1;
     }
 }

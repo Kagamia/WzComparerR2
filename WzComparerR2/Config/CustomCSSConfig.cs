@@ -22,6 +22,7 @@ namespace WzComparerR2.Config
             ChangedTextColor = Color.FromArgb(Int32.Parse("ff000000", NumberStyles.HexNumber));
             AddedTextColor = Color.FromArgb(Int32.Parse("ff000000", NumberStyles.HexNumber));
             RemovedTextColor = Color.FromArgb(Int32.Parse("ff000000", NumberStyles.HexNumber));
+            HyperlinkColor = Color.FromArgb(Int32.Parse("ff0000ff", NumberStyles.HexNumber));
         }
 
         [ConfigurationProperty("backgroundColor")]
@@ -78,6 +79,13 @@ namespace WzComparerR2.Config
         {
             get { return (Color)this["removedTextColor"]; }
             set { this["removedTextColor"] = value; }
+        }
+
+        [ConfigurationProperty("hyperlinkColor")]
+        public Color HyperlinkColor
+        {
+            get { return (Color)this["hyperlinkColor"]; }
+            set { this["hyperlinkColor"] = value; }
         }
     }
 }
