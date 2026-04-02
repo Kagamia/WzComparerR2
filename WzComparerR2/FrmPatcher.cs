@@ -483,7 +483,8 @@ namespace WzComparerR2
                                 CustomCSSConfig.Default.RemovedBackgroundColor,
                                 CustomCSSConfig.Default.ChangedTextColor,
                                 CustomCSSConfig.Default.AddedTextColor,
-                                CustomCSSConfig.Default.RemovedTextColor
+                                CustomCSSConfig.Default.RemovedTextColor,
+                                CustomCSSConfig.Default.HyperlinkColor
                             };
                             wznew.Load(e.Part.TempFilePath, false);
                             wzold.Load(e.Part.OldFilePath, false);

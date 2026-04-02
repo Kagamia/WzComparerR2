@@ -3135,7 +3135,8 @@ namespace WzComparerR2
                         CustomCSSConfig.Default.RemovedBackgroundColor,
                         CustomCSSConfig.Default.ChangedTextColor,
                         CustomCSSConfig.Default.AddedTextColor,
-                        CustomCSSConfig.Default.RemovedTextColor
+                        CustomCSSConfig.Default.RemovedTextColor,
+                        CustomCSSConfig.Default.HyperlinkColor
                     };
                     try
                     {

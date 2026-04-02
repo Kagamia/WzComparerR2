@@ -58,10 +58,17 @@ namespace WzComparerR2
             get { return colorPickerAddedTextColor.SelectedColor; }
             set { colorPickerAddedTextColor.SelectedColor = value; }
         }
+
         public Color removedTextColor
         {
             get { return colorPickerRemovedTextColor.SelectedColor; }
             set { colorPickerRemovedTextColor.SelectedColor = value; }
+        }
+
+        public Color hyperlinkColor
+        {
+            get { return colorPickerHyperlinkColor.SelectedColor; }
+            set { colorPickerHyperlinkColor.SelectedColor = value; }
         }
 
         private void btnDefault_Click(object sender, EventArgs e)
@@ -76,6 +83,7 @@ namespace WzComparerR2
                 this.changedTextColor = Color.FromArgb(Int32.Parse("ffffffff", NumberStyles.HexNumber));
                 this.addedTextColor = Color.FromArgb(Int32.Parse("ffffffff", NumberStyles.HexNumber));
                 this.removedTextColor = Color.FromArgb(Int32.Parse("ffffffff", NumberStyles.HexNumber));
+                this.hyperlinkColor = Color.FromArgb(Int32.Parse("ffffffff", NumberStyles.HexNumber));
             }
             else
             {
@@ -87,6 +95,7 @@ namespace WzComparerR2
                 this.changedTextColor = Color.FromArgb(Int32.Parse("ff000000", NumberStyles.HexNumber));
                 this.addedTextColor = Color.FromArgb(Int32.Parse("ff000000", NumberStyles.HexNumber));
                 this.removedTextColor = Color.FromArgb(Int32.Parse("ff000000", NumberStyles.HexNumber));
+                this.hyperlinkColor = Color.FromArgb(Int32.Parse("ff0000ff", NumberStyles.HexNumber));
             }
             this.DarkMode = !this.DarkMode;
         }
@@ -96,12 +105,14 @@ namespace WzComparerR2
             this.richTextBoxEx1.ReadOnly = false;
             this.richTextBoxEx1.Clear();
             this.richTextBoxEx1.BackColorRichTextBox = backgroundColor;
+            this.richTextBoxEx1.AppendText("                     ");
             var contents = new[]
             {
-                new {Text = "                Normal Content Text               " + Environment.NewLine, Fore = normalTextColor, Back = backgroundColor},
-                new {Text = "               Changed Content Text               " + Environment.NewLine, Fore = changedTextColor, Back = changedBackgroundColor},
-                new {Text = "                 Added Content Text               " + Environment.NewLine, Fore = addedTextColor, Back = addedBackgroundColor},
-                new {Text = "               Removed Content Text               ", Fore = removedTextColor, Back = removedBackgroundColor}
+                new {Text = "Hyperlink" + Environment.NewLine, Fore = hyperlinkColor, Back = backgroundColor, Underline = true},
+                new {Text = "                Normal Content Text               " + Environment.NewLine, Fore = normalTextColor, Back = backgroundColor, Underline = false},
+                new {Text = "               Changed Content Text               " + Environment.NewLine, Fore = changedTextColor, Back = changedBackgroundColor, Underline = false},
+                new {Text = "                 Added Content Text               " + Environment.NewLine, Fore = addedTextColor, Back = addedBackgroundColor, Underline = false},
+                new {Text = "               Removed Content Text               ", Fore = removedTextColor, Back = removedBackgroundColor, Underline = false}
             };
             foreach (var line in contents)
             {
@@ -110,6 +121,10 @@ namespace WzComparerR2
                 richTextBoxEx1.Select(start, line.Text.Length);
                 richTextBoxEx1.SelectionColor = line.Fore;
                 richTextBoxEx1.SelectionBackColor = line.Back;
+                if (line.Underline)
+                {
+                    richTextBoxEx1.SelectionFont = new Font(richTextBoxEx1.Font, FontStyle.Underline);
+                }
             }
             this.richTextBoxEx1.ReadOnly = true;
         }
@@ -125,6 +140,7 @@ namespace WzComparerR2
             this.addedTextColor = config.AddedTextColor;
             this.removedTextColor = config.RemovedTextColor;
             this.changedBackgroundColor = config.ChangedBackgroundColor;
+            this.hyperlinkColor = config.HyperlinkColor;
         }
 
         public void SaveConfig(CustomCSSConfig config)
@@ -138,6 +154,7 @@ namespace WzComparerR2
             config.AddedTextColor = this.addedTextColor;
             config.RemovedTextColor = this.removedTextColor;
             config.ChangedBackgroundColor = this.changedBackgroundColor;
+            config.HyperlinkColor = this.hyperlinkColor;
         }
     }
 }
