@@ -329,9 +329,17 @@ namespace WzComparerR2.WzLib
 
                 public Wz_Node Add(string nodeText)
                 {
-                    Wz_Node newNode = new Wz_Node(nodeText);
-                    this.Add(newNode);
-                    return newNode;
+                    if (this.Contains(nodeText))
+                    {
+
+                        return this[nodeText];
+                    }
+                    else
+                    {
+                        Wz_Node newNode = new Wz_Node(nodeText);
+                        this.Add(newNode);
+                        return newNode;
+                    }
                 }
 
                 public new void Add(Wz_Node item)
