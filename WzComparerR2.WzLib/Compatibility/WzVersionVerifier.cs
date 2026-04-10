@@ -273,14 +273,19 @@ namespace WzComparerR2.WzLib.Compatibility
     /// <summary>
     /// PKG2 hash version calculation for KMST 1199 (V4). Uses parallel brute-force with SIMD.
     /// </summary>
-    public sealed class Pkg2HashVersionCalcV4 : IPkg2HashVersionCalc
+    public class Pkg2HashVersionCalcV4 : IPkg2HashVersionCalc
     {
         private const uint magic = Pkg2BacktrackSolver.Magic;
 
         public IReadOnlyList<uint> CalcCandidates(uint hash1, uint hash2)
         {
-            uint hash1Low4 = hash1 & 0xF;
             uint target = ~hash2;
+            return CalcCandidatesCore(hash1, target);
+        }
+
+        protected IReadOnlyList<uint> CalcCandidatesCore(uint hash1, uint target)
+        {
+            uint hash1Low4 = hash1 & 0xF;
 
             List<uint> results = new List<uint>();
             object lockObj = new object();
@@ -436,6 +441,29 @@ namespace WzComparerR2.WzLib.Compatibility
             uint mixedHash = Mix(preHash ^ 0x6D4C3B2A) ^ 0x91E10DA5;
             uint lt = ROL(hash1 ^ ((ushort)mixedHash + hashVersion + magic), (int)(((mixedHash ^ hashVersion) & 0xF) + (hash1 & 0xF)));
             return (lt ^ (preHash + mixedHash)) == ~hash2;
+        }
+    }
+
+    /// <summary>
+    /// PKG2 hash version calculation for KMST 1200 (V5). Similar to V4.
+    /// </summary>
+    public sealed class Pkg2HashVersionCalcV5 : Pkg2HashVersionCalcV4, IPkg2HashVersionCalc
+    {
+        private const uint magic = Pkg2BacktrackSolver.Magic;
+        private const uint magicV5 = 0x2A2C818B;
+
+        public new IReadOnlyList<uint> CalcCandidates(uint hash1, uint hash2)
+        {
+            uint target = hash2 ^ magicV5;
+            return CalcCandidatesCore(hash1, target);
+        }
+
+        public new bool Verify(uint hash1, uint hash2, uint hashVersion)
+        {
+            uint preHash = hash1 ^ hashVersion;
+            uint mixedHash = Mix(preHash ^ 0x6D4C3B2A) ^ 0x91E10DA5;
+            uint lt = ROL(hash1 ^ ((ushort)mixedHash + hashVersion + magic), (int)(((mixedHash ^ hashVersion) & 0xF) + (hash1 & 0xF)));
+            return (lt ^ (preHash + mixedHash) ^ magicV5) == hash2;
         }
     }
 
