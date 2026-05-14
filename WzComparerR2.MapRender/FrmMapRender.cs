@@ -1194,7 +1194,7 @@ namespace WzComparerR2.MapRender
             string[] path = this.bgmName.Split('/');
             if (path.Length <= 1)
                 return;
-            path[0] += ".img";
+            path[0] += path[0].Contains(".img") ? "" : ".img";
 
             Wz_Node soundNode = soundWz.FindNodeByPath(true, true, path);
             Wz_Sound _sound = soundNode.GetValueEx<Wz_Sound>(null);
