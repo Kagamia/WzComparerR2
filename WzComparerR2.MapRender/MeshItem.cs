@@ -12,6 +12,7 @@ namespace WzComparerR2.MapRender
         public Vector2 Position { get; set; }
         public int Z0 { get; set; }
         public int Z1 { get; set; }
+        public int Alpha { get; set; } = 255;
 
         //附加信息
         public bool FlipX { get; set; }
