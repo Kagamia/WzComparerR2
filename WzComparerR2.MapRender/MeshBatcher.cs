@@ -129,6 +129,8 @@ namespace WzComparerR2.MapRender
                 rect.X = -rect.Right;
             }
 
+            var alpha = mesh.Alpha < 255 ? (int)(frame.A0 * (mesh.Alpha / 255f)) : frame.A0;
+
             //兼容平铺
             if (mesh.TileRegion != null)
             {
@@ -149,7 +151,7 @@ namespace WzComparerR2.MapRender
                         Prepare(frame.Blend ? ItemType.Sprite_BlendAdditive : ItemType.Sprite);
                         sprite.Draw(frame.Texture, pos,
                             frame.AtlasRect,
-                            new Color(Color.White, frame.A0),
+                            new Color(Color.White, alpha),
                             0,
                             origin,
                             1,
@@ -167,7 +169,7 @@ namespace WzComparerR2.MapRender
                     Prepare(frame.Blend ? ItemType.Sprite_BlendAdditive : ItemType.Sprite);
                     sprite.Draw(frame.Texture, mesh.Position,
                         frame.AtlasRect,
-                        new Color(Color.White, frame.A0),
+                        new Color(Color.White, alpha),
                         0,
                         origin,
                         1,
@@ -627,6 +629,7 @@ namespace WzComparerR2.MapRender
                 mesh.Position = Vector2.Zero;
                 mesh.Z0 = 0;
                 mesh.Z1 = 0;
+                mesh.Alpha = 255;
                 mesh.FlipX = false;
                 mesh.TileRegion = null;
                 mesh.TileOffset = Vector2.Zero;
