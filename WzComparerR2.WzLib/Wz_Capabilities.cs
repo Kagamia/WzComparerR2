@@ -11,5 +11,6 @@ namespace WzComparerR2.WzLib
     {
         Default = 0,
         EncverMissing = 1,
+        Pkg2RandomHeader = 2,
     }
 }

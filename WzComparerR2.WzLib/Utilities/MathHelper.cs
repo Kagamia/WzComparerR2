@@ -261,5 +261,13 @@ namespace WzComparerR2.WzLib.Utilities
 
             return cs;
         }
+
+        public static uint GatherAsUInt32(ReadOnlySpan<byte> data, ReadOnlySpan<int> offsets)
+        {
+            return (uint)data[offsets[0]]
+                 | (uint)data[offsets[1]] << 8
+                 | (uint)data[offsets[2]] << 16
+                 | (uint)data[offsets[3]] << 24;
+        }
     }
 }

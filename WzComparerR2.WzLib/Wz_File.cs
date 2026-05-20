@@ -121,7 +121,16 @@ namespace WzComparerR2.WzLib
             if (filesize < 4) { goto __failed; }
 
             string signature = new string(br.ReadChars(4));
-            if (signature != Wz_Header.PKG1 && signature != Wz_Header.PKG2) { goto __failed; }
+            if (signature != Wz_Header.PKG1 && signature != Wz_Header.PKG2)
+            {
+                // KMST1201: use rand num header instead of signature
+                if (this.TryReadPkg2KMST1201Header(fileName, out var header))
+                {
+                    this.Header = header;
+                    return true;
+                }
+                goto __failed;
+            }
 
             long dataSize = br.ReadInt64();
             int headerSize = br.ReadInt32();
@@ -186,6 +195,41 @@ namespace WzComparerR2.WzLib
         __failed:
             this.header = new Wz_Header(null, null, fileName, 0, 0, filesize, 0);
             return false;
+        }
+
+        private bool TryReadPkg2KMST1201Header(string fileName, out Wz_Header.WzPkg2Header header)
+        {
+            const int headerLen = 68;
+            ReadOnlySpan<int> hash1Offsets = stackalloc int[] { 0x43, 0x1A, 0x30, 0x10 };
+            ReadOnlySpan<int> hash2Offsets = stackalloc int[] { 0x2D, 0x07, 0x3F, 0x2E };
+            ReadOnlySpan<int> dataSizeOffsets = stackalloc int[] { 0x15, 0x19, 0x39, 0x41 };
+
+            header = null;
+            long fileSize = this.fileStream.Length;
+            if (fileSize < headerLen)
+            {
+                return false;
+            }
+
+            long expectedDataSize = fileSize - headerLen;
+            if (expectedDataSize > uint.MaxValue)
+                return false;
+
+            this.fileStream.Position = 0;
+            Span<byte> buffer = stackalloc byte[headerLen];
+            this.fileStream.ReadExactly(buffer);
+
+            uint hash1 = MathHelper.GatherAsUInt32(buffer, hash1Offsets);
+            uint hash2 = MathHelper.GatherAsUInt32(buffer, hash2Offsets);
+            uint dataSize = MathHelper.GatherAsUInt32(buffer, dataSizeOffsets);
+
+            if (dataSize != (uint)expectedDataSize)
+                return false;
+
+            header = new Wz_Header.WzPkg2Header(Wz_Header.PKG2, null, fileName, headerLen, dataSize, fileSize, headerLen, hash1, hash2);
+            header.Capabilities |= Wz_Capabilities.Pkg2RandomHeader;
+            this.fileStream.Position = headerLen;
+            return true;
         }
 
         public void GetDirTree(Wz_Node parent, bool useBaseWz = false, bool loadWzAsFolder = false)
