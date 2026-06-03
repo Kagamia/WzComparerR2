@@ -760,7 +760,7 @@ namespace WzComparerR2.MapRender
                             {
                                 var path = new List<string>() { "Sound" };
                                 path.AddRange(this.mapData.Bgm.Split('/'));
-                                path[1] += ".img";
+                                path[1] += path[1].Contains(".img") ? "" : ".img";
                                 var bgmNode = PluginBase.PluginManager.FindWz(string.Join("\\", path));
                                 var subNodes = bgmNode?.Nodes ?? new Wz_Node.WzNodeCollection(null);
                                 this.ui.ChatBox.AppendTextHelp($"多重BGM: {subNodes.Count}");

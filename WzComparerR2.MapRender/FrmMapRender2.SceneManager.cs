@@ -218,7 +218,7 @@ namespace WzComparerR2.MapRender
             {
                 var path = new List<string>() { "Sound" };
                 path.AddRange(mapData.Bgm.Split('/'));
-                path[1] += ".img";
+                path[1] += path[1].Contains(".img") ? "" : ".img";
                 var bgmNode = PluginManager.FindWz(string.Join("\\", path));
                 if (bgmNode != null)
                 {
