@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 using WzComparerR2.PluginBase;
 using WzComparerR2.WzLib;
 
@@ -17,16 +18,14 @@ namespace WzComparerR2.MapRender.Patches2
         public int Y { get; set; }
         public int Z { get; set; }
         public int MoveType { get; set; }
-        public int MoveW { get; set; }
-        public int MoveH { get; set; }
-        public int MoveP { get; set; }
-        public int MoveDelay { get; set; }
         public bool Flip { get; set; }
         public bool Light { get; set; }
         public string SpineAni { get; set; }
         public List<QuestInfo> Quest { get; private set; } = new List<QuestInfo>();
         public List<QuestExInfo> Questex { get; private set; } = new List<QuestExInfo>();
         public List<ItemEvent> Events { get; private set; } = new List<ItemEvent>();
+        public List<MoveNode> MoveNodes { get; private set; } = new List<MoveNode>();
+        public int TotalMovePeriod => MoveNodes.Count > 0 ? MoveNodes[MoveNodes.Count - 1].StartTime + MoveNodes[MoveNodes.Count - 1].TotalPeriod : 0;
 
         public ItemView View { get; set; }
 
@@ -44,10 +43,6 @@ namespace WzComparerR2.MapRender.Patches2
                 Z = node.Nodes["z"].GetValueEx(0),
 
                 MoveType = 0,
-                MoveW = 0,
-                MoveH = 0,
-                MoveP = 5000,
-                MoveDelay = 0,
 
                 Flip = node.Nodes["f"].GetValueEx(false),
                 Light = node.Nodes["light"].GetValueEx<int>(0) != 0,
@@ -121,10 +116,47 @@ namespace WzComparerR2.MapRender.Patches2
             if (obj_node != null)
             {
                 item.MoveType = obj_node.Nodes["moveType"].GetValueEx(0);
-                item.MoveW = obj_node.Nodes["moveW"].GetValueEx(0);
-                item.MoveH = obj_node.Nodes["moveH"].GetValueEx(0);
-                item.MoveP = obj_node.Nodes["moveP"].GetValueEx(5000);
-                item.MoveDelay = obj_node.Nodes["moveDelay"].GetValueEx(0);
+                if (item.MoveType > 0)
+                {
+                    var top_moveNode = obj_node.FindNodeByPath("moveNode");
+                    if (top_moveNode == null)
+                    {
+                        item.MoveNodes.Add(new MoveNode()
+                        {
+                            MoveW = obj_node.Nodes["moveW"].GetValueEx(0),
+                            MoveH = obj_node.Nodes["moveH"].GetValueEx(0),
+                            MoveP = obj_node.Nodes["moveP"].GetValueEx(5000),
+                            MoveDelay = obj_node.Nodes["moveDelay"].GetValueEx(0),
+                            StartPos = Vector2.Zero,
+                            StartTime = 0,
+                        });
+                    }
+                    else
+                    {
+                        Vector2 sp = Vector2.Zero;
+                        int st = 0;
+                        Wz_Node moveNode;
+                        for (int idx = 0; (moveNode = top_moveNode.FindNodeByPath(idx.ToString())) != null; idx++)
+                        {
+                            var mn = new MoveNode()
+                            {
+                                MoveW = moveNode.Nodes["moveW"].GetValueEx(0),
+                                MoveH = moveNode.Nodes["moveH"].GetValueEx(0),
+                                MoveP = moveNode.Nodes["moveP"].GetValueEx(5000),
+                                MoveDelay = moveNode.Nodes["moveDelay"].GetValueEx(0),
+                                StartPos = sp,
+                                StartTime = st,
+                            };
+                            item.MoveNodes.Add(mn);
+                            sp += new Vector2(mn.MoveW, mn.MoveH);
+                            st += mn.TotalPeriod;
+                        }
+                    }
+                    if (item.MoveNodes.Count > 0)
+                    {
+                        item.MoveNodes[item.MoveNodes.Count - 1].IsLastNode = true;
+                    }
+                }
             }
 
             return item;
@@ -132,6 +164,13 @@ namespace WzComparerR2.MapRender.Patches2
 
         public class ItemView
         {
+            public ItemView(ObjItem owner)
+            {
+                this.Owner = owner;
+            }
+
+            public ObjItem Owner { get; }
+
             /// <summary>
             /// 时间关联，单位为毫秒。
             /// </summary>
@@ -146,6 +185,27 @@ namespace WzComparerR2.MapRender.Patches2
             /// Flip state of item.
             /// </summary>
             public bool Flip { get; set; }
+
+            public int Alpha { get; set; } = 255;
+
+            public MoveNode CurrentMoveNode
+            {
+                get
+                {
+                    if (Owner.TotalMovePeriod > 0)
+                    {
+                        var t = Time % Owner.TotalMovePeriod;
+                        foreach (var moveNode in Owner.MoveNodes)
+                        {
+                            if (t < moveNode.StartTime + moveNode.TotalPeriod)
+                            {
+                                return moveNode;
+                            }
+                        }
+                    }
+                    return null;
+                }
+            }
         }
     }
 }

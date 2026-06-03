@@ -920,10 +920,11 @@ namespace WzComparerR2.MapRender
             mesh.Z0 = obj.Z;
             mesh.Z1 = obj.Index;
 
-            if (obj.MoveW != 0 || obj.MoveH != 0)
+            if (obj.MoveNodes.Count > 0)
             {
                 mesh.Position += GetMovingObjPos(obj);
             }
+            mesh.Alpha = obj.View.Alpha;
             mesh.FlipX = obj.View.Flip;
 
             return mesh;
@@ -1091,34 +1092,59 @@ namespace WzComparerR2.MapRender
             double movingX = 0;
             double movingY = 0;
             double time = obj.View.Time;
+            double period;
+            float progress;
+            MoveNode curMoveNode = obj.View.CurrentMoveNode;
+            if (curMoveNode == null || curMoveNode.MoveP <= 0)
+            {
+                return Vector2.Zero;
+            }
             switch (obj.MoveType)
             {
                 case 1:
                 case 2: // line
-                    time *= Math.PI * 2 / obj.MoveP;
-                    movingX = obj.MoveW * Math.Cos(time);
-                    movingY = obj.MoveH * Math.Cos(time);
+                    time *= Math.PI * 2 / curMoveNode.MoveP;
+                    movingX = curMoveNode.MoveW * Math.Cos(time);
+                    movingY = curMoveNode.MoveH * Math.Cos(time);
                     break;
                 case 3: // circle
-                    time *= Math.PI * 2 / obj.MoveP;
-                    movingX = obj.MoveW * Math.Cos(time);
-                    movingY = obj.MoveH * Math.Sin(time);
+                    time *= Math.PI * 2 / curMoveNode.MoveP;
+                    movingX = curMoveNode.MoveW * Math.Cos(time);
+                    movingY = curMoveNode.MoveH * Math.Sin(time);
                     break;
 
-                case 6:
-                case 7:
-                case 8:
-                    int sign = -1;
-                    double freq = (double)(obj.MoveP + obj.MoveDelay) * 2;
-                    time = time % freq;
-                    if (time >= freq / 2)
+                case 6: // one-way
+                    period = (double)(curMoveNode.MoveDelay + curMoveNode.MoveP);
+                    time = time % obj.TotalMovePeriod - curMoveNode.StartTime;
+
+                    progress = MathHelper.Clamp((float)((time - curMoveNode.MoveDelay) / curMoveNode.MoveP), 0f, 1f);
+                    movingX = MathHelper.Lerp(0, curMoveNode.MoveW, progress) + curMoveNode.StartPos.X;
+                    movingY = MathHelper.Lerp(0, curMoveNode.MoveH, progress) + curMoveNode.StartPos.Y;
+
+                    // fade in/out
+                    float alphaProgress = 1;
+                    float fadeTime = Math.Min(curMoveNode.MoveP * 0.1f, 300f);
+                    if (curMoveNode.IsFirstNode && time <= curMoveNode.MoveDelay + fadeTime)
                     {
-                        time -= freq / 2;
+                        alphaProgress = MathHelper.Clamp((float)(time - curMoveNode.MoveDelay) / fadeTime, 0f, 1f);
+                    }
+                    else if (curMoveNode.IsLastNode && time >= curMoveNode.MoveDelay + curMoveNode.MoveP - fadeTime)
+                    {
+                        alphaProgress = MathHelper.Clamp((float)(curMoveNode.MoveDelay + curMoveNode.MoveP - time) / fadeTime, 0f, 1f);
+                    }
+                    obj.View.Alpha = (int)MathHelper.Lerp(0, 255, alphaProgress);
+                    break;
+
+                case 7: // back and forth
+                case 8:
+                    period = (double)(curMoveNode.MoveDelay + curMoveNode.MoveP) * 2;
+                    time = time % period;
+                    bool back = time >= period / 2;
+                    if (back)
+                    {
+                        time -= period / 2;
                         if (obj.MoveType == 8)
                             obj.View.Flip = !obj.Flip;
-
-                        if (obj.MoveType != 6)
-                            sign = +1;
                     }
                     else
                     {
@@ -1126,9 +1152,11 @@ namespace WzComparerR2.MapRender
                             obj.View.Flip = obj.Flip;
                     }
 
-                    movingX = (Math.Min(1, Math.Max(-1, (time - obj.MoveDelay) * -2 / obj.MoveP + 1)) * sign + 1) / 2 * obj.MoveW;
-                    movingY = (Math.Min(1, Math.Max(-1, (time - obj.MoveDelay) * -2 / obj.MoveP + 1)) * sign + 1) / 2 * obj.MoveH;
-
+                    progress = MathHelper.Clamp((float)((time - curMoveNode.MoveDelay) / curMoveNode.MoveP), 0f, 1f);
+                    if (back)
+                        progress = 1 - progress;
+                    movingX = MathHelper.Lerp(0, curMoveNode.MoveW, progress);
+                    movingY = MathHelper.Lerp(0, curMoveNode.MoveH, progress);
                     break;
 
                 default:

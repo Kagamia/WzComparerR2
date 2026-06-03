@@ -687,7 +687,7 @@ namespace WzComparerR2.MapRender
         {
             string path = $@"Map\Obj\{obj.OS}.img\{obj.L0}\{obj.L1}\{obj.L2}";
             var aniItem = resLoader.LoadAnimationData(path);
-            obj.View = new ObjItem.ItemView()
+            obj.View = new ObjItem.ItemView(obj)
             {
                 Animator = CreateAnimator(aniItem, obj.SpineAni),
                 Flip = obj.Flip
