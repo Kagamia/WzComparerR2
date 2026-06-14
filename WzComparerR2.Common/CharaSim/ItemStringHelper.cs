@@ -377,6 +377,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.onmyoSen: return "阴阳扇";
                 case GearType.kannaReifu: return "灵符";
 
+                case GearType.gram: return "光之枪";
+                case GearType.keir: return "铠尔";
+
                 default: return null;
             }
         }
@@ -514,6 +517,9 @@ namespace WzComparerR2.CharaSim
                 case GearType.chakram:
                 case GearType.hexSeeker: return GetExtraJobReqString(154);
 
+                case GearType.gram:
+                case GearType.keir: return GetExtraJobReqString(181);
+
                 case GearType.celestialLight:
                 case GearType.compass: return GetExtraJobReqString(182);
 
@@ -560,6 +566,7 @@ namespace WzComparerR2.CharaSim
                 case 164: return "虎影可穿戴装备";
                 case 172: return "琳可穿戴装备";
                 case 175: return "墨玄可穿戴装备";
+                case 181: return "艾利尔可穿戴装备";
                 case 182: return "施亚可穿戴装备";
                 default: return null;
             }
@@ -969,6 +976,13 @@ namespace WzComparerR2.CharaSim
                 case 17511: return "墨玄(3次)";
                 case 17512: return "墨玄(4次)";
                 case 17514: return "墨玄(6次)";
+
+                case 18001: return "艾利尔";
+                case 18100: return "艾利尔(1次)";
+                case 18110: return "艾利尔(2次)";
+                case 18111: return "艾利尔(3次)";
+                case 18112: return "艾利尔(4次)";
+                case 18114: return "艾利尔(6次)";
 
                 case 18000: return "施亚";
                 case 18200: return "施亚(1次)";
