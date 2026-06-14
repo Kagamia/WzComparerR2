@@ -1001,10 +1001,7 @@ namespace WzComparerR2.MapRender
 
                 case ISpineAnimationData spineAniData:
                     var spineAni = spineAniData.CreateAnimator();
-                    if (aniName != null)
-                    {
-                        spineAni.SelectedAnimationName = aniName;
-                    }
+                    spineAni.SelectedAnimationName = aniName;
                     return spineAni;
 
                 case MsCustomSpriteData msSpriteData:
