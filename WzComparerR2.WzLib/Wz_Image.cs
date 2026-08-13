@@ -782,6 +782,13 @@ namespace WzComparerR2.WzLib
                             value = longValue;
                             break;
 
+                        case NodeType.R4:
+                            valueStr = reader.ReadLine();
+                            if (!float.TryParse(valueStr, out var floatValue))
+                                throw new FormatException($"Failed to parse R4 value {valueStr}.");
+                            value = floatValue;
+                            break;
+
                         case NodeType.R8:
                             valueStr = reader.ReadLine();
                             if (!double.TryParse(valueStr, out var doubleValue))
@@ -860,6 +867,7 @@ namespace WzComparerR2.WzLib
                 Empty,
                 I4,
                 I8,
+                R4,
                 R8,
                 String,
                 Vector,
@@ -873,6 +881,7 @@ namespace WzComparerR2.WzLib
                     case "<Empty>": type = NodeType.Empty; return true;
                     case "<I4>": type = NodeType.I4; return true;
                     case "<I8>": type = NodeType.I8; return true;
+                    case "<R4>": type = NodeType.R4; return true;
                     case "<R8>": type = NodeType.R8; return true;
                     case "<String>": type = NodeType.String; return true;
                     case "<Vector>": type = NodeType.Vector; return true;
