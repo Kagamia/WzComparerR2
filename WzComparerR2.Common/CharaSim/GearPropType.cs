@@ -27,6 +27,7 @@ namespace WzComparerR2.CharaSim
         incAUT,
         incPAD_incMAD,
         incPAD,
+        incWAT,
         incMAD,
         incPDD_incMDD,
         incPDD,
@@ -45,6 +46,8 @@ namespace WzComparerR2.CharaSim
         incIMDR,
         damR,
         nbdR,
+        incCRT,
+        incCRD,
 
         //潜能属性
         incPADr = 100,

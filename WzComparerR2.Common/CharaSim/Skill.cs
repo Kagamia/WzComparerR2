@@ -35,6 +35,19 @@ namespace WzComparerR2.CharaSim
             }
         }
 
+        public Dictionary<string, string> GetCommon(int level)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>(this.common);
+            if (level > 0 && level <= levelCommon.Count)
+            {
+                foreach (var kv in levelCommon[level - 1])
+                {
+                    result[kv.Key] = kv.Value;
+                }
+            }
+            return result;
+        }
+
         public Dictionary<string, string> PVPcommon { get; private set; }
         public int SkillID { get; set; }
         public BitmapOrigin Icon { get; set; }
@@ -225,14 +238,7 @@ namespace WzComparerR2.CharaSim
             }
 
             //判定技能声明版本
-            skill.PreBBSkill = false;
-            if (skill.levelCommon.Count > 0)
-            {
-                if (skill.common.Count <= 0 || skill.common.ContainsKey("maxLevel"))
-                {
-                    skill.PreBBSkill = true;
-                }
-            }
+            skill.PreBBSkill = skill.levelCommon.Count > 0;
 
             return skill;
         }

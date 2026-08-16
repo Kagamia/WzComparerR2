@@ -230,8 +230,9 @@ namespace WzComparerR2.CharaSim
             string h = null;
             if (skill.PreBBSkill) //用level声明的技能
             {
+                var levelCommon = overrideSkillCommon ?? skill.GetCommon(level);
                 string hsSummary;
-                if (skill.Level == level && skill.Common.TryGetValue("hs", out string hs)
+                if (skill.Level == level && levelCommon.TryGetValue("hs", out string hs)
                     && (hsSummary = sr[hs]) != null) // fix for skill 170001005, 170011005
                 {
                     h = hsSummary;
@@ -244,7 +245,6 @@ namespace WzComparerR2.CharaSim
                 {
                     h = sr.SkillH[0];
                 }
-                var levelCommon = level <= skill.levelCommon.Count ? skill.levelCommon[level - 1] : skill.common;
                 return GetSkillSummary(h, level, levelCommon, param, options);
             }
             else

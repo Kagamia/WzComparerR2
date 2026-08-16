@@ -75,6 +75,7 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incMMPr: return "最大魔量： " + sign + value + "%";
                 case GearPropType.incMDF: return "MaxDF : " + sign + value;
                 case GearPropType.incPAD: return "攻击力 : " + sign + value;
+                case GearPropType.incWAT: return "攻击力 : " + sign + value;
                 case GearPropType.incPADr: return "攻击力 : " + sign + value + "%";
                 case GearPropType.incMAD: return "魔法力 : " + sign + value;
                 case GearPropType.incMADr: return "魔法力 : " + sign + value + "%";
@@ -91,8 +92,10 @@ namespace WzComparerR2.CharaSim
                 case GearPropType.incCraft: return "手技 : " + sign + value;
                 case GearPropType.damR:
                 case GearPropType.incDAMr: return "总伤害 : " + sign + value + "%";
-                case GearPropType.incCr: return "爆击率 : " + sign + value + "%";
-                case GearPropType.incCDr: return "爆击伤害 : " + sign + value + "%";
+                case GearPropType.incCr:
+                case GearPropType.incCRT: return "爆击率 : " + sign + value + "%";
+                case GearPropType.incCDr:
+                case GearPropType.incCRD: return "爆击伤害 : " + sign + value + "%";
                 case GearPropType.knockback: return "直接攻击时" + value + "的比率发生后退现象。";
                 case GearPropType.incPVPDamage: return "大乱斗时追加攻击力" + sign + value;
                 case GearPropType.incPQEXPr: return "组队任务经验值增加" + value + "%";
