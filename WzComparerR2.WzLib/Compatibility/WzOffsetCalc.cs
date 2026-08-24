@@ -56,10 +56,12 @@ namespace WzComparerR2.WzLib.Compatibility
         KMST1196 = 1,
         /// <summary>KMST 1198</summary>
         KMST1198 = 2,
-        /// <summary>KMST 1199</summary>
+        /// <summary>KMST 1199-1201</summary>
         KMST1199 = 3,
-        /// <summary>KMST 1202</summary>
+        /// <summary>KMST 1202-1204</summary>
         KMST1202 = 4,
+        /// <summary>KMST 1205</summary>
+        KMST1205 = 5,
     }
 
     /// <summary>
@@ -215,14 +217,14 @@ namespace WzComparerR2.WzLib.Compatibility
             // client only use low 32bits.
             this.headerLen = headerLen;
             this.hash1 = hash1;
-            this.hashVersionFull = hashVersion;
+            this.hashVersion = hashVersion;
             this.preHash = (uint)hash1 ^ (uint)hashVersion;
             this.mixedHash = this.preHash ^ 0x33BBBB33;
         }
 
         private readonly uint headerLen;
         private readonly ulong hash1;
-        private readonly ulong hashVersionFull;
+        private readonly ulong hashVersion;
         private readonly uint preHash;
         private readonly uint mixedHash;
 
@@ -252,10 +254,50 @@ namespace WzComparerR2.WzLib.Compatibility
 
         public int DecryptEntryCount(long encryptedEntryCount)
         {
-            ulong dirCount = ((ulong)encryptedEntryCount ^ this.hash1 ^ this.hashVersionFull ^ 0x550EC4DD02C468ECUL) >> 16;
+            ulong dirCount = ((ulong)encryptedEntryCount ^ this.hash1 ^ this.hashVersion ^ 0x550EC4DD02C468ECUL) >> 16;
             if (dirCount > int.MaxValue)
             {
                 throw new ArgumentOutOfRangeException(nameof(encryptedEntryCount), "64-bit PKG2 dir count exceeds supported range.");
+            }
+            return (int)dirCount;
+        }
+    }
+
+    /// <summary>
+    /// 64-bit PKG2 offset calculation for KMST 1205.
+    /// </summary>
+    public sealed class Pkg2OffsetCalc64V2 : IPkg2ImageOffsetCalc<long>, IPkg2ImageLengthCalc
+    {
+        public Pkg2OffsetCalc64V2(uint headerLen, ulong hash1, ulong hashVersion)
+        {
+            this.headerLen = headerLen;
+            this.hash1 = hash1;
+            this.hashVersion = hashVersion;
+        }
+
+        private readonly uint headerLen;
+        private readonly ulong hash1;
+        private readonly ulong hashVersion;
+
+        public uint CalcOffset(uint filePos, uint hashedOffset)
+        {
+            return Pkg2Kmst1205Hash.ComputeImageOffset(this.hash1, this.hashVersion, this.headerLen, filePos, hashedOffset);
+        }
+
+        public int CalcLength(uint filePos, int encryptedValue)
+        {
+            ulong key = Pkg2Kmst1205Hash.ComputeEntryFieldKey(this.hash1, this.hashVersion, filePos - this.headerLen);
+            return encryptedValue ^ unchecked((int)key);
+        }
+
+        public int DecryptEntryCount(long encryptedEntryCount)
+        {
+            ulong key = Pkg2Kmst1205Hash.ComputeDirectoryCountKey(this.hash1, this.hashVersion);
+            ulong dirCount = ((ulong)encryptedEntryCount ^ key) >> 16;
+            if (dirCount > int.MaxValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(encryptedEntryCount),
+                    "64-bit PKG2 dir count exceeds supported range.");
             }
             return (int)dirCount;
         }

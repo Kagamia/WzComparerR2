@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 #if NET6_0_OR_GREATER
+using System.Numerics;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 #endif
@@ -23,7 +24,62 @@ namespace WzComparerR2.WzLib.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint ROL(uint v, int n) => (v << n) | (v >> (32 - n));
+        public static uint ROL(uint v, int n)
+        {
+    #if NET6_0_OR_GREATER
+            return BitOperations.RotateLeft(v, n);
+    #else
+            return (v << n) | (v >> (32 - n));
+    #endif
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong ROL(ulong v, int n)
+        {
+#if NET6_0_OR_GREATER
+            return BitOperations.RotateLeft(v, n);
+#else
+            return (v << n) | (v >> (64 - n));
+#endif
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint ROR(uint v, int n)
+        {
+#if NET6_0_OR_GREATER
+            return BitOperations.RotateRight(v, n);
+#else
+            return (v >> n) | (v << (32 - n));
+#endif
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong ROR(ulong v, int n)
+        {
+#if NET6_0_OR_GREATER
+            return BitOperations.RotateRight(v, n);
+#else
+            return (v >> n) | (v << (64 - n));
+#endif
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint XorShiftRight(uint value, int shift)
+        {
+            return value ^ (value >> shift);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong XorShiftRight(ulong value, int shift)
+        {
+            return value ^ (value >> shift);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint XorFold64To32(ulong value)
+        {
+            return (uint)value ^ (uint)(value >> 32);
+        }
 
         const byte M8 = 0xAA;
         const ushort M16 = 0xAAAA;

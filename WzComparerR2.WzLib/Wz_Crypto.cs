@@ -470,5 +470,24 @@ namespace WzComparerR2.WzLib
                 this.SetBaseKey(baseKey);
             }
         }
+
+        public class Pkg2DirStringKeyV5 : Pkg2DirStringKey, IWzStatefulDecrypter
+        {
+            public Pkg2DirStringKeyV5(ulong hash1, ulong hashVersion) : base(0)
+            {
+                this.hash1 = hash1;
+                this.hashVersion = hashVersion;
+                this.ApplyState(0);
+            }
+
+            private readonly ulong hash1;
+            private readonly ulong hashVersion;
+
+            public void ApplyState(ulong filePosition)
+            {
+                ulong baseKey = Pkg2Kmst1205Hash.ComputeDirEntryNameKey(this.hash1, this.hashVersion, filePosition);
+                this.SetBaseKey(baseKey);
+            }
+        }
     }
 }

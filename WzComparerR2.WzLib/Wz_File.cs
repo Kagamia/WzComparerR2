@@ -120,8 +120,14 @@ namespace WzComparerR2.WzLib
             string signature = new string(br.ReadChars(4));
             if (signature != Wz_Header.PKG1 && signature != Wz_Header.PKG2)
             {
+                // KMST1205: 163-byte random header carrying 64-bit hashes
+                if (this.TryReadPkg2KMST1205Header(fileName, out var header64))
+                {
+                    this.Header = header64;
+                    return true;
+                }
                 // KMST1204: 200-byte random header carrying 64-bit hashes
-                if (this.TryReadPkg2KMST1204Header(fileName, out var header64))
+                if (this.TryReadPkg2KMST1204Header(fileName, out header64))
                 {
                     this.Header = header64;
                     return true;
@@ -256,6 +262,15 @@ namespace WzComparerR2.WzLib
             ReadOnlySpan<int> hash1Offsets = stackalloc int[] { 0x1E, 0x1A, 0x10, 0x01, 0x0F, 0x48, 0xC5, 0x99 };
             ReadOnlySpan<int> hash2Offsets = stackalloc int[] { 0x64, 0x6C, 0x25, 0x16, 0x0A, 0x03, 0xA2, 0xAA };
             ReadOnlySpan<int> dataSizeOffsets = stackalloc int[] { 0x14, 0xB0, 0xB6, 0xB7 };
+            return this.TryReadPkg2RandomHeader64(fileName, headerLen, hash1Offsets, hash2Offsets, dataSizeOffsets, out header);
+        }
+
+        private bool TryReadPkg2KMST1205Header(string fileName, out Wz_Header.WzPkg2Header64 header)
+        {
+            const int headerLen = 163;
+            ReadOnlySpan<int> hash1Offsets = stackalloc int[] { 0x84, 0x32, 0x43, 0x7F, 0x62, 0x01, 0x83, 0x27 };
+            ReadOnlySpan<int> hash2Offsets = stackalloc int[] { 0xA2, 0x1B, 0x05, 0x0D, 0x9A, 0x85, 0x79, 0x4D };
+            ReadOnlySpan<int> dataSizeOffsets = stackalloc int[] { 0x08, 0x8F, 0x3F, 0x63 };
             return this.TryReadPkg2RandomHeader64(fileName, headerLen, hash1Offsets, hash2Offsets, dataSizeOffsets, out header);
         }
 
@@ -478,10 +493,11 @@ namespace WzComparerR2.WzLib
             for (int i = 0; i < entryCount; i++)
             {
                 byte nodeType = reader.ReadByte();
-                string name;
+                string name = null;
                 if (nodeType == 0x03 || nodeType == 0x04)
                 {
-                    name = context.DirStringReader.ReadName(reader, entries.Count == 0);
+                    if (rule.EntryNamePosition == Pkg2EntryNamePosition.BeforeData)
+                        name = context.DirStringReader.ReadName(reader, entries.Count == 0);
                 }
                 else
                 {
@@ -497,6 +513,8 @@ namespace WzComparerR2.WzLib
                     size = context.LengthCalc.CalcLength(sizePosition, size);
                     cs32 = context.LengthCalc.CalcLength(checksumPosition, cs32);
                 }
+                if (rule.EntryNamePosition == Pkg2EntryNamePosition.AfterData)
+                    name = context.DirStringReader.ReadName(reader, entries.Count == 0);
                 entries.Add(new Pkg2DirEntry
                 {
                     NodeType = nodeType,

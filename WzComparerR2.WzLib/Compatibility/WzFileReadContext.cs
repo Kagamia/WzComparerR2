@@ -39,8 +39,15 @@ namespace WzComparerR2.WzLib.Compatibility
 
     public interface IPkg2DirTreeReadRule
     {
+        Pkg2EntryNamePosition EntryNamePosition { get; }
         int ReadEntryCount(WzBinaryReader reader, IWzImageOffsetCalc offsetCalc);
         bool ShouldReadOffsets(WzBinaryReader reader, IWzImageOffsetCalc offsetCalc, int actualEntryCount);
+    }
+
+    public enum Pkg2EntryNamePosition
+    {
+        BeforeData,
+        AfterData,
     }
 
     internal sealed class Pkg2DirTreeReadRule : IPkg2DirTreeReadRule
@@ -50,6 +57,8 @@ namespace WzComparerR2.WzLib.Compatibility
         private Pkg2DirTreeReadRule()
         {
         }
+
+        public Pkg2EntryNamePosition EntryNamePosition => Pkg2EntryNamePosition.BeforeData;
 
         public int ReadEntryCount(WzBinaryReader reader, IWzImageOffsetCalc offsetCalc)
         {
@@ -77,10 +86,14 @@ namespace WzComparerR2.WzLib.Compatibility
     internal sealed class Pkg2DirTreeReadRule64 : IPkg2DirTreeReadRule
     {
         public static readonly Pkg2DirTreeReadRule64 Instance = new Pkg2DirTreeReadRule64();
+        public static readonly Pkg2DirTreeReadRule64 AfterDataInstance = new Pkg2DirTreeReadRule64(Pkg2EntryNamePosition.AfterData);
 
-        private Pkg2DirTreeReadRule64()
+        private Pkg2DirTreeReadRule64(Pkg2EntryNamePosition entryNamePosition = Pkg2EntryNamePosition.BeforeData)
         {
+            this.EntryNamePosition = entryNamePosition;
         }
+
+        public Pkg2EntryNamePosition EntryNamePosition { get; }
 
         public int ReadEntryCount(WzBinaryReader reader, IWzImageOffsetCalc offsetCalc)
         {
