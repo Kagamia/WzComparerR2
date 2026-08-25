@@ -336,16 +336,32 @@ namespace WzComparerR2.WzLib
 
                 public new void Add(Wz_Node item)
                 {
-                    base.Add(item);
-                    if (item.parentNode != null)
-                    {
-                        int index = item.parentNode.nodes.innerCollection.Items.IndexOf(item);
-                        if (index > -1)
-                        {
-                            item.parentNode.nodes.innerCollection.RemoveItem(index);
-                        }
-                    }
-                    item.parentNode = this.parentNode;
+                     // 若 item 已属于其它父节点，先从原父节点脱离（保证单一父子关系）。
+                   if (item.parentNode != null)
+                   {
+                       int index = item.parentNode.nodes.innerCollection.Items.IndexOf(item);
+                       if (index > -1)
+                       {
+                           item.parentNode.nodes.innerCollection.RemoveItem(index);
+                       }
+                   }
+                
+                   // KeyedCollection 不允许同父节点下出现重名子节点。
+                   // 解析 wz 时遇到重复键（数据本身重复或偏移错位产生的脏数据）时，
+                   // 自动追加后缀重命名，避免直接抛出 "已添加了具有相同键的项" 异常。
+                   if (item.text != null && this.Contains(item.text))
+                   {
+                       int suffix = 2;
+                       string candidate;
+                       while (this.Contains(candidate = item.text + "__" + suffix))
+                       {
+                           suffix++;
+                       }
+                       item.text = candidate;
+                   }
+                
+                   base.Add(item);
+                   item.parentNode = this.parentNode;
                 }
 
                 protected override void RemoveItem(int index)
