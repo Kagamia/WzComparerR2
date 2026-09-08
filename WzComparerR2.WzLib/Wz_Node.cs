@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Xml;
 using System.Reflection;
@@ -319,13 +318,23 @@ namespace WzComparerR2.WzLib
                 }
             }
 
-            private class InnerCollection : KeyedCollection<string, Wz_Node>
+            private class InnerCollection : IEnumerable<Wz_Node>
             {
                 public InnerCollection(Wz_Node owner)
-                    : base(null, 12)
                 {
                     this.parentNode = owner;
+                    this.items = new List<Wz_Node>();
                 }
+
+                private const int DictionaryCreationThreshold = 12;
+                private readonly Wz_Node parentNode;
+                private readonly List<Wz_Node> items;
+                // TODO: Replace Dictionary to a custom hash table implementation to reduce memory usage.
+                private Dictionary<string, Wz_Node> itemsByName;
+
+                public Wz_Node this[int index] => this.items[index];
+
+                public int Count => this.items.Count;
 
                 public Wz_Node Add(string nodeText)
                 {
@@ -334,48 +343,74 @@ namespace WzComparerR2.WzLib
                     return newNode;
                 }
 
-                public new void Add(Wz_Node item)
+                public void Add(Wz_Node item)
                 {
-                    base.Add(item);
                     if (item.parentNode != null)
                     {
-                        int index = item.parentNode.nodes.innerCollection.Items.IndexOf(item);
-                        if (index > -1)
+                        item.parentNode.nodes.innerCollection?.Remove(item);
+                    }
+                    this.items.Add(item);
+                    item.parentNode = this.parentNode;
+                    if (item.text != null)
+                    {
+                        if (this.itemsByName != null)
                         {
-                            item.parentNode.nodes.innerCollection.RemoveItem(index);
+                            this.itemsByName[item.text] = item;
+                        }
+                        else if (this.items.Count > DictionaryCreationThreshold)
+                        {
+                            this.CreateNameIndex();
                         }
                     }
-                    item.parentNode = this.parentNode;
                 }
 
-                protected override void RemoveItem(int index)
+                private void Remove(Wz_Node item)
                 {
-                    var item = this[index];
-                    if (item != null)
+                    int index = this.items.IndexOf(item);
+                    if (index < 0)
                     {
-                        item.parentNode = null;
+                        return;
                     }
-                    base.RemoveItem(index);
+                    this.items.RemoveAt(index);
+                    item.parentNode = null;
+                    if (this.itemsByName != null && this.items.Count <= DictionaryCreationThreshold)
+                    {
+                        this.itemsByName = null;
+                    }
+                    else if (this.itemsByName != null && item.text != null
+                        && this.itemsByName.TryGetValue(item.text, out Wz_Node indexedItem)
+                        && object.ReferenceEquals(indexedItem, item))
+                    {
+                        this.ReindexName(item.text);
+                    }
                 }
-
-                private readonly Wz_Node parentNode;
 
                 public void Sort()
                 {
-                    (base.Items as List<Wz_Node>)?.Sort();
+                    this.items.Sort();
                 }
 
                 public void Sort<T>(Func<Wz_Node, T> getKeyFunc) where T : IComparable<T>
                 {
-                    ListSorter.Sort(base.Items as List<Wz_Node>, getKeyFunc);
+                    ListSorter.Sort(this.items, getKeyFunc);
                 }
 
                 public void Trim()
                 {
-                    (base.Items as List<Wz_Node>)?.TrimExcess();
+                    this.items.TrimExcess();
                 }
 
-                public new Wz_Node this[string key]
+                public void Clear()
+                {
+                    foreach (Wz_Node item in this.items)
+                    {
+                        item.parentNode = null;
+                    }
+                    this.items.Clear();
+                    this.itemsByName = null;
+                }
+
+                public Wz_Node this[string key]
                 {
                     get
                     {
@@ -383,30 +418,55 @@ namespace WzComparerR2.WzLib
                         {
                             return null;
                         }
-                        if (this.Dictionary != null)
+                        if (this.itemsByName != null)
                         {
-                            Wz_Node node;
-                            this.Dictionary.TryGetValue(key, out node);
-                            return node;
+                            this.itemsByName.TryGetValue(key, out Wz_Node item);
+                            return item;
                         }
-                        else
+                        for (int i = this.items.Count - 1; i >= 0; i--)
                         {
-                            List<Wz_Node> list = this.Items as List<Wz_Node>;
-                            foreach (var node in list)
+                            if (string.Equals(this.items[i].text, key, StringComparison.Ordinal))
                             {
-                                if (this.Comparer.Equals(this.GetKeyForItem(node), key))
-                                {
-                                    return node;
-                                }
+                                return this.items[i];
                             }
-                            return null;
+                        }
+                        return null;
+                    }
+                }
+
+                public IEnumerator<Wz_Node> GetEnumerator()
+                {
+                    return this.items.GetEnumerator();
+                }
+
+                System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+                {
+                    return this.GetEnumerator();
+                }
+
+                private void CreateNameIndex()
+                {
+                    this.itemsByName = new Dictionary<string, Wz_Node>(StringComparer.Ordinal);
+                    foreach (Wz_Node item in this.items)
+                    {
+                        if (item.text != null)
+                        {
+                            this.itemsByName[item.text] = item;
                         }
                     }
                 }
 
-                protected override string GetKeyForItem(Wz_Node item)
+                private void ReindexName(string name)
                 {
-                    return item.text;
+                    for (int i = this.items.Count - 1; i >= 0; i--)
+                    {
+                        if (string.Equals(this.items[i].text, name, StringComparison.Ordinal))
+                        {
+                            this.itemsByName[name] = this.items[i];
+                            return;
+                        }
+                    }
+                    this.itemsByName.Remove(name);
                 }
             }
 

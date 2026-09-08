@@ -102,6 +102,7 @@ namespace WzComparerR2.Comparer
                 arrayOld.Sort();
             }
 
+            // TODO: Group duplicate node names and match them deterministically instead of relying on unstable sort order.
             foreach (var diff in CompareSortedNodes(arrayNew, arrayOld))
             {
                 yield return diff;
