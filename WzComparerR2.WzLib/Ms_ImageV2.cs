@@ -15,7 +15,6 @@ namespace WzComparerR2.WzLib
         {
             this.MsEntry = msEntry;
             this.Offset = msEntry.StartPos;
-            this.IsChecksumChecked = true; // disable checksum check
         }
 
         public Ms_Entry MsEntry { get; private set; }

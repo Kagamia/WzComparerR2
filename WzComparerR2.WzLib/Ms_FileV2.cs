@@ -79,7 +79,8 @@ namespace WzComparerR2.WzLib
 
             // 2. check file version
             const int supportedVersion = 4;
-            var version = bReader.ReadByte() ^ randBytes[0];
+            byte encryptedVersion = bReader.ReadByte();
+            var version = encryptedVersion ^ randBytes[0];
             if (version != supportedVersion)
                 throw new Exception($"Version check failed. (expected: {supportedVersion}, actual {version})");
 
@@ -117,7 +118,15 @@ namespace WzComparerR2.WzLib
             int entryCount = chacha20Reader.ReadInt32();
 
             ReadOnlySpan<ushort> u16SaltBytes = MemoryMarshal.Cast<byte, ushort>(saltBytes);
-            // TODO: validate file hash
+            int actualHash = hashedSaltLen + encryptedVersion + version + entryCount;
+            for (int i = 0; i < u16SaltBytes.Length; i++)
+            {
+                actualHash += u16SaltBytes[i];
+            }
+            if (hash != actualHash)
+            {
+                throw new Exception($"Hash check failed. (expected: {hash}, actual: {actualHash})");
+            }
 
             // 5. skip random bytes
             long entryStartPos = headerStartPos + 8 + fileName.Select(v => (int)v * 3).Sum() % 212 + 64;
@@ -165,7 +174,7 @@ namespace WzComparerR2.WzLib
                 int unk4 = chacha20Reader.ReadInt32();
 
                 var entry = new Ms_Entry(entryName, checkSum, flags, startPos, size, sizeAligned, unk1, unk2, entryKey, unk3, unk4);
-                //TODO: calcuate ms_image checksum
+                entry.CalculatedCheckSum = flags + startPos + size + sizeAligned + unk1 + entryKey.Sum(b => (int)b);
                 this.Entries.Add(entry);
             }
 

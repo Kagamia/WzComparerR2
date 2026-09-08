@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -630,30 +631,27 @@ namespace WzComparerR2.WzLib
             {
                 while (!reader.EndOfStream)
                 {
-                    reader.SkipWhitespaceExceptLineEnding();
-                    string key = reader.ReadUntilWhitespace();
+                    string line = reader.ReadLine();
+                    string trimmedLine = line.Trim(' ', '\t', '\r');
 
-                    if (string.IsNullOrEmpty(key)) // skip empty line
+                    if (string.IsNullOrEmpty(trimmedLine)) // skip empty line
                     {
-                        reader.SkipLine();
                         continue;
                     }
-                    else if (key == "}" && !isTopLevel) // end property
+                    else if (trimmedLine[0] == '#' || trimmedLine[0] == '\'' || trimmedLine[0] == '/')
                     {
-                        if (!reader.SkipLineAndCheckEmpty())
-                        {
-                            throw new Exception("Incorrect property end line.");
-                        }
+                        continue;
+                    }
+                    else if (trimmedLine == "}" && !isTopLevel) // end property
+                    {
                         return;
                     }
 
-                    reader.SkipWhitespaceExceptLineEnding();
-                    int equalSign = reader.Read();
-                    if (equalSign != '=')
-                        throw new Exception($"Expect '=' sign but got '{(char)equalSign}'.");
-                    reader.SkipWhitespaceExceptLineEnding();
-
-                    string stringVal = reader.ReadLine();
+                    int equalSignIndex = FindUnescapedChar(trimmedLine, '=');
+                    if (equalSignIndex < 0)
+                        throw new FormatException($"Expected an unescaped '=' sign in property line '{trimmedLine}'.");
+                    string key = Unescape(trimmedLine.Substring(0, equalSignIndex).Trim(' ', '\t', '\r'));
+                    string stringVal = Unescape(trimmedLine.Substring(equalSignIndex + 1).Trim(' ', '\t', '\r'));
 
                     if (string.IsNullOrEmpty(stringVal))
                     {
@@ -664,23 +662,67 @@ namespace WzComparerR2.WzLib
                         Wz_Node child = parent.Nodes.Add(key);
                         ReadProperty(reader, child, false);
                     }
-                    else if (int.TryParse(stringVal, out var intVal))
+                    else if (stringVal.StartsWith("!l", StringComparison.Ordinal)
+                        && long.TryParse(stringVal.Substring(2), NumberStyles.Integer, CultureInfo.InvariantCulture, out long int64Value))
                     {
-                        parent.Nodes.Add(key).Value = intVal;
+                        parent.Nodes.Add(key).Value = int64Value;
                     }
-                    else if (long.TryParse(stringVal, out var longVal))
+                    else if (stringVal.StartsWith("!s", StringComparison.Ordinal))
                     {
-                        parent.Nodes.Add(key).Value = longVal;
+                        parent.Nodes.Add(key).Value = stringVal.Substring(2);
                     }
-                    else if (double.TryParse(stringVal, out var doubleVal))
+                    else if (stringVal.StartsWith("[UOL]", StringComparison.Ordinal))
                     {
-                        parent.Nodes.Add(key).Value = doubleVal;
+                        parent.Nodes.Add(key).Value = new Wz_Uol(stringVal.Substring(5));
+                    }
+                    else if (int.TryParse(stringVal, NumberStyles.Integer, CultureInfo.InvariantCulture, out int int32Value))
+                    {
+                        parent.Nodes.Add(key).Value = int32Value;
+                    }
+                    else if (float.TryParse(stringVal, NumberStyles.Float, CultureInfo.InvariantCulture, out float singleValue))
+                    {
+                        parent.Nodes.Add(key).Value = singleValue;
                     }
                     else
                     {
                         parent.Nodes.Add(key).Value = stringVal;
                     }
                 }
+            }
+
+            private static int FindUnescapedChar(string value, char target)
+            {
+                bool escaped = false;
+                for (int i = 0; i < value.Length; i++)
+                {
+                    if (escaped)
+                    {
+                        escaped = false;
+                    }
+                    else if (value[i] == '\\')
+                    {
+                        escaped = true;
+                    }
+                    else if (value[i] == target)
+                    {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+
+            private static string Unescape(string value)
+            {
+                StringBuilder result = new StringBuilder(value.Length);
+                for (int i = 0; i < value.Length; i++)
+                {
+                    if (value[i] == '\\' && i + 1 < value.Length)
+                    {
+                        i++;
+                    }
+                    result.Append(value[i]);
+                }
+                return result.ToString();
             }
         }
 
@@ -754,7 +796,17 @@ namespace WzComparerR2.WzLib
                 string typeName = reader.ReadUntilWhitespace();
                 if (!TryParseNodeType(typeName, out type))
                 {
-                    throw new FormatException($"Unknown type name ${typeName}.");
+                    throw new FormatException($"Unknown type name {typeName}.");
+                }
+                switch (type)
+                {
+                    case NodeType.Canvas:
+                    case NodeType.Sound:
+                    case NodeType.Uol:
+                    case NodeType.Convex:
+                    case NodeType.Unknown:
+                    case NodeType.RawData:
+                        throw new NotSupportedException($"Text image node type {typeName} is not supported.");
                 }
                 if (reader.Peek() == '\t')
                 {
@@ -768,25 +820,53 @@ namespace WzComparerR2.WzLib
                             value = null;
                             break;
 
-                        case NodeType.I4:
+                        case NodeType.I2:
                             valueStr = reader.ReadLine();
-                            if (!int.TryParse(valueStr, out var intValue))
-                                throw new FormatException($"Failed to parse I4 value {valueStr}.");
-                            value = intValue;
+                            if (!short.TryParse(valueStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out short int16Value))
+                                throw new FormatException($"Failed to parse I2 value {valueStr}.");
+                            value = int16Value;
                             break;
 
-                        case NodeType.I8:
+                        case NodeType.I4:
                             valueStr = reader.ReadLine();
-                            if (!long.TryParse(valueStr, out var longValue))
-                                throw new FormatException($"Failed to parse I8 value {valueStr}.");
-                            value = longValue;
+                            if (!int.TryParse(valueStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out int int32Value))
+                                throw new FormatException($"Failed to parse I4 value {valueStr}.");
+                            value = int32Value;
+                            break;
+
+                        case NodeType.R4:
+                            valueStr = reader.ReadLine();
+                            if (!float.TryParse(valueStr, NumberStyles.Float, CultureInfo.InvariantCulture, out float singleValue))
+                                throw new FormatException($"Failed to parse R4 value {valueStr}.");
+                            value = singleValue;
                             break;
 
                         case NodeType.R8:
                             valueStr = reader.ReadLine();
-                            if (!double.TryParse(valueStr, out var doubleValue))
+                            if (!double.TryParse(valueStr, NumberStyles.Float, CultureInfo.InvariantCulture, out double doubleValue))
                                 throw new FormatException($"Failed to parse R8 value {valueStr}.");
                             value = doubleValue;
+                            break;
+
+                        case NodeType.I8:
+                            valueStr = reader.ReadLine();
+                            if (!long.TryParse(valueStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out long int64Value))
+                                throw new FormatException($"Failed to parse I8 value {valueStr}.");
+                            value = int64Value;
+                            break;
+
+                        case NodeType.UI4:
+                            valueStr = reader.ReadLine();
+                            if (!uint.TryParse(valueStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out uint uint32Value))
+                                throw new FormatException($"Failed to parse UI4 value {valueStr}.");
+                            value = uint32Value;
+                            break;
+
+                        case NodeType.Bool:
+                            valueStr = reader.ReadLine();
+                            if (!short.TryParse(valueStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out short boolValue))
+                                throw new FormatException($"Failed to parse BOOL value {valueStr}.");
+                            value = boolValue != 0;
                             break;
 
                         case NodeType.String:
@@ -856,27 +936,46 @@ namespace WzComparerR2.WzLib
 
             public enum NodeType
             {
-                Unknown = 0,
-                Empty,
-                I4,
-                I8,
-                R8,
-                String,
-                Vector,
-                Property,
+                Property = 0,
+                Canvas = 1,
+                Sound = 2,
+                Uol = 3,
+                Vector = 4,
+                Convex = 5,
+                String = 6,
+                Empty = 7,
+                I2 = 8,
+                I4 = 9,
+                R4 = 10,
+                R8 = 11,
+                I8 = 12,
+                UI4 = 13,
+                Bool = 14,
+                Unknown = 15,
+                RawData = 16,
             }
 
             public static bool TryParseNodeType(string s, out NodeType type)
             {
                 switch (s)
                 {
-                    case "<Empty>": type = NodeType.Empty; return true;
-                    case "<I4>": type = NodeType.I4; return true;
-                    case "<I8>": type = NodeType.I8; return true;
-                    case "<R8>": type = NodeType.R8; return true;
-                    case "<String>": type = NodeType.String; return true;
-                    case "<Vector>": type = NodeType.Vector; return true;
                     case "<Property>": type = NodeType.Property; return true;
+                    case "<Canvas>": type = NodeType.Canvas; return true;
+                    case "<Sound>": type = NodeType.Sound; return true;
+                    case "<UOL>": type = NodeType.Uol; return true;
+                    case "<Vector>": type = NodeType.Vector; return true;
+                    case "<Convex>": type = NodeType.Convex; return true;
+                    case "<String>": type = NodeType.String; return true;
+                    case "<Empty>": type = NodeType.Empty; return true;
+                    case "<I2>": type = NodeType.I2; return true;
+                    case "<I4>": type = NodeType.I4; return true;
+                    case "<R4>": type = NodeType.R4; return true;
+                    case "<R8>": type = NodeType.R8; return true;
+                    case "<I8>": type = NodeType.I8; return true;
+                    case "<UI4>": type = NodeType.UI4; return true;
+                    case "<BOOL>": type = NodeType.Bool; return true;
+                    case "<Unknown>": type = NodeType.Unknown; return true;
+                    case "<RawData>": type = NodeType.RawData; return true;
                     default: type = NodeType.Unknown; return false;
                 }
             }
