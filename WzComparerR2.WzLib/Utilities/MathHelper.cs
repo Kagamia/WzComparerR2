@@ -87,7 +87,7 @@ namespace WzComparerR2.WzLib.Utilities
         /// <summary>
         /// XOR each byte with (byte)(0xAA + i), widening to char.
         /// </summary>
-        public static unsafe void XorWidenToChar(ReadOnlySpan<byte> bytes, Span<char> chars)
+        public static unsafe void DecodeWzStringAscii(ReadOnlySpan<byte> bytes, Span<char> chars)
         {
             int length = bytes.Length;
             int i = 0;
@@ -163,7 +163,7 @@ namespace WzComparerR2.WzLib.Utilities
         /// <summary>
         /// XOR each char with (ushort)(0xAAAA + i).
         /// </summary>
-        public static unsafe void XorChars(ReadOnlySpan<char> input, Span<char> output)
+        public static unsafe void ApplyWzStringCharMask(ReadOnlySpan<char> input, Span<char> output)
         {
             int length = input.Length;
             int i = 0;
@@ -217,7 +217,7 @@ namespace WzComparerR2.WzLib.Utilities
         /// <summary>
         /// XOR each byte with (byte)(0xAA + i), writing to output.
         /// </summary>
-        public static unsafe void XorBytes(ReadOnlySpan<byte> input, Span<byte> output)
+        public static unsafe void ApplyWzStringByteMask(ReadOnlySpan<byte> input, Span<byte> output)
         {
             int length = input.Length;
             int i = 0;

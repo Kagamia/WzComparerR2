@@ -149,11 +149,11 @@ namespace WzComparerR2.WzLib.Compatibility
         {
             if (encoding == WzStringEncoding.ASCII)
             {
-                MathHelper.XorBytes(rawBytes, output);
+                MathHelper.ApplyWzStringByteMask(rawBytes, output);
             }
             else
             {
-                MathHelper.XorChars(MemoryMarshal.Cast<byte, char>(rawBytes), MemoryMarshal.Cast<byte, char>(output));
+                MathHelper.ApplyWzStringCharMask(MemoryMarshal.Cast<byte, char>(rawBytes), MemoryMarshal.Cast<byte, char>(output));
             }
         }
 
@@ -171,6 +171,7 @@ namespace WzComparerR2.WzLib.Compatibility
         private static readonly IWzFormatProfile[] allProfiles = new IWzFormatProfile[]
         {
             new Pkg1Profile(),
+            new Pkg2Profile64(1206, WzFileFormat.Pkg2Kmst1206, Pkg2OffsetVersion.KMST1205, Pkg2EntryNameVersion.KMST1206, Wz_CryptoKeyType.KMST1199, new Pkg2HashVersionCalc64V3(), Pkg2EntryNamePosition.AfterData),
             new Pkg2Profile64(1205, WzFileFormat.Pkg2Kmst1205, Pkg2OffsetVersion.KMST1205, Pkg2EntryNameVersion.KMST1205, Wz_CryptoKeyType.KMST1199, new Pkg2HashVersionCalc64V2(), Pkg2EntryNamePosition.AfterData),
             new Pkg2Profile64(1204, WzFileFormat.Pkg2Kmst1204, Pkg2OffsetVersion.KMST1202, Pkg2EntryNameVersion.KMST1204, Wz_CryptoKeyType.KMST1199, new Pkg2HashVersionCalc64V1()),
             new Pkg2Profile64(1202, WzFileFormat.Pkg2Kmst1202, Pkg2OffsetVersion.KMST1202, Pkg2EntryNameVersion.KMST1202, Wz_CryptoKeyType.KMST1199, new Pkg2HashVersionCalc64V1()),
@@ -464,7 +465,8 @@ namespace WzComparerR2.WzLib.Compatibility
             return this.Format switch
             {
                 WzFileFormat.Pkg2Kmst1204 => new Pkg2OffsetCalc64V1((uint)header.HeaderSize, header.Hash1, hashVersion),
-                WzFileFormat.Pkg2Kmst1205 => new Pkg2OffsetCalc64V2((uint)header.HeaderSize, header.Hash1, hashVersion),
+                WzFileFormat.Pkg2Kmst1205 or
+                WzFileFormat.Pkg2Kmst1206 => new Pkg2OffsetCalc64V2((uint)header.HeaderSize, header.Hash1, hashVersion),
                 _ => null,
             };
         }
@@ -496,6 +498,7 @@ namespace WzComparerR2.WzLib.Compatibility
                 Pkg2EntryNameVersion.KMST1202 => new Pkg2MixedKeyDirStringReader64(new Wz_Crypto.Pkg2DirStringKeyV3(header.Hash1, hashVersion), pkg1Keys),
                 Pkg2EntryNameVersion.KMST1204 => new Pkg2MixedKeyDirStringReader64(new Wz_Crypto.Pkg2DirStringKeyV4(header.Hash1, hashVersion), pkg1Keys, true),
                 Pkg2EntryNameVersion.KMST1205 => new Pkg2MixedKeyDirStringReader64(new Wz_Crypto.Pkg2DirStringKeyV5(header.Hash1, hashVersion), pkg1Keys, true),
+                Pkg2EntryNameVersion.KMST1206 => new Pkg2MixedKeyDirStringReader64(new Wz_Crypto.Pkg2DirStringKeyV6(header.Hash1, hashVersion), pkg1Keys, true),
                 _ => throw new ArgumentOutOfRangeException(nameof(EntryNameVersion)),
             };
         }

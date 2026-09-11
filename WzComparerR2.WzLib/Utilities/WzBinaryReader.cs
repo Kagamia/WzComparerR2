@@ -105,7 +105,7 @@ namespace WzComparerR2.WzLib.Utilities
 
                     using var charBuffer = MemoryPool<char>.Shared.Rent(size);
                     Span<char> chars = charBuffer.Memory.Span.Slice(0, size);
-                    MathHelper.XorWidenToChar(buffer.AsSpan(0, size), chars);
+                    MathHelper.DecodeWzStringAscii(buffer.AsSpan(0, size), chars);
                     return this.stringPool != null ? this.stringPool.GetOrAdd(currentPos, chars) : chars.ToString();
                 }
                 finally
@@ -127,7 +127,7 @@ namespace WzComparerR2.WzLib.Utilities
                     decrypter.Decrypt(buffer.AsSpan(0, byteSize));
 
                     Span<char> chars = MemoryMarshal.Cast<byte, char>(buffer.AsSpan(0, byteSize));
-                    MathHelper.XorChars(chars, chars);
+                    MathHelper.ApplyWzStringCharMask(chars, chars);
                     return this.stringPool != null ? this.stringPool.GetOrAdd(currentPos, chars) : chars.ToString();
                 }
                 finally

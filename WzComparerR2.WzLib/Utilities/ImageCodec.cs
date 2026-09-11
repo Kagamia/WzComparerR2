@@ -415,7 +415,11 @@ namespace WzComparerR2.WzLib.Utilities
                 while (r16Pixels.Length >= 2)
                 {
                     ulong pixel = 0xffff0000_00000000 | ((ulong)MemoryMarshal.Read<ushort>(r16Pixels) << 32);
+#if NET8_0_OR_GREATER
+                    MemoryMarshal.Write(outputBgraPixels, in pixel);
+#else
                     MemoryMarshal.Write(outputBgraPixels, ref pixel);
+#endif
                     r16Pixels = r16Pixels.Slice(2);
                     outputBgraPixels = outputBgraPixels.Slice(8);
                 }
