@@ -369,7 +369,22 @@ namespace WzComparerR2.MapRender
         private void DrawItem(MeshItem mesh, MsCustomSprite msCustomSprite)
         {
             Prepare(ItemType.MsSprite);
-            this.msSpriteRenderer.Draw(mesh.Position, msCustomSprite.Size, msCustomSprite.Material);
+            if (mesh.TileRegion != null)
+            {
+                var region = mesh.TileRegion.Value;
+                for (int y = region.Top; y < region.Bottom; y++)
+                {
+                    for (int x = region.Left; x < region.Right; x++)
+                    {
+                        Vector2 pos = mesh.Position + mesh.TileOffset * new Vector2(x, y);
+                        this.msSpriteRenderer.Draw(pos, msCustomSprite.Size, msCustomSprite.Material);
+                    }
+                }
+            }
+            else
+            {
+                this.msSpriteRenderer.Draw(mesh.Position, msCustomSprite.Size, msCustomSprite.Material);
+            }
         }
 
         public Rectangle[] Measure(MeshItem mesh)

@@ -675,11 +675,30 @@ namespace WzComparerR2.MapRender
                 default: throw new Exception($"Unknown back ani value: {back.Ani}.");
             }
             string path = $@"Map\Back\{back.BS}.img\{aniDir}\{back.No}";
-            var aniItem = resLoader.LoadAnimationData(path);
+            var aniNode = PluginManager.FindWz(path)?.ResolveUol();
+            var aniItem = aniNode != null ? resLoader.LoadAnimationData(aniNode) : null;
+            var animator = CreateAnimator(aniItem, back.SpineAni);
+
+            Rectangle bounds = Rectangle.Empty;
+            switch (animator)
+            {
+                case FrameAnimator frameAnimator:
+                    bounds = frameAnimator.Data.GetBound();
+                    break;
+                case WzComparerR2.Controls.AnimationItem animationItem:
+                    bounds = animationItem.Measure();
+                    break;
+                case MsCustomSprite msCustomSprite:
+                    bounds = new Rectangle(Point.Zero, msCustomSprite.Size.ToPoint());
+                    break;
+            }
 
             back.View = new BackItem.ItemView()
             {
-                Animator = CreateAnimator(aniItem, back.SpineAni)
+                Animator = animator,
+                FlowX = aniNode?.Nodes["flowX"]?.GetValueEx(0),
+                FlowY = aniNode?.Nodes["flowY"]?.GetValueEx(0),
+                Bounds = bounds,
             };
         }
 

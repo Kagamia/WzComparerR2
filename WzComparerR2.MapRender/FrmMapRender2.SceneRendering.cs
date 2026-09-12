@@ -797,8 +797,8 @@ namespace WzComparerR2.MapRender
 
         private MeshItem GetMeshBack(BackItem back)
         {
-            //计算计算culling
-            if (back.ScreenMode != 0 && back.ScreenMode != renderEnv.Camera.DisplayMode + 1)
+            //计算culling
+            if (!IsBackVisible(back))
             {
                 return null;
             }
@@ -808,51 +808,60 @@ namespace WzComparerR2.MapRender
             int cy = back.Cy;
             if ((back.TileMode & TileMode.BothTile) != 0 && (cx == 0 || cy == 0))
             {
-                Point renderSize = Point.Zero;
-                switch (back.View.Animator)
-                {
-                    case FrameAnimator frameAni:
-                        renderSize = frameAni.Data.GetBound().Size;
-                        break;
-                    case AnimationItem aniItem:
-                        // For spine animation, we don't know how to calculate the correct cx and cy
-                        renderSize = aniItem.Measure().Size;
-                        break;
-                    case MsCustomSprite msCustomSprite:
-                        renderSize = msCustomSprite.Size.ToPoint();
-                        break;
-                }
-
+                Point renderSize = back.View.Bounds.Size;
                 if (cx == 0) cx = renderSize.X;
                 if (cy == 0) cy = renderSize.Y;
             }
 
+            float GetBackScrollOffset(BackItem back, int rate, int explicitDistance)
+            {
+                int distance = back.W && explicitDistance != 0 ? Math.Abs(explicitDistance) : 100;
+                return (float)(rate * distance * back.View.Time / 20000.0 % distance);
+            }
+
             Vector2 tileOff = new Vector2(cx, cy);
             Vector2 position = new Vector2(back.X, back.Y);
+            bool hasSpineFlow = back.View.FlowX.HasValue || back.View.FlowY.HasValue;
 
             //计算水平卷动
-            if ((back.TileMode & TileMode.ScrollHorizontal) != 0)
+            if (hasSpineFlow)
             {
-                position.X += ((float)back.Rx * 5 * back.View.Time / 1000) % cx;// +this.Camera.Center.X * (100 - Math.Abs(this.rx)) / 100;
+                int flowX = back.View.FlowX.GetValueOrDefault();
+                int flowY = back.View.FlowY.GetValueOrDefault();
+                int flowRate = flowX != 0 ? flowX : flowY;
+                if (flowRate != 0)
+                {
+                    if (flowX != 0)
+                    {
+                        position.X += GetBackScrollOffset(back, flowRate, back.Wx);
+                    }
+                    if (flowY != 0)
+                    {
+                        position.Y += GetBackScrollOffset(back, flowRate, back.Wy);
+                    }
+                }
             }
-            else //镜头移动比率偏移
+            else
             {
-                position.X += renderEnv.Camera.Center.X * (100 + back.Rx) / 100;
-            }
+                if ((back.TileMode & TileMode.ScrollHorizontal) != 0)
+                {
+                    position.X += GetBackScrollOffset(back, back.Rx, back.Wx);
+                }
+                else //镜头移动比率偏移
+                {
+                    position.X += renderEnv.Camera.Center.X * (100 + back.Rx) / 100;
+                }
 
-            //计算垂直卷动
-            if ((back.TileMode & TileMode.ScrollVertical) != 0)
-            {
-                position.Y += ((float)back.Ry * 5 * back.View.Time / 1000) % cy;// +this.Camera.Center.Y * (100 - Math.Abs(this.ry)) / 100;
+                //计算垂直卷动
+                if ((back.TileMode & TileMode.ScrollVertical) != 0)
+                {
+                    position.Y += GetBackScrollOffset(back, back.Ry, back.Wy);
+                }
+                else //镜头移动比率偏移
+                {
+                    position.Y += renderEnv.Camera.Center.Y * (100 + back.Ry) / 100;
+                }
             }
-            else //镜头移动比率偏移
-            {
-                position.Y += (renderEnv.Camera.Center.Y) * (100 + back.Ry) / 100;
-            }
-
-            //y轴镜头调整
-            //if (back.TileMode == TileMode.None && renderEnv.Camera.WorldRect.Height > 600)
-            //    position.Y += (renderEnv.Camera.Height - 600) / 2;
 
             //取整
             position.X = (float)Math.Floor(position.X);
@@ -863,12 +872,17 @@ namespace WzComparerR2.MapRender
             if (back.TileMode != TileMode.None)
             {
                 var cameraRect = renderEnv.Camera.ClipRect;
+                var bounds = back.View.Bounds;
+                if (back.Flip)
+                {
+                    bounds.X = -bounds.Right;
+                }
 
                 int l, t, r, b;
                 if ((back.TileMode & TileMode.Horizontal) != 0 && cx > 0)
                 {
-                    l = (int)Math.Floor((cameraRect.Left - position.X) / cx) - 1;
-                    r = (int)Math.Ceiling((cameraRect.Right - position.X) / cx) + 1;
+                    l = (int)Math.Floor((cameraRect.Left - position.X - bounds.Right) / cx) - 1;
+                    r = (int)Math.Ceiling((cameraRect.Right - position.X - bounds.Left) / cx) + 2;
                 }
                 else
                 {
@@ -878,8 +892,8 @@ namespace WzComparerR2.MapRender
 
                 if ((back.TileMode & TileMode.Vertical) != 0 && cy > 0)
                 {
-                    t = (int)Math.Floor((cameraRect.Top - position.Y) / cy) - 1;
-                    b = (int)Math.Ceiling((cameraRect.Bottom - position.Y) / cy) + 1;
+                    t = (int)Math.Floor((cameraRect.Top - position.Y - bounds.Bottom) / cy) - 1;
+                    b = (int)Math.Ceiling((cameraRect.Bottom - position.Y - bounds.Top) / cy) + 2;
                 }
                 else
                 {
@@ -891,7 +905,7 @@ namespace WzComparerR2.MapRender
             }
 
             //生成mesh
-            var renderObj = GetRenderObject(back.View.Animator, back.Flip, back.Alpha);
+            var renderObj = GetRenderObject(back.View.Animator, back.Flip);
             if (renderObj == null)
             {
                 return null;
@@ -901,10 +915,30 @@ namespace WzComparerR2.MapRender
             mesh.Position = position;
             mesh.Z0 = 0;
             mesh.Z1 = back.Index;
+            mesh.Alpha = back.Alpha;
             mesh.FlipX = back.Flip;
             mesh.TileRegion = tileRect;
             mesh.TileOffset = tileOff;
             return mesh;
+        }
+
+        private bool IsBackVisible(BackItem back)
+        {
+            if (back.ScreenMode == 0)
+            {
+                return true;
+            }
+
+            if ((back.ScreenMode & 2) != 0)
+            {
+                if (renderEnv.Camera.Width == 1024 && renderEnv.Camera.Height == 768)
+                {
+                    return true;
+                }
+            }
+
+            // TODO: Implement the native adaptive transform for screenMode bit 4.
+            return back.ScreenMode == renderEnv.Camera.DisplayMode + 1;
         }
 
         private MeshItem GetMeshObj(ObjItem obj)
@@ -1036,17 +1070,13 @@ namespace WzComparerR2.MapRender
             return mesh;
         }
 
-        private object GetRenderObject(object animator, bool flip = false, int alpha = 255)
+        private object GetRenderObject(object animator, bool flip = false)
         {
             if (animator is FrameAnimator frameAni)
             {
                 var frame = frameAni.CurrentFrame;
                 if (frame != null)
                 {
-                    if (alpha < 255) //理论上应该返回一个新的实例
-                    {
-                        frame.A0 = frame.A0 * alpha / 255;
-                    }
                     return frame;
                 }
             }
@@ -1055,10 +1085,6 @@ namespace WzComparerR2.MapRender
                 var skeleton = spineAniV2.Skeleton;
                 if (skeleton != null)
                 {
-                    if (alpha < 255)
-                    {
-                        skeleton.A = alpha / 255.0f;
-                    }
                     return skeleton;
                 }
             }
@@ -1067,10 +1093,6 @@ namespace WzComparerR2.MapRender
                 var skeleton = spineAniV4.Skeleton;
                 if (skeleton != null)
                 {
-                    if (alpha < 255)
-                    {
-                        skeleton.A = alpha / 255.0f;
-                    }
                     return skeleton;
                 }
             }
