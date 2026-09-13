@@ -244,9 +244,26 @@ namespace WzComparerR2
                 recStarted = true;
                 rec.Draw();
                 using (var texture = rec.GetPngTexture())
-                using (var file = File.Create(fileName))
                 {
-                    texture.SaveAsPng(file, texture.Width, texture.Height);
+                    byte[] frameData = new byte[texture.Width * texture.Height * 4];
+                    texture.GetData(frameData);
+                    var gcHandle = GCHandle.Alloc(frameData, GCHandleType.Pinned);
+                    try
+                    {
+                        using (var bitmap = new System.Drawing.Bitmap(
+                            texture.Width,
+                            texture.Height,
+                            texture.Width * 4,
+                            System.Drawing.Imaging.PixelFormat.Format32bppArgb,
+                            gcHandle.AddrOfPinnedObject()))
+                        {
+                            bitmap.Save(fileName, System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                    }
+                    finally
+                    {
+                        gcHandle.Free();
+                    }
                 }
                 return true;
             }
