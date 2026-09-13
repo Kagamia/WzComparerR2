@@ -164,6 +164,103 @@ namespace WzComparerR2
             }
         }
 
+        public bool SaveAsPng(AnimationItem aniItem, string fileName, ImageHandlerConfig config, bool showOptions)
+        {
+            var rec = new AnimationRecoder(this.GraphicsDevice);
+            rec.Items.Add(aniItem);
+            rec.ResetAll();
+
+            var measuredBounds = aniItem.Measure();
+            measuredBounds.Offset(aniItem.Position);
+            var clipOptions = new AnimationClipOptions()
+            {
+                StartTime = 0,
+                StopTime = 1,
+                Left = measuredBounds.Left,
+                Top = measuredBounds.Top,
+                Right = measuredBounds.Right,
+                Bottom = measuredBounds.Bottom,
+                OutputWidth = measuredBounds.Width,
+                OutputHeight = measuredBounds.Height,
+            };
+
+            if (showOptions)
+            {
+                var frmOptions = new FrmGifClipOptions()
+                {
+                    ClipOptions = clipOptions,
+                    ClipOptionsNew = clipOptions,
+                };
+                if (frmOptions.ShowDialog() != DialogResult.OK)
+                {
+                    return false;
+                }
+
+                var clipOptionsNew = frmOptions.ClipOptionsNew;
+                clipOptions.Left = clipOptionsNew.Left ?? clipOptions.Left;
+                clipOptions.Top = clipOptionsNew.Top ?? clipOptions.Top;
+                clipOptions.Right = clipOptionsNew.Right ?? clipOptions.Right;
+                clipOptions.Bottom = clipOptionsNew.Bottom ?? clipOptions.Bottom;
+                clipOptions.OutputWidth = clipOptionsNew.OutputWidth ?? (clipOptions.Right - clipOptions.Left);
+                clipOptions.OutputHeight = clipOptionsNew.OutputHeight ?? (clipOptions.Bottom - clipOptions.Top);
+            }
+
+            var bounds = new Rectangle(
+                clipOptions.Left.Value,
+                clipOptions.Top.Value,
+                clipOptions.Right.Value - clipOptions.Left.Value,
+                clipOptions.Bottom.Value - clipOptions.Top.Value);
+            var targetSize = new Point(clipOptions.OutputWidth.Value, clipOptions.OutputHeight.Value);
+            if (bounds.Width <= 0 || bounds.Height <= 0 || targetSize.X <= 0 || targetSize.Y <= 0)
+            {
+                return false;
+            }
+
+            switch (config.BackgroundType.Value)
+            {
+                default:
+                case ImageBackgroundType.Transparent:
+                    rec.BackgroundColor = Color.Transparent;
+                    break;
+
+                case ImageBackgroundType.Color:
+                    rec.BackgroundColor = System.Drawing.Color.FromArgb(255, config.BackgroundColor.Value).ToXnaColor();
+                    break;
+
+                case ImageBackgroundType.Mosaic:
+                    rec.BackgroundImage = MonogameUtils.CreateMosaic(GraphicsDevice,
+                        config.MosaicInfo.Color0.ToXnaColor(),
+                        config.MosaicInfo.Color1.ToXnaColor(),
+                        Math.Max(1, config.MosaicInfo.BlockSize));
+                    break;
+            }
+
+            bool isPlaying = this.IsPlaying;
+            bool recStarted = false;
+            try
+            {
+                this.IsPlaying = false;
+                rec.Begin(bounds, targetSize);
+                recStarted = true;
+                rec.Draw();
+                using (var texture = rec.GetPngTexture())
+                using (var file = File.Create(fileName))
+                {
+                    texture.SaveAsPng(file, texture.Width, texture.Height);
+                }
+                return true;
+            }
+            finally
+            {
+                if (recStarted)
+                {
+                    rec.End();
+                }
+                rec.BackgroundImage?.Dispose();
+                this.IsPlaying = isPlaying;
+            }
+        }
+
         public bool SaveAsGif(AnimationItem aniItem, string fileName, ImageHandlerConfig config, GifEncoder encoder, bool showOptions)
         {
             var rec = new AnimationRecoder(this.GraphicsDevice);
