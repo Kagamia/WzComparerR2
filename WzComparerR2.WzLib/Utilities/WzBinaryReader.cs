@@ -50,6 +50,11 @@ namespace WzComparerR2.WzLib.Utilities
             return (s == -128) ? this.bReader.ReadInt32() : s;
         }
 
+        public uint ReadCompressedUInt32()
+        {
+            return (uint)this.ReadCompressedInt32();
+        }
+
         public int ReadInt32()
         {
             return this.bReader.ReadInt32();
@@ -73,8 +78,9 @@ namespace WzComparerR2.WzLib.Utilities
 
         public float ReadCompressedSingle()
         {
-            float fl = this.bReader.ReadSByte();
-            return (fl == -128) ? this.bReader.ReadSingle() : fl;
+            Span<int> bits = stackalloc int[1];
+            bits[0] = this.ReadCompressedInt32();
+            return MemoryMarshal.Cast<int, float>(bits)[0];
         }
 
         public double ReadDouble()
