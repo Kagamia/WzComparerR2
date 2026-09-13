@@ -196,6 +196,11 @@ namespace WzComparerR2.WzLib
             if (this.value is T)
                 return (T)this.value;
 
+            if (this.value is uint uintValue && typeT == typeof(int))
+                return (T)(object)((int)uintValue);
+            if (this.value is int intValue && typeT == typeof(uint))
+                return (T)(object)((uint)intValue);
+
 
             if (this.value is string s)
             {

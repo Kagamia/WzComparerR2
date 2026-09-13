@@ -457,7 +457,8 @@ namespace WzComparerR2.CharaSimControl
                 return BitmapOrigin.CreateFromNode(node, PluginBase.PluginManager.FindWz);
             }).ToArray();
 
-            Color color = Color.FromArgb(resNode.FindNodeByPath("clr").GetValueEx(-1));
+            uint argbColor = resNode.FindNodeByPath("clr").GetValueEx(uint.MaxValue);
+            Color color = Color.FromArgb((int)argbColor);
             BitmapOrigin ani0 = default;
             Wz_Node ani0Node = resNode.FindNodeByPath(false, "ani", "0");
             if (ani0Node != null)
