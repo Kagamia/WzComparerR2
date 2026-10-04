@@ -40,7 +40,7 @@ namespace WzComparerR2.WzLib
         public uint HashedOffset { get; set; }
         public uint HashedOffsetPosition { get; set; }
         public long Offset { get; set; }
-        
+        public bool IsExtracted { get { return this.extr; } }
         public Wz_Node Node { get; private set; }
 
         public Wz_Node OwnerNode { get; set; }
