@@ -480,6 +480,8 @@ namespace WzComparerR2.MapRender
         {
             this.sceneManagerState = SceneManagerState.Exiting;
 
+            _uiSpineSelectorInstance?.ClearContents();
+
             //场景渐出
             this.opacity = 1;
             double time = 500;
