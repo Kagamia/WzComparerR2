@@ -443,6 +443,23 @@ namespace WzComparerR2.MapRender
                 this.ui.MouseUp += mouseBtnEv;
                 this.attachedEvent.Add(EventDisposable(mouseBtnEv, _ev => this.ui.MouseUp -= _ev));
 
+                EmptyKeys.UserInterface.Input.MouseWheelEventHandler mouseWheelEv;
+
+                mouseWheelEv = (o, e) =>
+                {
+                    if (!EmptyKeys.UserInterface.Input.Keyboard.IsControlPressed || e.Delta == 0) return;
+
+                    var beforeMousePos = this.renderEnv.Camera.CameraToWorld(this.renderEnv.Input.MousePosition).ToVector2();
+
+                    this.renderEnv.Camera.ZoomLevel = MathHelper.Clamp(this.renderEnv.Camera.ZoomLevel + (int)Math.Round(e.Delta / 120f), -20, 20);
+
+                    var afterMousePos = this.renderEnv.Camera.CameraToWorld(this.renderEnv.Input.MousePosition).ToVector2();
+                    this.renderEnv.Camera.Center += (beforeMousePos - afterMousePos) * this.renderEnv.Camera.Scale;
+                };
+
+                this.ui.MouseWheel += mouseWheelEv;
+                this.attachedEvent.Add(EventDisposable(mouseWheelEv, _ev => this.ui.MouseWheel -= _ev));
+
                 //更新事件
                 EventHandler ev = (o, e) =>
                 {
@@ -458,8 +475,9 @@ namespace WzComparerR2.MapRender
             var disposable = UIHelper.RegisterClickEvent<SceneItem>(this.ui.ContentControl,
                 (sender, point) =>
                 {
-                    int x = (int)point.X;
-                    int y = (int)point.Y;
+                    var cameraScale = this.renderEnv.Camera.Scale;
+                    int x = (int)(point.X / cameraScale);
+                    int y = (int)(point.Y / cameraScale);
                     var mouseTarget = this.allItems.Reverse<ItemRect>().FirstOrDefault(item =>
                     {
                         return item.rect.Contains(x, y) && (item.item is PortalItem || item.item is IlluminantClusterItem || item.item is ReactorItem);
@@ -973,9 +991,11 @@ namespace WzComparerR2.MapRender
             var maxTextureHeight = 4096;
 
             Rectangle oldRect = this.renderEnv.Camera.WorldRect;
+            int originalZoomLevel = this.renderEnv.Camera.ZoomLevel;
             int width = Math.Min(oldRect.Width, maxTextureWidth);
             int height = Math.Min(oldRect.Height, maxTextureHeight);
             this.renderEnv.Camera.UseWorldRect = true;
+            this.renderEnv.Camera.ZoomLevel = 0;
 
             var target2d = new RenderTarget2D(this.GraphicsDevice, width, height, false, SurfaceFormat.Bgra32, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             PngEffect pngEffect = null;
@@ -1045,6 +1065,7 @@ namespace WzComparerR2.MapRender
 
             this.renderEnv.Camera.WorldRect = oldRect;
             this.renderEnv.Camera.UseWorldRect = false;
+            this.renderEnv.Camera.ZoomLevel = originalZoomLevel;
 
             GraphicsDevice.SetRenderTargets(oldTarget);
             prepareCapture = false;

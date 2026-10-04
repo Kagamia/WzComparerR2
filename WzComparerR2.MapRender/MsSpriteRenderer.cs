@@ -46,7 +46,7 @@ namespace WzComparerR2.MapRender
         private Vector4 resolution_time;
         private Matrix world;
 
-        public void Begin(Vector2 cameraOrigin, float gameTime)
+        public void Begin(Vector2 cameraOrigin, float gameTime, float scale = 1f)
         {
             if (this.isInBeginEndPair)
             {
@@ -54,7 +54,8 @@ namespace WzComparerR2.MapRender
             }
 
             var viewPort = this.GraphicsDevice.Viewport;
-            Matrix.CreateOrthographicOffCenter(cameraOrigin.X, cameraOrigin.X + viewPort.Width, cameraOrigin.Y + viewPort.Height, cameraOrigin.Y, 0, -1, out this.vp);
+            cameraOrigin = cameraOrigin / scale;
+            Matrix.CreateOrthographicOffCenter(cameraOrigin.X, cameraOrigin.X + viewPort.Width / scale, cameraOrigin.Y + viewPort.Height / scale, cameraOrigin.Y, 0, -1, out this.vp);
             Matrix.Invert(ref this.vp, out this.vp_inv);
             this.resolution_time = new Vector4(viewPort.Width, viewPort.Height, gameTime, 0);
             this.world = Matrix.Identity;
