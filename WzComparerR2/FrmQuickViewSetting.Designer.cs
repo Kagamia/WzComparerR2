@@ -30,6 +30,10 @@
         {
             this.superTabControl1 = new DevComponents.DotNetBar.SuperTabControl();
             this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.chkShowMiniMap = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowMiniMapMob = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowMiniMapNpc = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.chkShowMiniMapPortal = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX10 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.labelX3 = new DevComponents.DotNetBar.LabelX();
             this.comboBoxEx2 = new DevComponents.DotNetBar.Controls.ComboBoxEx();
@@ -71,7 +75,9 @@
             this.checkBoxX14 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.checkBoxX15 = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.superTabControlPanel5 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.superTabControlPanel6 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.superTabItem5 = new DevComponents.DotNetBar.SuperTabItem();
+            this.superTabItem6 = new DevComponents.DotNetBar.SuperTabItem();
             this.chkShowDamageSkinID = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkShowDamageSkin = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.chkUseMiniSize = new DevComponents.DotNetBar.Controls.CheckBoxX();
@@ -86,6 +92,7 @@
             this.superTabControlPanel3.SuspendLayout();
             this.superTabControlPanel2.SuspendLayout();
             this.superTabControlPanel5.SuspendLayout();
+            this.superTabControlPanel6.SuspendLayout();
             this.panelEx1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -111,6 +118,7 @@
             this.superTabControl1.Controls.Add(this.superTabControlPanel3);
             this.superTabControl1.Controls.Add(this.superTabControlPanel1);
             this.superTabControl1.Controls.Add(this.superTabControlPanel4);
+            this.superTabControl1.Controls.Add(this.superTabControlPanel6);
             this.superTabControl1.Controls.Add(this.superTabControlPanel5);
             this.superTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.superTabControl1.Location = new System.Drawing.Point(0, 0);
@@ -127,6 +135,7 @@
             this.superTabItem2,
             this.superTabItem3,
             this.superTabItem4,
+            this.superTabItem6,
             this.superTabItem5});
             this.superTabControl1.Text = "superTabControl1";
             // 
@@ -603,6 +612,91 @@
             this.checkBoxX15.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.checkBoxX15.TabIndex = 10;
             this.checkBoxX15.Text = "忽略公式求解错误";
+            // // superTabControlPanel6
+            // 
+            this.superTabControlPanel6.Controls.Add(this.chkShowMiniMap);
+            this.superTabControlPanel6.Controls.Add(this.chkShowMiniMapMob);
+            this.superTabControlPanel6.Controls.Add(this.chkShowMiniMapNpc);
+            this.superTabControlPanel6.Controls.Add(this.chkShowMiniMapPortal);
+            this.superTabControlPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.superTabControlPanel6.Location = new System.Drawing.Point(62, 0);
+            this.superTabControlPanel6.Name = "superTabControlPanel6";
+            this.superTabControlPanel6.Size = new System.Drawing.Size(242, 211);
+            this.superTabControlPanel6.TabIndex = 0;
+            this.superTabControlPanel6.TabItem = this.superTabItem6;
+            this.superTabControlPanel6.Visible = false;
+            // 
+            // superTabItem6
+            // 
+            this.superTabItem6.AttachedControl = this.superTabControlPanel6;
+            this.superTabItem6.GlobalItem = false;
+            this.superTabItem6.Name = "superTabItem6";
+            this.superTabItem6.Text = "Map";
+            // 
+            // chkShowMiniMap
+            // 
+            this.chkShowMiniMap.AutoSize = true;
+            this.chkShowMiniMap.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkShowMiniMap.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowMiniMap.Location = new System.Drawing.Point(15, 12);
+            this.chkShowMiniMap.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.chkShowMiniMap.Name = "chkShowMiniMap";
+            this.chkShowMiniMap.Size = new System.Drawing.Size(145, 16);
+            this.chkShowMiniMap.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowMiniMap.TabIndex = 4;
+            this.chkShowMiniMap.Text = "Show Minimap";
+            this.chkShowMiniMap.CheckedChanged += ChkShowMiniMap_CheckedChanged;
+            // 
+            // chkShowMiniMapMob
+            // 
+            this.chkShowMiniMapMob.AutoSize = true;
+            this.chkShowMiniMapMob.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkShowMiniMapMob.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowMiniMapMob.Location = new System.Drawing.Point(30, 36);
+            this.chkShowMiniMapMob.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.chkShowMiniMapMob.Name = "chkShowMiniMapMob";
+            this.chkShowMiniMapMob.Size = new System.Drawing.Size(145, 16);
+            this.chkShowMiniMapMob.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowMiniMapMob.TabIndex = 4;
+            this.chkShowMiniMapMob.Text = "Show Mobs on Minimap";
+            // 
+            // chkShowMiniMapNpc
+            // 
+            this.chkShowMiniMapNpc.AutoSize = true;
+            this.chkShowMiniMapNpc.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkShowMiniMapNpc.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowMiniMapNpc.Location = new System.Drawing.Point(30, 60);
+            this.chkShowMiniMapNpc.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.chkShowMiniMapNpc.Name = "chkShowMiniMapNpc";
+            this.chkShowMiniMapNpc.Size = new System.Drawing.Size(145, 16);
+            this.chkShowMiniMapNpc.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowMiniMapNpc.TabIndex = 4;
+            this.chkShowMiniMapNpc.Text = "Show NPCs on Minimap";
+            // 
+            // chkShowMiniMapPortal
+            // 
+            this.chkShowMiniMapPortal.AutoSize = true;
+            this.chkShowMiniMapPortal.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkShowMiniMapPortal.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkShowMiniMapPortal.Location = new System.Drawing.Point(30, 84);
+            this.chkShowMiniMapPortal.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.chkShowMiniMapPortal.Name = "chkShowMiniMapPortal";
+            this.chkShowMiniMapPortal.Size = new System.Drawing.Size(145, 16);
+            this.chkShowMiniMapPortal.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkShowMiniMapPortal.TabIndex = 4;
+            this.chkShowMiniMapPortal.Text = "Show Portals on Minimap";
             // 
             // superTabControlPanel5
             // 
@@ -758,6 +852,8 @@
             this.superTabControlPanel2.PerformLayout();
             this.superTabControlPanel5.ResumeLayout(false);
             this.superTabControlPanel5.PerformLayout();
+            this.superTabControlPanel6.ResumeLayout(false);
+            this.superTabControlPanel6.PerformLayout();
             this.panelEx1.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -808,7 +904,9 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX14;
         private DevComponents.DotNetBar.Controls.CheckBoxX checkBoxX15;
         private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanel5;
+        private DevComponents.DotNetBar.SuperTabControlPanel superTabControlPanel6;
         private DevComponents.DotNetBar.SuperTabItem superTabItem5;
+        private DevComponents.DotNetBar.SuperTabItem superTabItem6;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowDamageSkinID;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkShowDamageSkin;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkUseMiniSize;
@@ -816,5 +914,9 @@
         private DevComponents.DotNetBar.Controls.CheckBoxX chkDisplayUnitOnSingleLine;
         private DevComponents.DotNetBar.LabelX lblDamageSkinNumber;
         private DevComponents.DotNetBar.Controls.TextBoxX txtDamageSkinNumber;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowMiniMap;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowMiniMapMob;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowMiniMapNpc;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkShowMiniMapPortal;
     }
 }
