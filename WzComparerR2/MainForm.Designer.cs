@@ -226,8 +226,10 @@
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tsmi1Sort = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmi1Export = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmi1DumpAsXml = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmi1UpdateStringLinker = new System.Windows.Forms.ToolStripMenuItem();
             this.nodeConnector1 = new DevComponents.AdvTree.NodeConnector();
             this.elementStyle1 = new DevComponents.DotNetBar.ElementStyle();
             this.listViewExString = new DevComponents.DotNetBar.Controls.ListViewEx();
@@ -257,6 +259,13 @@
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmi2CopyFullPath = new System.Windows.Forms.ToolStripMenuItem();
             this.comboItem19 = new DevComponents.Editors.ComboItem();
+            this.itemContainerRB4 = new DevComponents.DotNetBar.ItemContainer();
+            this.itemContainerPrefLan1 = new DevComponents.DotNetBar.ItemContainer();
+            this.itemContainerPrefLan11 = new DevComponents.DotNetBar.ItemContainer();
+            this.itemContainerPrefLan12 = new DevComponents.DotNetBar.ItemContainer();
+            this.labelItemPrefLan = new DevComponents.DotNetBar.LabelItem();
+            this.comboBoxItemPrefLan = new DevComponents.DotNetBar.ComboBoxItem();
+            this.buttonItemApplyPrefLan = new DevComponents.DotNetBar.ButtonItem();
             this.ribbonControl1.SuspendLayout();
             this.ribbonPanel1.SuspendLayout();
             this.ribbonPanel2.SuspendLayout();
@@ -1056,7 +1065,7 @@
             this.ribbonBar4.Dock = System.Windows.Forms.DockStyle.Left;
             this.ribbonBar4.DragDropSupport = true;
             this.ribbonBar4.Items.AddRange(new DevComponents.DotNetBar.BaseItem[] {
-            this.itemContainer10});
+            this.itemContainerRB4});
             this.ribbonBar4.Location = new System.Drawing.Point(171, 0);
             this.ribbonBar4.Name = "ribbonBar4";
             this.ribbonBar4.Size = new System.Drawing.Size(168, 91);
@@ -1071,6 +1080,19 @@
             // 
             // 
             this.ribbonBar4.TitleStyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            //
+            // itemContainerRB4
+            // 
+            // 
+            // 
+            // 
+            this.itemContainerRB4.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainerRB4.Name = "itemContainerRB4";
+            this.itemContainerRB4.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainer10,
+            this.itemContainerPrefLan1});
+            // 
+            // 
             // 
             // itemContainer10
             // 
@@ -1220,6 +1242,69 @@
             this.buttonItemClearStringWz.Name = "buttonItemClearStringWz";
             this.buttonItemClearStringWz.Text = "Clear StringLinker";
             this.buttonItemClearStringWz.Click += new System.EventHandler(this.buttonItemClearStringWz_Click);
+            //
+            // itemContainerPrefLan1
+            // 
+            // 
+            // 
+            // 
+            this.itemContainerPrefLan1.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainerPrefLan1.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical;
+            this.itemContainerPrefLan1.Name = "itemContainerPrefLan1";
+            this.itemContainerPrefLan1.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.itemContainerPrefLan11,
+            this.itemContainerPrefLan12});
+            // 
+            // 
+            // 
+            // itemContainerPrefLan11
+            // 
+            // 
+            // 
+            // 
+            this.itemContainerPrefLan11.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainerPrefLan11.Name = "itemContainerPrefLan2";
+            this.itemContainerPrefLan11.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.labelItemPrefLan,
+            this.comboBoxItemPrefLan});
+            // 
+            // 
+            // 
+            // labelItemPrefLan
+            // 
+            this.labelItemPrefLan.Name = "labelItemPrefLan";
+            this.labelItemPrefLan.Text = "Preferred Language";
+            // 
+            // comboBoxItemPrefLan
+            // 
+            this.comboBoxItemPrefLan.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxItemPrefLan.Items.Add(new DevComponents.Editors.ComboItem() { Text = "Default" });
+            this.comboBoxItemPrefLan.ComboWidth = 85;
+            this.comboBoxItemPrefLan.DropDownHeight = 160;
+            this.comboBoxItemPrefLan.ItemHeight = 16;
+            this.comboBoxItemPrefLan.Enabled = false;
+            this.comboBoxItemPrefLan.Name = "comboBoxItemPrefLan";
+            // 
+            // 
+            // itemContainerPrefLan12
+            // 
+            // 
+            // 
+            // 
+            this.itemContainerPrefLan12.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.itemContainerPrefLan12.HorizontalItemAlignment = DevComponents.DotNetBar.eHorizontalItemsAlignment.Right;
+            this.itemContainerPrefLan12.Name = "itemContainerPrefLan12";
+            this.itemContainerPrefLan12.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
+            this.buttonItemApplyPrefLan});
+            // 
+            // 
+            // 
+            // buttonItemApplyPrefLan
+            // 
+            this.buttonItemApplyPrefLan.Name = "buttonItemApplyPrefLan";
+            this.buttonItemApplyPrefLan.Text = "Apply";
+            this.buttonItemApplyPrefLan.Enabled = false;
+            this.buttonItemApplyPrefLan.Click += new System.EventHandler(this.buttonItemApplyPrefLan_Click);
             // 
             // ribbonBar1
             // 
@@ -2714,6 +2799,11 @@
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
             this.toolStripMenuItem3.Size = new System.Drawing.Size(151, 6);
             // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(151, 6);
+            // 
             // tsmi1Export
             // 
             this.tsmi1Export.Name = "tsmi1Export";
@@ -2727,6 +2817,13 @@
             this.tsmi1DumpAsXml.Size = new System.Drawing.Size(154, 22);
             this.tsmi1DumpAsXml.Text = "&Dump as Xml";
             this.tsmi1DumpAsXml.Click += new System.EventHandler(this.tsmi1DumpAsXml_Click);
+            // 
+            // tsmi1UpdateStringLinker
+            // 
+            this.tsmi1UpdateStringLinker.Name = "tsmi1UpdateStringLinker";
+            this.tsmi1UpdateStringLinker.Size = new System.Drawing.Size(154, 22);
+            this.tsmi1UpdateStringLinker.Text = "Update StringLinker";
+            this.tsmi1UpdateStringLinker.Click += new System.EventHandler(this.tsmi1UpdateStringLinker_Click);
             // 
             // elementStyle1
             // 
@@ -3218,6 +3315,7 @@
         private DevComponents.DotNetBar.LabelX labelXComp2;
         private System.Windows.Forms.ToolStripMenuItem tsmi1Export;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
         private DevComponents.DotNetBar.ComboBoxItem comboBoxItemLanguage;
         private DevComponents.Editors.ComboItem comboItem13;
         private DevComponents.Editors.ComboItem comboItem14;
@@ -3260,6 +3358,7 @@
         private DevComponents.DotNetBar.ComboBoxItem cmbItemAniNames;
         private DevComponents.DotNetBar.ButtonItem buttonItemUpdate;
         private System.Windows.Forms.ToolStripMenuItem tsmi1DumpAsXml;
+        private System.Windows.Forms.ToolStripMenuItem tsmi1UpdateStringLinker;
         private DevComponents.Editors.ComboItem comboItem18;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkResolvePngLink;
         private DevComponents.DotNetBar.ComboBoxItem cmbItemSkins;
@@ -3274,5 +3373,12 @@
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem tsmi2CopyFullPath;
         private DevComponents.DotNetBar.ColorPickerDropDown colorPickerPicBoxBgColor;
+        private DevComponents.DotNetBar.ItemContainer itemContainerRB4;
+        private DevComponents.DotNetBar.ItemContainer itemContainerPrefLan1;
+        private DevComponents.DotNetBar.ItemContainer itemContainerPrefLan11;
+        private DevComponents.DotNetBar.ItemContainer itemContainerPrefLan12;
+        private DevComponents.DotNetBar.LabelItem labelItemPrefLan;
+        private DevComponents.DotNetBar.ComboBoxItem comboBoxItemPrefLan;
+        private DevComponents.DotNetBar.ButtonItem buttonItemApplyPrefLan;
     }
 }

@@ -19,6 +19,7 @@ namespace WzComparerR2.Config
             this.SortWzOnOpened = true;
             this.AutoDetectExtFiles = true;
             this.EnableAutoUpdate = true;
+            this.PreferredLanguage = string.Empty;
         }
 
         /// <summary>
@@ -119,6 +120,12 @@ namespace WzComparerR2.Config
             get { return (PatcherSettingCollection)this["patcherSettings"]; }
         }
 
+        [ConfigurationProperty("preferredLanguage")]
+        public ConfigItem<string> PreferredLanguage
+        {
+            get { return (ConfigItem<string>)this["preferredLanguage"]; }
+            set { this["preferredLanguage"] = value; }
+        }
 
         /// <summary>
         /// 获取或设置一个值，指示Release版本下是否需要自动检查更新。
