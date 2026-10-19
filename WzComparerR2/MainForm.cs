@@ -897,13 +897,14 @@ namespace WzComparerR2
                 return;
             }
 
-            Wz_File wz_f = advTree1.SelectedNode.AsWzNode()?.GetNodeWzFile();
-            if (wz_f == null)
+            Wz_Node baseWzNodeValue = baseWzNode.AsWzNode();
+            Wz_Structure wz = this.openedWz.FirstOrDefault(item => item.WzNode != null && item.WzNode == baseWzNodeValue)
+                ?? advTree1.SelectedNode.AsWzNode()?.GetNodeWzFile()?.WzStructure;
+            if (wz == null)
             {
                 MessageBoxEx.Show("没有正确选择要关闭的wz。", "喵~");
                 return;
             }
-            Wz_Structure wz = wz_f.WzStructure;
 
             advTree1.Nodes.Remove(baseWzNode);
 
