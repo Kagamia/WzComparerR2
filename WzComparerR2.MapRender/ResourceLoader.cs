@@ -418,7 +418,9 @@ namespace WzComparerR2.MapRender
             if (!loadedItems.TryGetValue(path, out ResourceHolder holder))
             {
                 holder = new ResourceHolder();
-                holder.Resource = new Texture2D(this.GraphicsDevice, width, height, false, SurfaceFormat.Alpha8);
+                var texture = new Texture2D(this.GraphicsDevice, width, height, false, SurfaceFormat.Alpha8);
+                texture.SetData(new byte[width * height]);
+                holder.Resource = texture;
                 loadedItems[path] = holder;
             }
 
