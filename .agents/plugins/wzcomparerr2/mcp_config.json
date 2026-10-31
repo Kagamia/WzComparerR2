@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "wzcomparerr2": {
+      "command": "node",
+      "args": ["${PLUGIN_ROOT}/mcp/wcr2-mcp-server.mjs"],
+      "cwd": "${PLUGIN_ROOT}"
+    }
+  }
+}

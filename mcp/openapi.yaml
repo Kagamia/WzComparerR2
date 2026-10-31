@@ -1,0 +1,272 @@
+openapi: 3.0.3
+info:
+  title: WzComparerR2 MapleStory API
+  description: API for inspecting MapleStory WZ data, querying equipment/items/skills/mobs/maps, rendering authentic tooltips and avatars, and exporting game assets.
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:21481
+    description: Local WzComparerR2 McpHost Daemon (or your ngrok / tunnel URL for ChatGPT Actions)
+paths:
+  /status:
+    get:
+      operationId: getStatus
+      summary: Get WzComparerR2 runtime status
+      description: Returns current server status, open WZ files, and memory statistics.
+      responses:
+        '200':
+          description: Successful status response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  running:
+                    type: boolean
+                  mode:
+                    type: string
+                  openWzCount:
+                    type: integer
+                  loadedWz:
+                    type: array
+                    items:
+                      type: string
+                  stringLinkerLoaded:
+                    type: boolean
+
+  /search_strings:
+    post:
+      operationId: searchStrings
+      summary: Search MapleStory names, descriptions, or IDs
+      description: Fast lookup across StringLinker categories (eqp, item, skill, mob, map, npc, quest).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  description: Keyword or numeric ID to search
+                category:
+                  type: string
+                  enum: [all, eqp, item, skill, mob, map, npc, quest]
+                  default: all
+                exact:
+                  type: boolean
+                  default: false
+                searchDesc:
+                  type: boolean
+                  default: false
+                limit:
+                  type: integer
+                  default: 20
+      responses:
+        '200':
+          description: Matching items and string entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        category:
+                          type: string
+                        desc:
+                          type: string
+                        path:
+                          type: string
+
+  /get_object_info:
+    post:
+      operationId: getObjectInfo
+      summary: Get structured MapleStory object data (Gear, Item, Skill, Mob, NPC, Map)
+      description: Parses full domain attributes using WzComparerR2 CharaSim models.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum: [gear, item, skill, mob, npc, map]
+                id:
+                  type: integer
+                  description: Object numeric ID
+                path:
+                  type: string
+                  description: Or explicit WZ node path
+                level:
+                  type: integer
+                  description: Skill level (default max)
+      responses:
+        '200':
+          description: Structured domain object attributes and strings
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /render_tooltip:
+    post:
+      operationId: renderTooltip
+      summary: Render authentic MapleStory in-game tooltip
+      description: Generates a pixel-perfect tooltip PNG for gears, items, skills, mobs, maps, or achievements.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum: [gear, item, skill, mob, map, achievement, recipe]
+                id:
+                  type: integer
+                path:
+                  type: string
+                level:
+                  type: integer
+                outputPath:
+                  type: string
+                  description: Optional local file path to save PNG
+                format:
+                  type: string
+                  enum: [base64, file]
+                  default: base64
+      responses:
+        '200':
+          description: Rendered tooltip image as base64 PNG or saved file path
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  width:
+                    type: integer
+                  height:
+                    type: integer
+                  base64:
+                    type: string
+                  outputPath:
+                    type: string
+
+  /avatar_render:
+    post:
+      operationId: renderAvatar
+      summary: Render MapleStory paper-doll character avatar
+      description: Composites skin, head, hair, face, and equipment into character sprite PNG.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  default: stand1
+                frame:
+                  type: integer
+                  default: 0
+                parts:
+                  type: array
+                  items:
+                    type: integer
+                  description: List of numeric gear IDs (body, head, hair, face, coat, pants, shoes, weapon, etc.)
+                outputPath:
+                  type: string
+                format:
+                  type: string
+                  enum: [base64, file]
+                  default: base64
+      responses:
+        '200':
+          description: Composited avatar sprite PNG
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  width:
+                    type: integer
+                  height:
+                    type: integer
+                  base64:
+                    type: string
+
+  /get_node:
+    post:
+      operationId: getNode
+      summary: Inspect raw WZ node tree
+      description: Returns node metadata, child hierarchy, and canvas properties.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - path
+              properties:
+                path:
+                  type: string
+                  description: WZ path (e.g. Mob/8880140.img/info)
+                depth:
+                  type: integer
+                  default: 1
+                maxChildren:
+                  type: integer
+                  default: 50
+      responses:
+        '200':
+          description: Node data and children
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /extract_png:
+    post:
+      operationId: extractPng
+      summary: Extract WZ Canvas as PNG
+      description: Resolves _inlink and _outlink references automatically and exports PNG.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - path
+              properties:
+                path:
+                  type: string
+                outputPath:
+                  type: string
+      responses:
+        '200':
+          description: Extracted PNG metadata and path
+          content:
+            application/json:
+              schema:
+                type: object

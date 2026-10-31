@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "wzcomparerr2": {
+      "command": "node",
+      "args": ["mcp/wcr2-mcp-server.mjs"]
+    }
+  }
+}

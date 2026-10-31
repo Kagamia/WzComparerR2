@@ -23,6 +23,15 @@ links: [\[更新日志\]](https://github.com/Kagamia/WzComparerR2/tree/master/Up
 - **WzComparerR2.MapRender** (可选插件)地图仿真器
 - **WzComparerR2.Avatar** (可选插件)纸娃娃
 - **WzComparerR2.Network** (可选插件)在线聊天室
+- **WzComparerR2.Mcp** (可选插件) MCP & Agent 桥接 / AI Agent Plugin (`wcr2_*` MCP tools & skills for ChatGPT/Codex, Claude, Antigravity, Cursor, Smithery — see [INTEGRATIONS.md](INTEGRATIONS.md))
+
+# AI Agents & Model Context Protocol (MCP)
+
+WzComparerR2 includes an official AI Agent bridge and MCP server (`WzComparerR2.Mcp`) that allows **Claude**, **ChatGPT**, **Antigravity**, and **Cursor** to inspect MapleStory data, render authentic in-game tooltips, and extract sprites/animations.
+
+- **Quick Build**: Run `powershell -ExecutionPolicy Bypass -File mcp/build-plugin.ps1` to compile and deploy without requiring external SDKs.
+- **Environment Variable**: Set `WCR2_INSTALL_DIR` to your WzComparerR2 binary folder (e.g. `[Environment]::SetEnvironmentVariable("WCR2_INSTALL_DIR", "C:\Path\To\WzComparerR2", "User")`) so MCP servers can locate the binaries from any plugin cache directory (`~/.claude/plugins/cache/...`).
+- **Integration Guides**: See [INTEGRATIONS.md](INTEGRATIONS.md) for detailed platform-by-platform instructions.
 
 # Prerequisite
 - **2.x**: Win7sp1+/.net4.6.2+/dx11.0

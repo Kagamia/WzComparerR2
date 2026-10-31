@@ -1,0 +1,20 @@
+{
+  "name": "wzcomparerr2",
+  "displayName": "WzComparerR2",
+  "version": "1.1.1",
+  "description": "Inspect MapleStory WZ data, search localized strings, parse game objects, render tooltips and avatars, extract assets, and control WzComparerR2.",
+  "author": {
+    "name": "Seo, Jang-won",
+    "url": "https://github.com/nanpuhaha"
+  },
+  "homepage": "https://github.com/Kagamia/WzComparerR2",
+  "repository": "https://github.com/Kagamia/WzComparerR2",
+  "license": "MIT",
+  "keywords": [
+    "maplestory",
+    "wz",
+    "mcp",
+    "charasim",
+    "asset-extraction"
+  ]
+}
