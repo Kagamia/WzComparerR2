@@ -1,0 +1,41 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "wzcomparerr2",
+  "version": "1.1.1",
+  "description": "Inspect MapleStory WZ data, search localized strings, parse game objects, render authentic tooltips and avatars, extract assets, and control WzComparerR2.",
+  "author": {
+    "name": "Seo, Jang-won",
+    "url": "https://github.com/nanpuhaha"
+  },
+  "homepage": "https://github.com/Kagamia/WzComparerR2",
+  "repository": "https://github.com/Kagamia/WzComparerR2",
+  "license": "MIT",
+  "keywords": [
+    "maplestory",
+    "wz",
+    "mcp",
+    "asset-extraction",
+    "charasim"
+  ],
+  "extensions": {
+    "com.openai": {
+      "requires_local_executor": true,
+      "interface": {
+        "displayName": "WzComparerR2",
+        "shortDescription": "Inspect MapleStory WZ data and extract game assets.",
+        "longDescription": "Connects ChatGPT to a local WzComparerR2 installation for MapleStory WZ inspection, localized search, CharaSim object parsing, tooltip and avatar rendering, asset extraction, WZ comparison, Lua automation, and live GUI control.",
+        "developerName": "WzComparerR2",
+        "category": "Developer tools",
+        "capabilities": ["Read", "Write"],
+        "websiteURL": "https://github.com/Kagamia/WzComparerR2",
+        "composerIcon": "./assets/logo.png",
+        "logo": "./assets/logo.png",
+        "defaultPrompt": [
+          "Search MapleStory equipment and localized strings with WzComparerR2.",
+          "Render a MapleStory tooltip or character avatar and show the result.",
+          "Inspect a WZ node and extract its linked sprite or animation."
+        ]
+      }
+    }
+  }
+}

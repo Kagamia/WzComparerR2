@@ -1,0 +1,38 @@
+{
+  "name": "wzcomparerr2-mcp",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) server & agent bridge for WzComparerR2 (MapleStory WZ data analysis, tooltip rendering, and asset extraction)",
+  "type": "module",
+  "main": "wcr2-mcp-server.mjs",
+  "bin": {
+    "wcr2-mcp": "./wcr2-mcp-server.mjs",
+    "wcr2-cli": "./wcr2-cli.mjs"
+  },
+  "files": [
+    "wcr2-mcp-server.mjs",
+    "wcr2-cli.mjs",
+    "build-plugin.ps1",
+    "openapi.json",
+    "openapi.yaml"
+  ],
+  "scripts": {
+    "start": "node wcr2-mcp-server.mjs",
+    "cli": "node wcr2-cli.mjs",
+    "build:plugin": "powershell -ExecutionPolicy Bypass -File ./build-plugin.ps1"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "chatgpt",
+    "antigravity",
+    "maplestory",
+    "wzcomparerr2",
+    "charasim"
+  ],
+  "author": "nanpuhaha",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

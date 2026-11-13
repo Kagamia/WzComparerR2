@@ -1,0 +1,14 @@
+{
+  "name": "wzcomparerr2",
+  "description": "MapleStory WZ inspection, simulation, and asset extraction tools for Claude Code.",
+  "owner": {
+    "name": "Kagamia"
+  },
+  "plugins": [
+    {
+      "name": "wzcomparerr2",
+      "source": "./.agents/plugins/wzcomparerr2",
+      "description": "Inspect MapleStory WZ files, search localized names, render tooltips and avatars, extract assets, and control WzComparerR2."
+    }
+  ]
+}

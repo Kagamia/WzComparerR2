@@ -1,0 +1,20 @@
+name: wzcomparerr2
+description: Model Context Protocol (MCP) server for WzComparerR2 — MapleStory WZ data inspection, authentic tooltip rendering, paper-doll avatar rendering, and asset extraction.
+version: 1.0.0
+runtime: node
+command: node
+args:
+  - mcp/wcr2-mcp-server.mjs
+tags:
+  - maplestory
+  - charasim
+  - gaming
+  - asset-extractor
+  - reverse-engineering
+env:
+  WCR2_INSTALL_DIR:
+    description: "Optional: Path to WzComparerR2 folder containing WzComparerR2.exe (auto-detected if omitted)"
+    required: false
+  WCR2_BASE_WZ:
+    description: "Optional: Path to MapleStory Base.wz (auto-detected if omitted)"
+    required: false

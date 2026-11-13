@@ -1,0 +1,22 @@
+{
+  "name": "wzcomparerr2-tools",
+  "interface": {
+    "displayName": "WzComparerR2 Tools"
+  },
+  "plugins": [
+    {
+      "name": "wzcomparerr2",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/Kagamia/WzComparerR2.git",
+        "path": "./.agents/plugins/wzcomparerr2",
+        "ref": "master"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer tools"
+    }
+  ]
+}
