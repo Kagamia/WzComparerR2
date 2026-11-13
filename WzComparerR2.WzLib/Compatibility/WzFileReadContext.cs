@@ -39,15 +39,18 @@ namespace WzComparerR2.WzLib.Compatibility
 
     public interface IPkg2DirTreeReadRule
     {
-        Pkg2EntryNamePosition EntryNamePosition { get; }
+        Pkg2EntryFieldOrder EntryFieldOrder { get; }
+        bool ReverseOffsetOrder { get; }
+        bool IsNodeTypeEncrypted { get; }
         int ReadEntryCount(WzBinaryReader reader, IWzImageOffsetCalc offsetCalc);
         bool ShouldReadOffsets(WzBinaryReader reader, IWzImageOffsetCalc offsetCalc, int actualEntryCount);
     }
 
-    public enum Pkg2EntryNamePosition
+    public enum Pkg2EntryFieldOrder
     {
-        BeforeData,
-        AfterData,
+        TypeNameSizeChecksum,
+        TypeSizeChecksumName,
+        TypeChecksumNameSize,
     }
 
     internal sealed class Pkg2DirTreeReadRule : IPkg2DirTreeReadRule
@@ -58,7 +61,9 @@ namespace WzComparerR2.WzLib.Compatibility
         {
         }
 
-        public Pkg2EntryNamePosition EntryNamePosition => Pkg2EntryNamePosition.BeforeData;
+        public Pkg2EntryFieldOrder EntryFieldOrder => Pkg2EntryFieldOrder.TypeNameSizeChecksum;
+        public bool ReverseOffsetOrder => false;
+        public bool IsNodeTypeEncrypted => false;
 
         public int ReadEntryCount(WzBinaryReader reader, IWzImageOffsetCalc offsetCalc)
         {
@@ -86,14 +91,16 @@ namespace WzComparerR2.WzLib.Compatibility
     internal sealed class Pkg2DirTreeReadRule64 : IPkg2DirTreeReadRule
     {
         public static readonly Pkg2DirTreeReadRule64 Instance = new Pkg2DirTreeReadRule64();
-        public static readonly Pkg2DirTreeReadRule64 AfterDataInstance = new Pkg2DirTreeReadRule64(Pkg2EntryNamePosition.AfterData);
+        public static readonly Pkg2DirTreeReadRule64 NameLastInstance = new Pkg2DirTreeReadRule64(Pkg2EntryFieldOrder.TypeSizeChecksumName);
 
-        private Pkg2DirTreeReadRule64(Pkg2EntryNamePosition entryNamePosition = Pkg2EntryNamePosition.BeforeData)
+        private Pkg2DirTreeReadRule64(Pkg2EntryFieldOrder entryFieldOrder = Pkg2EntryFieldOrder.TypeNameSizeChecksum)
         {
-            this.EntryNamePosition = entryNamePosition;
+            this.EntryFieldOrder = entryFieldOrder;
         }
 
-        public Pkg2EntryNamePosition EntryNamePosition { get; }
+        public Pkg2EntryFieldOrder EntryFieldOrder { get; }
+        public bool ReverseOffsetOrder => false;
+        public bool IsNodeTypeEncrypted => false;
 
         public int ReadEntryCount(WzBinaryReader reader, IWzImageOffsetCalc offsetCalc)
         {
@@ -101,6 +108,29 @@ namespace WzComparerR2.WzLib.Compatibility
             var pkg2Calc = offsetCalc as IPkg2ImageOffsetCalc<long>
                 ?? throw new InvalidOperationException("64-bit PKG2 dir tree reading requires a 64-bit PKG2 offset calculator.");
             return pkg2Calc.DecryptEntryCount(encryptedEntryCount);
+        }
+
+        public bool ShouldReadOffsets(WzBinaryReader reader, IWzImageOffsetCalc offsetCalc, int actualEntryCount)
+        {
+            return true;
+        }
+    }
+
+    internal sealed class Pkg2DirTreeReadRule1208 : IPkg2DirTreeReadRule
+    {
+        public static readonly Pkg2DirTreeReadRule1208 Instance = new Pkg2DirTreeReadRule1208();
+
+        private Pkg2DirTreeReadRule1208()
+        {
+        }
+
+        public Pkg2EntryFieldOrder EntryFieldOrder => Pkg2EntryFieldOrder.TypeChecksumNameSize;
+        public bool ReverseOffsetOrder => true;
+        public bool IsNodeTypeEncrypted => true;
+
+        public int ReadEntryCount(WzBinaryReader reader, IWzImageOffsetCalc offsetCalc)
+        {
+            return Pkg2DirTreeReadRule64.Instance.ReadEntryCount(reader, offsetCalc);
         }
 
         public bool ShouldReadOffsets(WzBinaryReader reader, IWzImageOffsetCalc offsetCalc, int actualEntryCount)

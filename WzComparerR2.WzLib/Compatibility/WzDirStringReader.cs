@@ -19,6 +19,7 @@ namespace WzComparerR2.WzLib.Compatibility
         KMST1204,
         KMST1205,
         KMST1206,
+        KMST1208,
     }
 
     /// <summary>

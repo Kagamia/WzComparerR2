@@ -171,8 +171,9 @@ namespace WzComparerR2.WzLib.Compatibility
         private static readonly IWzFormatProfile[] allProfiles = new IWzFormatProfile[]
         {
             new Pkg1Profile(),
-            new Pkg2Profile64(1206, WzFileFormat.Pkg2Kmst1206, Pkg2OffsetVersion.KMST1205, Pkg2EntryNameVersion.KMST1206, Wz_CryptoKeyType.KMST1199, new Pkg2HashVersionCalc64V3(), Pkg2EntryNamePosition.AfterData),
-            new Pkg2Profile64(1205, WzFileFormat.Pkg2Kmst1205, Pkg2OffsetVersion.KMST1205, Pkg2EntryNameVersion.KMST1205, Wz_CryptoKeyType.KMST1199, new Pkg2HashVersionCalc64V2(), Pkg2EntryNamePosition.AfterData),
+            new Pkg2Profile64(1208, WzFileFormat.Pkg2Kmst1208, Pkg2OffsetVersion.KMST1208, Pkg2EntryNameVersion.KMST1208, Wz_CryptoKeyType.KMST1199, new Pkg2HashVersionCalc64V4(), Pkg2EntryFieldOrder.TypeChecksumNameSize),
+            new Pkg2Profile64(1206, WzFileFormat.Pkg2Kmst1206, Pkg2OffsetVersion.KMST1205, Pkg2EntryNameVersion.KMST1206, Wz_CryptoKeyType.KMST1199, new Pkg2HashVersionCalc64V3(), Pkg2EntryFieldOrder.TypeSizeChecksumName),
+            new Pkg2Profile64(1205, WzFileFormat.Pkg2Kmst1205, Pkg2OffsetVersion.KMST1205, Pkg2EntryNameVersion.KMST1205, Wz_CryptoKeyType.KMST1199, new Pkg2HashVersionCalc64V2(), Pkg2EntryFieldOrder.TypeSizeChecksumName),
             new Pkg2Profile64(1204, WzFileFormat.Pkg2Kmst1204, Pkg2OffsetVersion.KMST1202, Pkg2EntryNameVersion.KMST1204, Wz_CryptoKeyType.KMST1199, new Pkg2HashVersionCalc64V1()),
             new Pkg2Profile64(1202, WzFileFormat.Pkg2Kmst1202, Pkg2OffsetVersion.KMST1202, Pkg2EntryNameVersion.KMST1202, Wz_CryptoKeyType.KMST1199, new Pkg2HashVersionCalc64V1()),
             new Pkg2Profile(1201, WzFileFormat.Pkg2Kmst1201, Pkg2OffsetVersion.KMST1199, Pkg2EntryNameVersion.KMST1199, Wz_CryptoKeyType.KMST1199, new Pkg2HashVersionCalcV4()),
@@ -408,21 +409,21 @@ namespace WzComparerR2.WzLib.Compatibility
     /// </summary>
     public sealed class Pkg2Profile64 : WzFormatProfile<Wz_Header.WzPkg2Header64, ulong>
     {
-        public Pkg2Profile64(int wzVersion, WzFileFormat format, Pkg2OffsetVersion offsetVersion, Pkg2EntryNameVersion entryNameVersion, Wz_CryptoKeyType cryptoKeyType, IPkg2HashVersionCalc<ulong> hashVersionCalc, Pkg2EntryNamePosition entryNamePosition = Pkg2EntryNamePosition.BeforeData)
+        public Pkg2Profile64(int wzVersion, WzFileFormat format, Pkg2OffsetVersion offsetVersion, Pkg2EntryNameVersion entryNameVersion, Wz_CryptoKeyType cryptoKeyType, IPkg2HashVersionCalc<ulong> hashVersionCalc, Pkg2EntryFieldOrder entryFieldOrder = Pkg2EntryFieldOrder.TypeNameSizeChecksum)
             : base(format, cryptoKeyType)
         {
             this.WzVersion = wzVersion;
             this.OffsetVersion = offsetVersion;
             this.EntryNameVersion = entryNameVersion;
             this.HashVersionCalc = hashVersionCalc;
-            this.EntryNamePosition = entryNamePosition;
+            this.EntryFieldOrder = entryFieldOrder;
         }
 
         public int WzVersion { get; }
         public Pkg2OffsetVersion OffsetVersion { get; }
         public Pkg2EntryNameVersion EntryNameVersion { get; }
         public IPkg2HashVersionCalc<ulong> HashVersionCalc { get; }
-        public Pkg2EntryNamePosition EntryNamePosition { get; }
+        public Pkg2EntryFieldOrder EntryFieldOrder { get; }
         public override string Name => $"pkg2_kmst{this.WzVersion}";
 
         public override bool CanHandle(Wz_File wzFile, out Wz_Header.WzPkg2Header64 header)
@@ -456,6 +457,7 @@ namespace WzComparerR2.WzLib.Compatibility
             {
                 Pkg2OffsetVersion.KMST1202 => new Pkg2OffsetCalc64V1((uint)header.HeaderSize, header.Hash1, hashVersion),
                 Pkg2OffsetVersion.KMST1205 => new Pkg2OffsetCalc64V2((uint)header.HeaderSize, header.Hash1, hashVersion),
+                Pkg2OffsetVersion.KMST1208 => new Pkg2OffsetCalc64V3((uint)header.HeaderSize, header.Hash1, hashVersion),
                 _ => throw new ArgumentOutOfRangeException(nameof(OffsetVersion)),
             };
         }
@@ -467,15 +469,20 @@ namespace WzComparerR2.WzLib.Compatibility
                 WzFileFormat.Pkg2Kmst1204 => new Pkg2OffsetCalc64V1((uint)header.HeaderSize, header.Hash1, hashVersion),
                 WzFileFormat.Pkg2Kmst1205 or
                 WzFileFormat.Pkg2Kmst1206 => new Pkg2OffsetCalc64V2((uint)header.HeaderSize, header.Hash1, hashVersion),
+                WzFileFormat.Pkg2Kmst1208 => new Pkg2OffsetCalc64V3((uint)header.HeaderSize, header.Hash1, hashVersion),
                 _ => null,
             };
         }
 
         public override WzFileReadContext CreateReadContext(Wz_Header.WzPkg2Header64 header, ulong hashVersion, IWzImageOffsetCalc offsetCalc, IPkg2ImageLengthCalc imageLengthCalc)
         {
-            IPkg2DirTreeReadRule rule = this.EntryNamePosition == Pkg2EntryNamePosition.AfterData
-                ? Pkg2DirTreeReadRule64.AfterDataInstance
-                : Pkg2DirTreeReadRule64.Instance;
+            IPkg2DirTreeReadRule rule = this.EntryFieldOrder switch
+            {
+                Pkg2EntryFieldOrder.TypeNameSizeChecksum => Pkg2DirTreeReadRule64.Instance,
+                Pkg2EntryFieldOrder.TypeSizeChecksumName => Pkg2DirTreeReadRule64.NameLastInstance,
+                Pkg2EntryFieldOrder.TypeChecksumNameSize => Pkg2DirTreeReadRule1208.Instance,
+                _ => throw new ArgumentOutOfRangeException(nameof(EntryFieldOrder)),
+            };
             return new WzFileReadContext<ulong>(hashVersion, unchecked((uint)hashVersion), offsetCalc, imageLengthCalc, rule);
         }
 
@@ -499,6 +506,7 @@ namespace WzComparerR2.WzLib.Compatibility
                 Pkg2EntryNameVersion.KMST1204 => new Pkg2MixedKeyDirStringReader64(new Wz_Crypto.Pkg2DirStringKeyV4(header.Hash1, hashVersion), pkg1Keys, true),
                 Pkg2EntryNameVersion.KMST1205 => new Pkg2MixedKeyDirStringReader64(new Wz_Crypto.Pkg2DirStringKeyV5(header.Hash1, hashVersion), pkg1Keys, true),
                 Pkg2EntryNameVersion.KMST1206 => new Pkg2MixedKeyDirStringReader64(new Wz_Crypto.Pkg2DirStringKeyV6(header.Hash1, hashVersion), pkg1Keys, true),
+                Pkg2EntryNameVersion.KMST1208 => new Pkg2MixedKeyDirStringReader64(new Wz_Crypto.Pkg2DirStringKeyV7(header.Hash1, hashVersion), pkg1Keys, true),
                 _ => throw new ArgumentOutOfRangeException(nameof(EntryNameVersion)),
             };
         }

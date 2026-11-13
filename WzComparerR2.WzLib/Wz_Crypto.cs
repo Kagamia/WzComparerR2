@@ -389,7 +389,7 @@ namespace WzComparerR2.WzLib
                 this.Decrypt((ReadOnlySpan<byte>)data, data, keyOffset);
             }
 
-            public unsafe void Decrypt(ReadOnlySpan<byte> inputBuffer, Span<byte> outputBuffer, int keyOffset)
+            public virtual unsafe void Decrypt(ReadOnlySpan<byte> inputBuffer, Span<byte> outputBuffer, int keyOffset)
             {
                 if (inputBuffer.Length != outputBuffer.Length)
                 {
@@ -525,6 +525,41 @@ namespace WzComparerR2.WzLib
                     u16Keys[i] = (ushort)(this.baseKey >> (8 * i));
                 }
                 this.keys = keys;
+            }
+        }
+
+        public class Pkg2DirStringKeyV7 : Pkg2DirStringKey, IWzStatefulDecrypter
+        {
+            public Pkg2DirStringKeyV7(ulong hash1, ulong hashVersion) : base(0)
+            {
+                this.sharedHash = Pkg2Kmst1208Hash.ComputeSharedHash(hash1, hashVersion);
+                this.ApplyState(0);
+            }
+
+            private readonly ulong sharedHash;
+            private ulong nameKey;
+
+            public void ApplyState(ulong filePosition)
+            {
+                this.nameKey = Pkg2Kmst1208Hash.ComputeDirEntryNameKey(this.sharedHash, (uint)filePosition);
+            }
+
+            public override void Decrypt(ReadOnlySpan<byte> inputBuffer, Span<byte> outputBuffer, int _)
+            {
+                if (inputBuffer.Length != outputBuffer.Length)
+                    throw new ArgumentException("Input and output buffer lengths must match.");
+
+                int charCount = inputBuffer.Length / 2;
+                ReadOnlySpan<ushort> inputChars = MemoryMarshal.Cast<byte, ushort>(inputBuffer);
+                Span<ushort> outputChars = MemoryMarshal.Cast<byte, ushort>(outputBuffer);
+                for (int i = 0; i < charCount; i++)
+                {
+                    ushort key = (ushort)ROR(this.nameKey, (31 + 11 * i) & 0x3F);
+                    outputChars[i] = (ushort)(inputChars[i] ^ key);
+                }
+
+                if ((inputBuffer.Length & 1) != 0)
+                    outputBuffer[inputBuffer.Length - 1] = inputBuffer[inputBuffer.Length - 1];
             }
         }
     }

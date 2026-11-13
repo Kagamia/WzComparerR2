@@ -35,6 +35,11 @@ namespace WzComparerR2.WzLib.Compatibility
         int CalcLength(uint filePos, int encryptedValue);
     }
 
+    public interface IPkg2NodeTypeDecryptor
+    {
+        byte DecryptNodeType(uint filePos, byte encryptedNodeType);
+    }
+
     internal static class Pkg2ImageOffsetCalcHelper
     {
         public static int DecryptEntryCount(IPkg2ImageOffsetCalc calc, long encryptedEntryCount)
@@ -62,6 +67,8 @@ namespace WzComparerR2.WzLib.Compatibility
         KMST1202 = 4,
         /// <summary>KMST 1205</summary>
         KMST1205 = 5,
+        /// <summary>KMST 1208</summary>
+        KMST1208 = 6,
     }
 
     /// <summary>
@@ -300,6 +307,56 @@ namespace WzComparerR2.WzLib.Compatibility
                     "64-bit PKG2 dir count exceeds supported range.");
             }
             return (int)dirCount;
+        }
+    }
+
+    /// <summary>
+    /// 64-bit PKG2 offset calculation for KMST 1208.
+    /// </summary>
+    public sealed class Pkg2OffsetCalc64V3 : IPkg2ImageOffsetCalc<long>, IPkg2ImageLengthCalc, IPkg2NodeTypeDecryptor
+    {
+        public Pkg2OffsetCalc64V3(uint headerLen, ulong hash1, ulong hashVersion)
+        {
+            this.headerLen = headerLen;
+            this.hash1 = hash1;
+            this.hashVersion = hashVersion;
+            this.sharedHash = Pkg2Kmst1208Hash.ComputeSharedHash(hash1, hashVersion);
+        }
+
+        private readonly uint headerLen;
+        private readonly ulong hash1;
+        private readonly ulong hashVersion;
+        private readonly ulong sharedHash;
+
+        public uint CalcOffset(uint filePos, uint hashedOffset)
+        {
+            return Pkg2Kmst1208Hash.ComputeImageOffset(this.headerLen, this.hashVersion, this.hash1, this.sharedHash, (int)(filePos - this.headerLen), hashedOffset);
+        }
+
+        public int CalcLength(uint filePos, int encryptedValue)
+        {
+            return encryptedValue ^ (int)this.CalcFieldKey(filePos);
+        }
+
+        public byte DecryptNodeType(uint filePos, byte encryptedNodeType)
+        {
+            return Pkg2Kmst1208Hash.DecryptNodeType(this.hashVersion, this.hash1, this.sharedHash, (int)(filePos - this.headerLen), encryptedNodeType);
+        }
+
+        public int DecryptEntryCount(long encryptedEntryCount)
+        {
+            ulong key = Pkg2Kmst1208Hash.ComputeDirectoryCountKey(this.hashVersion, this.hash1);
+            uint dirCount = (uint)((key ^ (ulong)encryptedEntryCount) >> 20);
+            if (dirCount > int.MaxValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(encryptedEntryCount), "64-bit PKG2 dir count exceeds supported range.");
+            }
+            return (int)dirCount;
+        }
+
+        private uint CalcFieldKey(uint filePos)
+        {
+            return Pkg2Kmst1208Hash.ComputeEntryFieldKey(this.hashVersion, this.hash1, this.sharedHash, (int)(filePos - this.headerLen));
         }
     }
 }

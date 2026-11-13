@@ -12,6 +12,11 @@ using static WzComparerR2.WzLib.Utilities.MathHelper;
 
 namespace WzComparerR2.WzLib.Compatibility
 {
+    internal static class KnownWzVersionStrings
+    {
+        public const string V410 = "v410_260106_1_A1F3C9E2";
+    }
+
     #region Version iterators
     public interface IWzVersionIterator<THashVersion>
     {
@@ -453,11 +458,10 @@ namespace WzComparerR2.WzLib.Compatibility
     /// </summary>
     public sealed class Pkg2HashVersionCalc64V2 : IPkg2HashVersionCalc<ulong>
     {
-        private const string VersionString = "v410_260106_1_A1F3C9E2";
 
         public IReadOnlyList<ulong> CalcCandidates(ulong hash1, ulong hash2)
         {
-            ulong knownHashVersion = WzVersionHasher.ComputePkg2HashVersion1202(VersionString);
+            ulong knownHashVersion = WzVersionHasher.ComputePkg2HashVersion1202(KnownWzVersionStrings.V410);
             if (this.Verify(hash1, hash2, knownHashVersion))
                 return new[] { knownHashVersion };
             return Array.Empty<ulong>();
@@ -474,11 +478,9 @@ namespace WzComparerR2.WzLib.Compatibility
     /// </summary>
     public sealed class Pkg2HashVersionCalc64V3 : IPkg2HashVersionCalc<ulong>
     {
-        private const string VersionString = "v410_260106_1_A1F3C9E2";
-
         public IReadOnlyList<ulong> CalcCandidates(ulong hash1, ulong hash2)
         {
-            ulong hashVersion = WzVersionHasher.ComputePkg2HashVersion1206(VersionString);
+            ulong hashVersion = WzVersionHasher.ComputePkg2HashVersion1206(KnownWzVersionStrings.V410);
             return Pkg2Kmst1205Hash.ComputeHash2(hash1, hashVersion) == hash2
                 ? new[] { hashVersion }
                 : Array.Empty<ulong>();
@@ -486,9 +488,30 @@ namespace WzComparerR2.WzLib.Compatibility
 
         public bool Verify(ulong hash1, ulong hash2, ulong hashVersion)
         {
-            ulong expectedHashVersion = WzVersionHasher.ComputePkg2HashVersion1206(VersionString);
+            ulong expectedHashVersion = WzVersionHasher.ComputePkg2HashVersion1206(KnownWzVersionStrings.V410);
             return hashVersion == expectedHashVersion
                 && Pkg2Kmst1205Hash.ComputeHash2(hash1, expectedHashVersion) == hash2;
+        }
+    }
+
+    /// <summary>
+    /// 64-bit PKG2 hash version calculation for KMST 1208.
+    /// </summary>
+    public sealed class Pkg2HashVersionCalc64V4 : IPkg2HashVersionCalc<ulong>
+    {
+        public IReadOnlyList<ulong> CalcCandidates(ulong hash1, ulong hash2)
+        {
+            ulong hashVersion = WzVersionHasher.ComputePkg2HashVersion1208(KnownWzVersionStrings.V410);
+            return this.Verify(hash1, hash2, hashVersion)
+                ? new[] { hashVersion }
+                : Array.Empty<ulong>();
+        }
+
+        public bool Verify(ulong hash1, ulong hash2, ulong hashVersion)
+        {
+            ulong expectedHashVersion = WzVersionHasher.ComputePkg2HashVersion1208(KnownWzVersionStrings.V410);
+            return hashVersion == expectedHashVersion
+                && Pkg2Kmst1208Hash.ComputeHash2(hash1, expectedHashVersion) == hash2;
         }
     }
 

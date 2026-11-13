@@ -1,4 +1,3 @@
-//"v410_260106_1_A1F3C9E2"
 using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -60,7 +59,6 @@ namespace WzComparerR2.WzLib.Compatibility
 
         public static ulong ComputePkg2HashVersion1206(string wzVersion)
         {
-            byte[] strBytes = Encoding.Unicode.GetBytes(wzVersion);
             byte[] key1 =
             {
                 0xDE, 0x17, 0x00, 0xB9, 0x5C, 0x7C, 0xF2, 0xFE,
@@ -74,18 +72,42 @@ namespace WzComparerR2.WzLib.Compatibility
                 0xEE, 0xAD, 0x10, 0x78, 0x0E, 0x2F, 0x58, 0x0A,
                 0x01,
             };
+            byte[] hash = ComputeDoubleHmac(wzVersion, key1, key2);
+            return BitConverter.ToUInt64(hash, 0);
+        }
 
-            byte[] ComputeHmacSha256(byte[] key, byte[] message)
+        public static ulong ComputePkg2HashVersion1208(string wzVersion)
+        {
+            byte[] key1 =
             {
-                using (var hmac = new HMACSHA256(key))
-                {
-                    return hmac.ComputeHash(message);
-                }
+                0x34, 0xD0, 0xF4, 0x29, 0x59, 0x3B, 0xE8, 0xAF,
+                0xA4, 0x96, 0x9F, 0x14, 0xCF, 0x4E, 0x66, 0xF0,
+                0x25, 0x76, 0x6D, 0x24, 0xE0, 0x2C, 0x54, 0x2F,
+                0xCE, 0x40, 0x0E, 0xDC, 0x18, 0xB3, 0xB3, 0x55,
+            };
+            byte[] key2 =
+            {
+                0x95, 0xB3, 0xDD, 0x88, 0x4A, 0xE3, 0xE4, 0x7A,
+                0x3B, 0xD6, 0x4A, 0xE5, 0xB0, 0x38, 0xB4, 0x97,
+                0x01,
+            };
+            byte[] hash = ComputeDoubleHmac(wzVersion, key1, key2);
+            return BitConverter.ToUInt64(hash, 0) ^ ROL(BitConverter.ToUInt64(hash, 8), 29);
+        }
+
+        private static byte[] ComputeDoubleHmac(string wzVersion, byte[] key1, byte[] key2)
+        {
+            byte[] message = Encoding.Unicode.GetBytes(wzVersion);
+            byte[] hash1;
+            using (var hmac = new HMACSHA256(key1))
+            {
+                hash1 = hmac.ComputeHash(message);
             }
 
-            byte[] hash1 = ComputeHmacSha256(key1, strBytes);
-            byte[] hash2 = ComputeHmacSha256(hash1, key2);
-            return BitConverter.ToUInt64(hash2, 0);
+            using (var hmac = new HMACSHA256(hash1))
+            {
+                return hmac.ComputeHash(key2);
+            }
         }
     }
 }
