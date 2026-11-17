@@ -235,6 +235,10 @@ namespace WzComparerR2
                     {
                         if (wz_f.Type == e.WzType)
                         {
+                            if (wz_f.Node.Nodes.Count <= 0)
+                            {
+                                continue;
+                            }
                             preSearch.Add(wz_f.Node);
                             find = true;
                             //e.WzFile = wz_f;
@@ -297,6 +301,7 @@ namespace WzComparerR2
             }
             //寻找失败
             e.WzNode = null;
+            e.WzFile = null;
         }
 
         #region 界面主题配置
@@ -798,6 +803,11 @@ namespace WzComparerR2
                 advTree1.Nodes.Add(node);
                 this.openedWz.Add(wz);
                 OnWzOpened(new WzStructureEventArgs(wz)); //触发事件
+                UpdateLanguageCombobox();
+                if (!this.stringLinker.HasValues)
+                {
+                    UpdateStringLinker(null, (this.comboBoxItemPrefLan.SelectedItem as DevComponents.Editors.ComboItem).Tag as Wz_Node);
+                }
                 QueryPerformance.End();
                 labelItemStatus.Text = "读取成功,用时" + (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000) + "ms,共读取" + wz.img_number + "img.";
 
@@ -930,6 +940,10 @@ namespace WzComparerR2
                 labelItemStatus.Text = "已经关闭所选wz...";
             else
                 labelItemStatus.Text = "wz已经关闭,但是发生了诡异的错误...";
+
+            this.comboBoxItemPrefLan.Enabled = false;
+            this.buttonItemApplyPrefLan.Enabled = false;
+            UpdateLanguageCombobox();
         }
 
         private void buttonItemCloseAll_Click(object sender, EventArgs e)
@@ -948,6 +962,8 @@ namespace WzComparerR2
             openedWz.Clear();
             CharaSimLoader.ClearAll();
             stringLinker.Clear();
+            this.comboBoxItemPrefLan.Enabled = false;
+            this.buttonItemApplyPrefLan.Enabled = false;
             labelItemStatus.Text = "已经清理全部已读取资源...";
             GC.Collect();
         }
@@ -981,6 +997,67 @@ namespace WzComparerR2
             if (btnItem == null || (path = btnItem.Tag as string) == null)
                 return;
             openWz(path);
+        }
+
+        private void UpdateLanguageCombobox()
+        {
+            this.comboBoxItemPrefLan.Items.Clear();
+            this.comboBoxItemPrefLan.Items.Add(new DevComponents.Editors.ComboItem() { Text = "Default" });
+            if (this.openedWz.Count == 0) return;
+
+            Wz_Node language = PluginManager.FindWz(Wz_Type.Language) ?? PluginManager.FindWz(Wz_Type.Etc)?.FindNodeByPath("Language");
+            if (language != null)
+            {
+                this.comboBoxItemPrefLan.Items.AddRange(language.Nodes.Select(n =>
+                {
+                    var item = new DevComponents.Editors.ComboItem();
+                    item.Text = n.Text;
+                    item.Tag = n;
+                    return item;
+                }).ToArray());
+                this.comboBoxItemPrefLan.Enabled = true;
+                this.buttonItemApplyPrefLan.Enabled = true;
+            }
+
+            ConfigManager.Reload();
+            string preferredLanguage = WcR2Config.Default.PreferredLanguage;
+            int index = this.comboBoxItemPrefLan.Items.Cast<DevComponents.Editors.ComboItem>().ToList().FindIndex(i => i.Text == preferredLanguage);
+            this.comboBoxItemPrefLan.SelectedIndex = index >= 0 ? index : 0;
+        }
+
+        private void UpdateStringLinker(Wz_Node baseNode, Wz_Node updateNode)
+        {
+            Wz_File stringWzFile = baseNode?.FindNodeByPath("String")?.GetNodeWzFile() ?? findWzByType(Wz_Type.String);
+            //Wz_File itemWzFile = baseNode?.FindNodeByPath("Item")?.GetNodeWzFile() ?? findWzByType(Wz_Type.Item);
+            //Wz_File etcWzFile = baseNode?.FindNodeByPath("Etc")?.GetNodeWzFile() ?? findWzByType(Wz_Type.Etc);
+            //Wz_File questWzFile = baseNode?.FindNodeByPath("Quest")?.GetNodeWzFile() ?? findWzByType(Wz_Type.Quest);
+            //Wz_File reactorWzFile = baseNode?.FindNodeByPath("Reactor")?.GetNodeWzFile() ?? findWzByType(Wz_Type.Reactor);
+
+            Wz_Node stringNode = updateNode?.FindNodeByPath("String") ?? updateNode?.FindNodeByPath("String.img", true);
+            //Wz_Node itemNode = updateNode?.FindNodeByPath("Item");
+            //Wz_Node etcNode = updateNode?.FindNodeByPath("Etc");
+            //Wz_Node questNode = updateNode?.FindNodeByPath("Quest");
+            //Wz_Node reactorNode = updateNode?.FindNodeByPath("Reactor");
+
+            QueryPerformance.Start();
+            this.stringLinker.Clear();
+            bool r = this.stringLinker.Load(stringWzFile);
+            //bool r = this.stringLinker.Load(stringWzFile, itemWzFile, etcWzFile, questWzFile, reactorWzFile);
+            if (updateNode != null)
+            {
+                r = stringLinker.Update(stringNode);
+                //r = stringLinker.Update(stringNode, itemNode, etcNode, questNode, reactorNode);
+            }
+            QueryPerformance.End();
+            if (r)
+            {
+                double ms = (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000);
+                labelItemStatus.Text = $"StringLinker {(updateNode == null ? "Reset" : "Update")} Finished: Elapsed " + ms + "ms";
+            }
+            else
+            {
+                labelItemStatus.Text = $"StringLinker {(updateNode == null ? "Reset" : "Update")} Failed";
+            }
         }
         #endregion
 
@@ -1026,6 +1103,20 @@ namespace WzComparerR2
             if (selectedNode == null)
             {
                 return;
+            }
+
+            if (selectedNode.FullPathToFile.Contains("Language"))
+            {
+                this.advTree1.ContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.toolStripMenuItem5,
+                this.tsmi1UpdateStringLinker});
+            }
+            else if (this.advTree1.ContextMenuStrip.Items.Contains(this.tsmi1UpdateStringLinker))
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    this.advTree1.ContextMenuStrip.Items.RemoveAt(this.advTree1.ContextMenuStrip.Items.Count - 1);
+                }
             }
 
             listViewExWzDetail.BeginUpdate();
@@ -1854,9 +1945,14 @@ namespace WzComparerR2
                 }
             }
         }
+
+        private void tsmi1UpdateStringLinker_Click(object sender, EventArgs e)
+        {
+            UpdateStringLinker(null, advTree1.SelectedNode?.AsWzNode());
+        }
         #endregion
 
-        #region Tools菜单事件和方法
+            #region Tools菜单事件和方法
         private void buttonItemSearchWz_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(textBoxItemSearchWz.Text))
@@ -2090,9 +2186,11 @@ namespace WzComparerR2
         {
             if (string.IsNullOrEmpty(textBoxItemSearchString.Text))
                 return;
-            QueryPerformance.Start();
+            //QueryPerformance.Start();
             if (!this.stringLinker.HasValues)
             {
+                UpdateStringLinker(null, null);
+                /*
                 if (!this.TryLoadStringWz())
                 {
                     MessageBoxEx.Show("没有初始化string链接，请手动指定一个String.wz。", "喵~~");
@@ -2101,6 +2199,7 @@ namespace WzComparerR2
                 QueryPerformance.End();
                 double ms = (Math.Round(QueryPerformance.GetLastInterval(), 4) * 1000);
                 labelItemStatus.Text = "初始化StringLinker成功, 用时" + ms + "ms.";
+                */
             }
             if (comboBoxItem2.SelectedIndex < 0)
                 comboBoxItem2.SelectedIndex = 0;
@@ -2172,6 +2271,21 @@ namespace WzComparerR2
             return false;
         }
 
+        private Wz_File findWzByType(Wz_Type type)
+        {
+            foreach (Wz_Structure wz in openedWz)
+            {
+                foreach (Wz_File file in wz.wz_files)
+                {
+                    if (file.Type == type && file.Node.Nodes.Count > 0)
+                    {
+                        return file;
+                    }
+                }
+            }
+            return null;
+        }
+
         private IEnumerable<KeyValuePair<int, StringResult>> searchStringLinker(IEnumerable<Dictionary<int, StringResult>> dicts, string key, bool exact, bool isRegex)
         {
             string[] match = key.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -2228,6 +2342,8 @@ namespace WzComparerR2
 
         private void buttonItemSelectStringWz_Click(object sender, EventArgs e)
         {
+            UpdateStringLinker(advTree1.SelectedNode?.AsWzNode(), null);
+            /*
             Wz_File stringWzFile = advTree1.SelectedNode?.AsWzNode()?.GetNodeWzFile();
             if (stringWzFile == null)
             {
@@ -2246,12 +2362,21 @@ namespace WzComparerR2
             {
                 MessageBoxEx.Show("初始化StringLinker失败。", "喵..");
             }
+            */
         }
 
         private void buttonItemClearStringWz_Click(object sender, EventArgs e)
         {
             stringLinker.Clear();
             labelItemStatus.Text = "StringLinker已经清空...";
+        }
+
+        private void buttonItemApplyPrefLan_Click(object sender, EventArgs e)
+        {
+            var selectedItem = this.comboBoxItemPrefLan.SelectedItem as DevComponents.Editors.ComboItem;
+            UpdateStringLinker(null, selectedItem.Tag as Wz_Node);
+            WcR2Config.Default.PreferredLanguage = selectedItem.Text;
+            ConfigManager.Save();
         }
 
         private void buttonItemPatcher_Click(object sender, EventArgs e)
@@ -2736,7 +2861,7 @@ namespace WzComparerR2
 
             if (!this.stringLinker.HasValues)
             {
-                this.TryLoadStringWz();
+                UpdateStringLinker(null, null);
             }
 
             object obj = null;
@@ -3257,7 +3382,7 @@ namespace WzComparerR2
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 if (!this.stringLinker.HasValues)
-                    this.TryLoadStringWz();
+                    UpdateStringLinker(null, null);
 
                 DBConnection conn = new DBConnection(this.stringLinker);
                 DataSet ds = conn.GenerateSkillTable();
@@ -3295,7 +3420,7 @@ namespace WzComparerR2
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 if (!this.stringLinker.HasValues)
-                    this.TryLoadStringWz();
+                    UpdateStringLinker(null, null);
 
                 DBConnection conn = new DBConnection(this.stringLinker);
                 conn.ExportSkillOption(dlg.SelectedPath);
