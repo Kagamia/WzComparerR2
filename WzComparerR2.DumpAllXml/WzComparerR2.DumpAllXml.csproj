@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net462;net6.0-windows;net8.0-windows</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>WzComparerR2.DumpAllXml</AssemblyName>
+    <RootNamespace>WzComparerR2.DumpAllXml</RootNamespace>
+    <IsPublishable>false</IsPublishable>
+    <WcR2Plugin>true</WcR2Plugin>
+  </PropertyGroup>
+  <Import Project="$(ProjectDir)..\Build\Common.props" />
+  <PropertyGroup Condition="$(DotnetEdition) == 'core'">
+
+  </PropertyGroup>
+  <PropertyGroup Condition="$(DotnetEdition) == 'framework'">
+  </PropertyGroup>
+  <ItemGroup Condition="$(DotnetEdition) == 'core'">
+
+  </ItemGroup>
+  <ItemGroup Condition="$(DotnetEdition) == 'framework'">
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>all</ExcludeAssets>
+    </ProjectReference>
+    <Reference Include="DevComponents.DotNetBar2">
+      <HintPath>..\References\DevComponents.DotNetBar2.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="Exists('..\Build\CommonAssemblyInfo.cs')">
+    <Compile Include="..\Build\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(ProjectDir)..\Build\WcR2Plugin.targets" />
+</Project>
