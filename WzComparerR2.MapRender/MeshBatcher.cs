@@ -43,10 +43,13 @@ namespace WzComparerR2.MapRender
         private bool matrixNoRot;
         private Rectangle viewport;
 
+        private float scale;
+        private SamplerState samplerState => scale > 1f ? SamplerState.PointClamp : SamplerState.LinearClamp;
 
-        public void Begin(Vector2 camaraOriginWorldPosition, float gameTime)
+        public void Begin(Vector2 camaraOriginWorldPosition, float gameTime, float scale = 1f)
         {
-            this.matrix = Matrix.CreateTranslation(-camaraOriginWorldPosition.X, -camaraOriginWorldPosition.Y, 0);
+            this.scale = scale;
+            this.matrix = Matrix.CreateScale(scale, scale, 1) * Matrix.CreateTranslation(-camaraOriginWorldPosition.X, -camaraOriginWorldPosition.Y, 0);
             this.camaraOriginWorldPosition = camaraOriginWorldPosition;
             this.gameTime = gameTime;
             this.lastItem = ItemType.Unknown;
@@ -522,7 +525,7 @@ namespace WzComparerR2.MapRender
                     {
                         this.sprite = new SpriteBatchEx(this.GraphicsDevice);
                     }
-                    this.sprite.Begin(SpriteSortMode.Deferred, this.alphaBlendState, transformMatrix: this.matrix);
+                    this.sprite.Begin(SpriteSortMode.Deferred, this.alphaBlendState, this.samplerState, transformMatrix: this.matrix);
                     break;
 
                 case ItemType.Skeleton:
@@ -551,7 +554,7 @@ namespace WzComparerR2.MapRender
                     {
                         this.sprite = new SpriteBatchEx(this.GraphicsDevice);
                     }
-                    this.sprite.Begin(SpriteSortMode.Deferred, BlendState.Additive, transformMatrix: this.matrix);
+                    this.sprite.Begin(SpriteSortMode.Deferred, BlendState.Additive, this.samplerState, transformMatrix: this.matrix);
                     break;
 
                 case ItemType.Sprite_BlendNonPremultiplied:
@@ -559,14 +562,14 @@ namespace WzComparerR2.MapRender
                     {
                         this.sprite = new SpriteBatchEx(this.GraphicsDevice);
                     }
-                    this.sprite.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, transformMatrix: this.matrix);
+                    this.sprite.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, this.samplerState, transformMatrix: this.matrix);
                     break;
                 case ItemType.Sprite_BlendMask:
                     if (this.sprite == null)
                     {
                         this.sprite = new SpriteBatchEx(this.GraphicsDevice);
                     }
-                    this.sprite.Begin(SpriteSortMode.Deferred, this.maskState, transformMatrix: this.matrix);
+                    this.sprite.Begin(SpriteSortMode.Deferred, this.maskState, this.samplerState, transformMatrix: this.matrix);
                     break;
 
                 case ItemType.MsSprite:
@@ -574,7 +577,7 @@ namespace WzComparerR2.MapRender
                     {
                         this.msSpriteRenderer = new MsSpriteRenderer(this.GraphicsDevice);
                     }
-                    this.msSpriteRenderer.Begin(this.camaraOriginWorldPosition, this.gameTime);
+                    this.msSpriteRenderer.Begin(this.camaraOriginWorldPosition, this.gameTime, this.scale);
                     break;
             }
         }

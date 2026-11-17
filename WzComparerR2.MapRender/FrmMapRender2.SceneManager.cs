@@ -451,9 +451,10 @@ namespace WzComparerR2.MapRender
             if (!string.IsNullOrEmpty(viewData.Portal))
             {
                 var portal = this.mapData.Scene.FindPortal(viewData.Portal);
+                var scale = this.renderEnv.Camera.Scale;
                 if (portal != null)
                 {
-                    this.renderEnv.Camera.Center = new Vector2(portal.X, portal.Y);
+                    this.renderEnv.Camera.Center = new Vector2(portal.X * scale, portal.Y * scale);
                 }
                 else
                 {
@@ -511,7 +512,7 @@ namespace WzComparerR2.MapRender
         private IE OnCameraMoving(Point toPos, int ms)
         {
             Vector2 cameraFrom = this.renderEnv.Camera.Center;
-            Vector2 cameraTo = toPos.ToVector2();
+            Vector2 cameraTo = toPos.ToVector2() * this.renderEnv.Camera.Scale;
             for (double i = 0; i < ms; i += cm.GameTime.ElapsedGameTime.TotalMilliseconds)
             {
                 var percent = (i / ms);
@@ -537,7 +538,8 @@ namespace WzComparerR2.MapRender
             //需要手动更新数据部分
             this.renderEnv.Camera.AdjustToWorldRect();
             {
-                var rect = this.renderEnv.Camera.ClipRect;
+                //var rect = this.renderEnv.Camera.ClipRect;
+                var rect = this.renderEnv.Camera.ScaledClipRect;
                 this.ui.Minimap.CameraViewPort = new EmptyKeys.UserInterface.Rect(rect.X, rect.Y, rect.Width, rect.Height);
             }
             //更新topbar

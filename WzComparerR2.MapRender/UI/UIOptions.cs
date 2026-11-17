@@ -380,6 +380,7 @@ namespace WzComparerR2.MapRender.UI
                  "Esc 设置",
                  "Ctrl+1~9 开关图层",
                  "Ctrl+U 解除地图范围锁定",
+                 "[Ctrl+Mouse Wheel] Map Zoom In/Out",
                  "~ 开关控制台",
                  "Alt+Enter 切换分辨率",
                  "ScrollLock 截图",
