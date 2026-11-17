@@ -25,6 +25,7 @@ namespace WzComparerR2.CharaSimControl
             this.ItemRender = new ItemTooltipRender2();
             this.SkillRender = new SkillTooltipRender2();
             this.RecipeRender = new RecipeTooltipRender();
+            this.MapRender = new MapTooltipRenderer();
             this.MobRender = new MobTooltipRenderer();
             this.NpcRender = new NpcTooltipRenderer();
             this.SizeChanged += AfrmTooltip_SizeChanged;
@@ -53,6 +54,7 @@ namespace WzComparerR2.CharaSimControl
         public ItemTooltipRender2 ItemRender { get; private set; }
         public SkillTooltipRender2 SkillRender { get; private set; }
         public RecipeTooltipRender RecipeRender { get; private set; }
+        public MapTooltipRenderer MapRender { get; private set; }
         public MobTooltipRenderer MobRender { get; private set; }
         public NpcTooltipRenderer NpcRender { get; private set; }
 
@@ -159,6 +161,11 @@ namespace WzComparerR2.CharaSimControl
             {
                 renderer = RecipeRender;
                 RecipeRender.Recipe = this.item as Recipe;
+            }
+            else if (item is Map)
+            {
+                renderer = MapRender;
+                MapRender.Map = this.item as Map;
             }
             else if (item is Mob)
             {

@@ -53,6 +53,12 @@ namespace WzComparerR2.Config
             get { return (CharaSimRecipeConfig)this["recipe"]; }
         }
 
+        [ConfigurationProperty("map")]
+        public CharaSimMapConfig Map
+        {
+            get { return (CharaSimMapConfig)this["map"]; }
+        }
+
         [ConfigurationProperty("mob")]
         public CharaSimMobConfig Mob
         {

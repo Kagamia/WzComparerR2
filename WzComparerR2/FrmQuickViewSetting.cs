@@ -199,6 +199,34 @@ namespace WzComparerR2
             set { checkBoxX12.Checked = value; }
         }
 
+        [Link]
+        public bool Map_ShowMiniMap
+        {
+            get { return chkShowMiniMap.Checked; }
+            set { chkShowMiniMap.Checked = value; }
+        }
+
+        [Link]
+        public bool Map_ShowMiniMapMob
+        {
+            get { return chkShowMiniMapMob.Checked; }
+            set { chkShowMiniMapMob.Checked = value; }
+        }
+
+        [Link]
+        public bool Map_ShowMiniMapNpc
+        {
+            get { return chkShowMiniMapNpc.Checked; }
+            set { chkShowMiniMapNpc.Checked = value; }
+        }
+
+        [Link]
+        public bool Map_ShowMiniMapPortal
+        {
+            get { return chkShowMiniMapPortal.Checked; }
+            set { chkShowMiniMapPortal.Checked = value; }
+        }
+
         private void txtDamageSkinNumber_TextChanged(object sender, EventArgs e)
         {
             this.buttonX1.Enabled = !(string.IsNullOrEmpty(txtDamageSkinNumber.Text) || txtDamageSkinNumber.Text == "0");
@@ -249,6 +277,13 @@ namespace WzComparerR2
                 }
                 catch { }
             }
+        }
+
+        private void ChkShowMiniMap_CheckedChanged(object sender, System.EventArgs e)
+        {
+            this.chkShowMiniMapMob.Enabled = this.chkShowMiniMap.Checked;
+            this.chkShowMiniMapNpc.Enabled = this.chkShowMiniMap.Checked;
+            this.chkShowMiniMapPortal.Enabled = this.chkShowMiniMap.Checked;
         }
 
         private sealed class LinkAttribute : Attribute

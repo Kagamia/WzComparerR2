@@ -33,6 +33,15 @@ namespace WzComparerR2.CharaSimControl
                 StringFormat.GenericTypographic);
         }
 
+        public static void DrawMultilineText(Graphics g, TextBlock block, Point offset, int width, int lineHeight, out int offsetY)
+        {
+            var x = block.Position.X + offset.X;
+            var y = block.Position.Y + offset.Y;
+            GearGraphics.DrawString(g, block.Text, block.Font, new Dictionary<string, Color>() { { "c", GearGraphics.SkillSummaryOrangeTextColor } }, x, width - 2, ref y, lineHeight, defaultColor: ((SolidBrush)block.Brush).Color);
+
+            offsetY = y - (block.Position.Y + offset.Y) - lineHeight;
+        }
+
         public static Rectangle Measure(IEnumerable<TextBlock> blocks)
         {
             Rectangle rect = Rectangle.Empty;

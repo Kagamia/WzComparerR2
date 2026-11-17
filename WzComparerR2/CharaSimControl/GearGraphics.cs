@@ -167,6 +167,13 @@ namespace WzComparerR2.CharaSimControl
         public static readonly Color SkillSummaryOrangeTextColor = Color.FromArgb(255, 204, 0);
         public static readonly Brush SkillSummaryOrangeTextBrush = new SolidBrush(SkillSummaryOrangeTextColor);
 
+        public static readonly Brush Equip22BrushEmphasis = new SolidBrush(Color.FromArgb(255, 204, 0));
+        public static readonly Brush Equip22BrushRare = new SolidBrush(Color.FromArgb(102, 255, 255));
+
+        public static readonly Brush BarrierArcBrush = new SolidBrush(Color.FromArgb(218, 161, 255));
+        public static readonly Brush BarrierAutBrush = new SolidBrush(Color.FromArgb(218, 161, 255));
+        public static readonly Brush MapBgmBrush = new SolidBrush(Color.FromArgb(100, 237, 46));
+
         public static Brush GetGearNameBrush(int diff, bool up)
         {
             if (diff < 0)
@@ -237,7 +244,7 @@ namespace WzComparerR2.CharaSimControl
             DrawString(g, s, font, null, x, x1, ref y, height, alignment);
         }
 
-        public static void DrawString(Graphics g, string s, Font font, IDictionary<string, Color> fontColorTable, int x, int x1, ref int y, int height, TextAlignment alignment = TextAlignment.Left)
+        public static void DrawString(Graphics g, string s, Font font, IDictionary<string, Color> fontColorTable, int x, int x1, ref int y, int height, TextAlignment alignment = TextAlignment.Left, Color defaultColor = default)
         {
             if (s == null)
                 return;
@@ -247,7 +254,7 @@ namespace WzComparerR2.CharaSimControl
                 r.WordWrapEnabled = false;
                 r.UseGDIRenderer = false;
                 r.FontColorTable = fontColorTable;
-                r.DrawString(g, s, font, x, x1, ref y, height, alignment);
+                r.DrawString(g, s, font, x, x1, ref y, height, alignment, defaultColor);
             }
         }
 
@@ -592,12 +599,12 @@ namespace WzComparerR2.CharaSimControl
             int drawX;
             Color defaultColor;
 
-            public void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height, TextAlignment alignment = TextAlignment.Left)
+            public void DrawString(Graphics g, string s, Font font, int x, int x1, ref int y, int height, TextAlignment alignment = TextAlignment.Left, Color defaultColor = default)
             {
                 //初始化环境
                 this.g = g;
                 this.drawX = x;
-                this.defaultColor = Color.White;
+                this.defaultColor = defaultColor == default ? Color.White : defaultColor;
                 float fontLineHeight = GetFontLineHeight(font);
                 this.infinityRect = new RectangleF(0, 0, ushort.MaxValue, fontLineHeight);
 

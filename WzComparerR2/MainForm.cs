@@ -168,6 +168,12 @@ namespace WzComparerR2
             tooltipQuickView.ItemRender.AlwaysUseMseaFormatDamageSkin = Setting.DamageSkin.AlwaysUseMseaFormat;
             tooltipQuickView.ItemRender.DisplayUnitOnSingleLine = Setting.DamageSkin.DisplayUnitOnSingleLine;
             tooltipQuickView.ItemRender.DamageSkinNumber = Setting.DamageSkin.DamageSkinNumber;
+
+            tooltipQuickView.MapRender.ShowMiniMap = Setting.Map.ShowMiniMap;
+            tooltipQuickView.MapRender.ShowMiniMapMob = Setting.Map.ShowMiniMapMob;
+            tooltipQuickView.MapRender.ShowMiniMapNpc = Setting.Map.ShowMiniMapNpc;
+            tooltipQuickView.MapRender.ShowMiniMapPortal = Setting.Map.ShowMiniMapPortal;
+
             tooltipQuickView.RecipeRender.ShowObjectID = Setting.Recipe.ShowID;
         }
 
@@ -2822,6 +2828,17 @@ namespace WzComparerR2
                             obj = skill;
                             fileName = "skill_" + skill.SkillID + ".png";
                         }
+                    }
+                    break;
+
+                case Wz_Type.Map:
+                    if ((image = selectedNode.GetValue<Wz_Image>()) == null || !image.TryExtract())
+                        return;
+                    var map = Map.CreateFromNode(image.Node, PluginManager.FindWz);
+                    obj = map;
+                    if (map != null)
+                    {
+                        fileName = map.MapID + ".png";
                     }
                     break;
 
