@@ -65,9 +65,23 @@ namespace WzComparerR2.Animation
             }
 
             if (anime.Frames.Count > 0)
+            {
+                if (node.FindNodeByPath("zigzag").GetValueEx<int>(0) != 0)
+                {
+                    AppendZigzagFrames(anime.Frames);
+                }
                 return anime;
+            }
             else
                 return null;
+        }
+
+        private static void AppendZigzagFrames(List<Frame> frames)
+        {
+            for (int i = frames.Count - 2; i > 0; i--)
+            {
+                frames.Add(frames[i]);
+            }
         }
     }
 
