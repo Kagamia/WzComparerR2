@@ -29,6 +29,7 @@ using WzComparerR2.Config;
 using WzComparerR2.Controls;
 using WzComparerR2.Encoders;
 using WzComparerR2.PluginBase;
+using WzComparerR2.UnityLib.Classic;
 using WzComparerR2.WzLib;
 
 namespace WzComparerR2
@@ -38,6 +39,7 @@ namespace WzComparerR2
         public MainForm()
         {
             InitializeComponent();
+            this.FormClosed += MainForm_FormClosed;
 #if NET6_0_OR_GREATER
             // https://learn.microsoft.com/en-us/dotnet/core/compatibility/fx-core#controldefaultfont-changed-to-segoe-ui-9pt
             this.Font = new Font(new FontFamily("Microsoft Sans Serif"), 8f);
@@ -53,9 +55,26 @@ namespace WzComparerR2
         }
 
         List<Wz_Structure> openedWz;
+        private List<UnityAssetDocument> openedUnitySources;
         StringLinker stringLinker;
         HistoryList<Node> historyNodeList;
         bool historySelecting;
+
+        private sealed class UnityAssetDocument
+        {
+            public UnityAssetDocument(ClassicWzSource source, Wz_Node rootNode, Node treeNode, string sourcePath)
+            {
+                this.Source = source;
+                this.RootNode = rootNode;
+                this.TreeNode = treeNode;
+                this.SourcePath = sourcePath;
+            }
+
+            public ClassicWzSource Source { get; private set; }
+            public Wz_Node RootNode { get; private set; }
+            public Node TreeNode { get; set; }
+            public string SourcePath { get; private set; }
+        }
 
         //soundPlayer
         BassSoundPlayer soundPlayer;
@@ -75,6 +94,7 @@ namespace WzComparerR2
         private void initFields()
         {
             openedWz = new List<Wz_Structure>();
+            openedUnitySources = new List<UnityAssetDocument>();
             stringLinker = new StringLinker();
             historyNodeList = new HistoryList<Node>();
 
@@ -880,6 +900,108 @@ namespace WzComparerR2
             }
         }
 
+        private async void btnItemOpenUnityFolder_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog dlg = new FolderBrowserDialog())
+            {
+                dlg.Description = "请选择 Unity 资源文件夹（Maplestory_Classic_Data）或包含 *.bundle 的目录。";
+                dlg.ShowNewFolderButton = false;
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    await openUnityFolder(dlg.SelectedPath);
+                }
+            }
+        }
+
+        private async Task openUnityFolder(string assetFolderPath)
+        {
+            UnityAssetDocument document = null;
+            bool addedToDocuments = false;
+            try
+            {
+                string fullPath = Path.GetFullPath(assetFolderPath);
+                if (this.openedUnitySources.Any(opened =>
+                    PathsEqual(opened.SourcePath, fullPath)
+                    || PathsEqual(opened.Source.Catalog.RootPath, fullPath)))
+                {
+                    MessageBoxEx.Show("此 Unity 资源文件夹已经打开。", "Open Unity Asset Folder");
+                    return;
+                }
+
+                this.btnItemOpenUnityFolder.Enabled = false;
+                this.labelItemStatus.Text = "正在读取 Unity 资源文件夹...";
+
+                document = await Task.Run(() => loadUnityFolder(fullPath));
+                if (this.IsDisposed || this.Disposing)
+                {
+                    return;
+                }
+
+                document.TreeNode.Expand();
+                this.openedUnitySources.Add(document);
+                addedToDocuments = true;
+                this.advTree1.Nodes.Add(document.TreeNode);
+                this.labelItemStatus.Text = string.Format(
+                    "Unity 资源文件夹已加载：{0} 个资源、{1} 个 bundle，区域：{2}。",
+                    document.Source.Catalog.Entries.Count,
+                    document.Source.Catalog.Bundles.Count,
+                    document.Source.Locale);
+                document = null;
+            }
+            catch (Exception ex)
+            {
+                if (!this.IsDisposed)
+                {
+                    MessageBoxEx.Show(ex.ToString(), "Open Unity Asset Folder");
+                }
+            }
+            finally
+            {
+                if (document != null)
+                {
+                    if (addedToDocuments)
+                    {
+                        this.openedUnitySources.Remove(document);
+                    }
+                    document.Source.Dispose();
+                }
+                if (!this.IsDisposed)
+                {
+                    this.btnItemOpenUnityFolder.Enabled = true;
+                }
+            }
+        }
+
+        private UnityAssetDocument loadUnityFolder(string assetFolderPath)
+        {
+            ClassicWzSource source = ClassicWzSource.Open(assetFolderPath);
+            try
+            {
+                Wz_Node rootNode = ClassicWzBridge.CreateCatalogNode(source, false, false);
+                Node treeNode = createNode(rootNode);
+                return new UnityAssetDocument(source, rootNode, treeNode, assetFolderPath);
+            }
+            catch
+            {
+                source.Dispose();
+                throw;
+            }
+        }
+
+        private static bool PathsEqual(string path1, string path2)
+        {
+            return string.Equals(Path.GetFullPath(path1), Path.GetFullPath(path2), StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            foreach (UnityAssetDocument document in this.openedUnitySources)
+            {
+                document.Source.Dispose();
+            }
+            this.openedUnitySources.Clear();
+        }
+
         private void buttonItemClose_Click(object sender, EventArgs e)
         {
             if (advTree1.SelectedNode == null)
@@ -890,6 +1012,19 @@ namespace WzComparerR2
             Node baseWzNode = advTree1.SelectedNode;
             while (baseWzNode.Parent != null)
                 baseWzNode = baseWzNode.Parent;
+            UnityAssetDocument unityDocument = this.openedUnitySources.FirstOrDefault(
+                document => ReferenceEquals(document.TreeNode, baseWzNode));
+            if (unityDocument != null)
+            {
+                advTree1.Nodes.Remove(baseWzNode);
+                advTree2.ClearAndDisposeAllNodes();
+                advTree3.ClearAndDisposeAllNodes();
+                listViewExWzDetail.Items.Clear();
+                this.openedUnitySources.Remove(unityDocument);
+                unityDocument.Source.Dispose();
+                labelItemStatus.Text = "已关闭 Unity 资源文件夹。";
+                return;
+            }
             if (baseWzNode.Text.ToLower() == "list.wz")
             {
                 advTree1.Nodes.Remove(baseWzNode);
@@ -946,6 +1081,11 @@ namespace WzComparerR2
                 wz.Clear();
             }
             openedWz.Clear();
+            foreach (UnityAssetDocument document in this.openedUnitySources)
+            {
+                document.Source.Dispose();
+            }
+            this.openedUnitySources.Clear();
             CharaSimLoader.ClearAll();
             stringLinker.Clear();
             labelItemStatus.Text = "已经清理全部已读取资源...";
@@ -1745,7 +1885,7 @@ namespace WzComparerR2
         #region contextMenuStrip1
         private void tsmi1Sort_Click(object sender, EventArgs e)
         {
-            if (openedWz.Count > 0)
+            if (openedWz.Count > 0 || this.openedUnitySources.Count > 0)
             {
                 var sw = Stopwatch.StartNew();
                 advTree1.BeginUpdate();
@@ -1758,6 +1898,12 @@ namespace WzComparerR2
                         Node node = createNode(wz.WzNode);
                         node.Expand();
                         advTree1.Nodes.Add(node);
+                    }
+                    foreach (UnityAssetDocument document in this.openedUnitySources)
+                    {
+                        document.TreeNode = createNode(document.RootNode);
+                        document.TreeNode.Expand();
+                        advTree1.Nodes.Add(document.TreeNode);
                     }
                 }
                 finally

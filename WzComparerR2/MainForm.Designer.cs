@@ -253,6 +253,7 @@
             this.panelDockContainer2 = new DevComponents.DotNetBar.PanelDockContainer();
             this.chkHashPngFileName = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.btnItemOpenImg = new DevComponents.DotNetBar.ButtonItem();
+            this.btnItemOpenUnityFolder = new DevComponents.DotNetBar.ButtonItem();
             this.buttonItemSaveWithOptions = new DevComponents.DotNetBar.ButtonItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmi2CopyFullPath = new System.Windows.Forms.ToolStripMenuItem();
@@ -1598,6 +1599,7 @@
             this.itemContainer3.SubItems.AddRange(new DevComponents.DotNetBar.BaseItem[] {
             this.btnItemOpenWz,
             this.btnItemOpenImg,
+            this.btnItemOpenUnityFolder,
             this.buttonItemClose,
             this.buttonItemCloseAll});
             // 
@@ -1618,7 +1620,13 @@
             this.btnItemOpenImg.Name = "btnItemOpenImg";
             this.btnItemOpenImg.Text = "Open Img...";
             this.btnItemOpenImg.Click += new System.EventHandler(this.btnItemOpenImg_Click);
-            // 
+            //
+            // btnItemOpenUnityFolder
+            //
+            this.btnItemOpenUnityFolder.Name = "btnItemOpenUnityFolder";
+            this.btnItemOpenUnityFolder.Text = "Open Unity Asset Folder...";
+            this.btnItemOpenUnityFolder.Click += new System.EventHandler(this.btnItemOpenUnityFolder_Click);
+            //
             // buttonItemClose
             // 
             this.buttonItemClose.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText;
@@ -3056,6 +3064,7 @@
         private DevComponents.DotNetBar.ItemContainer itemContainer3;
         private DevComponents.DotNetBar.ButtonItem btnItemOpenWz;
         private DevComponents.DotNetBar.ButtonItem buttonItemClose;
+        private DevComponents.DotNetBar.ButtonItem btnItemOpenUnityFolder;
         private DevComponents.DotNetBar.GalleryContainer galleryContainerRecent;
         private DevComponents.DotNetBar.LabelItem labelItem8;
         private DevComponents.DotNetBar.ItemContainer itemContainer4;

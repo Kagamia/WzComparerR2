@@ -7,6 +7,9 @@ namespace WzComparerR2.WzLib
         Unknown = 0,
         Mp3,
         Pcm,
-        Binary
+        Binary,
+
+        /// <summary>Ogg Vorbis (result of repackaging a Unity dataset's FSB5).</summary>
+        Ogg
     }
 }
