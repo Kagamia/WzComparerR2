@@ -24,6 +24,65 @@ namespace WzComparerR2.WzLib
         private Wz_Image wz_i;
 
         /// <summary>
+        /// Sound data provider for non-WZ file sources (e.g. a Unity dataset AudioClip).
+        /// When set, sound data is taken from here and <see cref="DataLength"/> reports the actual length.
+        /// </summary>
+        public Func<byte[]> DataProvider { get; set; }
+
+        /// <summary>Channel count of a non-WZ source (null for WZ sources).</summary>
+        public int? ExternalChannels { get; set; }
+
+        /// <summary>Sampling rate of a non-WZ source (null for WZ sources).</summary>
+        public int? ExternalFrequency { get; set; }
+
+        /// <summary>Length of a non-WZ source in milliseconds (null for WZ sources).</summary>
+        public int? ExternalMs { get; set; }
+
+        /// <summary>Sound format of a non-WZ source. When set, the format is not guessed from the data.</summary>
+        public Wz_SoundType? ExternalSoundType { get; set; }
+
+        private byte[] providerCache;
+
+        /// <summary>Gets sound data from an external source (cached).</summary>
+        private byte[] GetProviderData()
+        {
+            Func<byte[]> provider = this.DataProvider;
+            if (provider == null)
+            {
+                return null;
+            }
+            byte[] cached = this.providerCache;
+            if (cached == null)
+            {
+                cached = provider();
+                this.providerCache = cached;
+            }
+            return cached;
+        }
+
+        private Wz_SoundType DetectProviderSoundType(byte[] data)
+        {
+            if (data == null || data.Length < 4)
+            {
+                return Wz_SoundType.Unknown;
+            }
+            if (data[0] == 'O' && data[1] == 'g' && data[2] == 'g' && data[3] == 'S')
+            {
+                return Wz_SoundType.Ogg;
+            }
+            if (data[0] == 'R' && data[1] == 'I' && data[2] == 'F' && data[3] == 'F')
+            {
+                return Wz_SoundType.Pcm;
+            }
+            if ((data[0] == 'I' && data[1] == 'D' && data[2] == '3')
+                || (data[0] == 0xFF && (data[1] & 0xE0) == 0xE0))
+            {
+                return Wz_SoundType.Mp3;
+            }
+            return Wz_SoundType.Unknown;
+        }
+
+        /// <summary>
         /// 获取或设置数据块对于文件的偏移。
         /// </summary>
         public uint Offset
@@ -32,14 +91,14 @@ namespace WzComparerR2.WzLib
             set { offset = value; }
         }
 
-        public int Channels => this.mediaType?.PbFormat switch
+        public int Channels => this.ExternalChannels ?? this.mediaType?.PbFormat switch
         {
             Interop.WAVEFORMATEX waveFmtEx => (int)waveFmtEx.Channels,
             Interop.MPEGLAYER3WAVEFORMAT mp3WaveFmt => (int)mp3WaveFmt.Wfx.Channels,
             _ => 0,
         };
 
-        public int Frequency => this.mediaType?.PbFormat switch
+        public int Frequency => this.ExternalFrequency ?? this.mediaType?.PbFormat switch
         {
             Interop.WAVEFORMATEX waveFmtEx => (int)waveFmtEx.SamplesPerSec,
             Interop.MPEGLAYER3WAVEFORMAT mp3WaveFmt => (int)mp3WaveFmt.Wfx.SamplesPerSec,
@@ -51,7 +110,15 @@ namespace WzComparerR2.WzLib
         /// </summary>
         public int DataLength
         {
-            get { return dataLength; }
+            get
+            {
+                if (this.DataProvider != null)
+                {
+                    byte[] data = this.GetProviderData();
+                    return data == null ? 0 : data.Length;
+                }
+                return dataLength;
+            }
             set { dataLength = value; }
         }
 
@@ -60,7 +127,7 @@ namespace WzComparerR2.WzLib
         /// </summary>
         public int Ms
         {
-            get { return ms; }
+            get { return this.ExternalMs ?? ms; }
             set { ms = value; }
         }
 
@@ -91,6 +158,15 @@ namespace WzComparerR2.WzLib
         {
             get
             {
+                if (this.ExternalSoundType.HasValue)
+                {
+                    return this.ExternalSoundType.Value;
+                }
+                if (this.DataProvider != null)
+                {
+                    return this.DetectProviderSoundType(this.GetProviderData());
+                }
+
                 if (this.mediaType?.MajorType == Interop.MEDIATYPE_Stream)
                 {
                     if (this.mediaType.SubType == Interop.MEDIASUBTYPE_MPEG1Audio)
@@ -125,6 +201,11 @@ namespace WzComparerR2.WzLib
 
         public byte[] ExtractSound()
         {
+            if (this.DataProvider != null)
+            {
+                return this.GetProviderData();
+            }
+
             switch (this.SoundType)
             {
                 case Wz_SoundType.Mp3:
@@ -161,6 +242,21 @@ namespace WzComparerR2.WzLib
 
         public void CopyTo(byte[] buffer, int offset)
         {
+            if (this.DataProvider != null)
+            {
+                byte[] data = this.GetProviderData();
+                if (data == null)
+                {
+                    throw new InvalidOperationException("The external audio data does not exist.");
+                }
+                if (buffer.Length - offset < data.Length)
+                {
+                    throw new ArgumentException("Insufficient buffer size");
+                }
+                Buffer.BlockCopy(data, 0, buffer, offset, data.Length);
+                return;
+            }
+
             if (buffer.Length - offset < this.DataLength)
             {
                 throw new ArgumentException("Insufficient buffer size");
@@ -175,6 +271,21 @@ namespace WzComparerR2.WzLib
 
         public void CopyTo(Span<byte> span)
         {
+            if (this.DataProvider != null)
+            {
+                byte[] data = this.GetProviderData();
+                if (data == null)
+                {
+                    throw new InvalidOperationException("The external audio data does not exist.");
+                }
+                if (span.Length < data.Length)
+                {
+                    throw new ArgumentException("Insufficient buffer size");
+                }
+                data.AsSpan().CopyTo(span);
+                return;
+            }
+
             if (span.Length < this.DataLength)
             {
                 throw new ArgumentException("Insufficient buffer size");

@@ -27,6 +27,22 @@ namespace WzComparerR2.WzLib
             this.checEnc = false;
         }
 
+        /// <summary>
+        /// Creates an img that does not originate from a WZ file (for example, a Unity asset).
+        /// The content is provided by the subclass, which must override <see cref="TryExtract(out Exception)"/>.
+        /// </summary>
+        /// <param name="name">Logical name of the img.</param>
+        /// <param name="nodeText">Display name of the node (for conventional WZ images, <c>&lt;id&gt;.img</c>).</param>
+        protected Wz_Image(string name, string nodeText)
+        {
+            this.Name = name;
+            this.Node = new Wz_ImageNode(nodeText ?? name, this);
+
+            this.extr = false;
+            this.chec = true;
+            this.checEnc = true;
+        }
+
         private bool extr;
         private bool chec;
         private bool checEnc;
@@ -41,7 +57,7 @@ namespace WzComparerR2.WzLib
         public uint HashedOffsetPosition { get; set; }
         public long Offset { get; set; }
         
-        public Wz_Node Node { get; private set; }
+        public Wz_Node Node { get; protected set; }
 
         public Wz_Node OwnerNode { get; set; }
 
@@ -75,7 +91,7 @@ namespace WzComparerR2.WzLib
             return TryExtract(out ex);
         }
 
-        public bool TryExtract(out Exception e)
+        public virtual bool TryExtract(out Exception e)
         {
             if (!this.extr)
             {
@@ -187,7 +203,7 @@ namespace WzComparerR2.WzLib
             return true;
         }
 
-        public void Unextract()
+        public virtual void Unextract()
         {
             this.extr = false;
             if (this.stream != null)
@@ -231,6 +247,11 @@ namespace WzComparerR2.WzLib
 
         public virtual Stream OpenRead()
         {
+            if (this.WzFile == null)
+            {
+                // An img from a non-WZ source (for example, a Unity asset) has no data stream to read.
+                throw new NotSupportedException("Cannot open the data stream because this img does not originate from a WZ file: " + this.Name);
+            }
             if (this.stream == null)
             {
                 this.stream = new PartialStream(this.WzFile.FileStream, this.Offset, this.Size, true);

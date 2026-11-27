@@ -84,7 +84,41 @@ namespace WzComparerR2.WzLib
         /// </summary>
         public Wz_Image WzImage { get; set; }
 
+        /// <summary>
+        /// PNG byte provider for non-WZ file sources (for example, a Canvas in a Unity asset).
+        /// When set, <see cref="ExtractPng(int)"/> decodes this PNG directly instead of reading the WZ data stream.
+        /// </summary>
+        public Func<byte[]> PngDataProvider { get; set; }
+
         public int GetRawDataSize() => this.GetRawDataSizePerPage() * this.ActualPages;
+
+        /// <summary>
+        /// Fills in the size and data length for an external PNG (<see cref="PngDataProvider"/>).
+        /// Both can be obtained by reading only the PNG header, without decoding the whole image;
+        /// images from WZ already carry these values, so calling this method has no effect on them.
+        /// </summary>
+        public void EnsureExternalPngInfo()
+        {
+            Func<byte[]> provider = this.PngDataProvider;
+            if (provider == null)
+            {
+                return;
+            }
+
+            byte[] data = provider();
+            if (data == null || data.Length < 24)
+            {
+                return;
+            }
+
+            this.DataLength = data.Length;
+            if (data[0] == 0x89 && data[1] == 0x50 && data[2] == 0x4E && data[3] == 0x47
+                && data[12] == 'I' && data[13] == 'H' && data[14] == 'D' && data[15] == 'R')
+            {
+                this.Width = (int)(((uint)data[16] << 24) | ((uint)data[17] << 16) | ((uint)data[18] << 8) | data[19]);
+                this.Height = (int)(((uint)data[20] << 24) | ((uint)data[21] << 16) | ((uint)data[22] << 8) | data[23]);
+            }
+        }
 
         public int GetRawDataSizePerPage() => GetUncompressedDataSize(this.Format, this.ActualScale, this.Width, this.Height);
 
@@ -140,6 +174,11 @@ namespace WzComparerR2.WzLib
 
         public Stream UnsafeOpenRead()
         {
+            if (this.WzImage == null)
+            {
+                // A non-WZ file source (for example, a Unity canvas) has no WZ data stream; use PngDataProvider instead.
+                throw new NotSupportedException("Cannot read raw data because this image does not originate from a WZ file.");
+            }
             DeflateStream zlib;
 
             var stream = this.WzImage.OpenRead();
@@ -172,6 +211,12 @@ namespace WzComparerR2.WzLib
 
         public Bitmap ExtractPng(int page)
         {
+            Func<byte[]> provider = this.PngDataProvider;
+            if (provider != null)
+            {
+                return ExtractExternalPng(provider);
+            }
+
             if (this.Pages > 0)
             {
                 if (page < 0 || page >= this.Pages)
@@ -312,6 +357,23 @@ namespace WzComparerR2.WzLib
             }
 
             return pngDecoded;
+        }
+
+        private Bitmap ExtractExternalPng(Func<byte[]> provider)
+        {
+            byte[] data = provider();
+            if (data == null || data.Length == 0)
+            {
+                return null;
+            }
+            this.DataLength = data.Length;
+            using (var stream = new MemoryStream(data))
+            using (var decoded = new Bitmap(stream))
+            {
+                this.Width = decoded.Width;
+                this.Height = decoded.Height;
+                return new Bitmap(decoded);
+            }
         }
 
         private static void CopyBmpDataWithStride(byte[] source, int stride, BitmapData bmpData)

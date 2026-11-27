@@ -527,6 +527,68 @@ namespace WzComparerR2.WzLib
 
     public static class Wz_NodeExtension
     {
+        /// <summary>
+        /// Type resolution for non-WZ file sources (for example, a Unity data set).
+        /// Returning null means the node does not belong to an external source.
+        /// </summary>
+        public static Func<Wz_Node, Wz_Type?> ExternalTypeResolver { get; set; }
+
+        /// <summary>
+        /// Content expander for imgs of non-WZ file sources: given an img node, returns its content root node
+        /// (for example, <c>UnityWzImage</c> of a Unity asset). Returns null when not found.
+        /// </summary>
+        public static Func<Wz_Node, Wz_Node> ExternalImageResolver { get; set; }
+
+        /// <summary>
+        /// Gets the content root node of an img node: conventional WZ images extract through
+        /// <see cref="Wz_Image"/>, while other sources (for example, a Unity data set) are delegated to
+        /// <see cref="ExternalImageResolver"/>.
+        /// </summary>
+        public static Wz_Node GetImageContentNode(this Wz_Node imageNode)
+        {
+            if (imageNode == null)
+            {
+                return null;
+            }
+            Wz_Image image = imageNode.GetValue<Wz_Image>();
+            if (image != null)
+            {
+                if (image.WzFile == null)
+                {
+                    // Non-WZ file source (for example, a Unity asset): let an external resolver supply the
+                    // parent node chain so that path checks such as FullPathToFile keep using the WZ logic.
+                    Func<Wz_Node, Wz_Node> externalResolver = ExternalImageResolver;
+                    Wz_Node external = externalResolver?.Invoke(imageNode);
+                    if (external != null)
+                    {
+                        return external;
+                    }
+                }
+                return image.TryExtract() ? image.Node : null;
+            }
+            Func<Wz_Node, Wz_Node> resolver = ExternalImageResolver;
+            return resolver?.Invoke(imageNode);
+        }
+
+        /// <summary>
+        /// Gets the WZ type the node belongs to: first looks for the owning <see cref="Wz_File"/>,
+        /// and falls back to <see cref="ExternalTypeResolver"/> (for example, a Unity data set) when none is found.
+        /// </summary>
+        public static Wz_Type? GetNodeWzType(this Wz_Node node)
+        {
+            if (node == null)
+            {
+                return null;
+            }
+            Wz_File wzFile = node.GetNodeWzFile();
+            if (wzFile != null)
+            {
+                return wzFile.Type;
+            }
+            Func<Wz_Node, Wz_Type?> resolver = ExternalTypeResolver;
+            return resolver?.Invoke(node);
+        }
+
         public static T GetValueEx<T>(this Wz_Node node, T defaultValue)
         {
             if (node == null)

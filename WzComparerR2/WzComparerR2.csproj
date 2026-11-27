@@ -56,6 +56,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WzComparerR2.Common\WzComparerR2.Common.csproj" />
     <ProjectReference Include="..\WzComparerR2.WzLib\WzComparerR2.WzLib.csproj" />
+    <ProjectReference Include="..\WzComparerR2.UnityLib\WzComparerR2.UnityLib.csproj" />
     <ProjectReference Include="..\WzComparerR2.PluginBase\WzComparerR2.PluginBase.csproj" />
     <ProjectReference Include="..\WzComparerR2.Updater\WzComparerR2.Updater.csproj">
       <Private>false</Private>

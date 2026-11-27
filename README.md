@@ -18,6 +18,7 @@ links: [\[更新日志\]](https://github.com/Kagamia/WzComparerR2/tree/master/Up
 - **WzComparerR2.Common** 一些通用类
 - **WzComparerR2.PluginBase** 插件管理器
 - **WzComparerR2.WzLib** wz文件读取相关
+- **WzComparerR2.UnityLib** 读取 MapleStory Classic World (Unity) 客户端资源，并转换成类 WZ 的节点结构
 - **CharaSimResource** 用于装备模拟的资源文件
 - **WzComparerR2.LuaConsole** (可选插件)Lua控制台
 - **WzComparerR2.MapRender** (可选插件)地图仿真器
